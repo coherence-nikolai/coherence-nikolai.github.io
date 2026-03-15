@@ -10,7 +10,7 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0d0d12;--text:#f0eee8;--dim:rgba(240,238,232,.45);
+      --bg:#0d0d12;--text:#f0eee8;--dim:rgba(240,238,232,.42);
       --border:rgba(255,255,255,.08);
       --serif:'Outfit',system-ui,sans-serif;
       --sans:'Syne',system-ui,sans-serif;
@@ -23,55 +23,62 @@
     /* ── HEADER ── */
     header{position:relative;z-index:10;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      min-height:100svh;padding:60px 32px;text-align:center;gap:16px}
+      min-height:100svh;padding:60px 32px;text-align:center;gap:14px}
     .logo{font-family:var(--sans);font-weight:600;
-      font-size:clamp(36px,10vw,96px);letter-spacing:.12em;text-transform:uppercase;
-      color:var(--text);animation:glow 6s ease-in-out infinite;
-      white-space:nowrap;width:100%;text-align:center}
+      font-size:clamp(36px,10vw,88px);letter-spacing:.12em;text-transform:uppercase;
+      color:var(--text);white-space:nowrap;
+      animation:glow 6s ease-in-out infinite}
     @keyframes glow{0%,100%{text-shadow:0 0 40px rgba(240,238,232,.10)}
       50%{text-shadow:0 0 80px rgba(240,238,232,.28)}}
     .tagline{font-family:var(--serif);font-weight:200;
-      font-size:clamp(16px,4vw,22px);color:var(--dim);
-      letter-spacing:.22em;text-transform:lowercase}
+      font-size:clamp(14px,3.5vw,20px);color:var(--dim);
+      letter-spacing:.18em;text-transform:lowercase;max-width:420px;line-height:1.6}
     .scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
       font-family:var(--sans);font-size:11px;letter-spacing:.20em;text-transform:uppercase;
-      color:rgba(240,238,232,.20);animation:pulse 3s ease-in-out infinite}
+      color:rgba(240,238,232,.18);animation:pulse 3s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.8}}
 
-    /* ── APPS ── */
-    .apps{position:relative;z-index:10;
-      display:flex;flex-direction:column;
-      max-width:600px;margin:0 auto;padding:0 24px 120px;gap:0;
-      border-top:1px solid var(--border)}
+    /* ── SECTIONS ── */
+    .section{position:relative;z-index:10;max-width:600px;margin:0 auto;padding:0 24px 60px}
+    .section-header{padding:0 8px 20px;border-bottom:1px solid var(--border);margin-bottom:0}
+    .section-label{font-family:var(--sans);font-size:clamp(10px,2.5vw,12px);
+      font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(240,238,232,.28);margin-bottom:8px}
+    .section-title{font-family:var(--sans);font-weight:600;
+      font-size:clamp(20px,5vw,26px);letter-spacing:.06em;color:var(--text)}
+
+    /* ── APP CARDS ── */
     .app-card{display:flex;align-items:center;justify-content:space-between;
-      padding:clamp(24px,5vw,36px) 8px;border-bottom:1px solid var(--border);
+      padding:clamp(20px,4.5vw,32px) 8px;border-bottom:1px solid var(--border);
       text-decoration:none;color:var(--text);
       transition:background .2s;position:relative;overflow:hidden}
     .app-card::before{content:'';position:absolute;inset:0;
-      background:linear-gradient(90deg,var(--tint) 0%,transparent 50%);
+      background:linear-gradient(90deg,var(--tint) 0%,transparent 55%);
       opacity:0;transition:opacity .3s}
     .app-card:hover::before,.app-card:active::before{opacity:1}
-    .app-left{display:flex;flex-direction:column;gap:6px}
+    .app-left{display:flex;flex-direction:column;gap:5px;position:relative;z-index:1}
     .app-name{font-family:var(--sans);font-weight:600;
-      font-size:clamp(28px,7vw,40px);letter-spacing:.04em}
-    .app-desc{font-size:clamp(12px,3vw,14px);color:var(--dim);
+      font-size:clamp(24px,6vw,36px);letter-spacing:.04em}
+    .app-desc{font-size:clamp(11px,2.8vw,13px);color:var(--dim);
       letter-spacing:.08em;text-transform:lowercase}
-    .app-arrow{font-size:22px;color:rgba(240,238,232,.25);
-      transition:transform .2s,color .2s;flex-shrink:0}
+    .app-arrow{font-size:20px;color:rgba(240,238,232,.20);
+      transition:transform .2s,color .2s;flex-shrink:0;position:relative;z-index:1}
     .app-card:hover .app-arrow,.app-card:active .app-arrow{
-      transform:translateX(4px);color:rgba(240,238,232,.70)}
-    .app-dot{width:8px;height:8px;border-radius:50%;
-      position:absolute;right:40px;top:50%;transform:translateY(-50%)}
+      transform:translateX(5px);color:rgba(240,238,232,.65)}
+
+    /* ── SPACER ── */
+    .section-gap{height:60px}
 
     /* ── FOOTER ── */
     footer{position:relative;z-index:10;
-      text-align:center;padding:0 32px 60px;
-      display:flex;flex-direction:column;align-items:center;gap:16px}
+      text-align:center;padding:0 32px 80px;
+      display:flex;flex-direction:column;align-items:center;gap:14px}
+    .divider{width:1px;height:40px;background:var(--border);margin:0 auto 20px}
     .support-link{font-family:var(--sans);font-size:12px;letter-spacing:.16em;
-      text-transform:lowercase;color:rgba(138,191,184,.60);
+      text-transform:lowercase;color:rgba(138,191,184,.55);
       text-decoration:none;transition:color .2s}
-    .support-link:hover{color:rgba(138,191,184,.95)}
-    .footer-note{font-size:11px;letter-spacing:.10em;color:rgba(240,238,232,.18);
+    .support-link:hover{color:rgba(138,191,184,.90)}
+    .footer-note{font-size:11px;letter-spacing:.10em;color:rgba(240,238,232,.15);
       text-transform:lowercase}
   </style>
 </head>
@@ -80,33 +87,38 @@
 
 <header>
   <div class="logo">Coherence</div>
-  <div class="tagline">contemplative tools for present moment practice</div>
+  <div class="tagline">built for minds that notice everything</div>
   <div class="scroll-hint">↓ explore</div>
 </header>
 
-<div class="apps">
-  <a class="app-card" href="https://coherence-nikolai.github.io/see" style="--tint:rgba(245,166,35,.05)">
+<!-- CONTEMPLATIVE PRACTICE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-label">contemplative practice</div>
+    <div class="section-title">Present moment tools</div>
+  </div>
+  <a class="app-card" href="https://coherence-nikolai.github.io/see" style="--tint:rgba(245,166,35,.06)">
     <div class="app-left">
       <div class="app-name">See</div>
-      <div class="app-desc">sense · tone · emotion · vipassana noting</div>
+      <div class="app-desc">sense · tone · emotion · noting practice</div>
     </div>
     <div class="app-arrow">→</div>
   </a>
-  <a class="app-card" href="https://coherence-nikolai.github.io/field" style="--tint:rgba(138,191,184,.05)">
+  <a class="app-card" href="https://coherence-nikolai.github.io/field" style="--tint:rgba(138,191,184,.06)">
     <div class="app-left">
       <div class="app-name">Field</div>
       <div class="app-desc">observe · witness · collapse · still</div>
     </div>
     <div class="app-arrow">→</div>
   </a>
-  <a class="app-card" href="https://coherence-nikolai.github.io/resonance" style="--tint:rgba(90,181,212,.05)">
+  <a class="app-card" href="https://coherence-nikolai.github.io/resonance" style="--tint:rgba(90,181,212,.06)">
     <div class="app-left">
       <div class="app-name">Resonance</div>
       <div class="app-desc">wave · frequency · presence</div>
     </div>
     <div class="app-arrow">→</div>
   </a>
-  <a class="app-card" href="https://coherence-nikolai.github.io/threshold" style="--tint:rgba(155,111,232,.05)">
+  <a class="app-card" href="https://coherence-nikolai.github.io/threshold" style="--tint:rgba(155,111,232,.06)">
     <div class="app-left">
       <div class="app-name">Threshold</div>
       <div class="app-desc">questions · coherence · portal</div>
@@ -115,7 +127,32 @@
   </a>
 </div>
 
+<div class="section-gap"></div>
+
+<!-- NEURODIVERGENT TOOLS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-label">neurodivergent tools</div>
+    <div class="section-title">Built for how you think</div>
+  </div>
+  <a class="app-card" href="https://coherence-nikolai.github.io/flux-notes" style="--tint:rgba(126,184,247,.06)">
+    <div class="app-left">
+      <div class="app-name">Flux Notes</div>
+      <div class="app-desc">note-taking · voice · visual · bionic reading</div>
+    </div>
+    <div class="app-arrow">→</div>
+  </a>
+  <a class="app-card" href="https://coherence-nikolai.github.io/clear-path" style="--tint:rgba(120,240,177,.06)">
+    <div class="app-left">
+      <div class="app-name">Clear Path</div>
+      <div class="app-desc">academic skills · one step at a time</div>
+    </div>
+    <div class="app-arrow">→</div>
+  </a>
+</div>
+
 <footer>
+  <div class="divider"></div>
   <a class="support-link" href="https://buymeacoffee.com/coherence_nikolai" target="_blank" rel="noopener">support this work</a>
   <div class="footer-note">free · open source · no tracking</div>
 </footer>
@@ -126,9 +163,9 @@ const ctx=canvas.getContext('2d');
 let W,H,ripples=[];
 function resize(){const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;canvas.width=W*d;canvas.height=H*d;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(1,0,0,1,0,0);ctx.scale(d,d);}
 window.addEventListener('resize',resize);resize();
-function spawn(){ripples.push({x:W/2+(-0.5+Math.random())*W*.6,y:H/2+(-0.5+Math.random())*H*.4,r:2,maxR:Math.max(W,H)*.55,alpha:.35});}
-spawn();setInterval(spawn,3500);
-(function loop(){requestAnimationFrame(loop);ctx.clearRect(0,0,W,H);ripples=ripples.filter(r=>r.alpha>0.003);ripples.forEach(rp=>{rp.r+=(rp.maxR-rp.r)*.012;rp.alpha=Math.max(0,rp.alpha-.003);for(let i=0;i<3;i++){const rr=rp.r*(1-i*.18);if(rr<1)return;const a=rp.alpha*(1-i*.3);ctx.beginPath();ctx.arc(rp.x,rp.y,rr,0,Math.PI*2);ctx.strokeStyle=`rgba(240,238,232,${a.toFixed(3)})`;ctx.lineWidth=Math.max(.5,1.5-i*.5);ctx.stroke();}});})();
+function spawn(){ripples.push({x:W/2+(-0.5+Math.random())*W*.65,y:H/2+(-0.5+Math.random())*H*.45,r:2,maxR:Math.max(W,H)*.55,alpha:.30});}
+spawn();setInterval(spawn,4000);
+(function loop(){requestAnimationFrame(loop);ctx.clearRect(0,0,W,H);ripples=ripples.filter(r=>r.alpha>0.003);ripples.forEach(rp=>{rp.r+=(rp.maxR-rp.r)*.011;rp.alpha=Math.max(0,rp.alpha-.0025);for(let i=0;i<3;i++){const rr=rp.r*(1-i*.18);if(rr<1)return;const a=rp.alpha*(1-i*.3);ctx.beginPath();ctx.arc(rp.x,rp.y,rr,0,Math.PI*2);ctx.strokeStyle=`rgba(240,238,232,${a.toFixed(3)})`;ctx.lineWidth=Math.max(.5,1.5-i*.5);ctx.stroke();}});})();
 </script>
 </body>
 </html>
