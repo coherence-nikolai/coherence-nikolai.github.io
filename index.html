@@ -80,6 +80,9 @@
     .support-link:hover{color:rgba(138,191,184,.90)}
     .footer-note{font-size:11px;letter-spacing:.10em;color:rgba(240,238,232,.15);
       text-transform:lowercase}
+    .about-text{font-family:var(--serif);font-size:clamp(15px,3.8vw,18px);
+      font-weight:300;color:rgba(240,238,232,.55);line-height:1.9;
+      padding:0 8px;max-width:520px}
   </style>
 </head>
 <body>
@@ -127,13 +130,13 @@
   </a>
 </div>
 
-<div class="section-gap"></div>
+<div class="section-gap" style="position:relative"><div style="position:absolute;left:50%;transform:translateX(-50%);top:50%;width:32px;height:1px;background:linear-gradient(90deg,rgba(138,191,184,.3),rgba(255,140,105,.3))"></div></div>
 
 <!-- NEURODIVERGENT TOOLS -->
-<div class="section">
+<div class="section" style="border-left:2px solid rgba(255,140,105,.25);padding-left:28px;margin-left:0">
   <div class="section-header">
-    <div class="section-label">neurodivergent tools</div>
-    <div class="section-title">Built for how you think</div>
+    <div class="section-label" style="color:rgba(255,140,105,.70)">neurodivergent tools</div>
+    <div class="section-title" style="color:#FF8C69">Built for how you think</div>
   </div>
   <a class="app-card" href="https://coherence-nikolai.github.io/spark" style="--tint:rgba(255,209,102,.06)">
     <div class="app-left">
@@ -163,6 +166,19 @@
     </div>
     <div class="app-arrow">→</div>
   </a>
+</div>
+
+<div class="section" style="padding-bottom:20px">
+  <div class="section-header" style="border-bottom:none;padding-bottom:0;margin-bottom:24px">
+    <div class="section-label">about</div>
+    <div class="section-title">coherence-nikolai</div>
+  </div>
+  <div class="about-text">
+    I'm an academic skills advisor who works with neurodivergent students — ADHD, autism, dyslexia, and everything in between and beyond.<br><br>
+    I didn't set out to build apps. I got plopped into this by the universe and kept going.<br><br>
+    I think of myself as an ambient stabiliser — someone who tries to help without being a teacher. These tools are an extension of that. Quiet, present, useful when you need them.<br><br>
+    Everything here is free, open source, and built with care.
+  </div>
 </div>
 
 <footer>
