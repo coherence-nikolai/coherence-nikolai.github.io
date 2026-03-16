@@ -661,80 +661,81 @@ var introW,introH;
 function resizeIntro(){var d=devicePixelRatio||1;introW=innerWidth;introH=innerHeight;introC.width=introW*d;introC.height=introH*d;introC.style.width=introW+'px';introC.style.height=introH+'px';introX.setTransform(1,0,0,1,0,0);introX.scale(d,d);}
 window.addEventListener('resize',resizeIntro);resizeIntro();
 
-var introPhase='in';
-var introT=0;
-var introAlpha=1;
-var introDone=false;
-var introPs=[];
-var INTRO_COUNT=55;
+var iPhase='in',iT=0,iAlpha=1,iDone=false;
+var iPs=[];
+var I_COUNT=120;
 
-function spawnIntroParticles(){
-  introPs=[];
-  var cx=introW/2,cy=introH/2;
-  for(var i=0;i<INTRO_COUNT;i++){
-    // In breath: particles start dispersed below centre, converge upward into a tight tube
-    // Out breath: particles start tight at top, disperse downward in a wide cone
-    var angle=(Math.random()*Math.PI*2);
-    var spread=introPhase==='in'?Math.random()*.38+.08:Math.random()*.04;
-    introPs.push({
-      // start position
-      sx: cx + Math.cos(angle)*introW*spread,
-      sy: cy + Math.abs(Math.sin(angle))*introH*(introPhase==='in'?(.18+Math.random()*.22):(0)),
-      // end position
-      ex: cx + Math.cos(angle)*introW*(introPhase==='in'?0.01:(.12+Math.random()*.32)),
-      ey: cy - (introPhase==='in'?(introH*(.28+Math.random()*.18)):(introH*(.12+Math.random()*.28))),
-      delay: Math.random()*.4,
-      dur: Math.random()*.5+.5,
-      r: Math.random()*2.2+.8,
-      a: Math.random()*.55+.25
-    });
+function spawnI(){
+  iPs=[];
+  var cx=introW/2;
+  for(var i=0;i<I_COUNT;i++){
+    var angle=Math.random()*Math.PI*2;
+    if(iPhase==='in'){
+      // IN: start spread across full screen bottom half, converge to narrow tube rising to top
+      var startSpread=Math.random()*.45+.05;
+      iPs.push({
+        sx:cx+Math.cos(angle)*introW*startSpread,
+        sy:introH*(0.55+Math.random()*.40),
+        ex:cx+(Math.random()-.5)*introW*.04,
+        ey:introH*(0.02+Math.random()*.18),
+        delay:Math.random()*.5,dur:Math.random()*.6+.7,
+        r:Math.random()*3+1.5,a:Math.random()*.6+.25,
+        hue:Math.random()*20-10
+      });
+    } else {
+      // OUT: start tight at top centre, splay wide downward across full screen
+      var endSpread=Math.random()*.44+.06;
+      iPs.push({
+        sx:cx+(Math.random()-.5)*introW*.04,
+        sy:introH*(0.02+Math.random()*.15),
+        ex:cx+Math.cos(angle)*introW*endSpread,
+        ey:introH*(0.55+Math.random()*.40),
+        delay:Math.random()*.5,dur:Math.random()*.6+.7,
+        r:Math.random()*3+1.5,a:Math.random()*.6+.25,
+        hue:Math.random()*20-10
+      });
+    }
   }
 }
-spawnIntroParticles();
+spawnI();
 
 function runIntro(){
-  if(introDone)return;
+  if(iDone)return;
   requestAnimationFrame(runIntro);
   introX.clearRect(0,0,introW,introH);
-  introT+=.012;
+  iT+=.011;
 
-  var alpha=introPhase==='fade'?introAlpha:1;
-
-  introPs.forEach(function(p){
-    var t=Math.max(0,(introT-p.delay)/p.dur);
+  iPs.forEach(function(p){
+    var t=Math.max(0,(iT-p.delay)/p.dur);
     if(t>1)t=1;
-    var ease=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; // ease in-out
+    var ease=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
     var fade=Math.sin(ease*Math.PI);
     var px=p.sx+(p.ex-p.sx)*ease;
     var py=p.sy+(p.ey-p.sy)*ease;
-    var sz=p.r*(introPhase==='in'?(1+ease*.8):(1+(1-ease)*.8));
-    // Blur effect — draw multiple overlapping circles
-    for(var b=0;b<3;b++){
-      var br=sz*(1+b*.9);
-      var ba=fade*p.a*alpha*(introPhase==='in'?(0.45-b*.12):(0.40-b*.12));
-      if(ba<.01)continue;
+    var alpha=iPhase==='fade'?fade*p.a*iAlpha:fade*p.a;
+    if(alpha<.008)return;
+    // Field-style blur: 5 overlapping circles of decreasing opacity
+    var sz=p.r*(iPhase==='in'?(0.8+ease*.5):(0.8+(1-ease)*.5));
+    for(var b=0;b<5;b++){
+      var br=sz*(1+b*1.1);
+      var ba=alpha*(0.55-b*.09);
+      if(ba<.005)continue;
       introX.beginPath();introX.arc(px,py,br,0,Math.PI*2);
       introX.fillStyle='rgba(240,238,232,'+ba.toFixed(3)+')';
       introX.fill();
     }
   });
 
-  if(introPhase==='fade'){
-    introAlpha=Math.max(0,introAlpha-.02);
-    if(introAlpha<=0){
-      introDone=true;introC.style.display='none';
+  if(iPhase==='fade'){
+    iAlpha=Math.max(0,iAlpha-.016);
+    if(iAlpha<=0){
+      iDone=true;introC.style.display='none';
       document.getElementById('s-home').classList.add('active');
       return;
     }
   }
-
-  // Phase transitions
-  if(introT>1.6&&introPhase==='in'){
-    introPhase='out';introT=0;spawnIntroParticles();
-  }
-  if(introT>1.6&&introPhase==='out'){
-    introPhase='fade';
-  }
+  if(iT>1.8&&iPhase==='in'){iPhase='out';iT=0;spawnI();}
+  if(iT>1.8&&iPhase==='out'){iPhase='fade';}
 }
 runIntro();
 
