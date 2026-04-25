@@ -57,7 +57,27 @@
   <circle cx="512" cy="512" r="281" fill="none" stroke="url(#ringStroke)" stroke-width="14" stroke-opacity=".74"/>
   <circle cx="512" cy="512" r="281" fill="none" stroke="#fff7e8" stroke-width="5" stroke-opacity=".36"/>
 
-  <path d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527" fill="none" stroke="#f7ead7" stroke-width="42" stroke-linecap="round" stroke-opacity=".22" filter="url(#waveGlow)"/>
-  <path d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527" fill="none" stroke="url(#waveStroke)" stroke-width="22" stroke-linecap="round" stroke-opacity=".96" filter="url(#waveGlow)"/>
-  <path d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-opacity=".56"/>
+  <path
+    d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527"
+    fill="none"
+    stroke="#f7ead7"
+    stroke-width="42"
+    stroke-linecap="round"
+    stroke-opacity=".22"
+    filter="url(#waveGlow)"/>
+  <path
+    d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527"
+    fill="none"
+    stroke="url(#waveStroke)"
+    stroke-width="22"
+    stroke-linecap="round"
+    stroke-opacity=".96"
+    filter="url(#waveGlow)"/>
+  <path
+    d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-opacity=".56"/>
 </svg>

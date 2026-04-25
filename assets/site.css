@@ -290,10 +290,9 @@ h3 {
 
 .app-icon-logo {
   position: relative;
-  width: min(260px, 72%);
+  width: min(292px, 78%);
   height: auto;
-  border-radius: 28%;
-  filter: drop-shadow(0 0 34px rgba(232, 215, 178, 0.42)) drop-shadow(0 22px 70px rgba(0, 0, 0, 0.42));
+  filter: drop-shadow(0 0 42px rgba(232, 215, 178, 0.44)) drop-shadow(0 24px 76px rgba(0, 0, 0, 0.44));
 }
 
 .orb-core,
@@ -417,10 +416,6 @@ dd {
   transform: translateY(-3px);
   border-color: rgba(232, 215, 178, 0.34);
   background: rgba(232, 215, 178, 0.06);
-}
-
-.featured-lab {
-  grid-column: span 2;
 }
 
 .lab-kicker {
@@ -576,10 +571,6 @@ dd {
   .split,
   .feature-list {
     grid-template-columns: 1fr;
-  }
-
-  .featured-lab {
-    grid-column: auto;
   }
 
   .tone-orb {
