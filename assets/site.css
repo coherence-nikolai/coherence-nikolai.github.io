@@ -363,7 +363,6 @@ h3 {
 .steps article,
 .lab-link,
 .support-grid a,
-.support-grid span,
 .split > div {
   border: 1px solid var(--hairline);
   border-radius: 24px;
@@ -410,9 +409,10 @@ dd {
   padding: 24px;
   color: var(--bone);
   text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
-a.lab-link:hover {
+.lab-link:hover {
   transform: translateY(-3px);
   border-color: rgba(232, 215, 178, 0.34);
   background: rgba(232, 215, 178, 0.06);
@@ -454,8 +454,7 @@ a.lab-link:hover {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.support-grid a,
-.support-grid span {
+.support-grid a {
   padding: 18px 14px;
   color: rgba(242, 234, 223, 0.76);
   text-align: center;
