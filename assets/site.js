@@ -1,5 +1,20 @@
 const canvas = document.getElementById("tone-field");
 
+document.addEventListener("click", (event) => {
+  const target = event.target.closest(".lab-link[href], .support-grid a[href]");
+  if (!target) {
+    return;
+  }
+
+  const href = target.getAttribute("href");
+  if (!href) {
+    return;
+  }
+
+  event.preventDefault();
+  window.location.href = href;
+});
+
 if (canvas) {
   const context = canvas.getContext("2d");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
