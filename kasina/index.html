@@ -1,35 +1,1265 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kasina - Coherence Nikolai</title>
-  <meta name="description" content="Kasina is an earlier Coherence Nikolai visual concentration experiment.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/kasina/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Kasina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Syne:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#06060a;--text:#e8e4dc;--dim:rgba(232,228,220,.48);
+      --border:rgba(255,255,255,.08);--surface:rgba(255,255,255,.05);
+      --serif:'Outfit',system-ui,sans-serif;--sans:'Syne',system-ui,sans-serif;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);
+      font-family:var(--serif);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+    #mainCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      padding:max(env(safe-area-inset-top),24px) 28px max(env(safe-area-inset-bottom),24px);
+      opacity:0;pointer-events:none;transition:opacity .6s ease;z-index:10;overflow-y:auto}
+    .screen.active{opacity:1;pointer-events:all}
+
+    /* HOME */
+    #s-home{justify-content:center;gap:8px}
+    .home-title{font-family:var(--sans);font-weight:600;
+      font-size:clamp(48px,14vw,76px);letter-spacing:.14em;text-transform:uppercase;
+      text-align:center;color:var(--text)}
+    .home-sub{font-size:clamp(13px,3.2vw,16px);font-weight:300;color:var(--dim);
+      text-align:center;letter-spacing:.14em;text-transform:lowercase;margin-bottom:48px}
+    .kasina-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;
+      width:100%;max-width:360px}
+    .k-card{padding:18px 16px;border-radius:16px;border:1px solid var(--border);
+      background:var(--surface);cursor:pointer;-webkit-tap-highlight-color:transparent;
+      display:flex;align-items:center;gap:12px;
+      transition:border-color .3s,background .3s}
+    .k-card:active{background:rgba(255,255,255,.09)}
+    .k-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .k-name{font-size:clamp(16px,4vw,18px);font-weight:400;color:var(--text)}
+    .k-pali{font-size:clamp(11px,2.8vw,12px);color:var(--dim);font-weight:300;margin-top:2px;font-style:italic}
+
+    /* SETUP */
+    #s-setup{gap:20px;padding-top:60px;justify-content:flex-start;overflow-y:auto}
+    .setup-inner{width:100%;max-width:400px;display:flex;flex-direction:column;gap:20px;padding-bottom:100px}
+    .setup-name{font-family:var(--sans);font-size:clamp(28px,7vw,38px);font-weight:600;letter-spacing:.06em}
+    .setup-pali{font-size:clamp(13px,3.2vw,15px);color:var(--dim);font-style:italic;font-weight:300;margin-top:-12px}
+    .setup-instruction{font-size:clamp(15px,3.8vw,17px);font-weight:300;color:var(--dim);line-height:1.85}
+    .setup-tradition{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .setup-trad-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-weight:400;margin-bottom:8px}
+    .setup-trad-text{font-size:clamp(13px,3.2vw,15px);font-weight:300;color:var(--dim);line-height:1.80;font-style:italic}
+    .timer-row{display:flex;flex-direction:column;gap:10px}
+    .timer-label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:400}
+    .timer-options{display:flex;gap:8px;flex-wrap:wrap}
+    .timer-btn{padding:10px 18px;border-radius:999px;border:1px solid var(--border);
+      background:var(--surface);font-family:var(--serif);font-size:clamp(14px,3.5vw,16px);
+      font-weight:300;color:var(--dim);cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:border-color .2s,color .2s,background .2s}
+    .timer-btn.active{color:var(--text);background:rgba(255,255,255,.10)}
+    .begin-btn{width:100%;padding:20px;border-radius:16px;border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.06);font-family:var(--serif);
+      font-size:clamp(17px,4.2vw,20px);font-weight:300;
+      color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;
+      letter-spacing:.08em;transition:background .2s,border-color .2s}
+    .begin-btn:active{background:rgba(255,255,255,.12)}
+
+    /* PRACTICE — total darkness */
+    #s-practice{background:transparent;padding:0}
+
+    /* Minimal floating UI */
+    #practiceUI{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:0;transition:opacity .5s}
+    #practiceUI.show{opacity:1;pointer-events:all}
+
+    #timerDisplay{position:fixed;top:max(env(safe-area-inset-top),20px);left:50%;
+      transform:translateX(-50%);font-family:var(--sans);font-size:14px;
+      font-weight:300;letter-spacing:.18em;color:rgba(232,228,220,.22);
+      pointer-events:none;transition:color .5s}
+
+    #returnCounter{position:fixed;bottom:max(env(safe-area-inset-bottom),36px);
+      left:50%;transform:translateX(-50%);
+      display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:all}
+    #returnBtn{background:none;border:none;cursor:pointer;
+      -webkit-tap-highlight-color:transparent;padding:20px;
+      display:flex;flex-direction:column;align-items:center;gap:6px}
+    #returnCount{font-family:var(--sans);font-size:clamp(32px,8vw,44px);font-weight:200;
+      color:rgba(232,228,220,.18);transition:color .4s,transform .2s;letter-spacing:.04em}
+    #returnCount.flash{color:rgba(232,228,220,.55);transform:scale(1.15)}
+    #returnLabel{font-size:11px;letter-spacing:.20em;text-transform:uppercase;
+      color:rgba(232,228,220,.15);font-weight:300}
+
+    #practiceEnd{position:fixed;bottom:max(env(safe-area-inset-bottom),36px);
+      right:24px;background:none;border:none;cursor:pointer;
+      font-family:var(--serif);font-size:12px;letter-spacing:.14em;
+      color:rgba(232,228,220,.15);-webkit-tap-highlight-color:transparent;padding:12px;pointer-events:none;opacity:0}
+
+    /* Nimitta indicator */
+    #nimitta{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      display:flex;flex-direction:column;align-items:center;gap:12px;
+      pointer-events:none;opacity:0;transition:opacity 3s ease;z-index:40;
+      text-align:center;width:80vw}
+    #nimitta.arise{opacity:1}
+    #nimittaWord{font-family:var(--sans);font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:rgba(232,228,220,.45);font-weight:300}
+    #nimittaMsg{font-family:var(--serif);font-size:clamp(15px,3.8vw,18px);font-weight:200;color:rgba(232,228,220,.35);line-height:1.7;font-style:italic}
+
+    /* COMPLETE */
+    #s-complete{gap:24px}
+    .complete-glyph{font-size:48px}
+    .complete-title{font-family:var(--sans);font-size:clamp(26px,6.5vw,34px);
+      font-weight:600;text-align:center;letter-spacing:.08em}
+    .complete-stats{display:flex;gap:32px;justify-content:center}
+    .stat{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .stat-num{font-family:var(--sans);font-size:clamp(28px,7vw,36px);font-weight:200;color:var(--text)}
+    .stat-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-weight:300}
+    .complete-quote{font-size:clamp(14px,3.5vw,16px);font-weight:300;color:var(--dim);
+      text-align:center;max-width:300px;line-height:1.85;font-style:italic}
+    .complete-btns{display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;margin-top:8px}
+    .complete-btn{padding:16px;border-radius:14px;border:1px solid var(--border);
+      background:var(--surface);font-family:var(--serif);
+      font-size:clamp(15px,3.8vw,17px);font-weight:300;
+      color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+    /* NAV */
+    #topBack{position:fixed;top:max(env(safe-area-inset-top),16px);left:16px;
+      z-index:200;background:none;border:none;cursor:pointer;
+      color:rgba(232,228,220,.30);font-size:22px;padding:8px;
+      -webkit-tap-highlight-color:transparent;display:none;pointer-events:none}
+
+    /* Colour picker */
+    #colorSection{display:flex;flex-direction:column;gap:10px}
+    .color-label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:400}
+    .color-swatches{display:flex;gap:10px;flex-wrap:wrap}
+    .swatch{width:36px;height:36px;border-radius:50%;cursor:pointer;
+      border:2px solid transparent;-webkit-tap-highlight-color:transparent;
+      transition:transform .2s,border-color .2s}
+    .swatch.active{border-color:rgba(255,255,255,.6);transform:scale(1.2)}
+
+    .style-picker{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+    .style-label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:400}
+    .style-options{display:flex;gap:8px;flex-wrap:wrap}
+    .style-opt{padding:10px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-family:var(--serif);font-size:clamp(13px,3.2vw,15px);font-weight:300;color:var(--dim);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .2s}
+    .style-opt.active{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:var(--text)}
+    .fade-in{animation:fadeUp .4s ease forwards}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  </style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Focus</p>
-      <h1>Kasina</h1>
-      <p>Simple visual concentration objects.</p>
-      <p class="muted">This earlier experiment is being kept in the Coherence archive while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+<canvas id="mainCanvas"></canvas>
+<canvas id="introCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:300;pointer-events:none"></canvas>
+<div id="introEnter" style="position:fixed;bottom:max(env(safe-area-inset-bottom),40px);left:50%;transform:translateX(-50%);z-index:400;opacity:0;transition:opacity 2s ease;pointer-events:none">
+  <button onclick="enterMenu()" style="background:rgba(6,6,10,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(232,228,220,.18);border-radius:999px;padding:14px 32px;font-family:var(--serif);font-size:14px;letter-spacing:.18em;text-transform:lowercase;color:rgba(232,228,220,.60);cursor:pointer;-webkit-tap-highlight-color:transparent">enter</button>
+</div>
+
+<button id="topBack" onclick="goHome()">←</button>
+
+<!-- HOME -->
+<div class="screen" id="s-home">
+  <div class="home-title">Kasina</div>
+  <div class="home-sub">the ten objects of pure concentration</div>
+  <div class="kasina-grid" id="kasinaGrid"></div>
+  <button id="infoBtn" onclick="openInfo()" style="margin-top:24px;background:none;border:1px solid rgba(232,228,220,.12);border-radius:999px;padding:10px 22px;font-family:var(--serif);font-size:13px;letter-spacing:.14em;color:rgba(232,228,220,.35);cursor:pointer;-webkit-tap-highlight-color:transparent">ℹ about kasina practice</button>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="s-setup">
+  <div class="setup-inner" id="setupInner"></div>
+</div>
+
+<!-- FIXED BEGIN BTN - always visible on setup screen -->
+<button id="fixedBeginBtn" onclick="beginPractice()" style="display:none;position:fixed;bottom:max(env(safe-area-inset-bottom),24px);left:24px;right:24px;padding:20px;border-radius:16px;border:1.5px solid rgba(255,255,255,.20);background:rgba(255,255,255,.06);font-family:'Outfit',system-ui,sans-serif;font-size:18px;font-weight:300;color:#e8e4dc;cursor:pointer;z-index:150;-webkit-tap-highlight-color:transparent;letter-spacing:.08em;transition:background .2s,border-color .2s,color .2s">Begin sitting</button>
+
+<!-- PRACTICE -->
+<div class="screen" id="s-practice"></div>
+
+<div id="practiceUI">
+  <div id="timerDisplay"></div>
+  <div id="nimitta">
+    <div id="nimittaWord">nimitta</div>
+    <div id="nimittaMsg">The sign is arising.<br>Close your eyes and hold it.</div>
+  </div>
+  <div id="returnCounter">
+    <button id="returnBtn" onclick="logReturn()">
+      <div id="returnCount">0</div>
+      <div id="returnLabel">returns</div>
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(232,228,220,.12);font-weight:300;text-align:center;max-width:160px;line-height:1.6;margin-top:4px">tap each time your mind wanders and returns</div>
+    </button>
+  </div>
+  <button id="practiceEnd" onclick="endPractice()">end</button>
+</div>
+
+<!-- COMPLETE -->
+<div class="screen" id="s-complete">
+  <div class="complete-glyph" id="cGlyph"></div>
+  <div class="complete-title" id="cTitle"></div>
+  <div class="complete-stats">
+    <div class="stat"><div class="stat-num" id="cTime">0</div><div class="stat-label">minutes</div></div>
+    <div class="stat"><div class="stat-num" id="cReturns">0</div><div class="stat-label">returns</div></div>
+  </div>
+  <div class="complete-quote" id="cQuote"></div>
+  <div class="complete-btns">
+    <button class="complete-btn" onclick="startAgain()">Sit again</button>
+    <button class="complete-btn" onclick="goHome()">Choose another kasina</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CANVAS ──
+var C=document.getElementById('mainCanvas'),X=C.getContext('2d');
+var W,H;
+function resizeC(){var d=devicePixelRatio||1;W=innerWidth;H=innerHeight;C.width=W*d;C.height=H*d;C.style.width=W+'px';C.style.height=H+'px';X.setTransform(1,0,0,1,0,0);X.scale(d,d);}
+window.addEventListener('resize',resizeC);resizeC();
+
+// ── INTRO ANIMATION ──
+var iC=document.getElementById('introCanvas'),iX=iC.getContext('2d');
+var iW,iH;
+function resizeI(){var d=devicePixelRatio||1;iW=innerWidth;iH=innerHeight;iC.width=iW*d;iC.height=iH*d;iC.style.width=iW+'px';iC.style.height=iH+'px';iX.setTransform(1,0,0,1,0,0);iX.scale(d,d);}
+window.addEventListener('resize',resizeI);resizeI();
+
+var iDone=false,iT=0,iAlpha=1;
+var iParticles=[];
+var ALL_COLORS=[
+  [196,149,106],[90,181,212],[244,162,97],[168,216,234],
+  [74,144,196],[244,208,63],[231,76,60],[221,216,204],
+  [142,154,175],[245,240,224]
+];
+
+// Init particles — all elements simultaneously
+(function(){
+  for(var i=0;i<120;i++){
+    var col=ALL_COLORS[i%ALL_COLORS.length];
+    var angle=Math.random()*Math.PI*2;
+    var dist=Math.random();
+    iParticles.push({
+      angle:angle,
+      dist:dist,
+      vAngle:(Math.random()-.5)*.004,
+      vDist:(Math.random()-.5)*.003,
+      r:Math.random()*3+1,
+      a:Math.random()*.6+.2,
+      col:col,
+      life:Math.random(),
+      lifeSpeed:Math.random()*.006+.002,
+      type:Math.floor(Math.random()*3) // 0=orbit, 1=drift, 2=wisp
+    });
+  }
+})();
+
+function runIntro(){
+  if(iDone)return;
+  requestAnimationFrame(runIntro);
+  iX.clearRect(0,0,iW,iH);
+  iT+=.012;
+
+  var cx=iW/2,cy=iH/2;
+  var maxR=Math.min(iW,iH)*.42;
+  var alpha=iT<.8?(iT/.8):iT>5.5?Math.max(0,1-(iT-5.5)/1.5):1;
+  alpha*=1;
+
+  // Colour cycling — all elements rotate through
+  var colorIdx=Math.floor(iT*1.2)%ALL_COLORS.length;
+  var nextIdx=(colorIdx+1)%ALL_COLORS.length;
+  var blend=(iT*1.2)%1;
+  var c1=ALL_COLORS[colorIdx],c2=ALL_COLORS[nextIdx];
+  var cr=Math.round(c1[0]+(c2[0]-c1[0])*blend);
+  var cg=Math.round(c1[1]+(c2[1]-c1[1])*blend);
+  var cb=Math.round(c1[2]+(c2[2]-c1[2])*blend);
+
+  // Central sun — all elements unified
+  var pulse=Math.sin(iT*2.1)*.06+Math.sin(iT*3.7)*.04;
+  var sunR=maxR*(.55+pulse)*(iT<.8?iT/.8:1);
+
+  // Multiple glow layers
+  for(var gi=5;gi>=0;gi--){
+    var gr=sunR*(1+gi*.28);
+    var ga=(0.18-gi*.025)*alpha;
+    if(ga<.003)continue;
+    var gg=iX.createRadialGradient(cx,cy,0,cx,cy,gr);
+    gg.addColorStop(0,'rgba('+cr+','+cg+','+cb+','+ga+')');
+    gg.addColorStop(1,'rgba('+cr+','+cg+','+cb+',0)');
+    iX.fillStyle=gg;iX.fillRect(0,0,iW,iH);
+  }
+
+  // Core bright centre
+  var coreG=iX.createRadialGradient(cx,cy,0,cx,cy,sunR*.3);
+  coreG.addColorStop(0,'rgba(245,240,224,'+(0.85*alpha)+')');
+  coreG.addColorStop(.4,'rgba('+cr+','+cg+','+cb+','+(0.45*alpha)+')');
+  coreG.addColorStop(1,'rgba('+cr+','+cg+','+cb+',0)');
+  iX.fillStyle=coreG;iX.fillRect(0,0,iW,iH);
+
+  // Rays — fire element
+  for(var ri=0;ri<12;ri++){
+    var rAngle=ri/12*Math.PI*2+iT*.15;
+    var rayL=sunR*(.7+Math.sin(iT*2.3+ri)*.15);
+    var rg=iX.createLinearGradient(cx,cy,cx+Math.cos(rAngle)*rayL,cy+Math.sin(rAngle)*rayL);
+    rg.addColorStop(0,'rgba('+cr+','+cg+','+cb+','+(0.20*alpha)+')');
+    rg.addColorStop(1,'rgba('+cr+','+cg+','+cb+',0)');
+    iX.beginPath();iX.moveTo(cx,cy);iX.lineTo(cx+Math.cos(rAngle)*rayL,cy+Math.sin(rAngle)*rayL);
+    iX.strokeStyle=rg;iX.lineWidth=Math.max(.5,2+Math.sin(iT+ri)*1);iX.stroke();
+  }
+
+  // Orbiting rings — water element
+  for(var wi=0;wi<4;wi++){
+    var wr=sunR*(.6+wi*.22)+Math.sin(iT*1.8+wi)*8;
+    iX.beginPath();iX.arc(cx,cy,wr,0,Math.PI*2);
+    iX.strokeStyle='rgba('+cr+','+cg+','+cb+','+(0.22-wi*.04)*alpha+')';
+    iX.lineWidth=1.5-wi*.3;iX.stroke();
+  }
+
+  // Particles — air/fire elements, all colours
+  iParticles.forEach(function(p){
+    p.life+=p.lifeSpeed;
+    if(p.life>1)p.life=0;
+    p.angle+=p.vAngle;
+    p.dist+=p.vDist;
+    if(p.dist<.05||p.dist>1.1)p.vDist*=-1;
+    var fade=Math.sin(p.life*Math.PI);
+    var pr,px,py;
+    if(p.type===0){
+      // Orbital
+      pr=sunR*(p.dist*.8+.15);
+      px=cx+Math.cos(p.angle)*pr;py=cy+Math.sin(p.angle)*pr;
+    } else if(p.type===1){
+      // Drift — air element
+      pr=sunR*(p.dist*.9+.1);
+      px=cx+Math.cos(p.angle+iT*.1)*pr+Math.sin(iT*.7+p.angle)*sunR*.08;
+      py=cy+Math.sin(p.angle+iT*.1)*pr*.85;
+    } else {
+      // Wisp — rises
+      pr=sunR*(p.dist*.7+.2);
+      px=cx+Math.cos(p.angle)*pr*(1-p.life*.3);
+      py=cy+Math.sin(p.angle)*pr-p.life*sunR*.25;
+    }
+    var pa=fade*p.a*alpha;
+    if(pa<.008)return;
+    var pc=p.col;
+    for(var b=0;b<4;b++){
+      var br=p.r*(1+b*1.0);
+      var ba=pa*(0.50-b*.10);
+      if(ba<.005)continue;
+      iX.beginPath();iX.arc(px,py,br,0,Math.PI*2);
+      iX.fillStyle='rgba('+pc[0]+','+pc[1]+','+pc[2]+','+ba.toFixed(3)+')';
+      iX.fill();
+    }
+  });
+
+  // Show enter button after bloom
+  if(iT>2.5&&iT<2.6){
+    var enterEl=document.getElementById('introEnter');
+    enterEl.style.opacity='1';enterEl.style.pointerEvents='all';
+  }
+  // Auto fade after 7 seconds
+  if(iT>7){
+    var fadeOut=(iT-7)/1.5;
+    iX.fillStyle='rgba(6,6,10,'+Math.min(1,fadeOut)+')';
+    iX.fillRect(0,0,iW,iH);
+    if(fadeOut>=1){
+      iDone=true;
+      iC.style.display='none';
+      var ie=document.getElementById('introEnter');
+      ie.style.display='none';ie.style.pointerEvents='none';ie.style.opacity='0';
+      document.getElementById('s-home').classList.add('active');
+    }
+  }
+}
+runIntro();
+
+// ── KASINAS ──
+var KASINAS={
+  allelements:{
+    name:'All Elements',pali:'Sabbā Dhātu',color:'#f5f0e0',rgb:'245,240,224',glyph:'✦',
+    instruction:'Rest attention on the unified field of all elements — earth, water, fire, air, space, light and colour arising together. No single object. The whole of experience as kasina.',
+    tradition:'While the Visuddhimagga describes ten distinct kasinas, the Abhidhamma teaches that the four great elements are never found separately. Every phenomenon contains all four. This kasina takes that teaching as its object: the unified nature of all elements, inseparable, co-arising.',
+    modern:'You have sat with each element separately. Now sit with them together. The whole field is the object.',
+    nimitta:'The counterpart sign of all elements unified is like the full moon in a clear sky — all colours present in white light.',
+    complete:'All elements, one nature.'
+  },
+  allelements:{
+    name:'All Elements',pali:'Sabbā Dhātu',
+    color:'#f5f0e0',rgb:'245,240,224',
+    glyph:'✦',
+    instruction:'Rest attention on the unified field of all elements — earth, water, fire, air, space, light and colour arising together. No single object. The whole of experience as kasina. When the Visuddhimagga describes the mind fully absorbed, it describes this — not one element but the ground from which all elements arise.',
+    tradition:'While the Visuddhimagga describes ten distinct kasinas, the Abhidhamma teaches that the four great elements — earth, water, fire, air — are never found separately. Every phenomenon contains all four. This kasina takes that teaching as its object: the unified nature of all elements, inseparable, co-arising. It is not described in the Visuddhimagga because it cannot be prepared in advance. It arises when the other nine are known.',
+    modern:'You have sat with each element separately. Now sit with them together. Let the colours and movements arise without following any one of them. The whole field is the object. Stability in complexity is a deeper concentration than stability in simplicity.',
+    nimitta:'The counterpart sign of all elements unified is said to be like the full moon in a clear sky — all colours of the spectrum present in white light.',
+    complete:'All elements, one nature.'
+  },
+  earth:{
+    name:'Earth',pali:'Pathavī Kasina',
+    color:'#c4956a',rgb:'196,149,106',
+    glyph:'◉',
+    instruction:'Rest your gaze on the earth element. Dense, present, unmoving. Notice the quality of solidity — not just below you, but within you. You are earth too.',
+    tradition:'The Visuddhimagga instructs: prepare a clay disc the colour of the dawn — perfectly round, smooth, free of blemishes. Fix attention upon it with the word "earth, earth." When the mind wanders, return without harshness. The earth does not judge the rain.',
+    modern:'Find any solid surface — floor, wall, the ground itself. Let it hold you. You need not do anything. The earth has been here before thought and will remain after it.',
+    nimitta:'The acquired sign appears like a polished mirror, still and bright. The counterpart sign is like the full moon emerging from cloud.',
+    complete:'The earth does not move. Stillness is its teaching.'
+  },
+  water:{
+    name:'Water',pali:'Āpo Kasina',
+    color:'#5ab5d4',rgb:'90,181,212',
+    glyph:'◎',
+    instruction:'Observe the water element. Fluid, yielding, cohesive. Water does not resist — it finds its level. Let attention rest on the quality of fluidity itself.',
+    tradition:'The Visuddhimagga instructs: observe clear water in a bowl or natural body of water — not the container, not the ripples, but the clear water itself. Attend to the sign of water until the mind-image arises clear and still.',
+    modern:'Watch the ripples arise and pass. The centre is always still. That stillness is always available.',
+    nimitta:'The acquired sign appears like the moving surface of water. The counterpart sign is still and perfectly clear, like a crystal sphere.',
+    complete:'Water yields to everything and is changed by nothing.'
+  },
+  fire:{
+    name:'Fire',pali:'Tejo Kasina',
+    color:'#f4a261',rgb:'244,162,97',
+    glyph:'◈',
+    instruction:'Fix attention on the fire element. Consuming, transforming, luminous. The flame takes what is given and releases it as light and heat. Watch how attention itself is like fire — it illuminates whatever it touches.',
+    tradition:'The Visuddhimagga instructs: make a fire and observe the flame through a hole in a mat or cloth — so only the flame is visible, not its surroundings. This is the original kasina — focusing light through darkness. The sign that arises is first the flame, then the mental image of flame, then pure luminosity.',
+    modern:'Any flame will do. A candle, a match, this screen. Soften your gaze. Let the flame come to you rather than reaching toward it. You are not staring — you are receiving.',
+    nimitta:'The acquired sign flickers like the flame itself. The counterpart sign is unwavering — pure light without fuel or heat.',
+    complete:'What burns away is not lost. It becomes light.'
+  },
+  air:{
+    name:'Air',pali:'Vāyo Kasina',
+    color:'#a8d8ea',rgb:'168,216,234',
+    glyph:'◌',
+    instruction:'Rest attention on the air element. Moving, invisible, life-giving. Notice breath as wind — the most intimate meeting with the air element. It enters, it leaves. You are briefly its home.',
+    tradition:'The Visuddhimagga instructs: observe wind moving in the tops of trees, or feel the movement of air on skin. The kasina object here is movement itself — the sign of wind touching form.',
+    modern:'Feel air on your skin. Feel breath as wind entering and leaving. Notice air as a living presence — always here, always moving, never grasped.',
+    nimitta:'The acquired sign appears like the trembling of heat haze. The counterpart sign is still, like a breath held perfectly.',
+    complete:'The wind does not carry its destination within it. Neither do you.'
+  },
+  blue:{
+    name:'Blue',pali:'Nīla Kasina',
+    color:'#4a90c4',rgb:'74,144,196',
+    glyph:'●',
+    instruction:'Let the colour blue become the whole of attention. Not sky, not water, not anything blue — just the quality of blueness itself. Pure perception before concept.',
+    tradition:'The Visuddhimagga instructs: gather blue flowers — the colour of flax or similar — and arrange them as a disc, or use blue cloth. Regard the colour with open eyes saying "blue, blue" until the mental sign arises. The colour kasinas train the mind in pure perception.',
+    modern:'Let the colour fill awareness completely. When thoughts arise — "this reminds me of..." — gently return to the colour itself, before the association.',
+    nimitta:'The acquired sign appears as it truly is — the colour itself. The counterpart sign is luminous, as if self-lit from within.',
+    complete:'Before the name, there was only this.'
+  },
+  yellow:{
+    name:'Yellow',pali:'Pīta Kasina',
+    color:'#f4d03f',rgb:'244,208,63',
+    glyph:'●',
+    instruction:'Let yellow fill awareness entirely. The warmth of it. The quality of luminosity that yellow carries even in darkness. Perception before name.',
+    tradition:'The Visuddhimagga instructs: yellow flowers — the colour of the champak or similar — arranged as a disc. Attend to the pure quality of yellowness until the mental image arises stable and clear.',
+    modern:'Yellow is the colour closest to light itself. Let it be luminous. Let awareness rest in warmth.',
+    nimitta:'The acquired sign is the colour as seen. The counterpart sign radiates — as if sunlight were looking at itself.',
+    complete:'The flower does not know it is yellow. You do not need to know you are aware.'
+  },
+  red:{
+    name:'Red',pali:'Lohita Kasina',
+    color:'#e74c3c',rgb:'231,76,60',
+    glyph:'●',
+    instruction:'Let red fill awareness entirely. The intensity of it. The quality of immediacy that red carries. This is perhaps the most activating kasina — bring steady attention to what is vivid.',
+    tradition:'The Visuddhimagga instructs: red flowers — the colour of the China rose or similar — arranged as a disc. The colour kasinas are said to develop the capacity for pure perception, the ground from which insight arises.',
+    modern:'Let the vividness be what it is without adding to it. The mind that can hold intensity without being swept away is the mind that can know things as they are.',
+    nimitta:'The acquired sign is vivid, like the colour as seen. The counterpart sign is luminous red — like a ruby held before a lamp.',
+    complete:'Intensity seen clearly becomes simply what is.'
+  },
+  white:{
+    name:'White',pali:'Odāta Kasina',
+    color:'#ddd8cc',rgb:'221,216,204',
+    glyph:'○',
+    instruction:'Let white fill awareness. Not emptiness — white contains all colours. The quality of clarity, of luminosity, of space that holds without excluding. White is perhaps the most subtle kasina.',
+    tradition:'The Visuddhimagga instructs: white flowers — the colour of the morning star or jasmine — arranged as a disc, or the disc of the full moon, or a clean white cloth. White is said to produce the most stable counterpart sign.',
+    modern:'Let awareness rest in clarity itself. Not blankness — luminous openness. The quality of a mind that is awake and still.',
+    nimitta:'The acquired sign is white as seen. The counterpart sign is said to be like the full moon emerging from cloud — or the morning star at dawn.',
+    complete:'Clarity is not added to the mind. It is what remains when confusion settles.'
+  },
+  space:{
+    name:'Space',pali:'Ākāsa Kasina',
+    color:'#8e9aaf',rgb:'142,154,175',
+    glyph:'◯',
+    instruction:'Attend to space itself. Not empty space — the quality of openness, of room, of the ground in which all phenomena arise and pass. This is among the most subtle of the ten kasinas.',
+    tradition:'The Visuddhimagga instructs: observe a hole in a wall or a window — attend to the space within the aperture, not the frame around it. Space is not nothing. It is the condition for everything.',
+    modern:'Notice the space in this room. The space between objects. The space in which breath moves. The space in which thoughts arise and dissolve. Rest there.',
+    nimitta:'The acquired sign is space as perceived — a hole, an opening. The counterpart sign is limitless and cannot be bounded by the mind.',
+    complete:'Form arises in space. Attention arises in awareness. Neither space nor awareness can be grasped.'
+  },
+  light:{
+    name:'Light',pali:'Āloka Kasina',
+    color:'#f5f0e0',rgb:'245,240,224',
+    glyph:'☀',
+    instruction:'Rest in the quality of light itself — not a source, not a direction, just luminosity as such. Of all the kasinas, this one points most directly at the nature of awareness. Awareness is self-luminous. It does not need another light to see by.',
+    tradition:'The Visuddhimagga instructs: observe a circle of sunlight cast through a hole in a wall or roof — attend to the luminosity itself, not its source, not what it illuminates. Or observe moonlight on a white wall. The light kasina is said to be the swiftest path to the counterpart sign.',
+    modern:'This is the kasina that became yours in a cell at Dhamma Bhumi — a shaft of light under a door, focused by a toilet roll, becoming the object that carried you to stream entry. The light does not care what focuses it. Your attention does the rest.',
+    nimitta:'The acquired sign is the circle of light as seen. The counterpart sign is described by Buddhaghosa as more brilliant than the sun — the mind seeing its own luminosity reflected back.',
+    complete:'The light that illuminates is not separate from the light that is seen.'
+  }
+};
+
+var KASINA_ORDER=['earth','water','fire','air','blue','yellow','red','white','space','light','allelements'];
+
+// ── BUILD HOME GRID ──
+var grid=document.getElementById('kasinaGrid');
+KASINA_ORDER.forEach(function(key){
+  var k=KASINAS[key];
+  var card=document.createElement('div');
+  card.className='k-card fade-in';
+  card.innerHTML='<div class="k-dot" style="background:'+k.color+'"></div><div><div class="k-name">'+k.name+'</div><div class="k-pali">'+k.pali+'</div></div>';
+  card.onclick=function(){showSetup(key);};
+  grid.appendChild(card);
+});
+
+// ── SCREENS ──
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var n=document.getElementById(id);if(n){n.classList.add('active');n.scrollTop=0;}
+  // Hide fixed begin btn unless on setup
+  var fbb=document.getElementById('fixedBeginBtn');
+  if(fbb)fbb.style.display=(id==='s-setup'?'block':'none');
+}
+function goHome(){
+  stopPractice();
+  showScreen('s-home');
+  var _tb2=document.getElementById('topBack');_tb2.style.display='none';_tb2.style.pointerEvents='none';
+  document.getElementById('practiceUI').classList.remove('show');
+  setBgTarget(0,0,0,0);
+}
+
+// ── SETUP ──
+var curKey=null,chosenTimer=0;
+var COLOR_SWATCHES={
+  blue:['#1a3a5c','#2e6da4','#4a90c4','#7ec8e3','#a8d8ea','#c8eaf5'],
+  yellow:['#8b6914','#c49a1a','#f4d03f','#f7dc6f','#fdeaa8','#fff5cc'],
+  red:['#7b1a1a','#c0392b','#e74c3c','#f1948a','#f5b7b1','#fadbd8'],
+  white:['#999','#bbb','#ccc','#ddd8cc','#eee','#f5f5f5']
+};
+
+function showSetup(key){
+  curKey=key;chosenTimer=0;
+  var k=KASINAS[key];
+  var inner=document.getElementById('setupInner');
+  inner.innerHTML='';
+
+  var nameEl=document.createElement('div');nameEl.className='setup-name fade-in';
+  nameEl.textContent=k.name;nameEl.style.color=k.color;inner.appendChild(nameEl);
+
+  var paliEl=document.createElement('div');paliEl.className='setup-pali fade-in';
+  paliEl.textContent=k.pali;inner.appendChild(paliEl);
+
+  var instEl=document.createElement('div');instEl.className='setup-instruction fade-in';
+  instEl.textContent=k.instruction;inner.appendChild(instEl);
+
+  // Colour picker for colour kasinas
+  if(['blue','yellow','red','white'].indexOf(key)>-1){
+    var cs=document.createElement('div');cs.id='colorSection';cs.className='color-section fade-in';
+    cs.innerHTML='<div class="color-label">choose your colour</div><div class="color-swatches" id="swatchRow"></div>';
+    inner.appendChild(cs);
+    setTimeout(function(){
+      var row=document.getElementById('swatchRow');
+      if(!row)return;
+      var swatches=COLOR_SWATCHES[key]||[];
+      swatches.forEach(function(hex,i){
+        var sw=document.createElement('div');sw.className='swatch'+(i===2?' active':'');
+        sw.style.background=hex;sw.dataset.hex=hex;
+        sw.onclick=function(){
+          document.querySelectorAll('.swatch').forEach(function(s){s.classList.remove('active');});
+          sw.classList.add('active');
+          // Update the kasina colour
+          KASINAS[key].color=hex;
+          var rgb=hexToRgb(hex);
+          if(rgb)KASINAS[key].rgb=rgb;
+        };
+        row.appendChild(sw);
+      });
+    },50);
+  }
+
+  // Timer
+  var timerDiv=document.createElement('div');timerDiv.className='timer-row fade-in';
+  timerDiv.innerHTML='<div class="timer-label">session length</div><div class="timer-options" id="timerOpts"></div>';
+  inner.appendChild(timerDiv);
+  setTimeout(function(){
+    var opts=document.getElementById('timerOpts');if(!opts)return;
+    [{l:'open',v:0},{l:'5 min',v:5},{l:'10 min',v:10},{l:'20 min',v:20},{l:'30 min',v:30},{l:'45 min',v:45}].forEach(function(o){
+      var btn=document.createElement('button');btn.className='timer-btn'+(o.v===0?' active':'');
+      btn.textContent=o.l;btn.onclick=function(){
+        document.querySelectorAll('.timer-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');chosenTimer=o.v;
+      };
+      opts.appendChild(btn);
+    });
+  },50);
+
+  // Style picker for fire/earth/water/air
+  var _styleMap={
+    fire:[["particles","Particles"],["candle","Candle"],["wildfire","Wildfire"]],
+    earth:[["disc","Disc"],["clay","Clay"],["ground","Ground"]],
+    water:[["ripples","Ripples"],["ocean","Ocean"],["rain","Rain"]],
+    air:[["mist","Mist"],["turbulence","Turbulence"],["wind","Wind Lines"]]
+  };
+  if(_styleMap[key]){
+    var _sd=document.createElement("div");_sd.className="style-picker fade-in";
+    _sd.innerHTML='<div class="style-label">visual style</div><div class="style-options" id="styleOpts"></div>';
+    inner.appendChild(_sd);
+    setTimeout(function(){
+      var _so=document.getElementById("styleOpts");if(!_so)return;
+      _styleMap[key].forEach(function(s){
+        var _b=document.createElement("button");_b.className="style-opt"+(kasinaStyle[key]===s[0]?" active":"");
+        _b.textContent=s[1];_b.type="button";
+        _b.onclick=function(){kasinaStyle[key]=s[0];document.querySelectorAll(".style-opt").forEach(function(x){x.classList.remove("active");});_b.classList.add("active");};
+        _so.appendChild(_b);
+      });
+    },50);
+  }
+
+  // Tradition
+  var tradDiv=document.createElement('div');tradDiv.className='setup-tradition fade-in';
+  tradDiv.innerHTML='<div class="setup-trad-label">Visuddhimagga instruction</div><div class="setup-trad-text">'+k.tradition+'</div>';
+  inner.appendChild(tradDiv);
+
+  // Begin button - fixed at bottom, always visible
+  var fixedBegin=document.getElementById('fixedBeginBtn');
+  if(fixedBegin){
+    fixedBegin.style.display='block';
+    fixedBegin.style.borderColor='rgba('+k.rgb+',.40)';
+    fixedBegin.style.color=k.color;
+    fixedBegin.style.background='rgba('+k.rgb+',.08)';
+  }
+
+  showScreen('s-setup');
+  var _tb=document.getElementById('topBack');_tb.style.display='block';_tb.style.pointerEvents='all';
+}
+
+function hexToRgb(hex){
+  var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  if(isNaN(r))return null;
+  return r+','+g+','+b;
+}
+
+// ── PRACTICE ──
+var practiceActive=false;
+var kasinaStyle={fire:"particles",earth:"disc",water:"ripples",air:"mist"};
+var returnCount=0,practiceStartTime=null,timerInterval=null;
+var nimitta=false,nimittaT=0,nimittaThreshold=180; // seconds of sustained practice
+var settleLevel=0; // 0-1, increases with returns and time
+var RAF=null;
+var bgR=0,bgG=0,bgB=0,bgA=0,bgTR=0,bgTG=0,bgTB=0,bgTA=0;
+
+function setBgTarget(r,g,b,a){bgTR=r;bgTG=g;bgTB=b;bgTA=a;}
+
+// Background animation loop
+(function bgLoop(){
+  requestAnimationFrame(bgLoop);
+  bgR+=(bgTR-bgR)*.02;bgG+=(bgTG-bgG)*.02;bgB+=(bgTB-bgB)*.02;bgA+=(bgTA-bgA)*.02;
+  if(!practiceActive){X.clearRect(0,0,W,H);return;}
+  drawKasina();
+})();
+
+var T=0,lightAngle=0;
+var fireParticles=[],mistP=[],waterRipples=[];
+
+function initKasinaParticles(){
+  fireParticles=[];mistP=[];waterRipples=[];
+  if(curKey==='allelements'||curKey==='fire'||curKey==='earth'){
+    for(var i=0;i<60;i++)fireParticles.push({x:Math.random(),y:Math.random()*1.2+.2,vx:(Math.random()-.5)*.003,vy:-(Math.random()*.006+.002),life:Math.random(),r:Math.random()*3+1.5,a:Math.random()*.6+.2});
+  }
+  if(curKey==='air'||curKey==='space'||curKey==='water'){
+    for(var j=0;j<80;j++)mistP.push({x:Math.random()*2-1,y:Math.random()*2-1,vx:(Math.random()-.5)*.006,vy:(Math.random()-.5)*.006,life:Math.random(),ls:Math.random()*.002+.001,r:Math.random()*.5+.15,a:Math.random()*.5+.2,wisp:Math.random()<.2});
+  }
+  if(curKey==='water'){
+    waterRipples.push({r:0,maxR:Math.min(W,H)*.45,a:.6,speed:0.8});
+  }
+}
+
+function drawKasina(){
+  var k=KASINAS[curKey];
+  var rgb=k.rgb;
+  var cx=W/2,cy=H/2;
+  T+=.012;lightAngle+=.004;
+
+  // Smooth settle colour wash
+  X.clearRect(0,0,W,H);
+  var washA=bgA*(0.08+settleLevel*.12);
+  if(washA>.003){
+    var wash=X.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.8);
+    wash.addColorStop(0,'rgba('+Math.round(bgR)+','+Math.round(bgG)+','+Math.round(bgB)+','+washA+')');
+    wash.addColorStop(1,'rgba('+Math.round(bgR)+','+Math.round(bgG)+','+Math.round(bgB)+',0)');
+    X.fillStyle=wash;X.fillRect(0,0,W,H);
+  }
+
+  if(curKey==='allelements'){
+    drawAllElements(cx,cy);
+  } else if(curKey==='fire'){
+    drawFire(cx,cy,rgb);
+  } else if(curKey==='water'){
+    drawWater(cx,cy,rgb);
+  } else if(curKey==='earth'){
+    drawEarth(cx,cy,rgb);
+  } else if(curKey==='air'){
+    drawAir(cx,cy,rgb);
+  } else if(curKey==='light'){
+    drawLight(cx,cy,rgb);
+  } else if(curKey==='space'){
+    drawSpace(cx,cy,rgb);
+  } else if(['blue','yellow','red','white'].indexOf(curKey)>-1){
+    drawColour(cx,cy,rgb);
+  }
+
+  // Nimitta afterimage effect
+  if(nimitta){
+    nimittaT+=.008;
+    var na=Math.sin(nimittaT)*.25+.15;
+    var ng=X.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*.35);
+    ng.addColorStop(0,'rgba('+rgb+','+na+')');
+    ng.addColorStop(.4,'rgba('+rgb+','+(na*.4)+')');
+    ng.addColorStop(1,'rgba('+rgb+',0)');
+    X.fillStyle=ng;X.fillRect(0,0,W,H);
+  }
+}
+
+// ── KASINA VISUALS ──
+function drawAllElements(cx,cy){
+  var ALL=[
+    {r:'196,149,106',speed:0.6,dist:0.55,size:1.4},
+    {r:'90,181,212',speed:0.45,dist:0.70,size:1.2},
+    {r:'244,162,97',speed:0.8,dist:0.45,size:1.6},
+    {r:'168,216,234',speed:0.35,dist:0.80,size:1.0},
+    {r:'74,144,196',speed:0.55,dist:0.60,size:1.3},
+    {r:'244,208,63',speed:0.70,dist:0.50,size:1.5},
+    {r:'231,76,60',speed:0.65,dist:0.65,size:1.1},
+    {r:'221,216,204',speed:0.40,dist:0.75,size:1.2},
+    {r:'142,154,175',speed:0.30,dist:0.85,size:0.9},
+    {r:'245,240,224',speed:0.50,dist:0.40,size:1.8}
+  ];
+  var maxR=Math.min(W,H)*.48;
+
+  // Colour cycling core — much brighter than intro
+  var ci=Math.floor(T*1.4)%ALL.length;
+  var cn=(ci+1)%ALL.length;
+  var blend=(T*1.4)%1;
+  var c1=ALL[ci].r.split(','),c2=ALL[cn].r.split(',');
+  var cr=Math.round(parseInt(c1[0])+(parseInt(c2[0])-parseInt(c1[0]))*blend);
+  var cg2=Math.round(parseInt(c1[1])+(parseInt(c2[1])-parseInt(c1[1]))*blend);
+  var cb=Math.round(parseInt(c1[2])+(parseInt(c2[2])-parseInt(c1[2]))*blend);
+
+  // Massive glow layers — fills the whole screen
+  for(var gi=0;gi<7;gi++){
+    var gr=maxR*(0.8+gi*.45);
+    var ga=(0.22-gi*.026)*(0.7+settleLevel*.3);
+    if(ga<.003)continue;
+    var gg=X.createRadialGradient(cx,cy,0,cx,cy,gr);
+    gg.addColorStop(0,'rgba('+cr+','+cg2+','+cb+','+ga+')');
+    gg.addColorStop(1,'rgba('+cr+','+cg2+','+cb+',0)');
+    X.fillStyle=gg;X.fillRect(0,0,W,H);
+  }
+
+  // Bright core
+  var coreG=X.createRadialGradient(cx,cy,0,cx,cy,maxR*.25);
+  coreG.addColorStop(0,'rgba(255,252,240,.98)');
+  coreG.addColorStop(.3,'rgba('+cr+','+cg2+','+cb+',.85)');
+  coreG.addColorStop(1,'rgba('+cr+','+cg2+','+cb+',0)');
+  X.fillStyle=coreG;X.fillRect(0,0,W,H);
+
+  // Large rays — 16, irregular lengths
+  for(var ri=0;ri<16;ri++){
+    var rAngle=ri/16*Math.PI*2+T*.12;
+    var rLen=maxR*(1.1+Math.sin(T*1.8+ri*1.1)*.28+Math.sin(T*.9+ri*.7)*.15);
+    var rg=X.createLinearGradient(cx,cy,cx+Math.cos(rAngle)*rLen,cy+Math.sin(rAngle)*rLen);
+    var ra=(0.28+Math.sin(T*1.4+ri)*.08)*(0.7+settleLevel*.3);
+    rg.addColorStop(0,'rgba('+cr+','+cg2+','+cb+','+ra+')');
+    rg.addColorStop(.4,'rgba('+cr+','+cg2+','+cb+','+(ra*.5)+')');
+    rg.addColorStop(1,'rgba('+cr+','+cg2+','+cb+',0)');
+    X.beginPath();X.moveTo(cx,cy);X.lineTo(cx+Math.cos(rAngle)*rLen,cy+Math.sin(rAngle)*rLen);
+    X.strokeStyle=rg;X.lineWidth=Math.max(1,3.5+Math.sin(T+ri)*1.5);X.stroke();
+  }
+
+  // Large particles — all element colours, much bigger than intro
+  fireParticles.forEach(function(p){
+    p.life+=.008;p.angle=(p.angle||Math.random()*Math.PI*2)+p.vx*.5;
+    p.dist2=(p.dist2||(.2+Math.random()*.7));
+    if(p.life>1){p.life=0;p.dist2=.15+Math.random()*.75;p.angle=Math.random()*Math.PI*2;}
+    var fade=Math.sin(p.life*Math.PI);
+    var col=ALL[Math.floor(p.x*ALL.length)%ALL.length].r;
+    var pr=maxR*p.dist2;
+    var px=cx+Math.cos(p.angle)*pr,py=cy+Math.sin(p.angle)*pr*.85;
+    var sz=p.r*(2.5+p.dist2*2);
+    for(var b=0;b<5;b++){
+      var br=sz*(1+b*1.2);
+      var ba=fade*p.a*(0.55-b*.09);
+      if(ba<.006)continue;
+      X.beginPath();X.arc(px,py,br,0,Math.PI*2);
+      X.fillStyle='rgba('+col+','+ba.toFixed(3)+')';X.fill();
+    }
+  });
+
+  // Orbit rings — water element, multiple sizes
+  for(var wi=0;wi<5;wi++){
+    var wr=maxR*(.35+wi*.18)+Math.sin(T*1.2+wi)*maxR*.04;
+    X.beginPath();X.arc(cx,cy,wr,0,Math.PI*2);
+    X.strokeStyle='rgba('+cr+','+cg2+','+cb+','+(0.18-wi*.03)*(0.6+settleLevel*.3)+')';
+    X.lineWidth=1.5-wi*.25;X.stroke();
+  }
+}
+
+function drawAllElements(cx,cy){
+  var ALL=[
+    {r:'196,149,106'},{r:'90,181,212'},{r:'244,162,97'},{r:'168,216,234'},
+    {r:'74,144,196'},{r:'244,208,63'},{r:'231,76,60'},{r:'221,216,204'},
+    {r:'142,154,175'},{r:'245,240,224'}
+  ];
+  var maxR=Math.min(W,H)*.48;
+  var ci=Math.floor(T*1.4)%ALL.length,cn=(ci+1)%ALL.length,blend=(T*1.4)%1;
+  var c1=ALL[ci].r.split(','),c2=ALL[cn].r.split(',');
+  var cr=Math.round(parseInt(c1[0])+(parseInt(c2[0])-parseInt(c1[0]))*blend);
+  var cg=Math.round(parseInt(c1[1])+(parseInt(c2[1])-parseInt(c1[1]))*blend);
+  var cb=Math.round(parseInt(c1[2])+(parseInt(c2[2])-parseInt(c1[2]))*blend);
+  for(var gi=0;gi<7;gi++){
+    var gr=maxR*(.8+gi*.45),ga=(.22-gi*.026)*(.7+settleLevel*.3);if(ga<.003)continue;
+    var gg=X.createRadialGradient(cx,cy,0,cx,cy,gr);
+    gg.addColorStop(0,'rgba('+cr+','+cg+','+cb+','+ga+')');gg.addColorStop(1,'rgba('+cr+','+cg+','+cb+',0)');
+    X.fillStyle=gg;X.fillRect(0,0,W,H);
+  }
+  var coreG=X.createRadialGradient(cx,cy,0,cx,cy,maxR*.25);
+  coreG.addColorStop(0,'rgba(255,252,240,.98)');coreG.addColorStop(.3,'rgba('+cr+','+cg+','+cb+',.85)');coreG.addColorStop(1,'rgba('+cr+','+cg+','+cb+',0)');
+  X.fillStyle=coreG;X.fillRect(0,0,W,H);
+  for(var ri=0;ri<16;ri++){
+    var rAngle=ri/16*Math.PI*2+T*.12;
+    var rLen=maxR*(1.1+Math.sin(T*1.8+ri*1.1)*.28);
+    var ra=(.28+Math.sin(T*1.4+ri)*.08)*(.7+settleLevel*.3);
+    var rg=X.createLinearGradient(cx,cy,cx+Math.cos(rAngle)*rLen,cy+Math.sin(rAngle)*rLen);
+    rg.addColorStop(0,'rgba('+cr+','+cg+','+cb+','+ra+')');rg.addColorStop(1,'rgba('+cr+','+cg+','+cb+',0)');
+    X.beginPath();X.moveTo(cx,cy);X.lineTo(cx+Math.cos(rAngle)*rLen,cy+Math.sin(rAngle)*rLen);
+    X.strokeStyle=rg;X.lineWidth=Math.max(1,3.5+Math.sin(T+ri)*1.5);X.stroke();
+  }
+  fireParticles.forEach(function(p){
+    p.life+=.008;p.angle=(p.angle||Math.random()*Math.PI*2)+p.vx*.5;
+    p.dist2=(p.dist2||(.2+Math.random()*.7));
+    if(p.life>1){p.life=0;p.dist2=.15+Math.random()*.75;p.angle=Math.random()*Math.PI*2;}
+    var fade=Math.sin(p.life*Math.PI);
+    var col=ALL[Math.floor(p.x*ALL.length)%ALL.length].r;
+    var pr=maxR*p.dist2;
+    var px=cx+Math.cos(p.angle)*pr,py=cy+Math.sin(p.angle)*pr*.85;
+    var sz=p.r*(2.5+p.dist2*2);
+    for(var b=0;b<5;b++){var br=sz*(1+b*1.2);var ba=fade*p.a*(.55-b*.09);if(ba<.006)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle='rgba('+col+','+ba.toFixed(3)+')';X.fill();}
+  });
+  for(var wi=0;wi<5;wi++){
+    var wr=maxR*(.35+wi*.18)+Math.sin(T*1.2+wi)*maxR*.04;
+    X.beginPath();X.arc(cx,cy,wr,0,Math.PI*2);
+    X.strokeStyle='rgba('+cr+','+cg+','+cb+','+(0.18-wi*.03)*(.6+settleLevel*.3)+')';X.lineWidth=1.5-wi*.25;X.stroke();
+  }
+}
+function drawFire(cx,cy,rgb){
+  var st=kasinaStyle.fire||"particles";
+  if(st==="particles")drawFireParticles(cx,cy);
+  else if(st==="candle")drawFireCandle(cx,cy);
+  else drawFireWild(cx,cy);
+}
+function drawFireParticles(cx,cy){
+  var by=cy+Math.min(W,H)*.15,sp=Math.min(W,H)*.12;
+  var bg=X.createRadialGradient(cx,by,0,cx,by,sp*2.5);bg.addColorStop(0,"rgba(180,60,0,.35)");bg.addColorStop(1,"rgba(180,60,0,0)");X.fillStyle=bg;X.fillRect(0,0,W,H);
+  fireParticles.forEach(function(p){
+    var cx2=0.5+Math.sin(p.life*3.1+(p.a0||0))*(0.15-Math.abs(p.x-.5)*.3);
+    p.x+=(cx2-p.x)*.018+Math.sin(T*2.8+(p.a0||0))*(p.wx||.002);
+    p.y-=(p.vy||.008)*(0.8+Math.abs(p.x-.5)*.4);p.life+=(p.ls||.014);
+    if(p.life>1||p.y<-.05){p.x=.42+Math.random()*.16;p.y=.50+Math.random()*.06;p.life=0;p.vy=Math.random()*.010+.006;p.ls=Math.random()*.018+.010;p.a0=Math.random()*Math.PI*2;p.wx=(Math.random()-.5)*.004;}
+    var fade=p.life<.25?p.life/.25:Math.max(0,(1-p.life)/.75);
+    var px=cx+(p.x-.5)*sp*4,py=by-(p.life*Math.min(W,H)*.55);
+    var col=p.life<.25?"255,255,210":p.life<.55?"255,190,60":"200,80,15";
+    var sz=p.r*(p.life<.3?2.5+p.life*3:Math.max(1,4-p.life*3));
+    for(var b=0;b<5;b++){var br=sz*(1+b*1.1),ba=fade*p.a*(.55-b*.09);if(ba<.006)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle="rgba("+col+","+ba.toFixed(3)+")";X.fill();}
+  });
+  var cr=X.createRadialGradient(cx,by-Math.min(W,H)*.05,0,cx,by,Math.min(W,H)*.08);cr.addColorStop(0,"rgba(255,255,220,.85)");cr.addColorStop(.4,"rgba(255,200,80,.45)");cr.addColorStop(1,"rgba(200,80,0,0)");X.fillStyle=cr;X.fillRect(0,0,W,H);
+}
+function drawFireCandle(cx,cy){
+  var by=cy+Math.min(W,H)*.08,h=Math.min(W,H)*.18;
+  var fl=Math.sin(T*2.3)*.015+Math.sin(T*4.7)*.008;
+  var og=X.createRadialGradient(cx,by-h*.3,0,cx,by,h*1.8);og.addColorStop(0,"rgba(200,100,20,.22)");og.addColorStop(1,"rgba(200,100,20,0)");X.fillStyle=og;X.fillRect(0,0,W,H);
+  fireParticles.slice(0,25).forEach(function(p){
+    p.x+=(0.5-p.x)*.01+fl+Math.sin(T*1.8+(p.a0||0))*.001;p.y-=(p.vy||.007)*.6;p.life+=(p.ls||.014);
+    if(p.life>1||p.y<.25){p.x=.48+Math.random()*.04;p.y=.55+Math.random()*.03;p.life=0;p.a0=Math.random()*6;}
+    var fade=p.life<.2?p.life/.2:Math.max(0,(1-p.life)/.8);
+    var px=cx+(p.x-.5)*Math.min(W,H)*.08+fl*30,py=by-(p.life*h*1.1);
+    var col=p.life<.3?"255,255,200":p.life<.6?"255,180,50":"180,70,10";
+    var sz=p.r*(p.life<.25?2:Math.max(.5,2.5-p.life*2));
+    for(var b=0;b<4;b++){var br=sz*(1+b*.9),ba=fade*p.a*(.50-b*.10);if(ba<.006)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle="rgba("+col+","+ba.toFixed(3)+")";X.fill();}
+  });
+  var cr=X.createRadialGradient(cx+fl*20,by-h*.15,0,cx,by-h*.1,h*.25);cr.addColorStop(0,"rgba(255,255,230,.92)");cr.addColorStop(.5,"rgba(255,190,60,.55)");cr.addColorStop(1,"rgba(200,80,0,0)");X.fillStyle=cr;X.fillRect(0,0,W,H);
+}
+function drawFireWild(cx,cy){
+  var by=cy+Math.min(W,H)*.22,sp=Math.min(W,H)*.22;
+  var bg=X.createRadialGradient(cx,by,0,cx,by,sp*3);bg.addColorStop(0,"rgba(200,60,0,.42)");bg.addColorStop(.4,"rgba(150,40,0,.18)");bg.addColorStop(1,"rgba(100,20,0,0)");X.fillStyle=bg;X.fillRect(0,0,W,H);
+  fireParticles.forEach(function(p){
+    p.x+=(Math.random()-.5)*.006+Math.sin(T*1.8+(p.a0||0))*.004;p.y-=(p.vy||.008)*1.4;p.life+=(p.ls||.014)*.9;
+    if(p.life>1||p.y<-.1){p.x=.2+Math.random()*.6;p.y=.55+Math.random()*.1;p.life=Math.random()*.2;p.a0=Math.random()*6;}
+    var fade=p.life<.2?p.life/.2:Math.max(0,(1-p.life)/.8);
+    var px=cx+(p.x-.5)*sp*3.5,py=by-(p.life*Math.min(W,H)*.72);
+    var col=p.life<.2?"255,240,150":p.life<.5?"255,140,20":"180,40,0";
+    var sz=p.r*(p.life<.3?3+p.life*4:Math.max(1.5,5.5-p.life*4));
+    for(var b=0;b<5;b++){var br=sz*(1+b*1.0),ba=fade*p.a*(.52-b*.09);if(ba<.005)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle="rgba("+col+","+ba.toFixed(3)+")";X.fill();}
+  });
+  var cr=X.createRadialGradient(cx,by-Math.min(W,H)*.12,0,cx,by,Math.min(W,H)*.15);cr.addColorStop(0,"rgba(255,255,180,.90)");cr.addColorStop(.3,"rgba(255,180,40,.55)");cr.addColorStop(1,"rgba(200,60,0,0)");X.fillStyle=cr;X.fillRect(0,0,W,H);
+}
+
+function drawWater(cx,cy,rgb){
+  var style=kasinaStyle.water||"ripples";
+  if(style==="ripples")drawWaterRipples(cx,cy,rgb);
+  else if(style==="ocean")drawWaterOcean(cx,cy,rgb);
+  else drawWaterRain(cx,cy,rgb);
+}
+function drawWaterRipples(cx,cy,rgb){
+  var wg=X.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*.4);
+  wg.addColorStop(0,"rgba("+rgb+",.18)");wg.addColorStop(1,"rgba("+rgb+",0)");
+  X.fillStyle=wg;X.fillRect(0,0,W,H);
+  waterRipples.forEach(function(r){r.r+=r.speed;r.a*=.992;});
+  waterRipples=waterRipples.filter(function(r){return r.a>.008;});
+  if(Math.random()<.008)waterRipples.push({r:0,maxR:Math.min(W,H)*(.3+Math.random()*.2),a:.5,speed:.5+Math.random()*.4,cx:cx,cy:cy});
+  if(waterRipples.length===0)waterRipples.push({r:0,maxR:Math.min(W,H)*.4,a:.55,speed:.7,cx:cx,cy:cy});
+  waterRipples.forEach(function(r){
+    for(var i=0;i<3;i++){var rr=r.r*(1-i*.18);if(rr<1)return;var ra=r.a*(1-i*.28);X.beginPath();X.arc(r.cx||cx,r.cy||cy,rr,0,Math.PI*2);X.strokeStyle="rgba("+rgb+","+ra.toFixed(3)+")";X.lineWidth=Math.max(.5,2-i*.5);X.stroke();}
+  });
+  X.beginPath();X.arc(cx,cy,3,0,Math.PI*2);X.fillStyle="rgba("+rgb+",.45)";X.fill();
+}
+function drawWaterOcean(cx,cy,rgb){
+  var wg=X.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.7);
+  wg.addColorStop(0,"rgba("+rgb+",.12)");wg.addColorStop(1,"rgba("+rgb+",0)");
+  X.fillStyle=wg;X.fillRect(0,0,W,H);
+  for(var wi=0;wi<6;wi++){
+    var yOff=cy-Math.min(W,H)*.15+wi*Math.min(W,H)*.06;
+    var amp=Math.min(W,H)*.025*(1-wi*.12);
+    var freq=0.006+wi*.001;
+    var phase=T*(0.4+wi*.08)+wi*1.1;
+    var wa=(.35-wi*.05)*(.5+settleLevel*.4);
+    X.beginPath();X.moveTo(0,yOff);
+    for(var x=0;x<=W;x+=4){var y=yOff+Math.sin(x*freq+phase)*amp+Math.sin(x*freq*.6+phase*.7)*amp*.4;X.lineTo(x,y);}
+    X.strokeStyle="rgba("+rgb+","+wa+")";X.lineWidth=1.5-wi*.2;X.stroke();
+  }
+}
+function drawWaterRain(cx,cy,rgb){
+  var bg=X.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*.5);
+  bg.addColorStop(0,"rgba("+rgb+",.10)");bg.addColorStop(1,"rgba("+rgb+",0)");
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+  if(Math.random()<.04)waterRipples.push({r:0,maxR:Math.min(W,H)*(.08+Math.random()*.15),a:.65,speed:.8+Math.random()*.5,cx:cx+(Math.random()-.5)*W*.7,cy:cy+(Math.random()-.5)*H*.5});
+  waterRipples.forEach(function(r){r.r+=r.speed;r.a*=.985;});
+  waterRipples=waterRipples.filter(function(r){return r.a>.01;});
+  waterRipples.forEach(function(r){
+    for(var i=0;i<3;i++){var rr=r.r*(1-i*.2);if(rr<1)return;var ra=r.a*(1-i*.3);X.beginPath();X.arc(r.cx,r.cy,rr,0,Math.PI*2);X.strokeStyle="rgba("+rgb+","+ra.toFixed(3)+")";X.lineWidth=Math.max(.4,1.5-i*.4);X.stroke();}
+  });
+}
+
+function drawEarth(cx,cy,rgb){
+  var style=kasinaStyle.earth||"disc";
+  if(style==="disc")drawEarthDisc(cx,cy,rgb);
+  else if(style==="clay")drawEarthClay(cx,cy,rgb);
+  else drawEarthGround(cx,cy,rgb);
+}
+function drawEarthDisc(cx,cy,rgb){
+  var discR=Math.min(W,H)*.24*(1+Math.sin(T*.35)*.025);
+  var glow=X.createRadialGradient(cx,cy,discR*.4,cx,cy,discR*2.4);
+  glow.addColorStop(0,"rgba("+rgb+","+(0.22+settleLevel*.12)+")");glow.addColorStop(1,"rgba("+rgb+",0)");
+  X.fillStyle=glow;X.fillRect(0,0,W,H);
+  var disc=X.createRadialGradient(cx,cy,0,cx,cy,discR);
+  disc.addColorStop(0,"rgba("+rgb+","+(0.88+settleLevel*.08)+")");disc.addColorStop(.8,"rgba("+rgb+",.55)");disc.addColorStop(1,"rgba("+rgb+",0)");
+  X.beginPath();X.arc(cx,cy,discR,0,Math.PI*2);X.fillStyle=disc;X.fill();
+  fireParticles.forEach(function(p){
+    p.life+=.004;if(p.life>1){p.life=0;p.x=Math.random();p.y=Math.random();}
+    var fade=Math.sin(p.life*Math.PI);
+    var angle=p.life*Math.PI*2+p.x*10+T*.2;
+    var pr=discR*(0.15+p.x*.72);
+    var px=cx+Math.cos(angle)*pr,py=cy+Math.sin(angle)*pr*.88;
+    for(var b=0;b<3;b++){var br=p.r*(.7+b*.8);var ba=fade*p.a*(.35-b*.09);if(ba<.005)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle="rgba("+rgb+","+ba.toFixed(3)+")";X.fill();}
+  });
+  X.beginPath();X.arc(cx,cy,discR*.97,0,Math.PI*2);
+  X.strokeStyle="rgba("+rgb+","+(0.45+settleLevel*.25)+")";X.lineWidth=1.5;X.stroke();
+}
+function drawEarthClay(cx,cy,rgb){
+  var r=Math.min(W,H)*.28;
+  var bg=X.createRadialGradient(cx,cy,0,cx,cy,r*2);
+  bg.addColorStop(0,"rgba("+rgb+","+(0.18+settleLevel*.12)+")");bg.addColorStop(1,"rgba("+rgb+",0)");
+  X.fillStyle=bg;X.fillRect(0,0,W,H);
+  fireParticles.forEach(function(p){
+    p.life+=.003;if(p.life>1){p.life=0;p.x=Math.random();p.y=Math.random();}
+    var fade=Math.sin(p.life*Math.PI);
+    var angle=(p.x+p.y)*Math.PI*3+T*.15+p.life*Math.PI;
+    var pr=r*(0.1+p.x*.8);
+    var px=cx+Math.cos(angle)*pr*(0.6+p.y*.5);
+    var py=cy+Math.sin(angle)*pr*(0.5+p.x*.4);
+    for(var b=0;b<3;b++){var br=p.r*(1+b*.7);var ba=fade*p.a*(.28-b*.07);if(ba<.004)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle="rgba("+rgb+","+ba.toFixed(3)+")";X.fill();}
+  });
+}
+function drawEarthGround(cx,cy,rgb){
+  var hy=cy+Math.min(W,H)*.04;
+  X.fillStyle="rgba(6,6,10,1)";X.fillRect(0,0,W,hy);
+  var gg=X.createLinearGradient(cx,hy,cx,H);
+  gg.addColorStop(0,"rgba("+rgb+","+(0.55+settleLevel*.20)+")");
+  gg.addColorStop(.3,"rgba("+rgb+","+(0.35+settleLevel*.12)+")");
+  gg.addColorStop(1,"rgba("+rgb+","+(0.15+settleLevel*.06)+")");
+  X.fillStyle=gg;X.fillRect(0,hy,W,H-hy);
+  var hg=X.createRadialGradient(cx,hy,0,cx,hy,Math.min(W,H)*.45);
+  hg.addColorStop(0,"rgba("+rgb+","+(0.45+settleLevel*.25)+")");hg.addColorStop(1,"rgba("+rgb+",0)");
+  X.fillStyle=hg;X.fillRect(0,0,W,H);
+  fireParticles.slice(0,30).forEach(function(p){
+    p.life+=.002;if(p.life>1){p.life=0;p.x=Math.random();}
+    var fade=Math.sin(p.life*Math.PI);
+    var px=cx+(p.x-.5)*W*.8,py=hy+(p.r+p.life*Math.min(W,H)*.08);
+    if(py>H)return;
+    for(var b=0;b<2;b++){var br=p.r*(1.5+b);var ba=fade*p.a*(.22-b*.08);if(ba<.004)continue;X.beginPath();X.arc(px,py,br,0,Math.PI*2);X.fillStyle="rgba("+rgb+","+ba.toFixed(3)+")";X.fill();}
+  });
+}
+
+function drawAir(cx,cy,rgb){
+  var style=kasinaStyle.air||"mist";
+  if(style==="mist")drawAirMist(cx,cy,rgb);
+  else if(style==="turbulence")drawAirTurbulence(cx,cy,rgb);
+  else drawAirWind(cx,cy,rgb);
+}
+function drawAirMist(cx,cy,rgb){
+  mistP.forEach(function(p){
+    p.x+=p.vx*.5;p.y+=p.vy*.5;p.life+=p.ls*.6;
+    if(p.life>1){p.life=0;p.x=(Math.random()*2-1)*.8;p.y=(Math.random()*2-1)*.8;}
+    if(!p.wisp)return;
+    var fade=Math.sin(p.life*Math.PI);
+    var px=cx+p.x*W*.45,py=cy+p.y*H*.45;
+    var pr=p.r*Math.min(W,H)*.65;
+    var mg=X.createRadialGradient(px,py,0,px,py,pr);
+    mg.addColorStop(0,"rgba("+rgb+","+(fade*p.a*.12)+")");mg.addColorStop(1,"rgba("+rgb+",0)");
+    X.beginPath();X.arc(px,py,pr,0,Math.PI*2);X.fillStyle=mg;X.fill();
+  });
+}
+function drawAirTurbulence(cx,cy,rgb){
+  for(var ti=0;ti<4;ti++){
+    var tx=cx+Math.cos(T*.15+ti*1.57)*W*.22;
+    var ty=cy+Math.sin(T*.12+ti*1.57)*H*.18;
+    var tr=Math.min(W,H)*(.18+Math.sin(T*.2+ti)*.06);
+    var ta=Math.sin(T*.3+ti*.8)*.025+.015;if(ta<.005)continue;
+    var tg=X.createRadialGradient(tx,ty,0,tx,ty,tr);
+    tg.addColorStop(0,"rgba("+rgb+","+ta+")");tg.addColorStop(1,"rgba("+rgb+",0)");
+    X.fillStyle=tg;X.fillRect(0,0,W,H);
+  }
+}
+function drawAirWind(cx,cy,rgb){
+  mistP.slice(0,20).forEach(function(p){
+    p.life+=p.ls*.4;p.x+=p.vx*2;
+    if(p.life>1||Math.abs(p.x)>1.1){p.life=0;p.x=-1.1;p.y=(Math.random()*2-1)*.7;}
+    var fade=Math.sin(p.life*Math.PI);
+    var startX=cx+p.x*W*.5,y=cy+p.y*H*.4,len=W*.35;
+    var curve=Math.sin(p.life*Math.PI*2+p.y*5)*H*.04;
+    var wg=X.createLinearGradient(startX,y,startX+len,y+curve);
+    wg.addColorStop(0,"rgba("+rgb+",0)");
+    wg.addColorStop(.3,"rgba("+rgb+","+(fade*p.a*.20)+")");
+    wg.addColorStop(.7,"rgba("+rgb+","+(fade*p.a*.14)+")");
+    wg.addColorStop(1,"rgba("+rgb+",0)");
+    X.beginPath();X.moveTo(startX,y);
+    X.bezierCurveTo(startX+len*.3,y+curve*.3,startX+len*.7,y+curve*.7,startX+len,y+curve);
+    X.strokeStyle=wg;X.lineWidth=Math.max(.5,p.r*.3);X.stroke();
+  });
+}
+
+function drawLight(cx,cy,rgb){
+  var settle=settleLevel;
+  var coreR=Math.min(W,H)*(.055+settle*.025);
+  var core=X.createRadialGradient(cx,cy,0,cx,cy,coreR*3.5);
+  core.addColorStop(0,"rgba(255,255,250,1)");
+  core.addColorStop(.2,"rgba(255,255,220,.95)");
+  core.addColorStop(.5,"rgba(255,240,160,.60)");
+  core.addColorStop(.8,"rgba(245,210,120,.20)");
+  core.addColorStop(1,"rgba(245,200,100,0)");
+  X.fillStyle=core;X.fillRect(0,0,W,H);
+  var RAY_DATA=[
+    {a:0.00,len:2.8,w:2.2,b:.75},{a:0.40,len:1.2,w:0.8,b:.35},
+    {a:0.78,len:3.5,w:2.8,b:.85},{a:1.10,len:0.9,w:0.5,b:.25},
+    {a:1.57,len:2.2,w:1.8,b:.65},{a:1.90,len:1.5,w:0.7,b:.40},
+    {a:2.35,len:3.8,w:3.0,b:.90},{a:2.70,len:0.8,w:0.4,b:.20},
+    {a:3.14,len:2.5,w:2.0,b:.70},{a:3.50,len:1.1,w:0.6,b:.30},
+    {a:3.93,len:3.2,w:2.5,b:.80},{a:4.30,len:1.0,w:0.5,b:.28},
+    {a:4.71,len:2.0,w:1.6,b:.60},{a:5.10,len:1.4,w:0.7,b:.38},
+    {a:5.50,len:3.0,w:2.3,b:.72},{a:5.90,len:0.7,w:0.4,b:.18}
+  ];
+  RAY_DATA.forEach(function(rd,i){
+    // Shimmer in place — no rotation, just breathing fluctuation
+    var shimmer=Math.sin(T*(1.2+i*.18)+i*.9)*.22+Math.sin(T*(2.1+i*.11))*.12;
+    var breathe=Math.sin(T*(0.4+i*.05)+i*.7)*.06;
+    var angle=rd.a+breathe;
+    var len=coreR*(rd.len*(2.5+settle*1.5))*(1+shimmer*.18);
+    var alpha=rd.b*(.6+settle*.35)*(.85+shimmer*.15);
+    if(alpha<.02)return;
+    var ex=cx+Math.cos(angle)*len,ey=cy+Math.sin(angle)*len;
+    var rg=X.createLinearGradient(cx,cy,ex,ey);
+    rg.addColorStop(0,"rgba(255,255,240,"+alpha+")");
+    rg.addColorStop(.15,"rgba(255,240,180,"+(alpha*.85)+")");
+    rg.addColorStop(.45,"rgba(245,210,120,"+(alpha*.45)+")");
+    rg.addColorStop(1,"rgba(245,200,100,0)");
+    X.beginPath();X.moveTo(cx,cy);X.lineTo(ex,ey);
+    X.strokeStyle=rg;X.lineWidth=rd.w*(.7+shimmer*.3);X.stroke();
+  });
+  if(settle>.1){
+    X.beginPath();X.arc(cx,cy,coreR*(8+settle*4),0,Math.PI*2);
+    X.strokeStyle="rgba(255,240,180,"+(settle*.08)+")";X.lineWidth=1;X.stroke();
+  }
+}
+
+function drawSpace(cx,cy,rgb){
+  mistP.forEach(function(p){
+    p.life+=p.ls*.25;p.x+=p.vx*.15;p.y+=p.vy*.15;
+    if(p.life>1){p.life=0;p.x=(Math.random()*2-1)*.92;p.y=(Math.random()*2-1)*.92;}
+    var fade=Math.sin(p.life*Math.PI);
+    var px=cx+p.x*W*.46,py=cy+p.y*H*.46;
+    var a=fade*p.a*.18;if(a<.005)return;
+    X.beginPath();X.arc(px,py,p.r*.35,0,Math.PI*2);
+    X.fillStyle="rgba("+rgb+","+a.toFixed(3)+")";X.fill();
+    if(p.a>.7){X.beginPath();X.arc(px,py,p.r*.12,0,Math.PI*2);X.fillStyle="rgba(232,228,220,"+(fade*p.a*.45).toFixed(3)+")";X.fill();}
+  });
+  for(var ni=0;ni<4;ni++){
+    var na=Math.sin(T*.06+ni*1.8)*.008+.006;if(na<.003)continue;
+    var nx=cx+Math.cos(lightAngle*.15+ni*1.57)*W*.28;
+    var ny=cy+Math.sin(lightAngle*.12+ni*1.57)*H*.24;
+    var nr=Math.min(W,H)*(.12+Math.sin(T*.10+ni)*.04);
+    var ng=X.createRadialGradient(nx,ny,0,nx,ny,nr);
+    ng.addColorStop(0,"rgba("+rgb+","+na+")");ng.addColorStop(1,"rgba("+rgb+",0)");
+    X.fillStyle=ng;X.fillRect(0,0,W,H);
+  }
+}
+
+function drawColour(cx,cy,rgb){
+  // Bounded disc — darkness around it so nimitta can form
+  var pulse=Math.sin(T*.3)*.025;
+  var discR=Math.min(W,H)*(.22+pulse+settleLevel*.04);
+
+  // Outer glow — bleeds into darkness
+  var glow=X.createRadialGradient(cx,cy,discR*.5,cx,cy,discR*2.2);
+  glow.addColorStop(0,'rgba('+rgb+','+(0.28+settleLevel*.15)+')');
+  glow.addColorStop(.4,'rgba('+rgb+','+(0.10+settleLevel*.06)+')');
+  glow.addColorStop(1,'rgba('+rgb+',0)');
+  X.fillStyle=glow;X.fillRect(0,0,W,H);
+
+  // The disc itself — solid, saturated, bounded
+  var disc=X.createRadialGradient(cx,cy,0,cx,cy,discR);
+  disc.addColorStop(0,'rgba('+rgb+','+(0.95+settleLevel*.05)+')');
+  disc.addColorStop(.7,'rgba('+rgb+','+(0.85+settleLevel*.10)+')');
+  disc.addColorStop(.92,'rgba('+rgb+',.60)');
+  disc.addColorStop(1,'rgba('+rgb+',0)');
+  X.beginPath();X.arc(cx,cy,discR,0,Math.PI*2);X.fillStyle=disc;X.fill();
+
+  // Soft edge ring
+  X.beginPath();X.arc(cx,cy,discR*.98,0,Math.PI*2);
+  X.strokeStyle='rgba('+rgb+','+(0.55+settleLevel*.30)+')';
+  X.lineWidth=2+settleLevel*2;X.stroke();
+
+  // Second fainter ring — the beginning of the nimitta
+  X.beginPath();X.arc(cx,cy,discR*1.12,0,Math.PI*2);
+  X.strokeStyle='rgba('+rgb+','+(0.12+settleLevel*.18)+')';
+  X.lineWidth=1;X.stroke();
+}
+
+// ── BEGIN/END PRACTICE ──
+function beginPractice(){
+  var k=KASINAS[curKey];
+  returnCount=0;settleLevel=0;nimitta=false;nimittaT=0;T=0;
+  practiceStartTime=Date.now();
+  var rgb=k.rgb.split(',');
+  var bgStrength=curKey==='air'||curKey==='space'?0.3:1;
+  setBgTarget(parseInt(rgb[0]),parseInt(rgb[1]),parseInt(rgb[2]),bgStrength);
+  document.getElementById('returnCount').textContent='0';
+  document.getElementById('nimitta').classList.remove('arise');
+  document.getElementById('timerDisplay').textContent='';
+  showScreen('s-practice');
+  var _tb2=document.getElementById('topBack');_tb2.style.display='none';_tb2.style.pointerEvents='none';
+  document.getElementById('practiceUI').classList.add('show');
+  var _pe=document.getElementById('practiceEnd');if(_pe){_pe.style.pointerEvents='all';_pe.style.opacity='1';}
+  initKasinaParticles();
+  practiceActive=true;
+  // Timer
+  if(chosenTimer>0){
+    var endTime=Date.now()+chosenTimer*60000;
+    timerInterval=setInterval(function(){
+      var remaining=Math.max(0,endTime-Date.now());
+      var mins=Math.floor(remaining/60000);
+      var secs=Math.floor((remaining%60000)/1000);
+      document.getElementById('timerDisplay').textContent=mins+':'+(secs<10?'0':'')+secs;
+      if(remaining<=0){clearInterval(timerInterval);endPractice();}
+    },1000);
+  }
+  // Nimitta check
+  if(window._nimittaInterval)clearInterval(window._nimittaInterval);
+  window._nimittaInterval=setInterval(function(){
+    if(!practiceActive)return;
+    var elapsed=(Date.now()-practiceStartTime)/1000;
+    settleLevel=Math.min(1,elapsed/300); // settles over 5 min
+    if(elapsed>nimittaThreshold&&!nimitta&&returnCount>3){
+      nimitta=true;
+      document.getElementById('nimitta').classList.add('arise');
+      setTimeout(function(){document.getElementById('nimitta').classList.remove('arise');},8000);
+    }
+  },5000);
+}
+
+function logReturn(){
+  returnCount++;
+  var el=document.getElementById('returnCount');
+  el.textContent=returnCount;
+  el.classList.add('flash');
+  setTimeout(function(){el.classList.remove('flash');},400);
+  settleLevel=Math.min(1,settleLevel+.015);
+}
+
+function stopPractice(){
+  practiceActive=false;
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  if(window._nimittaInterval){clearInterval(window._nimittaInterval);window._nimittaInterval=null;}
+  setBgTarget(0,0,0,0);
+  document.getElementById('practiceUI').classList.remove('show');
+  var _pe2=document.getElementById('practiceEnd');if(_pe2){_pe2.style.pointerEvents='none';_pe2.style.opacity='0';}
+}
+
+function endPractice(){
+  var elapsed=Math.round((Date.now()-practiceStartTime)/60000);
+  stopPractice();
+  var k=KASINAS[curKey];
+  document.getElementById('cGlyph').textContent=k.glyph;
+  document.getElementById('cGlyph').style.color=k.color;
+  document.getElementById('cTitle').textContent=k.name;
+  document.getElementById('cTitle').style.color=k.color;
+  document.getElementById('cTime').textContent=Math.max(1,elapsed);
+  document.getElementById('cReturns').textContent=returnCount;
+  document.getElementById('cQuote').textContent=k.complete;
+  showScreen('s-complete');
+  var _tb=document.getElementById('topBack');_tb.style.display='block';_tb.style.pointerEvents='all';
+}
+
+function startAgain(){showSetup(curKey);}
+function enterMenu(){
+  var el=document.getElementById('introCanvas');
+  var ie=document.getElementById('introEnter');
+  ie.style.opacity='0';ie.style.pointerEvents='none';ie.style.display='none';
+  el.style.transition='opacity .8s ease';el.style.opacity='0';
+  setTimeout(function(){
+    iDone=true;el.style.display='none';
+    document.getElementById('s-home').classList.add('active');
+  },800);
+}
+function openInfo(){var p=document.getElementById('infoPanel');p.style.transform='translateY(0)';p.style.pointerEvents='all';}
+function closeInfo(){var p=document.getElementById('infoPanel');p.style.transform='translateY(100%)';p.style.pointerEvents='none';}
+</script>
+<!-- INFO PANEL -->
+<div id="infoPanel" style="position:fixed;bottom:0;left:0;right:0;max-height:85vh;background:rgba(6,6,10,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);border-radius:24px 24px 0 0;z-index:500;transform:translateY(100%);pointer-events:none;transition:transform .4s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:24px 28px max(env(safe-area-inset-bottom),32px)">
+  <div onclick="closeInfo()" style="width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:99px;margin:0 auto 24px;cursor:pointer"></div>
+  <div style="max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:22px">
+    <div style="font-family:var(--sans);font-size:clamp(22px,5.5vw,28px);font-weight:600;color:#f5f0e0;letter-spacing:.06em">Kasina Practice</div>
+    <div style="font-size:clamp(14px,3.5vw,16px);font-weight:300;color:rgba(232,228,220,.60);line-height:1.85">Kasina (Pali: kasiṇa) means "whole" or "complete." It refers to a meditation object that is used to fill awareness entirely — a single thing held with such sustained attention that the mind becomes absorbed in it completely.</div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.20em;text-transform:uppercase;color:rgba(232,228,220,.30);font-weight:400;margin-bottom:10px">The Visuddhimagga</div>
+      <div style="font-size:clamp(14px,3.5vw,16px);font-weight:300;color:rgba(232,228,220,.60);line-height:1.85">The Visuddhimagga — Path of Purification — was written by the scholar-monk Buddhaghosa in 5th century Sri Lanka. It is the most comprehensive manual of Theravada meditation ever composed, systematically describing 40 objects of meditation including all ten kasinas in precise detail. Buddhaghosa drew from earlier Pali texts and established commentary traditions that are still followed today.</div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.20em;text-transform:uppercase;color:rgba(232,228,220,.30);font-weight:400;margin-bottom:10px">The ten objects</div>
+      <div style="font-size:clamp(14px,3.5vw,16px);font-weight:300;color:rgba(232,228,220,.60);line-height:1.85">The ten kasinas are earth, water, fire, air, blue, yellow, red, white, space, and light. Each represents a quality of experience that can be used as a concentration object. The meditator gazes at the object until a mental image — the nimitta — arises spontaneously. This acquired sign is then held in the mind without the physical object, deepening into full absorption.</div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.20em;text-transform:uppercase;color:rgba(232,228,220,.30);font-weight:400;margin-bottom:10px">The three signs</div>
+      <div style="font-size:clamp(14px,3.5vw,16px);font-weight:300;color:rgba(232,228,220,.60);line-height:1.85">The Visuddhimagga describes three stages of the sign: the preparatory sign (the actual object), the acquired sign (the mental image that persists when eyes close), and the counterpart sign — a purified, luminous version of the object that arises in deep concentration. The counterpart sign is said to be more brilliant than the original. It is the mind seeing its own clarity reflected back.</div>
+    </div>
+    <div>
+      <div style="font-size:11px;letter-spacing:.20em;text-transform:uppercase;color:rgba(232,228,220,.30);font-weight:400;margin-bottom:10px">How to use this app</div>
+      <div style="font-size:clamp(14px,3.5vw,16px);font-weight:300;color:rgba(232,228,220,.60);line-height:1.85">Choose an object. Read the instruction. Set a timer or sit open-endedly. Fix attention on the visual. When the mind wanders — and it will — tap the return counter and come back. The return is the practice, not a failure. Each return strengthens concentration the way each repetition strengthens a muscle. Over time, the visual will deepen. You may notice the nimitta arising.</div>
+    </div>
+    <div style="font-size:clamp(13px,3.2vw,15px);font-weight:300;color:rgba(232,228,220,.30);line-height:1.85;font-style:italic;padding-top:4px;border-top:1px solid rgba(255,255,255,.06)">"Just as a lamp illuminates an object in a dark room, so concentration illuminates the object of meditation."<br>— Visuddhimagga</div>
+    <button onclick="closeInfo()" style="width:100%;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);font-family:var(--serif);font-size:clamp(15px,3.8vw,17px);font-weight:300;color:rgba(232,228,220,.55);cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:4px">Close</button>
+  </div>
+</div>
 </body>
 </html>

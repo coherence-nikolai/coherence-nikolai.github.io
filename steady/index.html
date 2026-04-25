@@ -1,35 +1,1262 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Steady - Coherence Nikolai</title>
-  <meta name="description" content="Steady is an earlier Coherence Nikolai regulation support.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/steady/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEADY</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Lifted palette — warmer, more legible on phone */
+  --bg:#1a1610;
+  --surface:#242018;
+  --surface-lift:#2e2a1f;
+  --border:rgba(210,175,130,0.18);
+  --gold:#d4b483;
+  --gold-dim:rgba(212,180,131,0.7);
+  --gold-bright:#e8c97a;
+  --text:#f0e8dc;
+  --text-dim:rgba(240,232,220,0.72);
+  --text-faint:rgba(240,232,220,0.4);
+  --red:rgba(210,110,85,0.7);--red-dim:rgba(210,110,85,0.25);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:env(safe-area-inset-top, 28px) 24px 48px;padding-top:max(env(safe-area-inset-top), 28px);overflow-x:hidden}
+body::before{content:'';position:fixed;top:-10vh;left:50%;transform:translateX(-50%);width:80vw;height:80vw;background:radial-gradient(ellipse,rgba(200,160,90,0.06) 0%,transparent 70%);pointer-events:none;z-index:0}
+.container{width:100%;max-width:440px;position:relative;z-index:1}
+
+/* SCREENS */
+.screen{display:none;opacity:0;transform:translateY(6px);transition:opacity 0.15s ease,transform 0.15s ease}
+.screen.active{display:block}
+.screen.visible{opacity:1;transform:translateY(0)}
+
+/* MODE BAR */
+.mode-bar{display:flex;gap:7px;margin-bottom:32px;flex-wrap:wrap}
+.mode-pill{font-size:11px;letter-spacing:0.11em;text-transform:uppercase;color:var(--text-faint);background:none;border:1px solid var(--border);border-radius:20px;padding:7px 14px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;font-family:'DM Sans',sans-serif;font-weight:300}
+.mode-pill:hover,.mode-pill.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(212,180,131,0.07)}
+.mode-pill.em-pill{color:var(--red);border-color:var(--red-dim)}
+.mode-pill.em-pill:hover,.mode-pill.em-pill.active{color:rgba(230,130,105,0.95);border-color:rgba(210,110,85,0.45);background:rgba(210,110,85,0.06)}
+
+/* HOME */
+.home-label{font-size:13px;font-weight:400;letter-spacing:0.13em;text-transform:uppercase;color:rgba(212,180,131,0.92);margin-bottom:24px}
+.home-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;font-style:italic;color:var(--text);line-height:1.2;margin-bottom:12px}
+.home-sub{font-size:15px;font-weight:300;color:var(--text-dim);margin-bottom:32px;line-height:1.65}
+.state-grid{display:flex;flex-direction:column;gap:10px}
+.state-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .2s,border-color .2s;text-align:left;width:100%}
+.state-btn:hover{background:var(--surface-lift);border-color:var(--gold-dim)}
+.state-btn:active{transform:scale(0.985)}
+.state-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--text)}
+.state-hint{font-size:13px;font-weight:300;color:var(--text-faint);margin-top:3px}
+.state-arrow{color:var(--gold-dim);font-size:18px;opacity:.7;flex-shrink:0}
+
+/* STATE SCREENS */
+.state-title{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;font-style:italic;color:var(--gold-bright);margin-bottom:6px;line-height:1}
+.state-subtitle{font-size:12px;font-weight:300;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin-bottom:36px}
+.divider{width:36px;height:1px;background:var(--border);margin-bottom:28px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{padding:20px 0;border-bottom:1px solid var(--border);font-size:17px;font-weight:300;line-height:1.6;color:var(--text-dim)}
+.step.named{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;font-weight:400;color:var(--text)}
+.step.anchor{
+  font-size:15px;letter-spacing:0.04em;
+  color:var(--gold);
+  padding-left:14px;
+  border-left:2px solid var(--gold-dim);
+  margin-left:0;
+}
+.step:last-child{border-bottom:none;color:var(--text);font-weight:400}
+.breath-cue{margin-top:32px;padding:15px 18px;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:12px;opacity:0;transition:opacity .5s ease .3s;background:var(--surface)}
+.breath-cue.visible{opacity:1}
+.breath-dot{width:7px;height:7px;border-radius:50%;background:var(--gold-dim);flex-shrink:0;animation:bpulse 4s ease-in-out infinite}
+@keyframes bpulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+.breath-cue-text{font-size:12px;font-weight:300;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint)}
+.back-btn{background:none;border:1px solid var(--border);border-radius:10px;color:var(--text-faint);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;letter-spacing:0.08em;cursor:pointer;padding:16px 20px;margin-top:28px;width:100%;text-align:center;transition:color .2s,border-color .2s,background .2s}
+.back-btn:hover{color:var(--gold-dim);border-color:var(--gold-dim);background:rgba(212,180,131,0.05)}
+
+/* TAP MODE */
+.tap-progress{display:flex;gap:6px;margin-bottom:48px}
+.tap-dot{width:5px;height:5px;border-radius:50%;background:var(--border);transition:background .3s}
+.tap-dot.done{background:var(--gold-dim)}
+.tap-card{min-height:55vh;display:flex;flex-direction:column;justify-content:center;cursor:pointer;padding:8px 0}
+.tap-line{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;font-style:italic;color:var(--text);line-height:1.3;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+.tap-line.anchor-line{font-family:'DM Sans',sans-serif;font-size:17px;font-style:normal;letter-spacing:0.05em;color:var(--gold);padding-left:14px;border-left:2px solid var(--gold-dim)}
+.tap-line.action-line{font-family:'DM Sans',sans-serif;font-size:19px;font-style:normal;font-weight:400;color:var(--text)}
+.tap-line.show{opacity:1;transform:translateY(0)}
+.tap-hint-fixed{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-faint);pointer-events:none;display:none}
+
+/* EMERGENCY */
+.em-label{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--red);letter-spacing:0.1em;margin-bottom:48px}
+.em-word{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;font-style:italic;color:var(--text);line-height:1;margin-bottom:14px;opacity:0;transition:opacity .35s}
+.em-word.show{opacity:1}
+.em-sub{font-size:15px;font-weight:300;color:var(--gold-dim);letter-spacing:0.06em;margin-bottom:44px;opacity:0;transition:opacity .35s .15s}
+.em-sub.show{opacity:1}
+.em-timer{width:100%;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:44px}
+.em-bar{height:100%;background:rgba(210,110,85,0.4);transform-origin:left;transform:scaleX(1)}
+.em-bar.running{transition:transform 10s linear;transform:scaleX(0)}
+.em-next{font-size:13px;letter-spacing:0.11em;text-transform:uppercase;color:var(--text-faint);background:none;border:1px solid var(--border);border-radius:10px;padding:16px;width:100%;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .2s,border-color .2s;margin-bottom:12px}
+.em-next:hover{color:var(--gold-dim);border-color:var(--gold-dim)}
+
+/* FACILITATOR */
+.fac-header{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--red);margin-bottom:24px}
+.fac-grid{display:flex;flex-direction:column;gap:16px}
+.fac-card{border:1px solid var(--border);border-radius:12px;padding:22px;background:var(--surface)}
+.fac-state{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--gold);margin-bottom:14px}
+.fac-row{display:flex;gap:12px;margin-bottom:8px;align-items:flex-start}
+.fac-label{font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--text-faint);min-width:56px;padding-top:2px;flex-shrink:0}
+.fac-text{font-size:14px;font-weight:300;color:var(--text-dim);line-height:1.55}
+.fac-text.anchor{color:var(--gold)}
+.fac-text.action{color:var(--text);font-weight:400}
+
+/* AI SUPPORT LAYER */
+.ai-divider{width:100%;height:1px;background:var(--border);margin:36px 0 24px}
+.ai-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-faint);margin-bottom:14px}
+.ai-trigger{background:none;border:none;padding:0;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;color:var(--text-faint);letter-spacing:0.04em;text-align:left;transition:color .2s;display:flex;align-items:center;gap:8px}
+.ai-trigger:hover{color:var(--gold-dim)}
+.ai-trigger-arrow{font-size:11px;opacity:.5;transition:transform .25s}
+.ai-trigger.open .ai-trigger-arrow{transform:rotate(90deg)}
+
+.ai-panel{display:none;margin-top:20px}
+.ai-panel.open{display:block}
+
+.ai-prompt-label{font-size:13px;font-weight:300;color:var(--text-dim);margin-bottom:10px;line-height:1.5}
+.ai-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;line-height:1.55;padding:14px 16px;resize:none;min-height:72px;outline:none;transition:border-color .2s}
+.ai-textarea:focus{border-color:var(--gold-dim)}
+.ai-textarea::placeholder{color:var(--text-faint)}
+
+.ai-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ai-action-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text-dim);text-align:left;transition:background .2s,border-color .2s,color .2s;letter-spacing:0.02em}
+.ai-action-btn:hover{background:var(--surface-lift);border-color:var(--gold-dim);color:var(--text)}
+.ai-action-btn:disabled{opacity:.4;cursor:default}
+
+.ai-response{margin-top:20px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;border-left:2px solid var(--gold-dim);display:none}
+.ai-response.visible{display:block}
+.ai-response-text{font-size:15px;font-weight:300;color:var(--text);line-height:1.7;white-space:pre-wrap}
+.ai-response-text.loading{color:var(--text-faint);font-style:italic}
+
+.ai-no-key{font-size:12px;color:var(--text-faint);font-style:italic;margin-top:10px;line-height:1.5}
+.ai-no-key a{color:var(--gold-dim);text-decoration:none;cursor:pointer}
+
+/* SETTINGS */
+.settings-toggle{display:flex;align-items:center;justify-content:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+.settings-toggle-btn{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);cursor:pointer;transition:color .2s}
+.settings-toggle-btn:hover{color:var(--gold-dim)}
+
+.settings-panel{display:none;margin-top:24px;padding:22px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.settings-panel.open{display:block}
+.settings-title{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px}
+.settings-label{font-size:13px;font-weight:300;color:var(--text-dim);margin-bottom:8px}
+.settings-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;padding:12px 14px;outline:none;transition:border-color .2s;letter-spacing:0.04em}
+.settings-input:focus{border-color:var(--gold-dim)}
+.settings-input::placeholder{color:var(--text-faint);font-size:12px}
+.settings-row{display:flex;gap:8px;margin-top:10px}
+.settings-btn{flex:1;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-faint);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;letter-spacing:0.08em;cursor:pointer;padding:11px 14px;transition:color .2s,border-color .2s,background .2s}
+.settings-btn:hover{color:var(--gold-dim);border-color:var(--gold-dim);background:rgba(212,180,131,0.05)}
+.settings-btn.save{color:var(--gold-dim);border-color:var(--gold-dim)}
+.settings-btn.save:hover{background:rgba(212,180,131,0.08)}
+.settings-status{font-size:12px;color:var(--gold-dim);margin-top:10px;opacity:0;transition:opacity .3s;font-weight:300}
+.settings-status.show{opacity:1}
+
+/* VISUAL MODE */
+.visual-switch{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;letter-spacing:0.1em;color:var(--gold-dim);cursor:pointer;padding:14px 0 0;width:100%;text-align:center;display:block;opacity:0.7;transition:opacity .2s}
+.visual-switch:hover{opacity:1}
+
+#visual-screen{position:fixed;inset:0;background:#0d0b08;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+#visual-screen.active{display:flex}
+#visual-canvas{width:100%;height:100%;position:absolute;inset:0;pointer-events:none}
+.visual-instruction{position:absolute;bottom:clamp(80px,12vh,120px);left:50%;transform:translateX(-50%);font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;font-weight:300;color:rgba(240,232,220,0.55);letter-spacing:0.06em;white-space:nowrap;text-align:center;pointer-events:none}
+.visual-exit{position:absolute;bottom:clamp(28px,5vh,44px);left:50%;transform:translateX(-50%);background:none;border:none;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(240,232,220,0.2);cursor:pointer;padding:12px 24px;transition:color .3s}
+.visual-exit:hover{color:rgba(240,232,220,0.5)}
+
+/* FACILITATOR — PICKER */
+.fac-pick-label{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px}
+.fac-pick-grid{display:flex;flex-direction:column;gap:10px}
+.fac-pick-btn{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--text);text-align:left;width:100%;transition:background .2s,border-color .2s}
+.fac-pick-btn:hover{background:var(--surface-lift);border-color:var(--gold-dim)}
+
+/* FACILITATOR — PRESENTER */
+#fac-present{position:fixed;inset:0;background:#0d0b08;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;z-index:200}
+.fac-present-state{font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(212,180,131,0.4);margin-bottom:48px}
+.fac-present-step{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,8vw,52px);font-weight:300;font-style:italic;color:#f0e8dc;line-height:1.25;text-align:center;max-width:520px;transition:opacity 0.2s ease,transform 0.2s ease}
+.fac-present-step.anchor{font-family:'DM Sans',sans-serif;font-size:clamp(20px,5vw,30px);font-style:normal;letter-spacing:0.04em;color:rgba(212,180,131,0.85);border-left:2px solid rgba(212,180,131,0.4);padding-left:20px;text-align:left}
+.fac-present-step.action{font-family:'DM Sans',sans-serif;font-size:clamp(22px,5.5vw,34px);font-style:normal;font-weight:400;color:#f0e8dc}
+.fac-present-step.fade{opacity:0;transform:translateY(6px)}
+.fac-present-dots{display:flex;gap:8px;margin-top:40px}
+.fac-present-dot{width:5px;height:5px;border-radius:50%;background:rgba(240,232,220,0.15);transition:background .3s}
+.fac-present-dot.done{background:rgba(212,180,131,0.55)}
+.fac-present-dot.current{background:rgba(212,180,131,0.9)}
+.fac-present-tap{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:none;border:1px solid rgba(240,232,220,0.12);border-radius:10px;color:rgba(240,232,220,0.25);font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;padding:16px 40px;transition:color .2s,border-color .2s;min-width:200px;text-align:center}
+.fac-present-tap:hover,.fac-present-tap:active{color:rgba(240,232,220,0.6);border-color:rgba(240,232,220,0.3)}
+.fac-present-tap.done-state{color:rgba(212,180,131,0.6);border-color:rgba(212,180,131,0.3)}
+.fac-present-exit{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:none;border:none;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,220,0.15);cursor:pointer;padding:8px;transition:color .2s}
+.fac-present-exit:hover{color:rgba(240,232,220,0.4)}
+</style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Support</p>
-      <h1>Steady</h1>
-      <p>A small regulation and attention support from the Coherence archive.</p>
-      <p class="muted">This earlier experiment is being kept available as an archive path while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+<div class="container">
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <p class="home-label">Steady</p>
+  <h1 class="home-title">Before the reaction</h1>
+  <p class="home-sub">Use this when things feel intense. Choose what's strongest right now.</p>
+
+  <div class="mode-bar">
+    <button class="mode-pill active" id="pill-standard" onclick="setMode('standard',this)">Standard</button>
+    <button class="mode-pill" id="pill-tap" onclick="setMode('tap',this)">Tap through</button>
+    <button class="mode-pill em-pill" onclick="launchEmergency()">10 sec</button>
+    <button class="mode-pill" id="pill-fac" onclick="setMode('facilitator',this)">Facilitator</button>
+    <button class="mode-pill" id="pill-visual" onclick="setMode('visual',this)">Visual</button>
+  </div>
+
+  <!-- standard list -->
+  <div id="list-standard" class="state-grid">
+    <button class="state-btn" onclick="openState('overwhelm')">
+      <div><div class="state-name">Overwhelm</div><div class="state-hint">Too much at once</div></div>
+      <span class="state-arrow">→</span>
+    </button>
+    <button class="state-btn" onclick="openState('procrastination')">
+      <div><div class="state-name">Procrastination</div><div class="state-hint">Can't begin</div></div>
+      <span class="state-arrow">→</span>
+    </button>
+    <button class="state-btn" onclick="openState('shame')">
+      <div><div class="state-name">Shame</div><div class="state-hint">Something feels wrong with you</div></div>
+      <span class="state-arrow">→</span>
+    </button>
+    <button class="state-btn" onclick="openState('anger')">
+      <div><div class="state-name">Anger</div><div class="state-hint">Activated and reactive</div></div>
+      <span class="state-arrow">→</span>
+    </button>
+    <button class="state-btn" onclick="openState('disconnection')">
+      <div><div class="state-name">Disconnection</div><div class="state-hint">Numb, gone, offline</div></div>
+      <span class="state-arrow">→</span>
+    </button>
+    <button class="state-btn" onclick="openState('unknown')" style="border-style:dashed;margin-top:4px">
+      <div><div class="state-name" style="font-style:italic;opacity:0.7">I don't know</div><div class="state-hint">Something is off</div></div>
+      <span class="state-arrow" style="opacity:0.4">→</span>
+    </button>
+  </div>
+
+  <!-- tap list -->
+  <div id="list-tap" class="state-grid" style="display:none">
+    <p style="font-size:12px;color:var(--text-faint);font-weight:300;margin-bottom:16px;letter-spacing:0.04em">One line at a time. Tap to move forward.</p>
+    <button class="state-btn" onclick="openTap('overwhelm')"><div><div class="state-name">Overwhelm</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openTap('procrastination')"><div><div class="state-name">Procrastination</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openTap('shame')"><div><div class="state-name">Shame</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openTap('anger')"><div><div class="state-name">Anger</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openTap('disconnection')"><div><div class="state-name">Disconnection</div></div><span class="state-arrow">→</span></button>
+  </div>
+
+  <!-- facilitator entry -->
+  <div id="list-facilitator" style="display:none">
+    <p style="font-size:13px;color:var(--text-dim);font-weight:300;margin-bottom:20px;line-height:1.7">All five protocols visible at once. For classroom or session use.</p>
+    <button class="state-btn" onclick="showScreen('fac-screen')" style="justify-content:center">
+      <span style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim)">Open facilitator view</span>
+    </button>
+  </div>
+
+  <!-- visual list -->
+  <div id="list-visual" class="state-grid" style="display:none">
+    <p style="font-size:12px;color:var(--text-faint);font-weight:300;margin-bottom:16px;letter-spacing:0.04em">No words. Lock onto the pattern.</p>
+    <button class="state-btn" onclick="openVisual('overwhelm')"><div><div class="state-name">Overwhelm</div><div class="state-hint">Stay with the centre</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openVisual('anxiety')"><div><div class="state-name">Anxiety</div><div class="state-hint">Match this</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openVisual('dissociation')"><div><div class="state-name">Dissociation</div><div class="state-hint">Track one point</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openVisual('procrastination')"><div><div class="state-name">Procrastination</div><div class="state-hint">Just this</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openVisual('anger')"><div><div class="state-name">Anger</div><div class="state-hint">Hold here</div></div><span class="state-arrow">→</span></button>
+    <button class="state-btn" onclick="openVisual('unknown')" style="border-style:dashed"><div><div class="state-name" style="font-style:italic;opacity:0.7">I don't know</div><div class="state-hint">Stay here</div></div><span class="state-arrow" style="opacity:0.4">→</span></button>
+  </div>
+
+  <div class="settings-toggle">
+    <button class="settings-toggle-btn" onclick="toggleSettings()">Settings</button>
+  </div>
+  <div class="settings-panel" id="settings-panel">
+    <div class="settings-title">API Key</div>
+    <div class="settings-label">Anthropic API key</div>
+    <input class="settings-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+    <div class="settings-row">
+      <button class="settings-btn save" onclick="saveKey()">Save</button>
+      <button class="settings-btn" onclick="clearKey()">Clear key</button>
+    </div>
+    <div class="settings-status" id="settings-status"></div>
+  </div>
+</div>
+
+<!-- STANDARD SCREENS -->
+<div id="overwhelm" class="screen">
+  <div class="state-title">Overwhelm</div>
+  <div class="state-subtitle">nervous system overload</div>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step named">Your system is overloaded.</div>
+    <div class="step">Nothing is wrong with you.</div>
+    <div class="step anchor">Feel your breath at the upper lip.</div>
+    <div class="step">Pick one task. Open it.</div>
+  </div>
+  <div class="breath-cue"><div class="breath-dot"></div><span class="breath-cue-text">Breathe slowly</span></div>
+  <button class="visual-switch" onclick="openVisual('overwhelm')">switch to visual →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+</div>
+
+<div id="procrastination" class="screen">
+  <div class="state-title">Procrastination</div>
+  <div class="state-subtitle">avoidance of discomfort</div>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step named">You're not lazy.</div>
+    <div class="step">You're avoiding discomfort.</div>
+    <div class="step anchor">Feel your hands.</div>
+    <div class="step">Open the file. Read the first line.</div>
+  </div>
+  <div class="breath-cue"><div class="breath-dot"></div><span class="breath-cue-text">Breathe slowly</span></div>
+  <button class="visual-switch" onclick="openVisual('procrastination')">switch to visual →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+</div>
+
+<div id="shame" class="screen">
+  <div class="state-title">Shame</div>
+  <div class="state-subtitle">a learned response</div>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step named">You are not the problem.</div>
+    <div class="step">You are feeling shame.</div>
+    <div class="step anchor">Feel your feet on the floor.</div>
+    <div class="step">Stand up. Move to another room.</div>
+  </div>
+  <div class="breath-cue"><div class="breath-dot"></div><span class="breath-cue-text">Breathe slowly</span></div>
+  <button class="visual-switch" onclick="openVisual('dissociation')">switch to visual →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+</div>
+
+<div id="anger" class="screen">
+  <div class="state-title">Anger</div>
+  <div class="state-subtitle">a protection response</div>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step named">You are activated.</div>
+    <div class="step">Your system is protecting you.</div>
+    <div class="step anchor">Feel your feet on the floor. Press down.</div>
+    <div class="step">Do not send the message. Do not speak yet.</div>
+  </div>
+  <div class="breath-cue"><div class="breath-dot"></div><span class="breath-cue-text">Breathe slowly</span></div>
+  <button class="visual-switch" onclick="openVisual('anger')">switch to visual →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+</div>
+
+<div id="disconnection" class="screen">
+  <div class="state-title">Disconnection</div>
+  <div class="state-subtitle">a protective state</div>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step named">You're not broken.</div>
+    <div class="step">Your system has gone offline.</div>
+    <div class="step anchor">Rub your hands together. Feel the warmth.</div>
+    <div class="step">Stand up. Get a glass of water.</div>
+  </div>
+  <div class="breath-cue"><div class="breath-dot"></div><span class="breath-cue-text">Breathe slowly</span></div>
+  <button class="visual-switch" onclick="openVisual('dissociation')">switch to visual →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+  <div class="ai-divider"></div>
+  <div class="ai-label">Optional support</div>
+  <button class="ai-trigger" onclick="toggleAI(this)">
+    <span>Reflect briefly</span>
+    <span class="ai-trigger-arrow">›</span>
+  </button>
+  <div class="ai-panel">
+    <p class="ai-prompt-label">What's happening?</p>
+    <textarea class="ai-textarea" placeholder="1–2 sentences only." rows="2" maxlength="180"></textarea>
+    <div class="ai-actions">
+      <button class="ai-action-btn" onclick="callAI(this,'see')">See it clearly</button>
+      <button class="ai-action-btn" onclick="callAI(this,'next')">Next step</button>
+      <button class="ai-action-btn" onclick="callAI(this,'draft')">Draft response</button>
+    </div>
+    <div class="ai-response"><p class="ai-response-text"></p></div>
+  </div>
+</div>
+
+<!-- UNKNOWN STATE -->
+<div id="unknown" class="screen">
+  <div class="state-title" style="color:var(--text-dim);font-size:38px">Something is off.</div>
+  <div class="state-subtitle">no label needed</div>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step named">You don't need to name it.</div>
+    <div class="step anchor">Feel your feet on the floor.</div>
+    <div class="step">Stay here for this moment.</div>
+    <div class="step">One small step. Anything.</div>
+  </div>
+  <div class="breath-cue"><div class="breath-dot"></div><span class="breath-cue-text">Breathe slowly</span></div>
+  <button class="visual-switch" onclick="openVisual('unknown')">switch to visual →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+  <div class="ai-label">Optional support</div>
+  <button class="ai-trigger" onclick="toggleAI(this)">
+    <span>Reflect briefly</span>
+    <span class="ai-trigger-arrow">›</span>
+  </button>
+  <div class="ai-panel">
+    <p class="ai-prompt-label">What's happening?</p>
+    <textarea class="ai-textarea" placeholder="1–2 sentences only." rows="2" maxlength="180"></textarea>
+    <div class="ai-actions">
+      <button class="ai-action-btn" onclick="callAI(this,'see')">See it clearly</button>
+      <button class="ai-action-btn" onclick="callAI(this,'next')">Next step</button>
+      <button class="ai-action-btn" onclick="callAI(this,'draft')">Draft response</button>
+    </div>
+    <div class="ai-response"><p class="ai-response-text"></p></div>
+  </div>
+</div>
+
+<!-- TAP SCREEN -->
+<div id="tap-screen" class="screen">
+  <div class="tap-progress" id="tap-progress"></div>
+  <div class="tap-card" id="tap-card" onclick="tapNext()">
+    <div class="tap-line" id="tap-line"></div>
+  </div>
+  <button class="back-btn" id="tap-back" style="display:none" onclick="goHome()">← back to steady</button>
+</div>
+<!-- VISUAL SCREEN -->
+<div id="visual-screen">
+  <canvas id="visual-canvas"></canvas>
+  <div class="visual-instruction" id="visual-instruction"></div>
+  <button class="visual-exit" onclick="closeVisual()">exit visual</button>
+</div>
+
+<div class="tap-hint-fixed" id="tap-hint">tap anywhere to continue</div>
+
+<!-- EMERGENCY SCREEN -->
+<div id="em-screen" class="screen">
+  <div class="em-label">10-second protocol</div>
+  <div class="em-word" id="em-word"></div>
+  <div class="em-sub" id="em-sub"></div>
+  <div class="em-timer"><div class="em-bar" id="em-bar"></div></div>
+  <button class="em-next" onclick="nextEm()">Next →</button>
+  <button class="back-btn" onclick="goHome()">← back to steady</button>
+  <div class="ai-divider"></div>
+  <div class="ai-label">Optional support</div>
+  <button class="ai-trigger" onclick="toggleAI(this)">
+    <span>Reflect briefly</span>
+    <span class="ai-trigger-arrow">›</span>
+  </button>
+  <div class="ai-panel">
+    <p class="ai-prompt-label">What's happening?</p>
+    <textarea class="ai-textarea" placeholder="1–2 sentences only." rows="2" maxlength="180"></textarea>
+    <div class="ai-actions">
+      <button class="ai-action-btn" onclick="callAI(this,'see')">See it clearly</button>
+      <button class="ai-action-btn" onclick="callAI(this,'next')">Next step</button>
+      <button class="ai-action-btn" onclick="callAI(this,'draft')">Draft response</button>
+    </div>
+    <div class="ai-response"><p class="ai-response-text"></p></div>
+  </div>
+</div>
+
+<!-- FACILITATOR SCREEN -->
+<div id="fac-screen" class="screen">
+  <!-- STATE PICKER -->
+  <div id="fac-picker">
+    <div class="fac-pick-label">Select state</div>
+    <div class="fac-pick-grid">
+      <button class="fac-pick-btn" onclick="startFac('overwhelm')">Overwhelm</button>
+      <button class="fac-pick-btn" onclick="startFac('procrastination')">Procrastination</button>
+      <button class="fac-pick-btn" onclick="startFac('shame')">Shame</button>
+      <button class="fac-pick-btn" onclick="startFac('anger')">Anger</button>
+      <button class="fac-pick-btn" onclick="startFac('disconnection')">Disconnection</button>
+      <button class="fac-pick-btn" onclick="startFac('unknown')" style="border-style:dashed;opacity:0.7">I don't know</button>
+    </div>
+    <button class="back-btn" onclick="goHome()" style="margin-top:32px">← back to steady</button>
+  </div>
+
+  <!-- PRESENTER VIEW -->
+  <div id="fac-present" style="display:none">
+    <div class="fac-present-state" id="fac-present-state"></div>
+    <div class="fac-present-step" id="fac-present-step"></div>
+    <div class="fac-present-dots" id="fac-present-dots"></div>
+    <button class="fac-present-tap" id="fac-present-tap" onclick="facAdvance()">tap to continue</button>
+    <button class="fac-present-exit" onclick="facExit()">exit</button>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// DATA
+const STATES = {
+  overwhelm:[
+    {text:'Your system is overloaded.',type:'named'},
+    {text:'Nothing is wrong with you.',type:'normal'},
+    {text:'Feel your breath at the upper lip.',type:'anchor'},
+    {text:'Pick one task. Open it.',type:'action'}
+  ],
+  procrastination:[
+    {text:"You're not lazy.",type:'named'},
+    {text:"You're avoiding discomfort.",type:'normal'},
+    {text:'Feel your hands.',type:'anchor'},
+    {text:'Open the file. Read the first line.',type:'action'}
+  ],
+  shame:[
+    {text:'You are not the problem.',type:'named'},
+    {text:'You are feeling shame.',type:'normal'},
+    {text:'Feel your feet on the floor.',type:'anchor'},
+    {text:'Stand up. Move to another room.',type:'action'}
+  ],
+  anger:[
+    {text:'You are activated.',type:'named'},
+    {text:'Your system is protecting you.',type:'normal'},
+    {text:'Feel your feet on the floor. Press down.',type:'anchor'},
+    {text:'Do not send the message. Do not speak yet.',type:'action'}
+  ],
+  disconnection:[
+    {text:"You're not broken.",type:'named'},
+    {text:'Your system has gone offline.',type:'normal'},
+    {text:'Rub your hands together. Feel the warmth.',type:'anchor'},
+    {text:'Stand up. Get a glass of water.',type:'action'}
+  ],
+  unknown:[
+    {text:"You don't need to name it.",type:'named'},
+    {text:'Something is off. That is enough.',type:'normal'},
+    {text:'Feel your feet on the floor.',type:'anchor'},
+    {text:'One small step. Anything.',type:'action'}
+  ]
+};
+
+const EM_STEPS = [
+  {word:'Stop.',sub:'You are here. Right now.'},
+  {word:'Feel.',sub:'One body sensation.'},
+  {word:'Breathe.',sub:'Upper lip. One breath.'},
+  {word:'Name it.',sub:'One word. What is this?'},
+  {word:'Wait.',sub:'Do not act yet.'}
+];
+
+// STATE
+let tapData=null, tapIdx=0, emIdx=0, emTimer=null, audioCtx=null;
+
+// AUDIO — subtle sine tones, very low volume
+function tone(freq,dur,vol=0.05){
+  try{
+    if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+0.1);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+dur);
+    o.start(); o.stop(audioCtx.currentTime+dur+0.1);
+  }catch(e){}
+}
+const tones={
+  open:()=>tone(220,1.8,0.055),
+  tap:()=>tone(330,0.5,0.035),
+  anchor:()=>tone(174,2.0,0.06),
+  done:()=>{tone(264,2.2,0.045);setTimeout(()=>tone(330,1.8,0.035),380)},
+  emergency:()=>tone(196,3.0,0.07)
+};
+
+// SCREENS
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','visible'));
+  const t=document.getElementById(id);
+  t.classList.add('active');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('visible')));
+  return t;
+}
+
+function openState(id){
+  const t=showScreen(id);
+  tones.open();
+  const cue=t.querySelector('.breath-cue');
+  if(cue){cue.classList.remove('visible');setTimeout(()=>cue.classList.add('visible'),300)}
+}
+
+function goHome(){
+  if(emTimer){clearTimeout(emTimer);emTimer=null}
+  document.getElementById('tap-hint').style.display='none';
+  showScreen('home');
+}
+
+// MODE
+function setMode(mode, pill){
+  document.querySelectorAll('.mode-pill:not(.em-pill)').forEach(p=>p.classList.remove('active'));
+  if(pill) pill.classList.add('active');
+  document.getElementById('list-standard').style.display = mode==='standard'?'flex':'none';
+  document.getElementById('list-tap').style.display = mode==='tap'?'flex':'none';
+  document.getElementById('list-facilitator').style.display = mode==='facilitator'?'block':'none';
+  const vl = document.getElementById('list-visual');
+  if(vl) vl.style.display = mode==='visual'?'flex':'none';
+}
+
+// TAP THROUGH
+function openTap(stateId){
+  tapData=STATES[stateId]; tapIdx=0;
+  tones.open();
+  const prog=document.getElementById('tap-progress');
+  prog.innerHTML=tapData.map((_,i)=>`<div class="tap-dot" id="td${i}"></div>`).join('');
+  document.getElementById('tap-back').style.display='none';
+  document.getElementById('tap-hint').style.display='block';
+  showScreen('tap-screen');
+  setTimeout(renderTapLine,0);
+}
+
+function renderTapLine(){
+  if(tapIdx>=tapData.length){endTap();return}
+  const item=tapData[tapIdx];
+  const line=document.getElementById('tap-line');
+  line.classList.remove('show','anchor-line','action-line');
+  void line.offsetWidth;
+  line.className='tap-line'+(item.type==='anchor'?' anchor-line':item.type==='action'?' action-line':'');
+  line.textContent=item.text;
+  requestAnimationFrame(()=>line.classList.add('show'));
+  if(item.type==='anchor') tones.anchor();
+  else tones.tap();
+  tapData.forEach((_,i)=>{const d=document.getElementById('td'+i);if(d)d.classList.toggle('done',i<=tapIdx)});
+}
+
+function tapNext(){
+  tapIdx++;
+  renderTapLine();
+}
+
+function endTap(){
+  tones.done();
+  const line=document.getElementById('tap-line');
+  line.classList.remove('show','anchor-line','action-line');
+  setTimeout(()=>{
+    line.style.cssText='font-family:"DM Sans",sans-serif;font-size:18px;font-style:normal;color:var(--gold-dim)';
+    line.textContent='Done.';
+    requestAnimationFrame(()=>line.classList.add('show'));
+  },200);
+  document.getElementById('tap-hint').style.display='none';
+  document.getElementById('tap-back').style.display='block';
+}
+
+// EMERGENCY
+function launchEmergency(){
+  emIdx=0;
+  tones.emergency();
+  showScreen('em-screen');
+  setTimeout(renderEmStep,100);
+}
+
+function renderEmStep(){
+  if(emIdx>=EM_STEPS.length){
+    document.getElementById('em-word').textContent='Steady.';
+    document.getElementById('em-word').classList.add('show');
+    document.getElementById('em-sub').textContent='';
+    if(emTimer){clearTimeout(emTimer);emTimer=null}
+    return;
+  }
+  const s=EM_STEPS[emIdx];
+  const word=document.getElementById('em-word');
+  const sub=document.getElementById('em-sub');
+  const bar=document.getElementById('em-bar');
+
+  word.classList.remove('show'); sub.classList.remove('show');
+  bar.style.transition='none'; bar.style.transform='scaleX(1)';
+  bar.classList.remove('running');
+
+  setTimeout(()=>{
+    word.textContent=s.word; sub.textContent=s.sub;
+    word.classList.add('show'); sub.classList.add('show');
+    tones.open();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      bar.style.transition='transform 10s linear';
+      bar.classList.add('running');
+    }));
+    if(emTimer) clearTimeout(emTimer);
+    emTimer=setTimeout(()=>{emIdx++;renderEmStep()},10000);
+  },150);
+}
+
+function nextEm(){
+  if(emTimer){clearTimeout(emTimer);emTimer=null}
+  emIdx++;
+  renderEmStep();
+}
+
+// INIT
+requestAnimationFrame(()=>requestAnimationFrame(()=>document.getElementById('home').classList.add('visible')));
+
+// ── SETTINGS ──
+function toggleSettings(){
+  const p=document.getElementById('settings-panel');
+  p.classList.toggle('open');
+  // Populate field if key exists
+  const k=localStorage.getItem('steady_api_key');
+  if(k) document.getElementById('api-key-input').value=k;
+}
+
+function saveKey(){
+  const val=document.getElementById('api-key-input').value.trim();
+  if(!val){showStatus('No key entered.');return}
+  localStorage.setItem('steady_api_key',val);
+  showStatus('Key saved.');
+}
+
+function clearKey(){
+  localStorage.removeItem('steady_api_key');
+  document.getElementById('api-key-input').value='';
+  showStatus('Key cleared.');
+}
+
+function showStatus(msg){
+  const s=document.getElementById('settings-status');
+  s.textContent=msg; s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'),2500);
+}
+
+function getKey(){ return localStorage.getItem('steady_api_key')||''; }
+
+// ── AI LAYER ──
+function toggleAI(btn){
+  btn.classList.toggle('open');
+  const panel=btn.nextElementSibling;
+  panel.classList.toggle('open');
+
+  // If no key, show nudge
+  if(panel.classList.contains('open') && !getKey()){
+    const existing=panel.querySelector('.ai-no-key');
+    if(!existing){
+      const nudge=document.createElement('p');
+      nudge.className='ai-no-key';
+      nudge.innerHTML='Add your Anthropic API key in <a onclick="toggleSettings();document.getElementById(\'settings-panel\').scrollIntoView({behavior:\'smooth\'})">Settings</a> to use this.';
+      panel.insertBefore(nudge, panel.querySelector('.ai-prompt-label'));
+    }
+  }
+}
+
+function getStateContext(btn){
+  // Walk up to find state screen, extract state name
+  const screen=btn.closest('.screen');
+  const titleEl=screen?screen.querySelector('.state-title'):null;
+  return titleEl?titleEl.textContent.trim():'';
+}
+
+function getIntentLabel(intent){
+  if(intent==='see') return 'See it clearly';
+  if(intent==='next') return 'Next step';
+  if(intent==='draft') return 'Draft response';
+  return '';
+}
+
+// ── OUTPUT GUARDRAILS ──
+const SOFT_PHRASES=[
+  /i understand[^.]*\./gi, /it'?s okay[^.]*\./gi, /you'?re doing (well|great|okay)[^.]*\./gi,
+  /that makes sense[^.]*\./gi, /i hear (you|that)[^.]*\./gi, /completely (valid|understandable)[^.]*\./gi,
+  /it'?s (completely |totally )?(normal|natural)[^.]*\./gi
+];
+
+function enforceOutput(text){
+  let out=text;
+  SOFT_PHRASES.forEach(p=>{ out=out.replace(p,''); });
+  out=out.replace(/\n{3,}/g,'\n').trim();
+  const lines=out.split('\n').filter(l=>l.trim());
+  const capped=lines.slice(0,3);
+  const trimmed=capped.map(line=>{
+    const words=line.trim().split(/\s+/);
+    return words.length>14 ? words.slice(0,14).join(' ')+'.' : line.trim();
+  });
+  return trimmed.join('\n');
+}
+
+async function callAI(btn, intent){
+  const key=getKey();
+  if(!key){
+    toggleSettings();
+    setTimeout(()=>document.getElementById('settings-panel').scrollIntoView({behavior:'smooth'}),100);
+    return;
+  }
+
+  const panel=btn.closest('.ai-panel');
+  const textarea=panel.querySelector('.ai-textarea');
+  const userText=textarea.value.trim();
+  const stateCtx=getStateContext(btn);
+
+  const responseBox=panel.querySelector('.ai-response');
+  const responseText=panel.querySelector('.ai-response-text');
+
+  // Disable buttons while loading
+  panel.querySelectorAll('.ai-action-btn').forEach(b=>b.disabled=true);
+  responseBox.classList.add('visible');
+  responseText.className='ai-response-text loading';
+  responseText.textContent='…';
+
+  const intentMap={
+    see:'Identify what is actually happening for this person. Be direct. No comfort language.',
+    next:'Give one concrete next action. Specific and physical if possible.',
+    draft:'Draft a brief, calm response or message they can use or adapt.'
+  };
+
+  const systemPrompt=`You are a compressed, functional response system. Non-negotiable rules:
+Max 3 short lines. No exceptions.
+No validation. No "I understand". No "that makes sense". No "it's okay". No "you're doing well".
+No explanation beyond what is necessary.
+No identity language. No therapy tone.
+No advice beyond one concrete action.
+Name what is happening. Give the action. Stop.`;
+
+  const intentMap2={
+    see:'Name what is actually happening. One sentence. Then one action.',
+    next:'One concrete physical action. Nothing else.',
+    draft:'Write the message or response they need. Plain and brief.'
+  };
+
+  const userPrompt=`State the person is in: ${stateCtx}
+Request: ${intentMap2[intent]}
+${userText?`Their context: ${userText}`:'(No context given)'}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:120,
+        system:systemPrompt,
+        messages:[{role:'user',content:userPrompt}]
+      })
+    });
+
+    const data=await res.json();
+
+    if(data.error){
+      responseText.className='ai-response-text';
+      responseText.textContent=data.error.message||'API error. Check your key in Settings.';
+    } else {
+      const raw=data.content?.[0]?.text||'No response.';
+      responseText.className='ai-response-text';
+      responseText.textContent=enforceOutput(raw);
+    }
+  } catch(e){
+    responseText.className='ai-response-text';
+    responseText.textContent='Could not reach API. Check connection or key.';
+  }
+
+  panel.querySelectorAll('.ai-action-btn').forEach(b=>b.disabled=false);
+}
+
+
+
+
+
+
+
+
+
+
+
+// ── VISUAL MODE ──
+let visualRAF = null;
+let visualMode = null;
+let visualTime = 0;
+
+const VISUAL_CONFIGS = {
+  overwhelm:      { instruction: 'Stay with the centre.', draw: drawOverwhelm },
+  anxiety:        { instruction: 'Match this.',           draw: drawAnxiety },
+  dissociation:   { instruction: 'Track one point.',      draw: drawDissociation },
+  anger:          { instruction: 'Hold here.',            draw: drawAnger },
+  unknown:        { instruction: 'Stay here.',            draw: drawUnknown },
+  procrastination:{ instruction: 'Just this.',            draw: drawProcrastination }
+};
+
+function openVisual(mode) {
+  visualMode = mode;
+  visualTime = 0;
+  const screen = document.getElementById('visual-screen');
+  document.getElementById('visual-instruction').textContent = VISUAL_CONFIGS[mode].instruction;
+  screen.style.opacity = '0';
+  screen.style.transition = 'opacity 0.25s ease';
+  screen.classList.add('active');
+  resizeVisualCanvas();
+  window.addEventListener('resize', resizeVisualCanvas);
+  document.body.style.overflow = 'hidden';
+  if (visualRAF) cancelAnimationFrame(visualRAF);
+  visualLoop();
+  requestAnimationFrame(() => requestAnimationFrame(() => { screen.style.opacity = '1'; }));
+}
+
+function closeVisual() {
+  document.getElementById('visual-screen').classList.remove('active');
+  if (visualRAF) { cancelAnimationFrame(visualRAF); visualRAF = null; }
+  window.removeEventListener('resize', resizeVisualCanvas);
+  document.body.style.overflow = '';
+}
+
+function resizeVisualCanvas() {
+  const canvas = document.getElementById('visual-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+}
+
+function visualLoop() {
+  visualRAF = requestAnimationFrame(visualLoop);
+  visualTime += 0.016;
+  const canvas = document.getElementById('visual-canvas');
+  if (!canvas || !visualMode) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.width / dpr;
+  const H = canvas.height / dpr;
+  ctx.save();
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+  VISUAL_CONFIGS[visualMode].draw(ctx, W, H, visualTime);
+  ctx.restore();
+}
+
+// ── OVERWHELM: single breathing circle, collapses toward centre ──
+// One thing. Stay with it.
+function drawOverwhelm(ctx, W, H, t) {
+  const cx = W / 2, cy = H / 2;
+  const cycle = t % 10;
+  const r = cycle < 4 ? easeInOut(cycle / 4) : 1 - easeInOut((cycle - 4) / 6);
+  const minR = Math.min(W, H) * 0.06;
+  const maxR = Math.min(W, H) * 0.38;
+  const radius = minR + r * (maxR - minR);
+
+  // Two rings only
+  for (let i = 1; i >= 0; i--) {
+    const alpha = (0.38 - i * 0.12) * (0.5 + r * 0.5);
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + i * 20, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(212,180,131,' + alpha + ')';
+    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 0.55);
+  cg.addColorStop(0, 'rgba(212,180,131,' + (0.30 + r * 0.30) + ')');
+  cg.addColorStop(1, 'rgba(212,180,131,0)');
+  ctx.fillStyle = cg;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(212,180,131,0.95)';
+  ctx.fill();
+}
+
+// ── ANXIETY: expanding rings only, no contraction ──
+// Expansion = safety signal. Predictable. Hexagon stays stable.
+function drawAnxiety(ctx, W, H, t) {
+  const cx = W / 2, cy = H / 2;
+  const maxR = Math.min(W, H) * 0.46;
+
+  for (let i = 0; i < 5; i++) {
+    const offset = (i / 5) * 12;
+    const progress = easeOut(((t + offset) % 12) / 12);
+    const alpha = (1 - progress) * 0.45;
+    ctx.beginPath();
+    ctx.arc(cx, cy, progress * maxR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(138,191,184,' + alpha + ')';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  const hexR = Math.min(W, H) * 0.09;
+  ctx.beginPath();
+  for (let i = 0; i <= 6; i++) {
+    const angle = (i * Math.PI) / 3 - Math.PI / 6;
+    const x = cx + hexR * Math.cos(angle);
+    const y = cy + hexR * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(138,191,184,0.70)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(138,191,184,0.90)';
+  ctx.fill();
+}
+
+// ── DISSOCIATION: soft field + single tracking point on smooth path ──
+// Mechanism: tracking → re-engagement. Give attention one thing to follow.
+// No grid — complexity reinforces fog. One point. Slow. Predictable.
+function drawDissociation(ctx, W, H, t) {
+  const cx = W / 2, cy = H / 2;
+
+  // Very faint ambient field — barely there
+  const fieldR = Math.min(W, H) * 0.38;
+  const fg = ctx.createRadialGradient(cx, cy, 0, cx, cy, fieldR);
+  fg.addColorStop(0, 'rgba(200,180,240,0.06)');
+  fg.addColorStop(1, 'rgba(200,180,240,0)');
+  ctx.fillStyle = fg;
+  ctx.beginPath();
+  ctx.arc(cx, cy, fieldR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Smooth figure-eight path — predictable, continuous, never jerky
+  const sp = t * 0.35;
+  const rx = W * 0.20;
+  const ry = H * 0.13;
+  const trackX = cx + rx * Math.sin(sp);
+  const trackY = cy + ry * Math.sin(sp * 2);
+
+  // Faint trail showing direction of travel
+  for (let i = 3; i >= 1; i--) {
+    const tsp = sp - i * 0.12;
+    const tx = cx + rx * Math.sin(tsp);
+    const ty = cy + ry * Math.sin(tsp * 2);
+    ctx.beginPath();
+    ctx.arc(tx, ty, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(200,180,240,' + (0.07 - i * 0.018) + ')';
+    ctx.fill();
+  }
+
+  // Glow
+  const grd = ctx.createRadialGradient(trackX, trackY, 0, trackX, trackY, 30);
+  grd.addColorStop(0, 'rgba(200,180,240,0.40)');
+  grd.addColorStop(1, 'rgba(200,180,240,0)');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.arc(trackX, trackY, 30, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Point — pulses gently at peak
+  const pulse = 0.88 + 0.12 * Math.abs(Math.sin(t * 0.8));
+  ctx.beginPath();
+  ctx.arc(trackX, trackY, 5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(200,180,240,' + pulse + ')';
+  ctx.fill();
+}
+
+// ── ANGER: heavy mandala, near-stillness ──
+// Full rotation every 4 minutes. Weighted symmetry.
+function drawAnger(ctx, W, H, t) {
+  const cx = W / 2, cy = H / 2;
+  const baseR = Math.min(W, H) * 0.33;
+  const rot = t * (Math.PI * 2) / 600;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+
+  const layers = [
+    { r: baseR,        segs: 8, alpha: 0.50, lw: 1.2 },
+    { r: baseR * 0.72, segs: 8, alpha: 0.42, lw: 1.0 },
+    { r: baseR * 0.48, segs: 6, alpha: 0.46, lw: 1.0 },
+    { r: baseR * 0.28, segs: 6, alpha: 0.55, lw: 1.2 },
+  ];
+
+  for (const l of layers) {
+    ctx.beginPath();
+    for (let i = 0; i <= l.segs; i++) {
+      const a = (i / l.segs) * Math.PI * 2;
+      const x = l.r * Math.cos(a), y = l.r * Math.sin(a);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(240,200,140,' + l.alpha + ')';
+    ctx.lineWidth = l.lw;
+    ctx.stroke();
+
+    for (let i = 0; i < l.segs; i++) {
+      const a = (i / l.segs) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(l.r * Math.cos(a), l.r * Math.sin(a));
+      ctx.strokeStyle = 'rgba(240,200,140,' + (l.alpha * 0.45) + ')';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  }
+
+  ctx.beginPath();
+  ctx.arc(0, 0, baseR * 1.06, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(240,200,140,0.28)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.restore();
+
+  // Centre fixed
+  ctx.beginPath();
+  ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(240,200,140,0.25)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(240,200,140,0.95)';
+  ctx.fill();
+}
+
+
+// ── UNKNOWN: near-still breathing field, no edges, no geometry ──
+// Mechanism: coherence without decision. Somewhere to rest, not follow.
+function drawUnknown(ctx, W, H, t) {
+  const cx = W / 2, cy = H / 2;
+  const cycle = t % 10;
+  const r = cycle < 4 ? easeInOut(cycle / 4) : 1 - easeInOut((cycle - 4) / 6);
+
+  // Three soft concentric gradient fields — no hard edges, no circles drawn
+  const sizes = [0.55, 0.35, 0.18];
+  const alphas = [0.07, 0.10, 0.14];
+  for (let i = 0; i < 3; i++) {
+    const radius = Math.min(W, H) * sizes[i] * (0.92 + r * 0.08);
+    const alpha = alphas[i] * (0.7 + r * 0.3);
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    g.addColorStop(0, 'rgba(212,200,180,' + alpha + ')');
+    g.addColorStop(0.6, 'rgba(212,200,180,' + (alpha * 0.4) + ')');
+    g.addColorStop(1, 'rgba(212,200,180,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Single centre point — barely visible, just present
+  ctx.beginPath();
+  ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(212,200,180,' + (0.30 + r * 0.25) + ')';
+  ctx.fill();
+}
+// ── PROCRASTINATION: a line drawing itself forward, continuously ──
+// Mechanism: progressive emergence → initiation. Movement you can join.
+// No completion. No pause. No reset visible. Just forward.
+function drawProcrastination(ctx, W, H, t) {
+  const cy = H / 2;
+  const margin = W * 0.12;
+  const lineY = cy;
+  const totalWidth = W - margin * 2;
+
+  // Period: 5s per pass. No pause — the moment it reaches the end
+  // it wraps seamlessly. Leading point fades out at right edge
+  // and fades in at left, so the reset is invisible.
+  const period = 5.0;
+  const cycle = t % period;
+  const rawPhase = cycle / period;
+
+  // Slight acceleration at start — easeOut gives initial push,
+  // settles to steady. Feels like it wants to keep going.
+  const progress = easeOut(rawPhase);
+
+  const currentX = margin + progress * totalWidth;
+
+  // Faint guide — shows the full path ahead, always
+  ctx.beginPath();
+  ctx.moveTo(margin, lineY);
+  ctx.lineTo(margin + totalWidth, lineY);
+  ctx.strokeStyle = 'rgba(212,180,131,0.09)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // The line — clean, consistent thickness throughout
+  ctx.beginPath();
+  ctx.moveTo(margin, lineY);
+  ctx.lineTo(currentX, lineY);
+  ctx.strokeStyle = 'rgba(212,180,131,0.72)';
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Leading point — fades in at start, fades out at end
+  // This makes the reset invisible
+  const edgeFade = Math.min(rawPhase * 8, 1) * Math.min((1 - rawPhase) * 8, 1);
+  const grd = ctx.createRadialGradient(currentX, lineY, 0, currentX, lineY, 20);
+  grd.addColorStop(0, 'rgba(212,180,131,' + (0.40 * edgeFade) + ')');
+  grd.addColorStop(1, 'rgba(212,180,131,0)');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.arc(currentX, lineY, 20, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(currentX, lineY, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(212,180,131,' + (0.95 * edgeFade) + ')';
+  ctx.fill();
+
+  // Step markers — appear as line passes, stay at consistent opacity
+  // No fading out — they persist, showing ground already covered
+  const stepCount = 5;
+  const stepSpacing = totalWidth / (stepCount + 1);
+  for (let i = 1; i <= stepCount; i++) {
+    const stepX = margin + i * stepSpacing;
+    const stepProgress = (stepX - margin) / totalWidth;
+    const passed = progress >= stepProgress;
+    ctx.beginPath();
+    ctx.arc(stepX, lineY + 16, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = passed
+      ? 'rgba(212,180,131,0.38)'
+      : 'rgba(212,180,131,0.08)';
+    ctx.fill();
+  }
+}
+
+// ── EASING ──
+function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+function easeOut(t) { return 1 - Math.pow(1-t, 2); }
+
+
+let facSteps = [];
+let facIdx = 0;
+
+function startFac(stateId) {
+  facSteps = STATES[stateId] || [];
+  facIdx = 0;
+  var stateNames = {
+    overwhelm:'Overwhelm', procrastination:'Procrastination',
+    shame:'Shame', anger:'Anger', disconnection:'Disconnection', unknown:'I do not know'
+  };
+  document.getElementById('fac-present-state').textContent = stateNames[stateId] || stateId;
+  document.getElementById('fac-picker').style.display = 'none';
+  document.getElementById('fac-present').style.display = 'flex';
+  var dotsEl = document.getElementById('fac-present-dots');
+  dotsEl.innerHTML = facSteps.map(function(_,i){ return '<div class="fac-present-dot" id="fpdot-'+i+'"></div>'; }).join('');
+  renderFacStep(true);
+}
+
+function renderFacStep(instant) {
+  var stepEl = document.getElementById('fac-present-step');
+  var tapBtn = document.getElementById('fac-present-tap');
+  if (!instant) { stepEl.classList.add('fade'); }
+  setTimeout(function() {
+    if (facIdx >= facSteps.length) {
+      stepEl.className = 'fac-present-step';
+      stepEl.textContent = 'Done.';
+      tapBtn.textContent = 'back to states';
+      tapBtn.classList.add('done-state');
+      tapBtn.onclick = facExit;
+      facSteps.forEach(function(_,i) {
+        var d = document.getElementById('fpdot-'+i);
+        if(d) d.className = 'fac-present-dot done';
+      });
+      return;
+    }
+    var item = facSteps[facIdx];
+    stepEl.className = 'fac-present-step' + (item.type === 'anchor' ? ' anchor' : item.type === 'action' ? ' action' : '');
+    stepEl.textContent = item.text;
+    stepEl.classList.remove('fade');
+    facSteps.forEach(function(_,i) {
+      var d = document.getElementById('fpdot-'+i);
+      if (!d) return;
+      if (i < facIdx) d.className = 'fac-present-dot done';
+      else if (i === facIdx) d.className = 'fac-present-dot current';
+      else d.className = 'fac-present-dot';
+    });
+    var isLast = facIdx === facSteps.length - 1;
+    tapBtn.textContent = isLast ? 'finish' : 'tap to continue';
+    tapBtn.classList.remove('done-state');
+    tapBtn.onclick = facAdvance;
+    tones.tap();
+  }, instant ? 0 : 200);
+}
+
+function facAdvance() { facIdx++; renderFacStep(false); }
+
+function facExit() {
+  document.getElementById('fac-present').style.display = 'none';
+  document.getElementById('fac-picker').style.display = 'block';
+  var tapBtn = document.getElementById('fac-present-tap');
+  tapBtn.onclick = facAdvance;
+  tapBtn.classList.remove('done-state');
+}
+</script>
 </body>
 </html>

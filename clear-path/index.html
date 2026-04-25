@@ -1,35 +1,3153 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clear Path - Coherence Nikolai</title>
-  <meta name="description" content="Clear Path is an earlier Coherence Nikolai planning and simplification support.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/clear-path/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Clear Path"/>
+<title>Clear Path · Academic Skills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet"/>
+
+<style>
+/* ═══ DESIGN TOKENS ═══════════════════════════════════════════ */
+:root {
+  --bg:          #0c1410;
+  --bg2:         #111a14;
+  --surface:     #162019;
+  --surface2:    #1c2b22;
+  --surface3:    #223329;
+  --border:      rgba(255,255,255,.08);
+  --border-hi:   rgba(130,210,160,.3);
+  --fg:          #e8f0eb;
+  --fg2:         #c0d5c6;
+  --muted:       #82a08a;
+  --shadow:      rgba(0,0,0,.5);
+
+  --green:       #82d4a0;
+  --green-soft:  #5cb87a;
+  --green-dim:   rgba(130,212,160,.11);
+  --green-glow:  rgba(130,212,160,.2);
+  --amber:       #e8c07a;
+  --amber-dim:   rgba(232,192,122,.1);
+  --rose:        #e8909a;
+  --rose-dim:    rgba(232,144,154,.09);
+  --sky:         #82c4d8;
+  --sky-dim:     rgba(130,196,216,.1);
+  --lavender:    #b8a8d8;
+  --lav-dim:     rgba(184,168,216,.1);
+  --peach:       #e8b090;
+  --peach-dim:   rgba(232,176,144,.1);
+
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r:    16px;
+  --r-lg: 22px;
+  --r-xl: 30px;
+
+  --font-base:    'DM Sans', sans-serif;
+  --font-display: 'Fraunces', serif;
+  --font-a11y:    'Atkinson Hyperlegible', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --font-size:    16px;
+
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --ease-smooth: cubic-bezier(.4,0,.2,1);
+
+  --grad-bg: radial-gradient(ellipse 140% 70% at 0% 0%, rgba(82,180,120,.05) 0%, transparent 55%),
+             radial-gradient(ellipse 100% 60% at 100% 100%, rgba(82,160,200,.04) 0%, transparent 55%);
+}
+
+[data-theme="light"] {
+  --bg:        #f0f5f1;
+  --bg2:       #e8f0ea;
+  --surface:   #ffffff;
+  --surface2:  #ecf4ee;
+  --surface3:  #ddeee2;
+  --border:    rgba(0,0,0,.08);
+  --border-hi: rgba(40,130,80,.35);
+  --fg:        #182e20;
+  --fg2:       #2a4835;
+  --muted:     #5a8068;
+  --shadow:    rgba(0,0,0,.08);
+  --green:     #1f9150;
+  --green-soft:#2aaf60;
+  --green-dim: rgba(30,145,80,.09);
+  --green-glow:rgba(30,145,80,.18);
+  --amber:     #a07020;
+  --amber-dim: rgba(160,112,32,.08);
+  --rose:      #b04050;
+  --rose-dim:  rgba(176,64,80,.07);
+  --sky:       #1870a0;
+  --sky-dim:   rgba(24,112,160,.08);
+  --lavender:  #6050a0;
+  --lav-dim:   rgba(96,80,160,.08);
+  --peach:     #a05030;
+  --peach-dim: rgba(160,80,48,.08);
+  --grad-bg: radial-gradient(ellipse 140% 70% at 0% 0%, rgba(30,145,80,.04) 0%, transparent 55%);
+}
+
+/* ═══ ACCESSIBILITY MODES ═══════════════════════════════════ */
+[data-fontsize="large"] { --font-size: 18px; }
+[data-fontsize="xl"]    { --font-size: 21px; }
+[data-font="a11y"]      { --font-base: 'Atkinson Hyperlegible', sans-serif; }
+[data-contrast="high"] {
+  --border: rgba(255,255,255,.2);
+  --border-hi: rgba(130,212,160,.6);
+  --muted: #a8c4b0;
+}
+[data-contrast="high"][data-theme="light"] {
+  --border: rgba(0,0,0,.2);
+  --muted: #3a6048;
+}
+[data-bionic="on"] .bionic-text b {
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce), [data-motion="reduce"] * {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+}
+
+/* ═══ RESET ══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-base);
+  background: var(--bg);
+  background-image: var(--grad-bg);
+  background-attachment: fixed;
+  color: var(--fg);
+  min-height: 100dvh;
+  font-size: var(--font-size);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .3s, color .3s;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,.25); border-radius: 99px; }
+
+/* ═══ NOISE TEXTURE OVERLAY ══════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: .6;
+}
+
+/* ═══ LAYOUT ═════════════════════════════════════════════════ */
+.app { max-width: 700px; margin: 0 auto; padding: 18px 16px 100px; position: relative; z-index: 1; }
+
+/* ═══ HEADER ═════════════════════════════════════════════════ */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; padding: 0 2px;
+}
+.app-header-left { display: flex; align-items: center; gap: 13px; }
+
+/* Logo SVG container */
+.app-logo {
+  width: 46px; height: 46px; flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(82,200,130,.2));
+}
+
+.app-brand { line-height: 1.2; }
+.app-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 900; letter-spacing: -.4px;
+  background: linear-gradient(135deg, var(--green), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.app-subtitle { font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: .2px; }
+
+.settings-bar { display: flex; align-items: center; gap: 6px; }
+
+.icon-btn {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--surface2);
+  color: var(--muted); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s, color .15s, background .15s;
+  position: relative;
+}
+.icon-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.icon-btn.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+/* PANIC button */
+.panic-btn {
+  height: 36px; padding: 0 12px; border-radius: var(--r-sm);
+  border: 1px solid rgba(232,144,154,.35); background: var(--rose-dim);
+  color: var(--rose); font-family: var(--font-base); font-size: 12px;
+  font-weight: 700; cursor: pointer; letter-spacing: .3px;
+  transition: border-color .15s, background .15s; white-space: nowrap;
+}
+.panic-btn:hover { background: rgba(232,144,154,.18); border-color: var(--rose); }
+
+/* ═══ SETTINGS PANEL ═════════════════════════════════════════ */
+.settings-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 18px 20px; margin-bottom: 16px;
+  animation: fadeUp .22s var(--ease-smooth);
+}
+.settings-section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; margin-top: 6px;
+}
+.settings-section-title:first-child { margin-top: 0; }
+.settings-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.settings-row:last-child { margin-bottom: 0; }
+.settings-label { font-size: 13px; color: var(--muted); font-weight: 600; min-width: 110px; }
+
+.pill-btn {
+  padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--muted); font-family: var(--font-base);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.pill-btn:hover, .pill-btn.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+.install-btn {
+  width: 100%; padding: 10px; border-radius: var(--r-sm);
+  border: 1px dashed var(--border-hi); background: var(--green-dim);
+  color: var(--green); font-family: var(--font-base); font-size: 13px;
+  font-weight: 700; cursor: pointer; transition: background .15s; margin-top: 4px;
+}
+.install-btn:hover { background: var(--green-glow); }
+.install-btn:disabled { opacity: .35; cursor: default; }
+
+/* ═══ BOTTOM NAV ═════════════════════════════════════════════ */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: center;
+  padding: 8px 12px 10px;
+  background: linear-gradient(to top, var(--bg) 80%, transparent);
+}
+.bottom-nav-inner {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-xl); padding: 5px 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+  max-width: 600px; width: 100%;
+  justify-content: space-around;
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 7px 10px; border-radius: var(--r); border: none;
+  background: none; color: var(--muted); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px; cursor: pointer;
+  transition: color .15s, background .15s; flex: 1; min-width: 0;
+}
+.nav-btn .nav-icon { font-size: 18px; line-height: 1; }
+.nav-btn.active { color: var(--green); background: var(--green-dim); border-radius: var(--r); }
+.nav-btn:hover:not(.active) { color: var(--fg); background: var(--surface2); }
+
+/* ═══ SCREENS ════════════════════════════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; animation: fadeUp .3s var(--ease-smooth) both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ SECTION LABEL ══════════════════════════════════════════ */
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ═══ CARD ═══════════════════════════════════════════════════ */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden; margin-bottom: 14px;
+  box-shadow: 0 2px 16px var(--shadow);
+}
+.card-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.card-head-icon { font-size: 24px; flex-shrink: 0; }
+.card-head-text h2 {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 700; line-height: 1.2;
+}
+.card-head-text p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.card-body { padding: 18px 20px; }
+
+/* ═══ BLOCK ══════════════════════════════════════════════════ */
+.block {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
+}
+.block:last-child { margin-bottom: 0; }
+.block-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-weight: 700; font-size: 14px; margin-bottom: 8px;
+}
+
+/* ═══ INTENTION BOX ══════════════════════════════════════════ */
+.intention-box {
+  background: linear-gradient(135deg, var(--green-dim), var(--amber-dim));
+  border: 1px solid var(--border-hi); border-radius: var(--r-lg);
+  padding: 18px 20px; margin-bottom: 14px;
+}
+.intention-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .8px; color: var(--green); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.intention-input {
+  width: 100%; background: rgba(0,0,0,.2); border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm); padding: 10px 14px; color: var(--fg);
+  font-family: var(--font-display); font-size: 17px; font-style: italic;
+  line-height: 1.4; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+[data-theme="light"] .intention-input { background: rgba(255,255,255,.5); }
+.intention-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-dim); }
+.intention-input::placeholder { color: var(--muted); }
+
+/* ═══ BADGES ═════════════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; font-size: 11px; font-weight: 700;
+  letter-spacing: .3px; text-transform: uppercase; padding: 3px 9px;
+  border-radius: 999px; border: 1px solid var(--border); color: var(--muted);
+  background: rgba(128,128,128,.05); white-space: nowrap;
+}
+.badge.green   { color: var(--green);    border-color: rgba(130,212,160,.3); background: var(--green-dim); }
+.badge.amber   { color: var(--amber);   border-color: rgba(232,192,122,.3); background: var(--amber-dim); }
+.badge.sky     { color: var(--sky);     border-color: rgba(130,196,216,.3); background: var(--sky-dim); }
+.badge.rose    { color: var(--rose);    border-color: rgba(232,144,154,.3); background: var(--rose-dim); }
+.badge.lav     { color: var(--lavender); border-color: rgba(184,168,216,.3); background: var(--lav-dim); }
+
+/* ═══ FEELING GRID ═══════════════════════════════════════════ */
+.feeling-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (max-width: 440px) { .feeling-grid { grid-template-columns: 1fr 1fr; } }
+
+.feeling-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 14px 8px; border-radius: var(--r); border: 1px solid var(--border);
+  background: var(--surface2); color: var(--fg); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: border-color .18s, background .18s, transform .15s var(--ease-spring);
+  text-align: center; line-height: 1.25;
+}
+.feeling-tile:hover { transform: translateY(-2px); }
+.feeling-tile .feeling-icon { font-size: 28px; }
+.feeling-tile.f-overwhelmed:hover { border-color: var(--rose); background: var(--rose-dim); }
+.feeling-tile.f-scattered:hover   { border-color: var(--amber); background: var(--amber-dim); }
+.feeling-tile.f-anxious:hover     { border-color: var(--lavender); background: var(--lav-dim); }
+.feeling-tile.f-flat:hover        { border-color: var(--sky); background: var(--sky-dim); }
+.feeling-tile.f-procrastinating:hover { border-color: var(--amber); background: var(--amber-dim); }
+.feeling-tile.f-clear:hover       { border-color: var(--green); background: var(--green-dim); }
+
+/* ═══ TILE GRID ══════════════════════════════════════════════ */
+.tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+@media (max-width: 420px) { .tile-grid { grid-template-columns: 1fr; } }
+
+.tile {
+  display: flex; align-items: center; gap: 11px; padding: 14px 13px;
+  border-radius: var(--r); border: 1px solid var(--border); background: var(--surface2);
+  color: var(--fg); font-size: 14px; font-weight: 700; text-align: left;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: border-color .18s, background .18s, transform .15s var(--ease-spring), box-shadow .18s;
+}
+.tile:hover {
+  border-color: var(--green); background: var(--green-dim);
+  transform: translateY(-2px); box-shadow: 0 4px 16px var(--green-glow);
+}
+.tile:active { transform: scale(.97); }
+.tile .tile-icon { font-size: 22px; flex-shrink: 0; }
+.tile .tile-label { line-height: 1.25; }
+.tile .tile-hint { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+.tile.c-amber:hover { border-color: var(--amber); background: var(--amber-dim); box-shadow: 0 4px 16px rgba(232,192,122,.15); }
+.tile.c-rose:hover  { border-color: var(--rose);  background: var(--rose-dim);  box-shadow: 0 4px 16px rgba(232,144,154,.12); }
+.tile.c-sky:hover   { border-color: var(--sky);   background: var(--sky-dim);   box-shadow: 0 4px 16px rgba(130,196,216,.15); }
+.tile.c-lav:hover   { border-color: var(--lavender); background: var(--lav-dim); }
+.tile.c-peach:hover { border-color: var(--peach); background: var(--peach-dim); }
+.tile.selected      { border-color: var(--green); background: var(--green-dim); }
+
+/* ═══ BUTTONS ════════════════════════════════════════════════ */
+button { font-family: var(--font-base); cursor: pointer; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px;
+  border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface2);
+  color: var(--fg); font-family: var(--font-base); font-size: 13px; font-weight: 700;
+  transition: border-color .15s, background .15s, transform .12s; white-space: nowrap;
+}
+.btn:hover { border-color: rgba(128,128,128,.3); transform: translateY(-1px); }
+.btn:active { transform: scale(.96); }
+.btn.primary { color: var(--green); border-color: var(--border-hi); background: var(--green-dim); }
+.btn.primary:hover { background: var(--green-glow); }
+.btn.danger  { color: var(--rose); border-color: rgba(232,144,154,.3); background: var(--rose-dim); }
+.btn.amber   { color: var(--amber); border-color: rgba(232,192,122,.3); background: var(--amber-dim); }
+.btn.sm { font-size: 12px; padding: 6px 11px; }
+.btn.full { width: 100%; justify-content: center; padding: 13px; font-size: 15px; }
+.btn.full.primary { font-size: 15px; letter-spacing: .2px; }
+
+/* ═══ FORM ═══════════════════════════════════════════════════ */
+label { display: block; font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 5px; letter-spacing: .3px; text-transform: uppercase; }
+textarea, input:not([type=checkbox]):not([type=radio]), select {
+  width: 100%; padding: 10px 13px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--surface2); color: var(--fg);
+  font-family: var(--font-base); font-size: var(--font-size); line-height: 1.6;
+  outline: none; transition: border-color .15s, box-shadow .15s; min-height: 44px;
+}
+textarea:focus, input:not([type=checkbox]):not([type=radio]):focus, select:focus {
+  border-color: var(--border-hi); box-shadow: 0 0 0 3px var(--green-dim);
+}
+textarea { min-height: 80px; resize: vertical; }
+select { cursor: pointer; }
+input[type=checkbox] {
+  width: 20px !important; height: 20px !important; padding: 0 !important;
+  border-radius: 5px; border: 2px solid rgba(128,128,128,.3);
+  background: transparent; accent-color: var(--green); cursor: pointer; flex-shrink: 0;
+}
+.form-group { margin-bottom: 14px; }
+.form-group:last-child { margin-bottom: 0; }
+
+/* ═══ CHECKLIST ══════════════════════════════════════════════ */
+.check-item {
+  display: flex; align-items: flex-start; gap: 12px; padding: 11px 13px;
+  border: 1px solid var(--border); border-radius: var(--r-sm); margin-bottom: 7px;
+  transition: border-color .15s, background .15s; cursor: pointer;
+}
+.check-item:hover { background: rgba(128,128,128,.04); border-color: rgba(128,128,128,.2); }
+.check-item.done { border-color: rgba(130,212,160,.25); background: rgba(130,212,160,.05); }
+.check-item.done .check-label { color: var(--muted); text-decoration: line-through; }
+.check-label { flex: 1; font-size: 14px; line-height: 1.55; user-select: none; }
+.check-item input { margin-top: 2px; }
+
+/* ═══ BRAIN DUMP ═════════════════════════════════════════════ */
+.brain-dump-area {
+  width: 100%;
+  min-height: 140px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  color: var(--fg);
+  font-family: var(--font-base);
+  font-size: var(--font-size);
+  line-height: 1.75;
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.brain-dump-area:focus { border-color: var(--border-hi); box-shadow: 0 0 0 3px var(--green-dim); }
+.brain-dump-area::placeholder { color: var(--muted); font-style: italic; }
+
+.dump-thought-list { margin-top: 12px; }
+.dump-thought {
+  display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm);
+  margin-bottom: 6px; font-size: 14px; line-height: 1.5; animation: fadeUp .2s var(--ease-smooth);
+}
+.dump-thought-text { flex: 1; }
+.dump-thought-del { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; padding: 0 2px; line-height: 1; flex-shrink: 0; }
+.dump-thought-del:hover { color: var(--rose); }
+
+/* ═══ TASK BREAKER ═══════════════════════════════════════════ */
+.microstep {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm);
+  margin-bottom: 6px; font-size: 14px; line-height: 1.5;
+  animation: fadeUp .2s var(--ease-smooth); cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.microstep:hover { background: var(--surface3); border-color: rgba(130,212,160,.2); }
+.microstep.done { border-color: rgba(130,212,160,.25); background: rgba(130,212,160,.05); }
+.microstep.done .microstep-text { color: var(--muted); text-decoration: line-through; }
+.microstep-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--green-dim); border: 1px solid var(--border-hi);
+  color: var(--green); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.microstep.done .microstep-num { background: var(--green); color: #0c1410; }
+.microstep-text { flex: 1; }
+
+/* ═══ PROGRESS RING ══════════════════════════════════════════ */
+.ring-wrap {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  padding: 14px 16px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.ring-svg { width: 64px; height: 64px; flex-shrink: 0; }
+.ring-bg { fill: none; stroke: var(--border); stroke-width: 3; }
+.ring-fill {
+  fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round;
+  transform: rotate(-90deg); transform-origin: 50% 50%;
+  transition: stroke-dashoffset 1s var(--ease-smooth), stroke .5s;
+}
+.ring-text { font-family: var(--font-mono); font-size: 10px; font-weight: 500; fill: var(--green); text-anchor: middle; dominant-baseline: middle; }
+.ring-info { flex: 1; }
+.ring-count { font-size: 22px; font-weight: 900; color: var(--fg); }
+.ring-count span { font-size: 14px; color: var(--muted); font-weight: 500; }
+.ring-message { font-size: 13px; color: var(--muted); margin-top: 3px; font-style: italic; transition: color .5s; }
+.ring-message.celebrate { color: var(--green); font-weight: 700; font-style: normal; }
+
+/* ═══ COMPLETION ═════════════════════════════════════════════ */
+.complete-banner {
+  text-align: center; padding: 22px 20px; margin-bottom: 14px;
+  background: var(--green-dim); border: 1px solid var(--border-hi);
+  border-radius: var(--r-lg); animation: glow 2.5s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from { box-shadow: 0 0 14px var(--green-glow); }
+  to   { box-shadow: 0 0 30px var(--green-glow), 0 0 10px var(--green-dim); }
+}
+.complete-banner h3 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--green); margin-bottom: 5px; }
+.complete-banner p  { font-size: 14px; color: var(--muted); }
+
+/* ═══ ORB ════════════════════════════════════════════════════ */
+.orb-wrap { display: flex; flex-direction: column; align-items: center; margin: 16px 0 12px; gap: 12px; }
+.orb {
+  width: 140px; height: 140px; border-radius: 50%;
+  border: 1px solid rgba(130,212,160,.2);
+  background: radial-gradient(circle at 40% 40%, var(--green-glow), var(--green-dim) 70%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--green); text-align: center;
+  transition: transform 4s cubic-bezier(.4,0,.2,1), box-shadow 4s ease;
+}
+.orb.inhale { transform: scale(1.22); box-shadow: 0 0 0 20px rgba(130,212,160,.05), 0 0 60px var(--green-dim); }
+.orb.exhale { transform: scale(.82); box-shadow: none; }
+.orb-timer { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+/* ═══ WIZARD (Understand) ════════════════════════════════════ */
+.wizard-progress { display: flex; gap: 6px; align-items: center; margin-bottom: 20px; }
+.wizard-step-dot {
+  width: 9px; height: 9px; border-radius: 50%; background: var(--border);
+  transition: background .25s, transform .25s var(--ease-spring); flex-shrink: 0;
+}
+.wizard-step-dot.done  { background: var(--green); }
+.wizard-step-dot.active { background: var(--green); transform: scale(1.4); box-shadow: 0 0 0 3px var(--green-dim); }
+.wizard-step-line { flex: 1; height: 2px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.wizard-step-line-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width .4s var(--ease-smooth); }
+.wizard-step-label { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .3px; white-space: nowrap; }
+
+.wizard-pane { display: none; animation: fadeUp .22s var(--ease-smooth); }
+.wizard-pane.active { display: block; }
+.wizard-question { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+.wizard-hint { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+
+/* ═══ CHIPS ══════════════════════════════════════════════════ */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip {
+  display: inline-flex; padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface2);
+  font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s, transform .12s var(--ease-spring);
+  font-family: var(--font-base);
+}
+.chip:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); transform: scale(1.04); }
+.chip.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+/* ═══ INSIGHT BOX ════════════════════════════════════════════ */
+.insight {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 16px; margin-top: 12px; animation: fadeUp .22s var(--ease-smooth);
+}
+.insight-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.insight-text { font-size: 14px; line-height: 1.85; color: var(--fg2); white-space: pre-line; }
+
+/* ═══ KIND WORDS ═════════════════════════════════════════════ */
+.kind-words {
+  font-size: 16px; line-height: 2.1; color: var(--green); font-weight: 600;
+  padding: 22px; border-radius: var(--r); background: var(--green-dim);
+  border: 1px solid rgba(130,212,160,.2); text-align: center;
+  margin-top: 12px; display: none; font-family: var(--font-display); font-style: italic;
+}
+.kind-words.show { display: block; animation: fadeUp .2s var(--ease-smooth); }
+.kind-words div { margin-bottom: 4px; }
+
+/* ═══ TIMER ══════════════════════════════════════════════════ */
+.timer-face { text-align: center; padding: 16px 14px 12px; }
+.timer-mode { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.timer-time { font-family: var(--font-mono); font-size: 54px; font-weight: 500; line-height: 1; color: var(--green); transition: color .4s; }
+.timer-time.break { color: var(--sky); }
+.timer-sessions { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.timer-hint { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.progress-bar-wrap { height: 4px; background: rgba(128,128,128,.12); border-radius: 99px; overflow: hidden; margin: 10px 0; }
+.progress-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green-soft), var(--green)); transition: width .95s linear; }
+.progress-bar.break { background: linear-gradient(90deg, var(--sky), rgba(130,196,216,.7)); }
+
+/* ═══ SESSION DOTS ═══════════════════════════════════════════ */
+.session-dots { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+.session-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--border); border: 1px solid rgba(128,128,128,.2);
+  transition: background .3s, border-color .3s;
+}
+.session-dot.done { background: var(--green); border-color: rgba(130,212,160,.4); }
+
+/* ═══ NUDGE BANNER ═══════════════════════════════════════════ */
+.nudge {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+  background: var(--amber-dim); border: 1px solid rgba(232,192,122,.3);
+  border-radius: var(--r-sm); margin-bottom: 14px; font-size: 13px;
+  animation: fadeUp .25s var(--ease-smooth);
+}
+.nudge-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.nudge-text { flex: 1; line-height: 1.55; }
+.nudge-text strong { color: var(--amber); }
+.nudge-close { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 0 2px; }
+
+/* ═══ SUPPORT HUB ════════════════════════════════════════════ */
+.support-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px;
+}
+.support-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.support-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.support-card .support-link {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 8px;
+  padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  border: 1px solid var(--border); background: var(--surface); color: var(--fg);
+  text-decoration: none; transition: border-color .15s, color .15s;
+}
+.support-card .support-link:hover { border-color: var(--green); color: var(--green); }
+
+/* ═══ PANIC OVERLAY ══════════════════════════════════════════ */
+.panic-overlay {
+  position: fixed; inset: 0; z-index: 999; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+  background: rgba(0,0,0,.85); backdrop-filter: blur(8px);
+}
+.panic-overlay.show { display: flex; animation: fadeUp .25s var(--ease-smooth); }
+.panic-panel {
+  background: var(--surface); border: 1px solid rgba(232,144,154,.3);
+  border-radius: var(--r-xl); padding: 28px 24px; max-width: 420px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.panic-panel h2 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 700; color: var(--green); margin-bottom: 8px;
+}
+.panic-panel .panic-breath {
+  background: var(--green-dim); border: 1px solid var(--border-hi);
+  border-radius: var(--r); padding: 16px; margin: 16px 0; text-align: center;
+  font-size: 14px; color: var(--fg); line-height: 1.8;
+}
+.panic-panel .panic-crisis {
+  background: var(--rose-dim); border: 1px solid rgba(232,144,154,.25);
+  border-radius: var(--r); padding: 14px 16px; margin-top: 12px;
+  font-size: 13px; color: var(--fg); line-height: 1.8;
+}
+.panic-panel .panic-crisis strong { color: var(--rose); }
+
+/* ═══ QUICK SUMMARY (Understand result) ═════════════════════ */
+.summary-box {
+  background: linear-gradient(135deg, var(--green-dim), var(--sky-dim));
+  border: 1px solid var(--border-hi); border-radius: var(--r);
+  padding: 16px 18px; margin-top: 14px; font-size: 14px; line-height: 1.9;
+  animation: fadeUp .25s var(--ease-smooth);
+}
+.summary-box .sum-row { margin-bottom: 6px; }
+.summary-box .sum-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); display: block; }
+.summary-box .sum-val { color: var(--fg); }
+
+/* ═══ REF STYLE GUIDE ════════════════════════════════════════ */
+.ref-block {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 8px;
+  font-size: 13px; line-height: 1.7;
+}
+.ref-block strong { color: var(--green); font-size: 12px; text-transform: uppercase; letter-spacing: .3px; display: block; margin-bottom: 4px; }
+.ref-block code { font-family: var(--font-mono); font-size: 12px; color: var(--fg2); background: rgba(128,128,128,.08); padding: 2px 5px; border-radius: 4px; }
+
+/* ═══ TOAST ══════════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--green); color: #0c1410; font-weight: 700; font-size: 14px;
+  padding: 9px 22px; border-radius: 999px; opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .22s var(--ease-spring); z-index: 200;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3); white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+[data-theme="light"] .toast { color: #fff; background: #1f9150; }
+
+/* ═══ HELPERS ════════════════════════════════════════════════ */
+.hidden { display: none !important; }
+.mt-10 { margin-top: 10px; }
+.mt-14 { margin-top: 14px; }
+.mt-18 { margin-top: 18px; }
+.text-small { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.text-tiny  { font-size: 11px; color: var(--muted); line-height: 1.6; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.emoji-big { font-size: 36px; text-align: center; display: block; margin-bottom: 8px; }
+.centered  { text-align: center; }
+
+/* ═══ FOCUS / A11Y ═══════════════════════════════════════════ */
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 4px; }
+.skip-link { position: absolute; top: -999px; left: 8px; background: var(--green); color: #000; font-weight: 700; padding: 8px 14px; border-radius: var(--r-sm); font-size: 14px; z-index: 300; }
+.skip-link:focus { top: 8px; }
+
+/* ═══ AI TOOLS ═══════════════════════════════════════════════ */
+.ai-intro {
+  background: linear-gradient(135deg, var(--lav-dim), var(--sky-dim));
+  border: 1px solid rgba(184,168,216,.3); border-radius: var(--r-lg);
+  padding: 16px 18px; margin-bottom: 16px; font-size: 14px; line-height: 1.7;
+}
+.ai-intro strong { color: var(--lavender); }
+
+.ai-prompt-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px; margin-bottom: 10px;
+  transition: border-color .15s;
+}
+.ai-prompt-card:hover { border-color: rgba(184,168,216,.4); }
+.ai-prompt-card h3 {
+  font-size: 14px; font-weight: 700; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ai-prompt-card p { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+.ai-prompt-preview {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 10px 12px; margin-bottom: 10px;
+  font-size: 12px; color: var(--fg2); line-height: 1.65; font-family: var(--font-mono);
+  white-space: pre-wrap; max-height: 80px; overflow: hidden;
+  position: relative;
+}
+.ai-prompt-preview::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 24px; background: linear-gradient(transparent, var(--surface));
+}
+.ai-btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.ai-launch-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: var(--r-sm); font-size: 12px;
+  font-weight: 700; border: 1px solid var(--border); cursor: pointer;
+  text-decoration: none; font-family: var(--font-base);
+  transition: border-color .15s, background .15s, transform .12s;
+  background: var(--surface);  color: var(--fg);
+}
+.ai-launch-btn:hover { transform: translateY(-1px); }
+.ai-launch-btn.claude { border-color: rgba(184,168,216,.4); color: var(--lavender); background: var(--lav-dim); }
+.ai-launch-btn.claude:hover { background: rgba(184,168,216,.18); }
+.ai-launch-btn.chatgpt { border-color: rgba(130,212,160,.3); color: var(--green); background: var(--green-dim); }
+.ai-launch-btn.chatgpt:hover { background: var(--green-glow); }
+.ai-launch-btn.gemini { border-color: rgba(130,196,216,.3); color: var(--sky); background: var(--sky-dim); }
+.ai-launch-btn.gemini:hover { background: rgba(130,196,216,.2); }
+.ai-copy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: var(--r-sm); font-size: 12px;
+  font-weight: 700; border: 1px solid var(--border); cursor: pointer;
+  background: var(--surface2); color: var(--muted); font-family: var(--font-base);
+  transition: border-color .15s, color .15s;
+}
+.ai-copy-btn:hover { border-color: var(--border-hi); color: var(--green); }
+.ai-tip {
+  background: var(--amber-dim); border: 1px solid rgba(232,192,122,.25);
+  border-radius: var(--r-sm); padding: 10px 14px;
+  font-size: 12px; color: var(--fg2); line-height: 1.6; margin-top: 14px;
+}
+.ai-tip strong { color: var(--amber); }
+
+/* ═══ STREAK / STATS BAR ══════════════════════════════════════ */
+.stats-bar {
+  display: flex; gap: 8px; margin-bottom: 14px;
+}
+.stat-chip {
+  flex: 1; text-align: center; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--r);
+  padding: 10px 8px;
+}
+.stat-chip .stat-val { font-family: var(--font-mono); font-size: 20px; font-weight: 500; color: var(--green); line-height: 1; }
+.stat-chip .stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-top: 3px; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════════
+   PHASE 1: NEURODIVERGENT ENHANCEMENTS - CSS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Floating Action Buttons */
+.what-now-fab {
+  position: fixed; bottom: 90px; right: 20px; z-index: 150;
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-soft));
+  border: 3px solid var(--border-hi);
+  box-shadow: 0 8px 24px rgba(130,212,160,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; cursor: pointer;
+  transition: transform .2s var(--ease-spring);
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+.what-now-fab:hover { transform: scale(1.1); }
+.what-now-fab:active { transform: scale(0.95); }
+@keyframes gentlePulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(130,212,160,.4); }
+  50% { box-shadow: 0 8px 32px rgba(130,212,160,.6), 0 0 20px rgba(130,212,160,.3); }
+}
+
+.distraction-fab {
+  position: fixed; bottom: 90px; left: 20px; z-index: 150;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--lavender);
+  border: 2px solid rgba(184,168,216,.4);
+  box-shadow: 0 4px 16px rgba(184,168,216,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; cursor: pointer;
+  transition: transform .2s;
+}
+.distraction-fab:hover { transform: scale(1.1); }
+
+/* Modals */
+.what-now-modal, .distraction-modal {
+  position: fixed; inset: 0; z-index: 999; display: none;
+  background: rgba(0,0,0,.85); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.what-now-modal.show, .distraction-modal.show {
+  display: flex; animation: fadeIn .25s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.what-now-content, .distraction-content {
+  background: var(--surface); border: 2px solid var(--border-hi);
+  border-radius: var(--r-xl); padding: 32px 28px;
+  max-width: 480px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  animation: slideUp .3s var(--ease-spring);
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.what-now-title {
+  font-family: var(--font-display); font-size: 24px;
+  font-weight: 700; color: var(--green);
+  margin-bottom: 16px; display: flex;
+  align-items: center; gap: 10px;
+}
+.what-now-suggestion {
+  background: var(--green-dim);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r); padding: 20px;
+  margin-bottom: 16px; font-size: 16px;
+  line-height: 1.7; font-weight: 500;
+}
+.what-now-actions {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.what-now-btn {
+  padding: 14px; border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface2); color: var(--fg);
+  font-weight: 600; cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-base); font-size: 14px;
+}
+.what-now-btn:hover {
+  background: var(--surface3);
+  border-color: var(--green);
+}
+.what-now-btn.primary {
+  background: var(--green);
+  color: #0c1410;
+  border-color: var(--green);
+}
+
+.distraction-content h3 {
+  font-size:18px; font-weight:700;
+  margin-bottom:14px; color:var(--lavender);
+}
+.distraction-input {
+  width: 100%; min-height: 80px; padding: 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface2); color: var(--fg);
+  font-family: var(--font-base);
+  font-size: 15px; resize: vertical;
+}
+.distraction-type {
+  display: flex; gap: 8px;
+  margin: 12px 0; flex-wrap: wrap;
+}
+.distraction-chip {
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.distraction-chip:hover,
+.distraction-chip.selected {
+  background: var(--lav-dim);
+  border-color: var(--lavender);
+  color: var(--lavender);
+}
+
+/* Dopamine System */
+.dopamine-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px; margin-bottom: 16px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.streak-counter {
+  display: flex; align-items: center;
+  gap: 8px; font-weight: 700;
+}
+.streak-number {
+  font-size: 28px;
+  font-family: var(--font-display);
+  color: var(--amber);
+}
+.xp-bar-wrap { flex: 1; min-width: 200px; }
+.xp-label {
+  font-size: 11px; color: var(--muted);
+  margin-bottom: 4px;
+}
+.xp-bar {
+  height: 12px;
+  background: rgba(128,128,128,.1);
+  border-radius: 99px; overflow: hidden;
+}
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--amber));
+  border-radius: 99px;
+  transition: width .5s var(--ease-smooth);
+}
+.level-badge {
+  font-size: 20px; font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--green); padding: 8px 16px;
+  background: var(--green-dim);
+  border: 1px solid var(--border-hi);
+  border-radius: 20px;
+}
+
+.achievement-toast {
+  position: fixed; top: 80px; right: 20px;
+  z-index: 200;
+  background: linear-gradient(135deg, var(--amber), var(--green));
+  color: #0c1410; padding: 16px 20px;
+  border-radius: var(--r);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  transform: translateX(400px);
+  transition: transform .4s var(--ease-spring);
+  max-width: 300px; font-weight: 700;
+  display: none;
+}
+.achievement-toast.show {
+  display: block; transform: translateX(0);
+}
+
+/* Battery Tracker */
+.battery-tracker {
+  background: linear-gradient(135deg, var(--sky-dim), var(--green-dim));
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-lg);
+  padding: 18px 20px; margin-bottom: 16px;
+}
+.battery-label {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px; color: var(--sky);
+  margin-bottom: 10px;
+}
+.battery-selector {
+  display: flex; gap: 8px;
+  justify-content: center; flex-wrap: wrap;
+}
+.battery-btn {
+  width: 50px; height: 50px; border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface2); font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center;
+  justify-content: center;
+  transition: all .2s var(--ease-spring);
+}
+.battery-btn:hover {
+  transform: scale(1.1);
+  border-color: var(--sky);
+}
+.battery-btn.selected {
+  background: var(--sky-dim);
+  border-color: var(--sky);
+  transform: scale(1.15);
+  box-shadow: 0 4px 16px rgba(130,196,216,.3);
+}
+.battery-message {
+  margin-top: 12px; font-size: 13px;
+  color: var(--muted); text-align: center;
+  font-style: italic; min-height: 20px;
+}
+
+/* Quick Wins */
+.quick-wins {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px; margin-bottom: 16px;
+}
+.quick-wins-title {
+  font-size: 15px; font-weight: 700;
+  margin-bottom: 12px;
+  display: flex; align-items: center;
+  gap: 8px; color: var(--green);
+}
+.quick-win-item {
+  padding: 12px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px; cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px;
+}
+.quick-win-item:hover {
+  background: var(--green-dim);
+  border-color: var(--green);
+  transform: translateX(4px);
+}
+.quick-win-time {
+  font-size: 11px; color: var(--muted);
+  margin-left: auto;
+  background: rgba(128,128,128,.1);
+  padding: 3px 8px; border-radius: 12px;
+}
+
+/* Time Estimates */
+.time-estimate {
+  display: inline-flex; align-items: center;
+  gap: 5px; font-size: 11px;
+  color: var(--muted); font-weight: 600;
+  background: rgba(128,128,128,.08);
+  padding: 4px 10px; border-radius: 12px;
+}
+
+/* Success Journal */
+.success-journal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px; margin-bottom: 16px;
+}
+.success-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  color: var(--green); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.success-entry {
+  padding: 12px 14px;
+  background: var(--green-dim);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px; font-size: 14px;
+  line-height: 1.6;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.success-icon {
+  font-size: 18px; flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Focus Modes */
+.focus-mode-bar {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 8px;
+  margin-bottom: 16px;
+  display: flex; gap: 6px; align-items: center;
+}
+.focus-mode-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px; margin-right: 4px;
+}
+.focus-mode-btn {
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.focus-mode-btn:hover { background: var(--surface3); }
+.focus-mode-btn.active {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+body.focus-laser .app { max-width: 600px; }
+body.focus-laser .bottom-nav,
+body.focus-laser .what-now-fab,
+body.focus-laser .distraction-fab { display: none; }
+body.focus-laser .screen:not(.active) {
+  display: none !important;
+}
+body.focus-laser .screen.active > .card:not(:first-child) {
+  opacity: .3; pointer-events: none;
+}
+
+/* Context Restore */
+.restore-banner {
+  background: linear-gradient(135deg, var(--sky-dim), var(--green-dim));
+  border: 1px solid rgba(130,196,216,.3);
+  border-radius: var(--r);
+  padding: 16px 20px; margin-bottom: 16px;
+  display: none;
+}
+.restore-banner.show {
+  display: block;
+  animation: slideDown .3s ease;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.restore-text {
+  font-size: 14px; margin-bottom: 10px;
+  font-weight: 500;
+}
+.restore-btn {
+  padding: 10px 18px; background: var(--sky);
+  color: #fff; border: none;
+  border-radius: var(--r-sm); font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  font-family: var(--font-base);
+}
+.restore-btn:hover {
+  background: #6aacc0;
+  transform: translateY(-1px);
+}
+
+</style>
+
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
+<a href="#main" class="skip-link">Skip to content</a>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ═══ PHASE 1: ACHIEVEMENT TOAST ═══ -->
+
+<div id="achievementToast" class="achievement-toast">
+  <div style="font-size:24px;margin-bottom:4px;">🎉</div>
+  <div id="achievementText">Achievement Unlocked!</div>
+</div>
+
+<!-- ═══ PHASE 1: WHAT NOW MODAL ═══ -->
+
+<div class="what-now-modal" id="whatNowModal">
+  <div class="what-now-content">
+    <div class="what-now-title">🧭 What should I do now?</div>
+    <div class="what-now-suggestion" id="whatNowSuggestion">Loading suggestion...</div>
+    <div class="what-now-actions">
+      <button class="what-now-btn primary" id="doItBtn">✅ Do it</button>
+      <button class="what-now-btn" id="tooHardBtn">😰 Too hard - break it smaller</button>
+      <button class="what-now-btn" id="cantFocusBtn">🌊 Can't focus - go to Calm</button>
+      <button class="what-now-btn" id="closeWhatNow">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PHASE 1: DISTRACTION MODAL ═══ -->
+
+<div class="distraction-modal" id="distractionModal">
+  <div class="distraction-content">
+    <h3>💭 Capture This Thought</h3>
+    <textarea class="distraction-input" id="distractionInput" placeholder="What's on your mind? Get it out..."></textarea>
+    <div style="font-size:12px;color:var(--muted);margin:8px 0 4px;">What kind of thought?</div>
+    <div class="distraction-type">
+      <button class="distraction-chip" data-type="todo">📝 To-do</button>
+      <button class="distraction-chip" data-type="worry">😰 Worry</button>
+      <button class="distraction-chip" data-type="idea">💡 Idea</button>
+      <button class="distraction-chip" data-type="random">🌀 Random</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn primary" id="captureThought" style="flex:1;">Save & Return to Focus</button>
+      <button class="btn" id="closeDistraction">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PHASE 1: FLOATING ACTION BUTTONS ═══ -->
+
+<button class="what-now-fab" id="whatNowFab" title="What should I do now?">🧭</button>
+<button class="distraction-fab" id="distractionFab" title="Quick thought capture">💭</button>
+
+<!-- PANIC OVERLAY -->
+
+<div class="panic-overlay" id="panicOverlay" role="dialog" aria-modal="true" aria-label="Calm support">
+  <div class="panic-panel">
+    <h2>🌿 You're okay. You've got this.</h2>
+    <p class="text-small">Take one breath before anything else.</p>
+    <div class="panic-breath">
+      <strong>4-count breath</strong><br>
+      Breathe IN for 4 · Hold for 2 · Breathe OUT for 6<br>
+      Repeat 4 times. Slow is enough.
+    </div>
+    <div class="text-small">
+      <strong>Tiny next step:</strong> Close one tab. Get a glass of water. Open your document.
+      <br>You don't need to feel ready to begin. Starting changes the feeling.
+    </div>
+    <div class="panic-crisis">
+      <strong>Need real support right now?</strong><br>
+      📞 Lifeline: <strong>13 11 14</strong> (24/7)<br>
+      📞 Beyond Blue: <strong>1300 22 4636</strong><br>
+      📱 Crisis Text: Text <strong>HELLO</strong> to <strong>741741</strong><br>
+      🏫 Your uni's counselling service (check student portal)
+    </div>
+    <div class="btn-row mt-14" style="justify-content:space-between">
+      <button class="btn primary" id="closePanic">I'm okay — close this</button>
+      <button class="btn" id="panicToCalm">Take me to Calm →</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="main">
+
+  <!-- HEADER -->
+
+  <header class="app-header" role="banner">
+    <div class="app-header-left">
+      <!-- Clear Path Logo (SVG recreation) -->
+      <svg class="app-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Clear Path logo">
+        <defs>
+          <radialGradient id="logoGrad" cx="40%" cy="35%" r="65%" fx="40%" fy="35%">
+            <stop offset="0%" stop-color="#a8d4a8" stop-opacity="1"/>
+            <stop offset="60%" stop-color="#82b892" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#5a9870" stop-opacity="1"/>
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+        <!-- Circle background -->
+        <circle cx="50" cy="50" r="46" fill="url(#logoGrad)" opacity="0.9"/>
+        <!-- Winding S-path -->
+        <path d="M 30 72 C 30 72 20 55 50 50 C 80 45 70 28 70 28"
+              fill="none" stroke="white" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+        <!-- Path highlight -->
+        <path d="M 30 72 C 30 72 20 55 50 50 C 80 45 70 28 70 28"
+              fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+              stroke-linecap="round" stroke-dasharray="3 6"/>
+      </svg>
+      <div class="app-brand">
+        <div class="app-title">Clear Path</div>
+        <div class="app-subtitle">Academic Skills</div>
+      </div>
+    </div>
+    <div class="settings-bar">
+      <button class="panic-btn" id="panicTrigger" aria-label="I need help right now">🆘 Help</button>
+      <button class="icon-btn" id="toggleSettings" aria-label="Settings" title="Settings">⚙️</button>
+    </div>
   </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Support</p>
-      <h1>Clear Path</h1>
-      <p>A small planning and simplification support from the Coherence archive.</p>
-      <p class="muted">This earlier experiment is being kept available as an archive path while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+
+  <!-- SETTINGS PANEL -->
+
+  <div id="settingsPanel" class="settings-panel hidden" role="region" aria-label="Accessibility settings">
+    <p class="settings-section-title">Display</p>
+    <div class="settings-row">
+      <span class="settings-label">Theme</span>
+      <button class="pill-btn" data-setting="theme" data-val="dark">🌙 Dark</button>
+      <button class="pill-btn" data-setting="theme" data-val="light">☀️ Light</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Font size</span>
+      <button class="pill-btn" data-setting="fontsize" data-val="normal">A</button>
+      <button class="pill-btn" data-setting="fontsize" data-val="large">A+</button>
+      <button class="pill-btn" data-setting="fontsize" data-val="xl">A++</button>
+    </div>
+    <p class="settings-section-title mt-10">Accessibility</p>
+    <div class="settings-row">
+      <span class="settings-label">Reading font</span>
+      <button class="pill-btn" data-setting="font" data-val="default">Standard</button>
+      <button class="pill-btn" data-setting="font" data-val="a11y">Dyslexia-friendly</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Contrast</span>
+      <button class="pill-btn" data-setting="contrast" data-val="normal">Normal</button>
+      <button class="pill-btn" data-setting="contrast" data-val="high">High</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Motion</span>
+      <button class="pill-btn" data-setting="motion" data-val="normal">Normal</button>
+      <button class="pill-btn" data-setting="motion" data-val="reduce">Reduce</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Bionic Reading</span>
+      <button class="pill-btn" data-setting="bionic" data-val="off">Off</button>
+      <button class="pill-btn" data-setting="bionic" data-val="on">On</button>
+    </div>
+    <p class="settings-section-title mt-10">App</p>
+    <div class="settings-row">
+      <span class="settings-label">Install app</span>
+      <button class="install-btn" id="installBtn" disabled>📲 Add to Home Screen</button>
+    </div>
+    <button class="btn sm danger mt-10" id="clearAllData">🗑️ Clear all saved data</button>
+  </div>
+
+  <!-- ════ HOME ════════════════════════════════════════════════ -->
+
+  <section class="screen active" id="screen-home" aria-label="Home">
+
+  <!-- ═══ PHASE 1: CONTEXT RESTORE ═══ -->
+
+  <div class="restore-banner" id="restoreBanner">
+    <div class="restore-text" id="restoreText">Pick up where you left off?</div>
+    <button class="restore-btn" id="restoreBtn">Continue →</button>
+  </div>
+
+  <!-- ═══ PHASE 1: BATTERY TRACKER ═══ -->
+
+  <div class="battery-tracker">
+    <div class="battery-label">🔋 What's your battery level today?</div>
+    <div class="battery-selector">
+      <button class="battery-btn" data-battery="1">🪫</button>
+      <button class="battery-btn" data-battery="2">🔋</button>
+      <button class="battery-btn" data-battery="3">🔋🔋</button>
+      <button class="battery-btn" data-battery="4">🔋🔋🔋</button>
+      <button class="battery-btn" data-battery="5">⚡🔋🔋🔋</button>
+    </div>
+    <div class="battery-message" id="batteryMessage"></div>
+  </div>
+
+  <!-- ═══ PHASE 1: DOPAMINE BAR ═══ -->
+
+  <div class="dopamine-bar">
+    <div class="streak-counter">
+      🔥 <span class="streak-number" id="streakNumber">0</span>
+      <span style="font-size:12px;color:var(--muted);">day streak</span>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-label">Level Progress <span id="xpText">0/100 XP</span></div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    </div>
+    <div class="level-badge">LV <span id="levelNumber">1</span></div>
+  </div>
+
+  <!-- ═══ PHASE 1: FOCUS MODE SWITCHER ═══ -->
+
+  <div class="focus-mode-bar">
+    <span class="focus-mode-label">Focus:</span>
+    <button class="focus-mode-btn active" data-mode="normal">👁️ Normal</button>
+    <button class="focus-mode-btn" data-mode="laser">🔍 Laser</button>
+    <button class="focus-mode-btn" data-mode="flow">🌊 Flow</button>
+  </div>
+
+  <!-- ═══ PHASE 1: QUICK WINS ═══ -->
+
+  <div class="quick-wins">
+    <div class="quick-wins-title">⚡ Can't start? Pick a 5-min win:</div>
+    <div class="quick-win-item" data-action="open-doc">
+      <span>📂</span> Just open your document - that's it
+      <span class="quick-win-time">~2 min</span>
+    </div>
+    <div class="quick-win-item" data-action="read-title">
+      <span>👀</span> Read the assignment title once
+      <span class="quick-win-time">~1 min</span>
+    </div>
+    <div class="quick-win-item" data-action="name-date">
+      <span>✏️</span> Type your name and today's date
+      <span class="quick-win-time">~1 min</span>
+    </div>
+    <div class="quick-win-item" data-action="one-sentence">
+      <span>📝</span> Write one sentence - any sentence
+      <span class="quick-win-time">~3 min</span>
+    </div>
+  </div>
+
+<!-- Daily intention -->
+
+<div class="intention-box">
+  <div class="intention-label">🌿 Today's intention</div>
+  <input class="intention-input" id="intentionInput" placeholder="What's one thing you want to do today?" autocomplete="off" maxlength="120"/>
+  <p class="text-tiny mt-10">Just one thing. That's enough.</p>
+</div>
+
+<!-- Stats bar -->
+
+<div class="stats-bar">
+  <div class="stat-chip"><div class="stat-val" id="statSessions">0</div><div class="stat-lbl">Sessions</div></div>
+  <div class="stat-chip"><div class="stat-val" id="statDumps">0</div><div class="stat-lbl">Thoughts cleared</div></div>
+  <div class="stat-chip"><div class="stat-val" id="statChecks">0</div><div class="stat-lbl">Tasks done</div></div>
+</div>
+
+  <!-- ═══ PHASE 1: SUCCESS JOURNAL ═══ -->
+
+  <div class="success-journal hidden" id="successJournal">
+    <div class="success-title">🌟 Today's Wins</div>
+    <div id="successList"></div>
+    <button class="btn sm" id="addWin" style="margin-top:8px;">+ Add a win</button>
+  </div>
+
+<!-- Feeling check-in -->
+
+<div class="section-label">How are you feeling right now?</div>
+<div class="card" style="margin-bottom:14px">
+  <div class="card-body">
+    <p class="text-small" style="margin-bottom:12px">Your answer will guide you to the right place.</p>
+    <div class="feeling-grid">
+      <button class="feeling-tile f-overwhelmed" data-feeling="overwhelmed"><span class="feeling-icon">😤</span>Overwhelmed</button>
+      <button class="feeling-tile f-scattered"   data-feeling="scattered"><span class="feeling-icon">🌪</span>Scattered</button>
+      <button class="feeling-tile f-anxious"     data-feeling="anxious"><span class="feeling-icon">😰</span>Anxious</button>
+      <button class="feeling-tile f-flat"        data-feeling="flat"><span class="feeling-icon">😶</span>Flat / numb</button>
+      <button class="feeling-tile f-procrastinating" data-feeling="procrastinating"><span class="feeling-icon">🌀</span>Stuck</button>
+      <button class="feeling-tile f-clear"       data-feeling="clear"><span class="feeling-icon">✨</span>Clear enough</button>
+    </div>
+  </div>
+</div>
+
+<!-- Direct navigation -->
+
+<div class="section-label">Go directly to</div>
+<div class="tile-grid">
+  <button class="tile" data-nav="start"><span class="tile-icon">▶️</span><div class="tile-label">Start<div class="tile-hint">Prepare &amp; begin</div></div></button>
+  <button class="tile c-peach" data-nav="dump"><span class="tile-icon">🧠</span><div class="tile-label">Brain Dump<div class="tile-hint">Clear racing thoughts</div></div></button>
+  <button class="tile c-sky" data-nav="understand"><span class="tile-icon">🧩</span><div class="tile-label">Understand<div class="tile-hint">Unpack the question</div></div></button>
+  <button class="tile" data-nav="calm"><span class="tile-icon">🌊</span><div class="tile-label">Calm &amp; Focus<div class="tile-hint">Breathing &amp; grounding</div></div></button>
+  <button class="tile c-amber" data-nav="stress"><span class="tile-icon">⏱️</span><div class="tile-label">Focus Timer<div class="tile-hint">Pomodoro &amp; strategies</div></div></button>
+  <button class="tile c-lav" data-nav="support"><span class="tile-icon">🫂</span><div class="tile-label">Support Hub<div class="tile-hint">People &amp; resources</div></div></button>
+
+<button class="tile" data-nav="ai" style="border-color:rgba(184,168,216,.3);background:var(--lav-dim)"><span class="tile-icon">🤖</span><div class="tile-label">AI Tools<div class="tile-hint">Smart writing prompts</div></div></button>
+<button class="tile c-rose" data-nav="finish" style="grid-column:1/-1"><span class="tile-icon">✅</span><div class="tile-label">Finish & Submit<div class="tile-hint">Final checks before submitting</div></div></button>
+
+</div>
+  </section>
+
+<!-- CONTINUE IN PART 2... -->  <!-- ════ BRAIN DUMP ══════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-dump" aria-label="Brain dump">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">🧠</span>
+          <div class="card-head-text">
+            <h2>Brain Dump</h2>
+            <p>Get racing thoughts out of your head and onto the screen. No editing, no judging.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+        <p class="text-small" style="margin-bottom:12px">Type anything — worries, to-dos, distractions, random thoughts. Each sentence you dump leaves more space to focus.</p>
+        <div class="form-group">
+          <textarea class="brain-dump-area" id="dumpInput" placeholder="Type a thought and press Enter or Add…" rows="5"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="dumpAdd">+ Add thought</button>
+          <button class="btn sm" id="dumpClear" style="margin-left:auto">🗑️ Clear all</button>
+        </div>
+        <div class="dump-thought-list" id="dumpList"></div>
+        <div class="block mt-14">
+          <div class="block-title">🧩 Task Breaker</div>
+          <p class="text-small">Have one big scary task? Break it into micro-steps.</p>
+          <div class="form-group mt-10">
+            <label for="bigTask">What's the task?</label>
+            <input id="bigTask" placeholder="e.g., Write my 2000-word essay on climate policy"/>
+          </div>
+          <button class="btn primary" id="breakTask">Break it down →</button>
+          <div id="microStepList" class="mt-14"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ START ════════════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-start" aria-label="Prepare and begin">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">▶️</span>
+          <div class="card-head-text">
+            <h2>Prepare &amp; Begin</h2>
+            <p>Check what you can. Then choose your first step.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+        <div id="prepList" role="list" aria-label="Preparation checklist"></div>
+        <div class="btn-row mt-10">
+          <button class="btn sm" id="resetPrep">↺ Reset checklist</button>
+        </div>
+        <div class="block mt-14">
+          <div class="block-title">Choose your starting point</div>
+          <p class="text-small">Feeling activated? Start with Calm. Feeling clear? Go straight to Understand.</p>
+          <div class="btn-row mt-10">
+            <button class="btn primary" data-nav="calm">Begin with Calm &amp; Focus</button>
+            <button class="btn" data-nav="understand">Begin with Understand</button>
+            <button class="btn" data-nav="dump">Brain Dump first</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ UNDERSTAND ══════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-understand" aria-label="Understand the assignment">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">🧩</span>
+          <div class="card-head-text">
+            <h2>Unpack the Question</h2>
+            <p>One part at a time — no overwhelm.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+    <!-- Wizard progress -->
+    <div class="wizard-progress" role="progressbar" id="wizardProgress" aria-valuemin="1" aria-valuemax="4">
+      <div class="wizard-step-dot active" id="wdot-0"></div>
+      <div class="wizard-step-line"><div class="wizard-step-line-fill" id="wline-0" style="width:0%"></div></div>
+      <div class="wizard-step-dot" id="wdot-1"></div>
+      <div class="wizard-step-line"><div class="wizard-step-line-fill" id="wline-1" style="width:0%"></div></div>
+      <div class="wizard-step-dot" id="wdot-2"></div>
+      <div class="wizard-step-line"><div class="wizard-step-line-fill" id="wline-2" style="width:0%"></div></div>
+      <div class="wizard-step-dot" id="wdot-3"></div>
+      <span class="wizard-step-label" id="wizardLabel">Step 1 of 4</span>
+    </div>
+
+```
+<!-- Step 0 -->
+<div class="wizard-pane active" id="wpane-0">
+  <div class="wizard-question">What is the assignment question?</div>
+  <div class="wizard-hint">Paste or type it. Even just the first line helps.</div>
+  <div class="form-group">
+    <textarea id="brief" placeholder="Paste your assignment question here…"></textarea>
+  </div>
+  <div class="btn-row" style="margin-bottom:12px">
+    <button class="btn sm" id="toggleExample">📋 See an example</button>
+  </div>
+  <div class="block hidden" id="exampleCard">
+    <div class="block-title">Example <span class="badge amber">tap "Use this"</span></div>
+    <div class="text-small" style="margin-bottom:8px"><strong>Question:</strong> Analyse the impact of social media on adolescent wellbeing in Australia since 2020.</div>
+    <div class="btn-row">
+      <button class="btn primary" id="useExample">Use this example</button>
+      <button class="btn" id="closeExample">Close</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="task">How are you being asked to approach it?</label>
+    <input id="task" placeholder="e.g., analyse, discuss, evaluate…" autocomplete="off"/>
+    <div id="task-help" class="text-small mt-10" style="min-height:18px; font-style:italic;"></div>
+  </div>
+  <div class="text-small" style="margin-bottom:6px">Quick-fill task words:</div>
+  <div class="chip-row" id="taskChips"></div>
+  <div class="btn-row mt-14">
+    <button class="btn primary" id="wNext0">Next →</button>
+  </div>
+</div>
+
+<!-- Step 1 -->
+<div class="wizard-pane" id="wpane-1">
+  <div class="wizard-question">What is the assignment about?</div>
+  <div class="wizard-hint">The broad topic — not your argument yet, just the subject area.</div>
+  <div class="form-group">
+    <label for="topic">General topic</label>
+    <input id="topic" placeholder="e.g., stress and learning, climate policy, mental health…"/>
+  </div>
+  <div class="form-group">
+    <label for="limit">Any limits? (optional)</label>
+    <input id="limit" placeholder="e.g., Australia, since 2020, undergraduate students…"/>
+    <p class="text-tiny mt-10">Limits tell you what to leave out — this saves you from going too broad.</p>
+  </div>
+  <div class="btn-row mt-14">
+    <button class="btn" id="wBack1">← Back</button>
+    <button class="btn primary" id="wNext1">Next →</button>
+  </div>
+</div>
+
+<!-- Step 2 -->
+<div class="wizard-pane" id="wpane-2">
+  <div class="wizard-question">Logistics</div>
+  <div class="wizard-hint">These help you plan your time and structure.</div>
+  <div class="form-group">
+    <label for="wordCount">Word count or length</label>
+    <input id="wordCount" placeholder="e.g., 1500 words, 10 min presentation…"/>
+  </div>
+  <div class="form-group">
+    <label for="deadline">Due date</label>
+    <input id="deadline" type="date"/>
+  </div>
+  <div class="form-group">
+    <label for="format">Format / structure required</label>
+    <input id="format" placeholder="e.g., essay, report, annotated bibliography…"/>
+  </div>
+  <div class="btn-row mt-14">
+    <button class="btn" id="wBack2">← Back</button>
+    <button class="btn primary" id="wNext2">Next →</button>
+  </div>
+</div>
+
+<!-- Step 3 — save + summary -->
+<div class="wizard-pane" id="wpane-3">
+  <div class="wizard-question">Your Summary</div>
+  <div class="wizard-hint">Here's what you've unpacked. Review it — this is your anchor while you write.</div>
+  <div id="understandSummary"></div>
+  <div class="block mt-14">
+    <div class="block-title">📚 Quick Referencing Guide</div>
+    <div class="ref-block">
+      <strong>APA 7 — Journal Article</strong>
+      <code>Author, A. (Year). Title of article. <em>Journal Name</em>, Vol(Issue), pages. DOI</code>
+    </div>
+    <div class="ref-block">
+      <strong>APA 7 — Website</strong>
+      <code>Author, A. (Year, Month Day). <em>Title</em>. Site Name. URL</code>
+    </div>
+    <div class="ref-block">
+      <strong>APA 7 — In-text citation</strong>
+      <code>(Smith & Jones, 2022, p. 14)</code>
+    </div>
+    <p class="text-tiny mt-10">Always confirm the exact style required for your unit.</p>
+  </div>
+  <div class="btn-row mt-14">
+    <button class="btn" id="wBack3">← Back</button>
+    <button class="btn primary" id="saveUnderstand">💾 Save &amp; continue</button>
+    <span class="text-small" id="savedBadge" aria-live="polite"></span>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+  </section>
+
+  <!-- ════ CALM ═════════════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-calm" aria-label="Calm and focus tools">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">🌊</span>
+          <div class="card-head-text">
+            <h2>Calm &amp; Focus</h2>
+            <p>Pick one. You don't need to do all of them.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+        <div class="tile-grid">
+          <button class="tile" data-calm="breath"><span class="tile-icon">🌬️</span><div class="tile-label">Breath Anchor<div class="tile-hint">4 in · 6 out</div></div></button>
+          <button class="tile" data-calm="box"><span class="tile-icon">🟦</span><div class="tile-label">Box Breathing<div class="tile-hint">4 · 4 · 4 · 4</div></div></button>
+          <button class="tile" data-calm="scan"><span class="tile-icon">🧍</span><div class="tile-label">Body Scan<div class="tile-hint">Ground in the body</div></div></button>
+          <button class="tile" data-calm="grounding"><span class="tile-icon">🌱</span><div class="tile-label">5-4-3-2-1<div class="tile-hint">Sensory grounding</div></div></button>
+          <button class="tile" data-calm="note"><span class="tile-icon">🏷️</span><div class="tile-label">Gentle Noting<div class="tile-hint">Name what you notice</div></div></button>
+          <button class="tile" data-calm="pulse"><span class="tile-icon">🌊</span><div class="tile-label">Visual Reset<div class="tile-hint">Watch the orb</div></div></button>
+          <button class="tile" data-calm="kind" style="grid-column:1/-1"><span class="tile-icon">🫶</span><div class="tile-label">Kind Words<div class="tile-hint">Slow is allowed</div></div></button>
+        </div>
+    <div class="orb-wrap">
+      <div class="orb exhale" id="orb" role="img" aria-label="Breathing guide">Ready</div>
+      <div class="orb-timer" id="orbTimer" aria-live="polite"></div>
+    </div>
+
+```
+<div class="insight hidden" id="calmInsight" role="region" aria-live="polite">
+  <div class="insight-title">
+    <span id="calmInsightIcon"></span>
+    <span id="calmInsightTitle"></span>
+    <span class="badge green" id="calmBadge">ready</span>
+  </div>
+  <div class="insight-text" id="calmInsightText"></div>
+</div>
+
+<div class="kind-words" id="kindWords" role="region" aria-live="polite"></div>
+
+<div class="btn-row mt-14">
+  <button class="btn primary" data-nav="understand">Go to Understand</button>
+  <button class="btn" data-nav="stress">Go to Focus Timer</button>
+</div>
+```
+
+  </div>
+</div>
+  </section>
+
+  <!-- ════ STRESS / FOCUS ══════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-stress" aria-label="Manage study stress and focus">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">⏱️</span>
+          <div class="card-head-text">
+            <h2>Focus &amp; Stress</h2>
+            <p>Small strategies. Real results.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+        <div class="tile-grid">
+          <button class="tile c-amber" data-stress="cycle"><span class="tile-icon">🕒</span><div class="tile-label">Focus Cycles<div class="tile-hint">Pomodoro timer</div></div></button>
+          <button class="tile" data-stress="chunk"><span class="tile-icon">🧩</span><div class="tile-label">Chunking<div class="tile-hint">Small wins matter</div></div></button>
+          <button class="tile" data-stress="sleep"><span class="tile-icon">🛌</span><div class="tile-label">Sleep<div class="tile-hint">Memory &amp; emotion</div></div></button>
+          <button class="tile" data-stress="break"><span class="tile-icon">📵</span><div class="tile-label">Breaks<div class="tile-hint">Reduce drain</div></div></button>
+          <button class="tile" data-stress="move"><span class="tile-icon">🏃</span><div class="tile-label">Move<div class="tile-hint">Mood &amp; thinking</div></div></button>
+          <button class="tile" data-stress="plan"><span class="tile-icon">📅</span><div class="tile-label">Planning<div class="tile-hint">Reduce anxiety</div></div></button>
+          <button class="tile" data-stress="sensory"><span class="tile-icon">🎧</span><div class="tile-label">Sensory Breaks<div class="tile-hint">Reset your system</div></div></button>
+          <button class="tile c-sky" data-stress="support" style="grid-column:1/-1"><span class="tile-icon">🫂</span><div class="tile-label">Get Support<div class="tile-hint">Academic Skills, Studiosity &amp; more</div></div></button>
+        </div>
+    <div class="insight hidden" id="stressInsight" role="region" aria-live="polite">
+      <div class="insight-title">
+        <span id="stressInsightTitle"></span>
+        <span class="badge amber" id="stressBadge">ready</span>
+      </div>
+      <div class="insight-text" id="stressInsightText"></div>
+    </div>
+
+```
+<!-- FOCUS CYCLE TIMER -->
+<div id="cycleBox" class="hidden mt-14">
+  <div class="block">
+    <div class="block-title">🕒 Focus Cycle Timer <span class="badge">optional</span></div>
+    <p class="text-small">Adjust anytime. Stopping early is not failing — it's self-awareness.</p>
+    <div class="btn-row mt-10" style="gap:12px">
+      <div>
+        <label for="workMin" style="text-transform:none;font-size:12px;margin-bottom:4px">Work time</label>
+        <select id="workMin" style="width:auto;min-width:100px">
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+          <option value="25" selected>25 min</option>
+          <option value="45">45 min</option>
+        </select>
+      </div>
+      <div>
+        <label for="breakMin" style="text-transform:none;font-size:12px;margin-bottom:4px">Break time</label>
+        <select id="breakMin" style="width:auto;min-width:100px">
+          <option value="3">3 min</option>
+          <option value="5" selected>5 min</option>
+          <option value="10">10 min</option>
+        </select>
+      </div>
+    </div>
+    <div class="timer-face">
+      <div class="timer-mode" id="cycleMode">WORK</div>
+      <div class="timer-time" id="cycleTime" aria-live="polite" aria-atomic="true">25:00</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="cycleBar" style="width:100%"></div></div>
+      <div class="session-dots" id="sessionDots">
+        <div class="session-dot" id="sd0"></div>
+        <div class="session-dot" id="sd1"></div>
+        <div class="session-dot" id="sd2"></div>
+        <div class="session-dot" id="sd3"></div>
+      </div>
+      <div class="timer-hint" id="cycleHint">Start a cycle. Stop early if you need to.</div>
+    </div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn primary" id="cycleStart">▶ Start</button>
+      <button class="btn" id="cycleStop">⏸ Pause</button>
+      <button class="btn danger" id="cycleReset">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="btn-row mt-14">
+  <button class="btn" data-nav="finish">Go to Finish</button>
+  <button class="btn" data-nav="calm">Go to Calm &amp; Focus</button>
+</div>
+```
+
+  </div>
+</div>
+  </section>
+
+  <!-- ════ SUPPORT HUB ═════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-support" aria-label="Support and resources">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">🫂</span>
+          <div class="card-head-text">
+            <h2>Support Hub</h2>
+            <p>You don't have to figure everything out alone.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+    <div class="section-label">Academic support</div>
+    <div class="support-card">
+      <h3>🎓 Academic Skills</h3>
+      <p>Free appointments for essay planning, reading strategies, referencing, time management, and exam preparation. Check your student portal to book.</p>
+      <span class="badge green">Free · All students</span>
+    </div>
+    <div class="support-card">
+      <h3>💬 Studiosity</h3>
+      <p>Online 24/7 draft feedback service. Submit a draft essay and get written feedback within hours. Many Australian universities provide this for free. Access Studiosity through your student portal.</p>
+      <span class="badge sky">24/7 · Via student portal</span>
+    </div>
+    <div class="support-card">
+      <h3>📖 Your library</h3>
+      <p>Librarians are research specialists — not just book-keepers. Book a research consultation for help finding sources for your assignment.</p>
+      <span class="badge sky">Research consultations available</span>
+    </div>
+
+```
+<div class="section-label mt-18">Disability &amp; accessibility</div>
+<div class="support-card">
+  <h3>♿ Disability Services</h3>
+  <p>If you have ADHD, autism, dyslexia, anxiety, or any condition affecting study, Disability Services can arrange academic adjustments — extra time in exams, note-takers, alternate formats, and more. You don't need a formal diagnosis at all universities.</p>
+  <span class="badge lav">Reasonable adjustments · Confidential</span>
+</div>
+<div class="support-card">
+  <h3>🔬 Assessment for support</h3>
+  <p>If you think you might be neurodivergent but haven't had a formal assessment, your university's psychology service may offer low-cost or free assessment referrals.</p>
+</div>
+
+<div class="section-label mt-18">Wellbeing &amp; mental health</div>
+<div class="support-card">
+  <h3>🧠 Student counselling</h3>
+  <p>Most universities offer free short-term counselling. Counsellors understand study pressures. You don't need to be in crisis to book — struggling is enough reason.</p>
+  <span class="badge green">Free · No referral needed</span>
+</div>
+<div class="support-card">
+  <h3>📞 Crisis lines (Australia)</h3>
+  <p>
+    <strong>Lifeline:</strong> 13 11 14 (24/7)<br>
+    <strong>Beyond Blue:</strong> 1300 22 4636<br>
+    <strong>Headspace:</strong> 1800 650 890 (for under 25s)<br>
+    <strong>Crisis Text:</strong> Text HELLO to 741741
+  </p>
+</div>
+
+<div class="section-label mt-18">Neurodivergent-specific</div>
+<div class="support-card">
+  <h3>🌟 Tips for ADHD + study</h3>
+  <p>
+    • Body doubling: study near others (library, café, online)<br>
+    • Temptation bundling: reward yourself immediately after<br>
+    • External accountability: tell someone your plan<br>
+    • Time-block with physical alarms, not just phone timers<br>
+    • Start with the easiest part to generate momentum
+  </p>
+</div>
+<div class="support-card">
+  <h3>🧩 Tips for autism + study</h3>
+  <p>
+    • Create consistent routines for study sessions<br>
+    • Use visual schedules and checklists<br>
+    • Request written instructions from lecturers when possible<br>
+    • Schedule genuine recovery time — masking is exhausting<br>
+    • Use headphones + sensory tools freely — not something to hide
+  </p>
+</div>
+<div class="support-card">
+  <h3>📖 Tips for dyslexia + study</h3>
+  <p>
+    • Use text-to-speech tools (e.g., Natural Reader, built-in phone reader)<br>
+    • Record lectures with permission and replay at 0.75x speed<br>
+    • Mind-map before writing — structure first, words second<br>
+    • Use the dyslexia-friendly font in Settings above<br>
+    • Request extended time for exams via Disability Services
+  </p>
+</div>
+```
+
+  </div>
+</div>
+  </section>
+
+  <!-- ════ FINISH ═══════════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-finish" aria-label="Final submission checks">
+<div id="completeBanner" class="complete-banner hidden" aria-live="polite">
+  <span class="emoji-big">🎉</span>
+  <h3>You did this.</h3>
+  <p>Every box checked. You showed up and did the work. That is what matters.</p>
+</div>
+
+<div id="finishNudge" class="nudge hidden">
+  <span class="nudge-icon">💡</span>
+  <div class="nudge-text"><strong>Have you unpacked the question yet?</strong> The Understand section helps you check you've answered directly before submitting.</div>
+  <button class="nudge-close" id="closeNudge" aria-label="Dismiss">✕</button>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+      <span class="card-head-icon">✅</span>
+      <div class="card-head-text">
+        <h2>Finish &amp; Submit</h2>
+        <p>Pick what applies to your assignment. No need to check everything.</p>
+      </div>
+    </div>
+    <button class="btn sm" data-nav="home">← Home</button>
+  </div>
+  <div class="card-body">
+    <div class="ring-wrap" id="ringWrap">
+      <svg class="ring-svg" viewBox="0 0 36 36" aria-hidden="true">
+        <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
+        <circle class="ring-fill" id="ringFill" cx="18" cy="18" r="15.9"
+          stroke-dasharray="100 100" stroke-dashoffset="100"/>
+        <text class="ring-text" id="ringPct" x="18" y="18.5">0%</text>
+      </svg>
+      <div class="ring-info">
+        <div class="ring-count" id="ringCount">0 <span id="ringTotal">of 14</span></div>
+        <div class="ring-message" id="ringMessage">Pick what applies to your work.</div>
+      </div>
+    </div>
+
+```
+<div id="finishList" role="list" aria-label="Submission checklist"></div>
+<div class="btn-row mt-10">
+  <button class="btn sm" id="resetFinish">↺ Reset checklist</button>
+</div>
+
+<div class="block mt-14">
+  <div class="block-title">Last step <span class="badge">reduce risk</span></div>
+  <p class="text-small">If uncertain, tired, or stuck — book Academic Skills, or get draft feedback (Studiosity). Asking for help is part of doing well.</p>
+  <div class="btn-row mt-10">
+    <button class="btn" data-nav="support">🫂 Support Hub</button>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+  </section>
+
+  <!-- ════ AI TOOLS ════════════════════════════════════════════ -->
+
+  <section class="screen hidden" id="screen-ai" aria-label="AI writing tools">
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1">
+          <span class="card-head-icon">🤖</span>
+          <div class="card-head-text">
+            <h2>AI Writing Tools</h2>
+            <p>Smart prompts — copy and paste into any free AI.</p>
+          </div>
+        </div>
+        <button class="btn sm" data-nav="home">← Home</button>
+      </div>
+      <div class="card-body">
+    <div class="ai-intro">
+      These prompts are designed specifically for academic writing. <strong>Copy the prompt</strong>, then open your preferred AI below — Claude, ChatGPT, or Gemini are all free to use. Paste the prompt in and fill in your details.
+    </div>
+
+```
+<!-- PROMPT 1: Unpack my assignment -->
+<div class="ai-prompt-card">
+  <h3>🧩 Unpack my assignment question</h3>
+  <p>Paste your question — the AI will identify the task word, suggest a structure, and flag what to include or leave out.</p>
+  <div class="ai-prompt-preview" id="prompt-unpack">I'm a university student. Please help me unpack this assignment question:
+```
+
+[PASTE YOUR QUESTION HERE]
+
+1. Identify the task word (e.g. analyse, discuss, evaluate) and explain what it’s asking me to do
+1. Identify the topic and any limits or scope (time period, location, group)
+1. Suggest a simple essay structure with 3-4 main points
+1. List 2-3 things I should NOT include based on the question
+   Keep your response clear and student-friendly.</div>
+
+   <div class="ai-btn-row">
+   <button class="ai-copy-btn" data-copy="prompt-unpack">📋 Copy prompt</button>
+   <a class="ai-launch-btn claude" href="https://claude.ai" target="_blank" rel="noopener">Open Claude ↗</a>
+   <a class="ai-launch-btn chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">Open ChatGPT ↗</a>
+   <a class="ai-launch-btn gemini" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini ↗</a>
+   </div>
+   </div>
+    <!-- PROMPT 2: Essay plan -->
+    <div class="ai-prompt-card">
+      <h3>📝 Build an essay plan</h3>
+      <p>Give it your topic and word count — it'll return a detailed paragraph-by-paragraph plan you can write to.</p>
+      <div class="ai-prompt-preview" id="prompt-plan">I'm writing a [WORD COUNT] word [ESSAY/REPORT] on the following topic:
+
+[PASTE YOUR TOPIC OR QUESTION]
+
+Please create a detailed paragraph-by-paragraph plan. For each paragraph include:
+
+- What the paragraph covers
+- 1 key argument or point
+- 1 suggested source type (e.g. peer-reviewed study, government report)
+
+Include intro and conclusion in the plan. Keep it practical and easy to follow.</div>
+
+<div class="ai-btn-row">
+<button class="ai-copy-btn" data-copy="prompt-plan">📋 Copy prompt</button>
+<a class="ai-launch-btn claude" href="https://claude.ai" target="_blank" rel="noopener">Open Claude ↗</a>
+<a class="ai-launch-btn chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">Open ChatGPT ↗</a>
+<a class="ai-launch-btn gemini" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini ↗</a>
+</div>
+</div>
+    <!-- PROMPT 3: Check my paragraph -->
+    <div class="ai-prompt-card">
+      <h3>🔍 Check a paragraph I've written</h3>
+      <p>Paste a paragraph — the AI will check if it has a clear argument, evidence, and links back to the question.</p>
+      <div class="ai-prompt-preview" id="prompt-para">I'm a university student. Please review this paragraph from my assignment:
+[PASTE YOUR PARAGRAPH]
+
+The assignment question is: [PASTE QUESTION]
+
+Please check:
+
+1. Does it have a clear topic sentence?
+1. Is there evidence or reasoning to support the point?
+1. Does it link back to the question?
+1. Suggest one specific improvement
+
+Do NOT rewrite it for me — just give feedback I can use to improve it myself.</div>
+
+<div class="ai-btn-row">
+<button class="ai-copy-btn" data-copy="prompt-para">📋 Copy prompt</button>
+<a class="ai-launch-btn claude" href="https://claude.ai" target="_blank" rel="noopener">Open Claude ↗</a>
+<a class="ai-launch-btn chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">Open ChatGPT ↗</a>
+<a class="ai-launch-btn gemini" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini ↗</a>
+</div>
+</div>
+    <!-- PROMPT 4: Explain a concept -->
+    <div class="ai-prompt-card">
+      <h3>💡 Explain a concept simply</h3>
+      <p>Struggling to understand something from your readings? This prompt gets you a plain-English explanation.</p>
+      <div class="ai-prompt-preview" id="prompt-explain">Please explain the following concept to me in plain English. I'm a university student and I'm finding it hard to understand from the textbook.
+Concept: [PASTE CONCEPT OR TERM]
+
+Context (my subject/course): [OPTIONAL: e.g. Psychology, Business, Nursing]
+
+Please:
+
+1. Explain it simply, like you’re talking to someone hearing it for the first time
+1. Give one real-world example
+1. Explain why it matters for academic writing on this topic
+   Keep it under 200 words.</div>
+
+   <div class="ai-btn-row">
+   <button class="ai-copy-btn" data-copy="prompt-explain">📋 Copy prompt</button>
+   <a class="ai-launch-btn claude" href="https://claude.ai" target="_blank" rel="noopener">Open Claude ↗</a>
+   <a class="ai-launch-btn chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">Open ChatGPT ↗</a>
+   <a class="ai-launch-btn gemini" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini ↗</a>
+   </div>
+   </div>
+    <!-- PROMPT 5: Referencing help -->
+    <div class="ai-prompt-card">
+      <h3>📚 Fix my reference</h3>
+      <p>Paste a source you've used — the AI will format it correctly in APA 7 for you.</p>
+      <div class="ai-prompt-preview" id="prompt-ref">Please format the following source as an APA 7 reference list entry AND an in-text citation.
+
+Source details:
+[PASTE WHAT YOU KNOW: author name(s), title, year, journal name, website, DOI, URL — whatever you have]
+
+Source type: [e.g. journal article / book / website / government report]
+
+If any details are missing, tell me what I need to find to complete it correctly. Do not guess missing information.</div>
+
+<div class="ai-btn-row">
+<button class="ai-copy-btn" data-copy="prompt-ref">📋 Copy prompt</button>
+<a class="ai-launch-btn claude" href="https://claude.ai" target="_blank" rel="noopener">Open Claude ↗</a>
+<a class="ai-launch-btn chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">Open ChatGPT ↗</a>
+<a class="ai-launch-btn gemini" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini ↗</a>
+</div>
+</div>
+    <!-- PROMPT 6: Stuck / writer's block -->
+    <div class="ai-prompt-card">
+      <h3>🌀 I'm stuck — help me start</h3>
+      <p>Can't get going? This prompt helps you unstick without the AI writing it for you.</p>
+      <div class="ai-prompt-preview" id="prompt-stuck">I'm stuck on my assignment and I need help getting started — not having it written for me.
+Assignment: [PASTE QUESTION OR TOPIC]
+What I've done so far: [DESCRIBE WHAT YOU HAVE, EVEN IF JUST NOTES]
+Where I'm stuck: [DESCRIBE THE SPECIFIC PROBLEM, e.g. "I don't know how to start my intro" or "I have 3 points but don't know which to put first"]
+
+Please:
+
+1. Help me identify ONE small thing I can do right now to move forward
+1. Ask me 2 questions that might help me think through the problem
+   Do NOT write the essay for me. I want to do the work — I just need unsticking.</div>
+
+   <div class="ai-btn-row">
+   <button class="ai-copy-btn" data-copy="prompt-stuck">📋 Copy prompt</button>
+   <a class="ai-launch-btn claude" href="https://claude.ai" target="_blank" rel="noopener">Open Claude ↗</a>
+   <a class="ai-launch-btn chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">Open ChatGPT ↗</a>
+   <a class="ai-launch-btn gemini" href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini ↗</a>
+   </div>
+   </div>
+    <div class="ai-tip">
+      <strong>⚠️ Heads up:</strong> AI can get facts wrong — always check important claims against your readings or sources. Use AI to help you <em>think and plan</em>, not to replace your own work. Your university's academic integrity policy applies.
+    </div>
+      </div>
+    </div>
+
+  </section>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav" aria-label="Main navigation">
+  <div class="bottom-nav-inner">
+    <button class="nav-btn active" data-nav="home"><span class="nav-icon">🏠</span>Home</button>
+    <button class="nav-btn" data-nav="dump"><span class="nav-icon">🧠</span>Dump</button>
+    <button class="nav-btn" data-nav="understand"><span class="nav-icon">🧩</span>Understand</button>
+    <button class="nav-btn" data-nav="calm"><span class="nav-icon">🌊</span>Calm</button>
+    <button class="nav-btn" data-nav="stress"><span class="nav-icon">⏱️</span>Focus</button>
+    <button class="nav-btn" data-nav="ai"><span class="nav-icon">🤖</span>AI</button>
+    <button class="nav-btn" data-nav="finish"><span class="nav-icon">✅</span>Finish</button>
+  </div>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── UTILS ──────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
+  const qsa = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+  const safeAdd = (id, evt, fn, opts) => { const el = $(id); if (el) el.addEventListener(evt, fn, opts); };
+
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function storage(key, val) {
+    if (val === undefined) {
+      try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
+    }
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  }
+
+  /* ── SETTINGS ──────────────────────────────────────── */
+  const SETTINGS_KEY = 'cp_settings';
+  const defaults = { theme:'dark', fontsize:'normal', font:'default', contrast:'normal', motion:'normal', bionic:'off' };
+
+  function loadSettings() { return Object.assign({}, defaults, storage(SETTINGS_KEY) || {}); }
+
+  function applySettings(s) {
+    const html = document.documentElement;
+    html.dataset.theme    = s.theme;
+    html.dataset.fontsize = s.fontsize;
+    html.dataset.font     = s.font;
+    html.dataset.contrast = s.contrast;
+    html.dataset.motion   = s.motion;
+    html.dataset.bionic   = s.bionic;
+    qsa('.pill-btn').forEach(b => b.classList.toggle('active', b.dataset.val === s[b.dataset.setting]));
+    if (s.bionic === 'on') applyBionicReading();
+    else removeBionicReading();
+  }
+
+  function saveSetting(key, val) {
+    const s = loadSettings(); s[key] = val;
+    storage(SETTINGS_KEY, s); applySettings(s);
+  }
+
+  applySettings(loadSettings());
+
+  safeAdd('toggleSettings', 'click', () => {
+    $('settingsPanel').classList.toggle('hidden');
+    $('toggleSettings').classList.toggle('active');
+  });
+
+  qsa('.pill-btn').forEach(b => b.addEventListener('click', () => saveSetting(b.dataset.setting, b.dataset.val)));
+
+  safeAdd('clearAllData', 'click', () => {
+    if (confirm('Clear all saved data? This cannot be undone.')) {
+      localStorage.clear(); location.reload();
+    }
+  });
+
+  /* ── PANIC ──────────────────────────────────────────── */
+  safeAdd('panicTrigger', 'click', () => $('panicOverlay').classList.add('show'));
+  safeAdd('closePanic', 'click', () => $('panicOverlay').classList.remove('show'));
+  safeAdd('panicToCalm', 'click', () => { $('panicOverlay').classList.remove('show'); go('calm'); setTimeout(() => showCalm('breath'), 350); });
+  safeAdd('panicOverlay', 'click', e => { if (e.target === $('panicOverlay')) $('panicOverlay').classList.remove('show'); });
+
+  /* ── PWA ────────────────────────────────────────────── */
+  let deferredPrompt = null;
+
+  const manifest = {
+    name:'Clear Path', short_name:'Clear Path', start_url:'.', display:'standalone',
+    background_color:'#0c1410', theme_color:'#0c1410',
+    description:'Academic Skills support for neurodivergent students',
+    icons:[{ src:generateIcon(192), sizes:'192x192', type:'image/png' },
+           { src:generateIcon(512), sizes:'512x512', type:'image/png' }]
+  };
+
+  function generateIcon(size) {
+    try {
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const ctx = c.getContext('2d');
+      // Background
+      const grad = ctx.createRadialGradient(size*.4,size*.35,0,size*.5,size*.5,size*.55);
+      grad.addColorStop(0,'#a8d4a8');
+      grad.addColorStop(.6,'#82b892');
+      grad.addColorStop(1,'#5a9870');
+      ctx.beginPath();
+      ctx.arc(size/2,size/2,size/2,0,Math.PI*2);
+      ctx.fillStyle = grad; ctx.fill();
+      // Path
+      ctx.strokeStyle = 'rgba(255,255,255,.9)';
+      ctx.lineWidth = size*.055; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(size*.3,size*.72);
+      ctx.bezierCurveTo(size*.3,size*.72,size*.2,size*.55,size*.5,size*.5);
+      ctx.bezierCurveTo(size*.8,size*.45,size*.7,size*.28,size*.7,size*.28);
+      ctx.stroke();
+      return c.toDataURL('image/png');
+    } catch { return ''; }
+  }
+
+  const mLink = document.createElement('link');
+  mLink.rel = 'manifest';
+  mLink.href = 'data:application/json,' + encodeURIComponent(JSON.stringify(manifest));
+  document.head.appendChild(mLink);
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferredPrompt = e; $('installBtn').disabled = false;
+  });
+
+  safeAdd('installBtn', 'click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') showToast('App installed! 🎉');
+      deferredPrompt = null;
+    } else {
+      showToast('Browser menu → "Add to Home Screen"');
+    }
+  });
+
+  if ('serviceWorker' in navigator) {
+    const swCode = `const C='cp-v5';self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./',self.location.href])))});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});`;
+    try { navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode],{type:'text/javascript'}))).catch(()=>{}); } catch {}
+  }
+
+  /* ── NAVIGATION ─────────────────────────────────────── */
+  const SCREENS = ['home','dump','start','understand','calm','stress','support','ai','finish'];
+
+  function go(id) {
+    try {
+      if (!SCREENS.includes(id)) return;
+      SCREENS.forEach(s => {
+        const el = $(`screen-${s}`);
+        if (!el) return;
+        el.classList.toggle('hidden', s !== id);
+        el.classList.toggle('active', s === id);
+      });
+      qsa('.nav-btn').forEach(el => el.classList.toggle('active', el.dataset.nav === id));
+      if (id === 'finish')     initFinish();
+      if (id === 'start')      renderPrep();
+      if (id === 'understand') initWizard();
+      if (id === 'dump')       renderDump();
+      updateStats();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      saveContext();
+    } catch (err) {
+      console.error('[ClearPath] go("' + id + '") failed:', err);
+    }
+  }
+
+  document.addEventListener('click', e => {
+    const t = (e.target && e.target.closest) ? e.target : (e.target && e.target.parentElement);
+    const el = t && t.closest ? t.closest('[data-nav]') : null;
+    if (el && !el.closest('.panic-panel')) go(el.dataset.nav);
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-nav]:not(button)')) {
+      e.preventDefault(); go(e.target.dataset.nav);
+    }
+  });
+
+  /* ── INTENTION ──────────────────────────────────────── */
+  const INTENTION_KEY = 'cp_intention';
+  const storedIntention = storage(INTENTION_KEY);
+  if (storedIntention) $('intentionInput').value = storedIntention;
+  safeAdd('intentionInput', 'input', e => storage(INTENTION_KEY, e.target.value));
+
+  /* ── STATS ──────────────────────────────────────────── */
+  function updateStats() {
+    const sessions = storage('cp_sessions') || 0;
+    const dumps = (storage('cp_dump_thoughts') || []).length;
+    const finish = (storage('cp_finish') || []).filter(x => x.done).length;
+    const prep   = (storage('cp_prep') || []).filter(x => x.done).length;
+    $('statSessions').textContent = sessions;
+    $('statDumps').textContent = dumps;
+    $('statChecks').textContent = finish + prep;
+  }
+  updateStats();
+
+  /* ── FEELING ROUTER ─────────────────────────────────── */
+  const FEELING_ROUTES = {
+    overwhelmed:    { screen:'calm',      tool:'breath', note:"Let's start with breath — you're okay." },
+    scattered:      { screen:'calm',      tool:'scan',   note:"Grounding first. Let's settle the body." },
+    anxious:        { screen:'calm',      tool:'box',    note:"Box breathing can help calm anxiety." },
+    flat:           { screen:'stress',    tool:'move',   note:"Small movement can shift a flat mood." },
+    procrastinating:{ screen:'dump',      tool:null,     note:"Brain dump first — clear the noise." },
+    clear:          { screen:'understand',tool:null,     note:"Great — let's unpack the question." }
+  };
+
+  qsa('[data-feeling]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const r = FEELING_ROUTES[btn.dataset.feeling];
+      if (!r) return;
+      go(r.screen);
+      showToast(r.note);
+      if (r.tool && r.screen === 'calm') setTimeout(() => showCalm(r.tool), 350);
+      if (r.tool && r.screen === 'stress') setTimeout(() => showStress(r.tool), 350);
+    });
+  });
+
+  /* ── BRAIN DUMP ─────────────────────────────────────── */
+  const DUMP_KEY = 'cp_dump_thoughts';
+
+  function loadDumpThoughts() { return storage(DUMP_KEY) || []; }
+  function saveDumpThoughts(arr) { storage(DUMP_KEY, arr); }
+
+  function renderDump() {
+    const thoughts = loadDumpThoughts();
+    const list = $('dumpList');
+    list.innerHTML = '';
+    if (thoughts.length === 0) {
+      list.innerHTML = '<p class="text-small" style="margin-top:10px;font-style:italic">Nothing dumped yet. Let it out!</p>';
+      return;
+    }
+    thoughts.forEach((t, i) => {
+      const div = document.createElement('div');
+      div.className = 'dump-thought';
+      div.innerHTML = `<span class="dump-thought-text">${escapeHTML(t)}</span><button class="dump-thought-del" aria-label="Remove thought" data-idx="${i}">✕</button>`;
+      list.appendChild(div);
+    });
+    list.querySelectorAll('.dump-thought-del').forEach(b => {
+      b.addEventListener('click', () => {
+        const arr = loadDumpThoughts();
+        arr.splice(parseInt(b.dataset.idx), 1);
+        saveDumpThoughts(arr); renderDump(); updateStats();
+      });
+    });
+  }
+
+  function addDumpThought() {
+    const val = $('dumpInput').value.trim();
+    if (!val) return;
+    const arr = loadDumpThoughts();
+    arr.unshift(val);
+    saveDumpThoughts(arr);
+    $('dumpInput').value = '';
+    renderDump(); updateStats();
+    showToast('Thought captured ✓');
+    addXP(5, 'Thought dumped');
+  }
+
+  safeAdd('dumpAdd', 'click', addDumpThought);
+  safeAdd('dumpInput', 'keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addDumpThought(); } });
+  safeAdd('dumpClear', 'click', () => {
+    if (confirm('Clear all dumped thoughts?')) { saveDumpThoughts([]); renderDump(); updateStats(); }
+  });
+
+  /* ── TASK BREAKER ───────────────────────────────────── */
+  const TASK_MICRO = 'cp_micro_steps';
+
+  const MICRO_TEMPLATES = [
+    { prefix: 'Open', suffix: 'document and read the question once' },
+    { prefix: 'Write', suffix: 'a quick plan: intro, 3 main points, conclusion' },
+    { prefix: 'Write', suffix: 'just the intro (don\'t edit yet)' },
+    { prefix: 'Write', suffix: 'the first body paragraph' },
+    { prefix: 'Write', suffix: 'the second body paragraph' },
+    { prefix: 'Write', suffix: 'the third body paragraph' },
+    { prefix: 'Write', suffix: 'the conclusion' },
+    { prefix: 'Add', suffix: 'in-text citations throughout' },
+    { prefix: 'Build', suffix: 'your reference list' },
+    { prefix: 'Read', suffix: 'through once for clarity and flow' },
+    { prefix: 'Run', suffix: 'a spellcheck and fix errors' },
+    { prefix: 'Submit', suffix: 'and take a proper break — you did it' }
+  ];
+
+  safeAdd('breakTask', 'click', () => {
+    const task = $('bigTask').value.trim();
+    if (!task) { showToast('Enter a task first'); return; }
+    const steps = MICRO_TEMPLATES.map((t, i) => ({ label: `${t.prefix} your ${t.suffix}`, done: false }));
+    storage(TASK_MICRO, steps);
+    renderMicroSteps();
+    showToast('Task broken down ✓');
+  });
+
+  function renderMicroSteps() {
+    const steps = storage(TASK_MICRO) || [];
+    const list = $('microStepList');
+    list.innerHTML = '';
+    if (steps.length === 0) return;
+    steps.forEach((s, i) => {
+      const div = document.createElement('div');
+      div.className = 'microstep' + (s.done ? ' done' : '');
+      div.innerHTML = `<div class="microstep-num">${s.done ? '✓' : i+1}</div><div class="microstep-text">${escapeHTML(s.label)}</div>`;
+      div.addEventListener('click', () => {
+        const arr = storage(TASK_MICRO) || [];
+        arr[i].done = !arr[i].done;
+        storage(TASK_MICRO, arr); renderMicroSteps();
+        if (arr[i].done) addXP(10, 'Micro-step completed');
+      });
+      list.appendChild(div);
+    });
+  }
+
+  function escapeHTML(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── PREP CHECKLIST ─────────────────────────────────── */
+  const PREP_ITEMS = [
+    'Set up your workspace — desk, water, what you need',
+    'Close extra browser tabs and notifications',
+    'Open your document or assignment task',
+    'Read the question or task once — just read',
+    'Choose your very first action (just one)'
+  ];
+  const PREP_KEY = 'cp_prep';
+
+  function loadPrep() {
+    const s = storage(PREP_KEY);
+    return (Array.isArray(s) && s.length === PREP_ITEMS.length) ? s : PREP_ITEMS.map(t => ({ t, done: false }));
+  }
+
+  function renderPrep() {
+    const c = $('prepList');
+    const items = loadPrep();
+    c.innerHTML = '';
+    items.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.className = 'check-item' + (item.done ? ' done' : '');
+      row.setAttribute('role', 'listitem');
+      row.innerHTML = `<input type="checkbox" id="p${i}" ${item.done ? 'checked' : ''} aria-label="${item.t}"><label class="check-label" for="p${i}">${item.t}</label>`;
+      row.querySelector('input').addEventListener('change', e => {
+        items[i].done = e.target.checked;
+        row.classList.toggle('done', items[i].done);
+        storage(PREP_KEY, items); updateStats();
+        if (items[i].done) addXP(5, 'Prep item done');
+      });
+      c.appendChild(row);
+    });
+  }
+
+  safeAdd('resetPrep', 'click', () => { storage(PREP_KEY, PREP_ITEMS.map(t => ({ t, done: false }))); renderPrep(); showToast('Checklist reset ✓'); });
+
+  /* ── UNDERSTAND (wizard) ────────────────────────────── */
+  const UNDERSTAND_KEY = 'cp_understand';
+  const TASK_DEFS = {
+    analyse:   'Break into parts and explain how they connect or function.',
+    discuss:   'Explore different perspectives, providing evidence for each.',
+    evaluate:  'Judge strengths, weaknesses, or significance using criteria.',
+    reflect:   'Connect personal experience or learning to theory or practice.',
+    describe:  'Give a clear, accurate, detailed account of something.',
+    compare:   'Identify similarities and differences between two or more things.',
+    explain:   'Show how or why something happens — cause and effect.',
+    justify:   'Argue your position with reasons and evidence.',
+    summarise: 'Present the main points concisely in your own words.',
+    synthesise:'Combine multiple sources into one coherent argument or position.',
+    argue:     'Take a clear position and defend it with evidence.',
+    critique:  'Assess strengths, limitations, and underlying assumptions.',
+    review:    'Examine and comment on a body of work or evidence.'
+  };
+
+  let wizardStep = 0;
+
+  function initWizard() {
+    wizardStep = 0;
+    const u = storage(UNDERSTAND_KEY) || {};
+    ['brief','task','topic','limit','wordCount','format'].forEach(k => { if ($(k)) $(k).value = u[k] || ''; });
+    if ($('deadline') && u.deadline) $('deadline').value = u.deadline;
+    updateTaskHelp();
+    showWizardStep(0);
+  }
+
+  function showWizardStep(step) {
+    wizardStep = step;
+    const total = 4;
+    qsa('[id^="wpane-"]').forEach((p, i) => p.classList.toggle('active', i === step));
+    [0,1,2,3].forEach(i => {
+      const dot = $(`wdot-${i}`);
+      if (!dot) return;
+      dot.className = 'wizard-step-dot' + (i < step ? ' done' : i === step ? ' active' : '');
+    });
+    [0,1,2].forEach(i => { const l = $(`wline-${i}`); if (l) l.style.width = i < step ? '100%' : '0%'; });
+    $('wizardLabel').textContent = `Step ${step + 1} of ${total}`;
+    if (step === 3) buildUnderstandSummary();
+  }
+
+  function buildUnderstandSummary() {
+    const u = storage(UNDERSTAND_KEY) || {};
+    const box = $('understandSummary');
+    const rows = [
+      { label: 'Task word', val: u.task || '—' },
+      { label: 'What it means', val: TASK_DEFS[u.task] || '—' },
+      { label: 'Topic', val: u.topic || '—' },
+      { label: 'Limits / scope', val: u.limit || 'None specified' },
+      { label: 'Word count', val: u.wordCount || '—' },
+      { label: 'Format', val: u.format || '—' },
+      { label: 'Due date', val: u.deadline || '—' },
+    ];
+    box.innerHTML = `<div class="summary-box">${rows.map(r => `<div class="sum-row"><span class="sum-label">${r.label}</span><span class="sum-val">${r.val}</span></div>`).join('')}</div>`;
+  }
+
+  function autoSaveUnderstand() {
+    storage(UNDERSTAND_KEY, {
+      brief: $('brief').value, task: $('task').value, topic: $('topic').value,
+      limit: $('limit').value, wordCount: $('wordCount').value,
+      deadline: $('deadline').value, format: $('format').value
+    });
+  }
+
+  safeAdd('wNext0', 'click', () => { autoSaveUnderstand(); showWizardStep(1); });
+  safeAdd('wNext1', 'click', () => { autoSaveUnderstand(); showWizardStep(2); });
+  safeAdd('wNext2', 'click', () => { autoSaveUnderstand(); showWizardStep(3); });
+  safeAdd('wBack1', 'click', () => showWizardStep(0));
+  safeAdd('wBack2', 'click', () => showWizardStep(1));
+  safeAdd('wBack3', 'click', () => showWizardStep(2));
+
+  function saveUnderstand() {
+    autoSaveUnderstand();
+    showToast('Saved ✓');
+    const badge = $('savedBadge');
+    badge.textContent = '✓ Saved';
+    clearTimeout(badge._t);
+    badge._t = setTimeout(() => badge.textContent = '', 2500);
+    addXP(20, 'Assignment unpacked');
+  }
+
+  safeAdd('saveUnderstand', 'click', saveUnderstand);
+
+  function updateTaskHelp() {
+    const k = ($('task').value || '').toLowerCase().trim();
+    $('task-help').textContent = TASK_DEFS[k] ? '→ ' + TASK_DEFS[k] : '';
+    qsa('.chip').forEach(c => c.classList.toggle('active', c.dataset.word === k));
+  }
+
+  // Build chips
+  const chipRow = $('taskChips');
+  Object.keys(TASK_DEFS).forEach(word => {
+    const chip = document.createElement('button');
+    chip.className = 'chip'; chip.type = 'button';
+    chip.textContent = word; chip.dataset.word = word;
+    chip.addEventListener('click', () => { $('task').value = word; updateTaskHelp(); });
+    chipRow.appendChild(chip);
+  });
+
+  safeAdd('task', 'input', updateTaskHelp);
+
+  const exCard = $('exampleCard');
+  safeAdd('toggleExample', 'click', () => exCard.classList.toggle('hidden'));
+  safeAdd('closeExample', 'click', () => exCard.classList.add('hidden'));
+  safeAdd('useExample', 'click', () => {
+    $('brief').value = 'Analyse the impact of social media on adolescent wellbeing in Australia since 2020.';
+    $('task').value  = 'analyse'; $('topic').value = 'Social media and adolescent wellbeing';
+    $('limit').value = 'Australia; since 2020'; $('wordCount').value = '1500 words';
+    $('format').value = 'Essay'; autoSaveUnderstand(); exCard.classList.add('hidden'); updateTaskHelp();
+    showToast('Example loaded ✓');
+  });
+
+  /* ── CALM ───────────────────────────────────────────── */
+  const CALM_MAP = {
+    breath:    { icon:'🌬️', title:'Breath Anchor',     text:'Why it helps: Longer exhales slow the heart rate and activate rest mode.\n\nHow to try:\n→ Breathe IN slowly for 4 counts\n→ Breathe OUT slowly for 6 counts\n→ Repeat 6–8 times\n\nIf your mind wanders — that\'s completely normal. Just return to the breath, once.' },
+    box:       { icon:'🟦', title:'Box Breathing',      text:'Why it helps: Used by athletes and emergency workers to regulate intense emotions.\n\nHow to try:\n→ Breathe IN for 4 counts\n→ HOLD for 4 counts\n→ Breathe OUT for 4 counts\n→ HOLD for 4 counts\n→ Repeat 4 times\n\nSlower is better. Let the orb guide you.' },
+    scan:      { icon:'🧍', title:'Body Scan',          text:'Why it helps: Brings attention out of racing thoughts and into the physical present.\n\nHow to try:\n→ Start at your feet — just notice what\'s there\n→ Slowly move up: legs → stomach → chest → shoulders → face\n→ No forcing. No fixing. Just noticing.\n\nTake 60–90 seconds. That\'s enough.' },
+    grounding: { icon:'🌱', title:'5-4-3-2-1 Grounding', text:'Why it helps: Grounds scattered attention instantly using your senses.\n\nHow to try:\n→ Name 5 things you can SEE\n→ Name 4 things you can TOUCH (feel them)\n→ Name 3 things you can HEAR\n→ Name 2 things you can SMELL\n→ Name 1 thing you can TASTE\n\nTake your time on each. This is especially helpful during overwhelm or dissociation.' },
+    note:      { icon:'🏷️', title:'Gentle Noting',      text:'Why it helps: Labelling what you notice creates small space from thoughts and feelings.\n\nHow to try:\n→ Notice what\'s happening: "thinking", "worrying", "planning", "hearing"\n→ Say it quietly, once\n→ Return gently to your breath\n\nYou\'re not trying to stop thoughts — just to notice them without being swept away.' },
+    pulse:     { icon:'🌊', title:'Visual Reset',        text:'Why it helps: Visual rhythm can settle attention and help regulate the nervous system.\n\nHow to try:\n→ Watch the circle expand (inhale with it)\n→ Watch it contract (exhale with it)\n→ Do this for 30–60 seconds\n→ No thinking required — just watching.\n\nUseful if breathing exercises feel too focused or forced.' },
+    kind:      null
+  };
+
+  const KIND_WORDS = [
+    'You are doing enough.',
+    'Slow is not failure. Slow is allowed.',
+    'Starting is the hardest part. You already started.',
+    'One small step. Then rest.',
+    'You don\'t need to feel ready to begin.',
+    'This is hard — not because you\'re weak.'
+  ];
+
+  let orbTimers = [];
+  let orbCycleCount = 0;
+  let orbSecondsLeft = 0;
+  let orbSecondTimer = null;
+
+  function clearOrbTimers() { orbTimers.forEach(clearTimeout); orbTimers = []; clearInterval(orbSecondTimer); orbSecondTimer = null; }
+
+  function startOrbCycle(mode = 'breath') {
+    clearOrbTimers();
+    orbCycleCount = 0;
+    const orb = $('orb');
+    const timerEl = $('orbTimer');
+
+    function countdown(secs, label, next) {
+      orbSecondsLeft = secs;
+      timerEl.textContent = `${label} — ${secs}s`;
+      orbSecondTimer = setInterval(() => {
+        orbSecondsLeft--;
+        if (orbSecondsLeft > 0) timerEl.textContent = `${label} — ${orbSecondsLeft}s`;
+        else { clearInterval(orbSecondTimer); }
+      }, 1000);
+      orbTimers.push(setTimeout(() => { clearInterval(orbSecondTimer); next(); }, secs * 1000));
+    }
+
+    function doBreath() {
+      orb.className = 'orb inhale'; orb.textContent = 'Breathe in…';
+      countdown(4, 'Inhale', () => {
+        orb.className = 'orb exhale'; orb.textContent = 'Breathe out…';
+        countdown(6, 'Exhale', () => {
+          orbCycleCount++;
+          if (orbCycleCount >= 8) { orb.className='orb exhale'; orb.textContent='Done ✓'; timerEl.textContent=''; }
+          else doBreath();
+        });
+      });
+    }
+
+    function doBox() {
+      orb.className = 'orb inhale'; orb.textContent = 'Breathe in…';
+      countdown(4, 'Inhale', () => {
+        orb.textContent = 'Hold…';
+        countdown(4, 'Hold', () => {
+          orb.className = 'orb exhale'; orb.textContent = 'Breathe out…';
+          countdown(4, 'Exhale', () => {
+            orb.textContent = 'Hold…';
+            countdown(4, 'Hold', () => { orbCycleCount++; if (orbCycleCount >= 4) { orb.className='orb exhale'; orb.textContent='Done ✓'; timerEl.textContent=''; } else doBox(); });
+          });
+        });
+      });
+    }
+
+    if (mode === 'box') doBox(); else doBreath();
+  }
+
+  function stopOrb() { clearOrbTimers(); $('orb').className='orb exhale'; $('orb').textContent='Ready'; $('orbTimer').textContent=''; }
+
+  function showCalm(key) {
+    $('kindWords').classList.remove('show');
+    $('calmInsight').classList.add('hidden');
+    stopOrb();
+
+    if (key === 'kind') {
+      $('kindWords').innerHTML = KIND_WORDS.map(l => `<div>${l}</div>`).join('');
+      $('kindWords').classList.add('show');
+    } else {
+      const d = CALM_MAP[key];
+      if (!d) return;
+      $('calmInsightIcon').textContent  = d.icon;
+      $('calmInsightTitle').textContent = d.title;
+      $('calmInsightText').textContent  = d.text;
+      $('calmBadge').textContent        = 'ready';
+      $('calmInsight').classList.remove('hidden');
+      if (key === 'pulse' || key === 'breath') startOrbCycle('breath');
+      if (key === 'box') startOrbCycle('box');
+    }
+  }
+
+  qsa('[data-calm]').forEach(b => b.addEventListener('click', () => showCalm(b.dataset.calm)));
+
+  /* ── STRESS ─────────────────────────────────────────── */
+  const STRESS_MAP = {
+    sleep:   { title:'🛌 Sleep',           text:'Why it matters: Sleep consolidates memory and resets emotional regulation. One poor night can impair decision-making, attention, and mood significantly.\n\nTonight: Phone off 30 min before bed → keep a consistent sleep/wake time even on weekends → dark, cool room → if you can\'t sleep, get up and do something calm for 15 min, then return.' },
+    break:   { title:'📵 Breaks',          text:'Why it matters: Sustained focus without breaks depletes working memory — you\'re not losing focus because you\'re lazy, but because the brain needs recovery time.\n\nTry: 15–25 min of focused work → stand up → physical stretch or brief walk → return. Keep your phone in another room during work blocks.' },
+    move:    { title:'🏃 Move',            text:'Why it matters: Even brief movement elevates mood, reduces cortisol, and improves cognitive function.\n\nOptions: 5-min walk, shoulder rolls and neck stretches, jumping jacks, or even standing up and shaking out your hands. No "workout" required — brief is enough.' },
+    plan:    { title:'📅 Planning',        text:'Why it matters: Unclear next steps create ambient anxiety — your brain spins trying to hold everything. A short external plan takes that weight off.\n\nTry: Write one thing to do today. One thing for tomorrow. That\'s it. The list should be so short it feels easy. A tiny done list beats an overwhelming undone one.' },
+    chunk:   { title:'🧩 Chunking',        text:'Why it matters: Large tasks overwhelm working memory and make starting feel impossible — especially with ADHD or anxiety.\n\nTry: Open the document → add your name and title → write one sentence. Each tiny win lowers the wall. Use the Task Breaker in Brain Dump to create micro-steps.' },
+    sensory: { title:'🎧 Sensory Breaks',  text:'Why it matters: Sensory overload and under-stimulation both affect focus — especially for neurodivergent students.\n\nSensory reset ideas:\n→ Cold water on your face or wrists\n→ Put on noise-cancelling headphones (even with no audio)\n→ Fidget — pen, elastic band, whatever helps\n→ Change your environment: move to a different room or spot\n→ Dim or change your lighting\n→ Compression: hug a cushion, press palms together firmly\n\nStimming is regulation. It\'s okay.' },
+    cycle:   { title:'🕒 Focus Cycles',    text:'Why it matters: Structured work/break cycles reduce mental fatigue and make starting feel achievable.\n\nHow to use: Set your work time → press Start → work only on one task → when the timer rings, take your break fully — don\'t extend. After 4 sessions, take a longer break (15–30 min).\n\nStopping mid-session is absolutely allowed. Pausing is not failure.' },
+    support: { title:'🫂 Get Support',     text:'You don\'t need to be in crisis to ask for help. Academic support is there for everyone.\n\n→ Book an Academic Skills appointment via your student portal\n→ Submit to Studiosity for 24/7 draft feedback\n→ Email your tutor a specific question (they appreciate specific)\n→ Book student counselling (no referral needed at most universities)\n→ Contact Disability Services if you haven\'t yet — adjustments can change everything\n\nUse the Support Hub in the navigation for full details.' }
+  };
+
+  function showStress(key) {
+    const d = STRESS_MAP[key];
+    $('stressInsightTitle').textContent = d.title;
+    $('stressBadge').textContent        = 'ready';
+    $('stressInsightText').textContent  = d.text;
+    $('stressInsight').classList.remove('hidden');
+    const box = $('cycleBox');
+    if (key === 'cycle') { box.classList.remove('hidden'); syncCycle(); }
+    else { box.classList.add('hidden'); stopCycle(); }
+  }
+
+  qsa('[data-stress]').forEach(b => b.addEventListener('click', () => showStress(b.dataset.stress)));
+
+  /* ── TIMER ──────────────────────────────────────────── */
+  let cycleTimer = null, cycleMode = 'work', remaining = 1500, totalSecs = 1500;
+  let sessionsCompleted = 0;
+
+  const fmtTime = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+
+  function syncCycle() {
+    const w = parseInt($('workMin').value)*60;
+    const b = parseInt($('breakMin').value)*60;
+    remaining = totalSecs = (cycleMode === 'work' ? w : b);
+    updateCycleUI();
+  }
+
+  function updateCycleUI() {
+    $('cycleTime').textContent = fmtTime(remaining);
+    $('cycleMode').textContent = cycleMode === 'work' ? 'WORK' : 'BREAK';
+    $('cycleTime').className   = 'timer-time' + (cycleMode === 'break' ? ' break' : '');
+    $('cycleBar').className    = 'progress-bar' + (cycleMode === 'break' ? ' break' : '');
+    $('cycleBar').style.width  = (totalSecs > 0 ? (remaining/totalSecs)*100 : 100) + '%';
+    [0,1,2,3].forEach(i => {
+      const dot = $(`sd${i}`);
+      if (dot) dot.classList.toggle('done', i < sessionsCompleted);
+    });
+  }
+
+  function startCycle() {
+    if (cycleTimer) return;
+    $('cycleHint').textContent = 'Running — pause anytime.';
+    cycleTimer = setInterval(() => {
+      remaining = Math.max(0, remaining - 1);
+      updateCycleUI();
+      if (remaining === 0) {
+        const wasWork = cycleMode === 'work';
+        if (wasWork) sessionsCompleted = Math.min(4, sessionsCompleted + 1);
+        cycleMode = wasWork ? 'break' : 'work';
+        if (!wasWork && sessionsCompleted >= 4) sessionsCompleted = 0;
+        const w = parseInt($('workMin').value)*60;
+        const b = parseInt($('breakMin').value)*60;
+        remaining = totalSecs = (cycleMode === 'work' ? w : b);
+        $('cycleHint').textContent = wasWork ? '🛑 Break time — step away properly.' : '▶ Back to work when ready.';
+        if (wasWork) {
+          const total = parseInt(storage('cp_sessions') || 0) + 1;
+          storage('cp_sessions', total); updateStats();
+          showToast('Session done 🎉 Take a real break!');
+          addXP(15, 'Focus session complete');
+        }
+        updateCycleUI();
+      }
+    }, 1000);
+  }
+
+  function stopCycle() { clearInterval(cycleTimer); cycleTimer = null; if ($('cycleHint')) $('cycleHint').textContent = 'Paused.'; }
+  function resetCycle() { stopCycle(); cycleMode='work'; sessionsCompleted=0; syncCycle(); if ($('cycleHint')) $('cycleHint').textContent='Start a cycle. Stop early if you need to.'; }
+
+  safeAdd('workMin', 'change', resetCycle);
+  safeAdd('breakMin', 'change', resetCycle);
+  safeAdd('cycleStart', 'click', startCycle);
+  safeAdd('cycleStop', 'click', stopCycle);
+  safeAdd('cycleReset', 'click', resetCycle);
+
+  /* ── FINISH ─────────────────────────────────────────── */
+  const FINISH_ITEMS = [
+    'Check the rubric or marking criteria',
+    'Answered the question directly — not just around it',
+    'Used required sources or assigned readings',
+    'Met the word count (within 10% is usually fine)',
+    'Structure matches the task (intro / body / conclusion)',
+    'Each paragraph has one clear idea and links to the question',
+    'Proofread for clarity — read it aloud if possible',
+    'Spellcheck and grammar check done',
+    'In-text citations match the reference list',
+    'Referencing style is correct and consistent',
+    'Used a draft feedback service if available (e.g., Studiosity)',
+    'Applied feedback from your last assessment (if any)',
+    'Saved a final copy and backed it up',
+    'Uploaded and confirmed submission receipt'
+  ];
+  const FINISH_KEY = 'cp_finish';
+
+  const RING_MESSAGES = [
+    [0,0,    'Pick what applies to your work.'],
+    [1,4,    'Good start. Keep going.'],
+    [5,9,    "You\'re making real progress."],
+    [10,12,  "Nearly there — you\'ve got this."],
+    [13,13,  "One more. Almost done."],
+    [14,14,  "You did this. ✓"]
+  ];
+
+  function getRingMessage(n) {
+    for (const [min, max, msg] of RING_MESSAGES) { if (n >= min && n <= max) return msg; }
+    return '';
+  }
+
+  function updateRing(items) {
+    const n = items.filter(x => x.done).length;
+    const total = items.length;
+    const pct = Math.round((n/total)*100);
+    $('ringFill').setAttribute('stroke-dashoffset', 100 - pct);
+    $('ringPct').textContent = pct + '%';
+    $('ringCount').innerHTML = `${n} <span>of ${total}</span>`;
+    const msgEl = $('ringMessage');
+    msgEl.textContent = getRingMessage(n);
+    msgEl.classList.toggle('celebrate', n === total);
+    $('completeBanner').classList.toggle('hidden', n !== total);
+  }
+
+  function loadFinish() {
+    const s = storage(FINISH_KEY);
+    return (Array.isArray(s) && s.length === FINISH_ITEMS.length) ? s : FINISH_ITEMS.map(t => ({ t, done: false }));
+  }
+
+  function initFinish() {
+    const u = storage(UNDERSTAND_KEY) || {};
+    const understandEmpty = !u.brief && !u.task && !u.topic;
+    $('finishNudge').classList.toggle('hidden', !understandEmpty);
+    const container = $('finishList');
+    const items = loadFinish();
+    container.innerHTML = '';
+    updateRing(items);
+    items.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.className = 'check-item' + (item.done ? ' done' : '');
+      row.setAttribute('role', 'listitem');
+      row.innerHTML = `<input type="checkbox" id="f${i}" ${item.done ? 'checked' : ''} aria-label="${item.t}"><label class="check-label" for="f${i}">${item.t}</label>`;
+      row.querySelector('input').addEventListener('change', e => {
+        items[i].done = e.target.checked;
+        row.classList.toggle('done', items[i].done);
+        storage(FINISH_KEY, items); updateRing(items); updateStats();
+        if (items[i].done) addXP(5, 'Checklist item done');
+      });
+      container.appendChild(row);
+    });
+  }
+
+  safeAdd('closeNudge', 'click', () => $('finishNudge').classList.add('hidden'));
+  safeAdd('resetFinish', 'click', () => { storage(FINISH_KEY, FINISH_ITEMS.map(t => ({ t, done: false }))); initFinish(); showToast('Checklist reset ✓'); });
+
+  /* ── SWIPE NAV (mobile) ─────────────────────────────── */
+  let touchStartX = 0, touchStartY = 0;
+  const NAV_ORDER = ['home','dump','start','understand','calm','stress','support','ai','finish'];
+
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * .8) return;
+    const current = SCREENS.find(s => $(`screen-${s}`)?.classList.contains('active'));
+    const idx = NAV_ORDER.indexOf(current);
+    if (dx < 0 && idx < NAV_ORDER.length - 1) go(NAV_ORDER[idx + 1]);
+    if (dx > 0 && idx > 0) go(NAV_ORDER[idx - 1]);
+  }, { passive: true });
+
+  /* ── AI TOOLS — copy prompts ────────────────────────────── */
+  qsa('.ai-copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const el = $(btn.dataset.copy);
+      if (!el) return;
+      const text = el.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+        showToast('Prompt copied — paste into your AI of choice ✓');
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        showToast('Prompt copied ✓');
+      });
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
+     PHASE 1: NEURODIVERGENT ENHANCEMENTS - JAVASCRIPT
+     ═══════════════════════════════════════════════════════════  */
+
+  // ═══ XP/DOPAMINE SYSTEM ═══
+  let xp = storage('cp_xp') || 0;
+  let level = storage('cp_level') || 1;
+  let streak = storage('cp_streak') || 0;
+  let lastVisit = storage('cp_lastVisit') || null;
+
+  function addXP(amount, reason) {
+    xp += amount;
+    if (xp >= level * 100) {
+      level++;
+      xp = 0;
+      storage('cp_level', level);
+      showAchievement(`Level ${level} Reached! 🎉`);
+    }
+    storage('cp_xp', xp);
+    updateDopamineBar();
+    showToast(`+${amount} XP: ${reason}`);
+  }
+
+  function updateDopamineBar() {
+    $('streakNumber').textContent = streak;
+    $('levelNumber').textContent = level;
+    $('xpText').textContent = `${xp}/${level*100} XP`;
+    $('xpFill').style.width = (xp/(level*100)*100) + '%';
+  }
+
+  function checkStreak() {
+    const today = new Date().toDateString();
+    const last = lastVisit;
+    if (last !== today) {
+      if (last) {
+        const lastDate = new Date(last);
+        const todayDate = new Date(today);
+        const diff = Math.floor((todayDate - lastDate)/(1000*60*60*24));
+        if (diff === 1) {
+          streak++;
+          storage('cp_streak', streak);
+          showAchievement(`${streak} Day Streak! 🔥`);
+        }
+        else if (diff > 1) {
+          streak = 1;
+          storage('cp_streak', streak);
+        }
+      } else {
+        streak = 1;
+        storage('cp_streak', streak);
+      }
+      storage('cp_lastVisit', today);
+      addXP(10, 'Daily login');
+    }
+  }
+
+  function showAchievement(text) {
+    const a = $('achievementToast');
+    $('achievementText').textContent = text;
+    a.classList.add('show');
+    setTimeout(() => a.classList.remove('show'), 4000);
+  }
+
+  // ═══ BATTERY TRACKER ═══
+  qsa('.battery-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      qsa('.battery-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const battery = parseInt(btn.dataset.battery);
+      storage('cp_battery', battery);
+      const messages = {
+        1: 'Running on empty. Be very gentle with yourself today. Rest is work.',
+        2: 'Low battery. Pick one small thing. Charging counts as productive.',
+        3: 'Medium charge. You can do a couple of focused tasks with breaks.',
+        4: 'Good charge! You can tackle your main work today.',
+        5: 'Fully charged! Great day for complex tasks and deep work.'
+      };
+      $('batteryMessage').textContent = messages[battery];
+      addXP(5, 'Energy check-in');
+    });
+  });
+
+  const savedBattery = storage('cp_battery');
+  if (savedBattery) {
+    const btn = Array.from(qsa('.battery-btn')).find(b => parseInt(b.dataset.battery) === savedBattery);
+    if (btn) btn.click();
+  }
+
+  // ═══ QUICK WINS ═══
+  qsa('.quick-win-item').forEach(item => {
+    item.addEventListener('click', () => {
+      showToast('Great! That\'s a win! 🎉');
+      addXP(15, 'Quick win completed');
+      logSuccess(`Quick win: ${item.textContent.split('~')[0].trim()}`);
+    });
+  });
+
+  // ═══ WHAT NOW SYSTEM ═══
+  function getWhatNowSuggestion() {
+    const battery = storage('cp_battery') || 3;
+    const suggestions = {
+      1: { text: 'Open your document. Just open it. You don\'t need to write.', action: 'open-doc' },
+      2: { text: 'Read the assignment question once. That\'s the only task.', action: 'read-question' },
+      3: { text: 'Write a quick brain dump of what you know about this topic.', action: 'brain-dump' },
+      4: { text: 'Create a simple outline: intro + 3 points + conclusion.', action: 'outline' },
+      5: { text: 'Start writing your first body paragraph. Rough draft is fine.', action: 'write' }
+    };
+    return suggestions[battery] || suggestions[3];
+  }
+
+  $('whatNowFab').addEventListener('click', () => {
+    const sugg = getWhatNowSuggestion();
+    $('whatNowSuggestion').textContent = sugg.text;
+    $('whatNowModal').classList.add('show');
+  });
+
+  $('closeWhatNow').addEventListener('click', () => $('whatNowModal').classList.remove('show'));
+  $('doItBtn').addEventListener('click', () => {
+    showToast('You got this! 💪');
+    $('whatNowModal').classList.remove('show');
+    addXP(10, 'Taking action');
+  });
+  $('tooHardBtn').addEventListener('click', () => {
+    showToast('Let\'s break it smaller...');
+    $('whatNowModal').classList.remove('show');
+    go('dump');
+  });
+  $('cantFocusBtn').addEventListener('click', () => {
+    $('whatNowModal').classList.remove('show');
+    go('calm');
+  });
+
+  // ═══ DISTRACTION CATCHER ═══
+  let currentDistractionType = 'random';
+
+  $('distractionFab').addEventListener('click', () => {
+    $('distractionModal').classList.add('show');
+    $('distractionInput').focus();
+  });
+
+  $('closeDistraction').addEventListener('click', () => {
+    $('distractionModal').classList.remove('show');
+    $('distractionInput').value = '';
+  });
+
+  qsa('.distraction-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      qsa('.distraction-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      currentDistractionType = chip.dataset.type;
+    });
+  });
+
+  $('captureThought').addEventListener('click', () => {
+    const thought = $('distractionInput').value.trim();
+    if (!thought) return;
+
+    let distractions = storage('cp_distractions') || [];
+    distractions.unshift({ type: currentDistractionType, thought, time: Date.now() });
+    storage('cp_distractions', distractions);
+
+    showToast('Thought captured! ✅');
+    addXP(5, 'Distraction captured');
+    $('distractionModal').classList.remove('show');
+    $('distractionInput').value = '';
+    qsa('.distraction-chip').forEach(c => c.classList.remove('selected'));
+  });
+
+  // ═══ SUCCESS JOURNAL ═══
+  function logSuccess(text) {
+    let wins = storage('cp_wins') || [];
+    wins.unshift({ text, time: Date.now() });
+    storage('cp_wins', wins);
+    renderSuccesses();
+  }
+
+  function renderSuccesses() {
+    const wins = storage('cp_wins') || [];
+    const today = wins.filter(w => {
+      const wDate = new Date(w.time).toDateString();
+      return wDate === new Date().toDateString();
+    });
+
+    if (today.length > 0) {
+      $('successJournal').classList.remove('hidden');
+      $('successList').innerHTML = today.map(w =>
+        `<div class="success-entry"><span class="success-icon">✨</span>${w.text}</div>`
+      ).join('');
+    }
+  }
+
+  $('addWin').addEventListener('click', () => {
+    const win = prompt('What\'s a win from today?');
+    if (win) { logSuccess(win); addXP(10, 'Win logged'); }
+  });
+
+  // ═══ FOCUS MODES ═══
+  qsa('.focus-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      qsa('.focus-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const mode = btn.dataset.mode;
+      document.body.className = mode !== 'normal' ? `focus-${mode}` : '';
+      storage('cp_focusMode', mode);
+      showToast(`${btn.textContent} mode activated`);
+    });
+  });
+
+  const savedMode = storage('cp_focusMode');
+  if (savedMode && savedMode !== 'normal') {
+    const btn = Array.from(qsa('.focus-mode-btn')).find(b => b.dataset.mode === savedMode);
+    if (btn) btn.click();
+  }
+
+  // ═══ CONTEXT RESTORATION ═══
+  function saveContext() {
+    const active = Array.from(qsa('.screen')).find(s => s.classList.contains('active'));
+    if (active) storage('cp_lastScreen', active.id.replace('screen-',''));
+  }
+
+  function restoreContext() {
+    const last = storage('cp_lastScreen');
+    if (last && last !== 'home') {
+      $('restoreText').textContent = `Pick up where you left off? (You were on: ${last})`;
+      $('restoreBanner').classList.add('show');
+    }
+  }
+
+  $('restoreBtn').addEventListener('click', () => {
+    const last = storage('cp_lastScreen');
+    if (last) go(last);
+    $('restoreBanner').classList.remove('show');
+  });
+
+  // Auto-save context periodically
+  setInterval(saveContext, 30000);
+
+  // ═══ BIONIC READING ═══
+  function bionicWord(word) {
+    if (word.length <= 3) return `<b>${word.slice(0, 1)}</b>${word.slice(1)}`;
+    const boldLen = Math.ceil(word.length * 0.4);
+    return `<b>${word.slice(0, boldLen)}</b>${word.slice(boldLen)}`;
+  }
+
+  function applyBionicReading() {
+    const selectors = [
+      '.card-head-text p', '.block p', '.text-small', '.text-tiny',
+      '.wizard-hint', '.insight-text', '.kind-words div',
+      '.check-label', '.tile-label', '.tile-hint', '.feeling-tile',
+      '.support-card p', '.ai-prompt-card p', '.ref-block',
+      '.intention-input', '.brain-dump-area', '.microstep-text',
+      '.dump-thought-text', '.ai-tip', '.panic-breath', '.panic-crisis p',
+      'label', '.summary-box', '.battery-message', '.quick-win-item',
+      '.success-entry', '.nudge-text'
+    ];
+
+    selectors.forEach(sel => {
+      qsa(sel).forEach(el => {
+        if (el.classList.contains('bionic-processed')) return;
+        const text = el.textContent;
+        const words = text.split(/(\s+)/);
+        const bionic = words.map(w => w.trim() ? bionicWord(w) : w).join('');
+        el.innerHTML = `<span class="bionic-text">${bionic}</span>`;
+        el.classList.add('bionic-processed');
+      });
+    });
+  }
+
+  function removeBionicReading() {
+    qsa('.bionic-processed').forEach(el => {
+      const text = el.textContent;
+      el.innerHTML = text;
+      el.classList.remove('bionic-processed');
+    });
+  }
+
+  // ═══ INITIALIZE PHASE 1 ═══
+  checkStreak();
+  updateDopamineBar();
+  renderSuccesses();
+  restoreContext();
+
+  /* ── INIT ───────────────────────────────────────────── */
+  go('home');
+  renderMicroSteps();
+
+})();
+</script>
+
 </body>
 </html>

@@ -1,35 +1,429 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spark - Coherence Nikolai</title>
-  <meta name="description" content="Spark is an earlier Coherence Nikolai learning and activation support.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/spark/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Spark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d12;--text:#f0eee8;--dim:rgba(240,238,232,.50);
+      --border:rgba(255,255,255,.10);
+      --spark:#FFD166;--spark-dim:rgba(255,209,102,.12);
+      --go:#78f0b1;--go-dim:rgba(120,240,177,.12);
+      --stuck:#a78bfa;--stuck-dim:rgba(167,139,250,.12);
+      --font:'Lexend',system-ui,sans-serif;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);
+      font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased;
+      font-size:18px;line-height:1.6}
+
+    /* SCREENS */
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+      opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:10}
+    .screen.active{opacity:1;pointer-events:all}
+
+    /* CANVAS */
+    #rippleCanvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+    /* CHROME */
+    #chrome{position:fixed;top:0;left:0;right:0;
+      padding:max(env(safe-area-inset-top),18px) 20px 12px;
+      display:none;align-items:center;z-index:100}
+    .back-btn{background:none;border:none;cursor:pointer;
+      color:rgba(240,238,232,.40);font-size:26px;padding:8px;
+      font-family:var(--font);-webkit-tap-highlight-color:transparent}
+
+    /* HOME */
+    #s-home{gap:0;justify-content:center;padding:40px 32px}
+    .home-title{font-size:clamp(60px,18vw,90px);font-weight:700;
+      letter-spacing:.08em;text-align:center;
+      color:var(--spark);margin-bottom:10px;
+      text-shadow:0 0 60px rgba(255,209,102,.30)}
+    .home-sub{font-size:clamp(16px,4vw,20px);font-weight:300;
+      color:var(--dim);text-align:center;
+      letter-spacing:.08em;margin-bottom:60px}
+    .mode-btns{display:flex;flex-direction:column;gap:16px;width:100%;max-width:340px}
+    .mode-btn{padding:22px 28px;border-radius:18px;border:none;
+      font-family:var(--font);font-size:clamp(20px,5vw,24px);font-weight:600;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+      display:flex;align-items:center;gap:16px;
+      transition:transform .15s,box-shadow .15s}
+    .mode-btn:active{transform:scale(.97)}
+    .mode-btn.start{background:var(--go-dim);border:1.5px solid rgba(120,240,177,.35);color:var(--go)}
+    .mode-btn.start:active{box-shadow:0 0 40px rgba(120,240,177,.20)}
+    .mode-btn.stuck{background:var(--stuck-dim);border:1.5px solid rgba(167,139,250,.35);color:var(--stuck)}
+    .mode-btn.stuck:active{box-shadow:0 0 40px rgba(167,139,250,.20)}
+    .mode-btn-icon{font-size:28px;flex-shrink:0}
+    .mode-btn-text{display:flex;flex-direction:column;gap:2px;text-align:left}
+    .mode-btn-label{font-size:clamp(20px,5vw,24px);font-weight:600}
+    .mode-btn-hint{font-size:clamp(13px,3.2vw,15px);opacity:.65;font-weight:300}
+
+    /* ── START MODE ── */
+    #s-start-input{gap:24px;padding:80px 32px 40px}
+    .screen-title{font-size:clamp(26px,6.5vw,34px);font-weight:600;
+      text-align:center;line-height:1.3;max-width:320px}
+    .screen-title span{color:var(--go)}
+    .task-input{width:100%;max-width:360px;
+      background:rgba(255,255,255,.06);border:1.5px solid var(--border);
+      border-radius:16px;padding:18px 20px;
+      font-family:var(--font);font-size:clamp(18px,4.5vw,22px);
+      font-weight:400;color:var(--text);outline:none;
+      resize:none;min-height:100px;
+      transition:border-color .2s}
+    .task-input:focus{border-color:rgba(120,240,177,.45)}
+    .task-input::placeholder{color:rgba(240,238,232,.28)}
+    .next-btn{width:100%;max-width:360px;
+      padding:20px;border-radius:16px;border:none;
+      font-family:var(--font);font-size:clamp(18px,4.5vw,22px);font-weight:600;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:transform .15s,box-shadow .2s}
+    .next-btn:active{transform:scale(.97)}
+    .next-btn.go{background:rgba(120,240,177,.15);
+      border:1.5px solid rgba(120,240,177,.40);color:var(--go)}
+    .next-btn.go:active{box-shadow:0 0 40px rgba(120,240,177,.25)}
+
+    /* FIRST STEP */
+    #s-start-step{gap:20px;padding:80px 32px 40px}
+    .step-label{font-size:clamp(12px,3vw,14px);letter-spacing:.18em;
+      text-transform:uppercase;color:var(--dim);font-weight:400}
+    .step-box{width:100%;max-width:360px;
+      background:var(--go-dim);border:1.5px solid rgba(120,240,177,.30);
+      border-radius:20px;padding:28px 24px;text-align:center}
+    .step-text{font-size:clamp(22px,5.5vw,28px);font-weight:600;
+      color:var(--go);line-height:1.4}
+    .countdown-ring{width:120px;height:120px;position:relative;cursor:pointer;
+      -webkit-tap-highlight-color:transparent}
+    .countdown-ring svg{transform:rotate(-90deg)}
+    .countdown-ring circle{fill:none;stroke-width:4}
+    .ring-bg{stroke:rgba(255,255,255,.08)}
+    .ring-fill{stroke:var(--go);stroke-linecap:round;
+      transition:stroke-dashoffset .9s linear}
+    .countdown-num{position:absolute;inset:0;display:flex;align-items:center;
+      justify-content:center;font-size:42px;font-weight:700;color:var(--go)}
+    .go-text{font-size:clamp(14px,3.5vw,16px);color:var(--dim);text-align:center;
+      max-width:280px}
+
+    /* DONE */
+    #s-done{gap:20px;padding:60px 32px}
+    .done-icon{font-size:64px;animation:pop .4s var(--ease-spring) both}
+    @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+    .done-title{font-size:clamp(28px,7vw,36px);font-weight:700;
+      color:var(--go);text-align:center}
+    .done-sub{font-size:clamp(16px,4vw,20px);font-weight:300;
+      color:var(--dim);text-align:center;max-width:300px}
+    .done-btns{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px;margin-top:8px}
+    .done-btn{padding:18px;border-radius:14px;border:1.5px solid var(--border);
+      background:transparent;font-family:var(--font);
+      font-size:clamp(16px,4vw,18px);font-weight:600;
+      color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:background .2s}
+    .done-btn:active{background:rgba(255,255,255,.06)}
+    .done-btn.primary{border-color:rgba(120,240,177,.35);color:var(--go);
+      background:var(--go-dim)}
+
+    /* ── STUCK MODE ── */
+    #s-stuck-q{gap:20px;padding:80px 32px 40px}
+    .q-title{font-size:clamp(24px,6vw,30px);font-weight:600;
+      text-align:center;line-height:1.35;max-width:320px}
+    .q-title span{color:var(--stuck)}
+    .blocker-grid{display:flex;flex-direction:column;gap:11px;width:100%;max-width:380px}
+    .blocker-btn{padding:18px 20px;border-radius:16px;
+      border:1.5px solid var(--border);background:rgba(255,255,255,.04);
+      font-family:var(--font);font-size:clamp(17px,4.2vw,20px);font-weight:400;
+      color:var(--text);cursor:pointer;text-align:left;
+      -webkit-tap-highlight-color:transparent;
+      display:flex;align-items:center;gap:14px;
+      transition:border-color .2s,background .2s}
+    .blocker-btn:active{border-color:rgba(167,139,250,.55);background:var(--stuck-dim)}
+    .blocker-icon{font-size:24px;flex-shrink:0}
+
+    /* STRATEGY */
+    #s-strategy{gap:20px;padding:80px 32px 40px}
+    .strategy-box{width:100%;max-width:380px;
+      background:var(--stuck-dim);border:1.5px solid rgba(167,139,250,.28);
+      border-radius:20px;padding:28px 24px}
+    .strategy-name{font-size:clamp(13px,3.2vw,15px);letter-spacing:.16em;
+      text-transform:uppercase;color:var(--stuck);font-weight:600;margin-bottom:12px}
+    .strategy-text{font-size:clamp(17px,4.2vw,20px);font-weight:300;
+      color:var(--text);line-height:1.7}
+    .strategy-action{margin-top:20px;padding-top:16px;
+      border-top:1px solid rgba(255,255,255,.08)}
+    .strategy-action-label{font-size:clamp(12px,3vw,14px);letter-spacing:.14em;
+      text-transform:uppercase;color:var(--dim);font-weight:400;margin-bottom:8px}
+    .strategy-action-text{font-size:clamp(18px,4.5vw,22px);font-weight:600;
+      color:var(--go);line-height:1.4}
+
+    /* ANIMATIONS */
+    :root{--ease-spring:cubic-bezier(.34,1.56,.64,1)}
+    .chip-fade{animation:fadeIn .35s ease forwards}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  </style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Support</p>
-      <h1>Spark</h1>
-      <p>A small learning and activation support from the Coherence archive.</p>
-      <p class="muted">This earlier experiment is being kept available as an archive path while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+<canvas id="rippleCanvas"></canvas>
+
+<div id="chrome">
+  <button class="back-btn" onclick="goHome()">←</button>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="home-title">Spark</div>
+  <div class="home-sub">let's get you moving</div>
+  <div class="mode-btns">
+    <button class="mode-btn start" onclick="startMode()">
+      <span class="mode-btn-icon">▶</span>
+      <div class="mode-btn-text">
+        <div class="mode-btn-label">I have a task</div>
+        <div class="mode-btn-hint">help me just start</div>
+      </div>
+    </button>
+    <button class="mode-btn stuck" onclick="stuckMode()">
+      <span class="mode-btn-icon">🌀</span>
+      <div class="mode-btn-text">
+        <div class="mode-btn-label">I'm stuck</div>
+        <div class="mode-btn-hint">find out what's blocking me</div>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- START: task input -->
+<div class="screen" id="s-start-input">
+  <div class="screen-title">What's the <span>task?</span></div>
+  <textarea class="task-input" id="taskInput" placeholder="e.g. start my essay intro&#10;email my tutor&#10;read chapter 3" rows="3"></textarea>
+  <button class="next-btn go" onclick="showFirstStep()">Show me my first step →</button>
+</div>
+
+<!-- START: first step + countdown -->
+<div class="screen" id="s-start-step">
+  <div class="step-label">your only job right now</div>
+  <div class="step-box">
+    <div class="step-text" id="firstStepText"></div>
+  </div>
+  <div class="countdown-ring" id="countdownRing" onclick="ringTapped()">
+    <svg width="120" height="120" viewBox="0 0 120 120">
+      <circle class="ring-bg" cx="60" cy="60" r="54" stroke-dasharray="339.3" stroke-dashoffset="0"/>
+      <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="54" stroke-dasharray="339.3" stroke-dashoffset="0"/>
+    </svg>
+    <div class="countdown-num" id="countdownNum">5</div>
+  </div>
+  <div class="go-text">tap the circle to start — or wait for it</div>
+</div>
+
+<!-- DONE -->
+<div class="screen" id="s-done">
+  <div class="done-icon">✓</div>
+  <div class="done-title">You started.</div>
+  <div class="done-sub">That's the hardest part. Keep going — even slowly.</div>
+  <div class="done-btns">
+    <button class="done-btn primary" onclick="startMode()">Another task</button>
+    <button class="done-btn" onclick="goHome()">Back to home</button>
+  </div>
+</div>
+
+<!-- STUCK: blocker picker -->
+<div class="screen" id="s-stuck-q">
+  <div class="q-title">What's <span>actually</span> stopping you?</div>
+  <div class="blocker-grid">
+    <button class="blocker-btn chip-fade" onclick="showStrategy('big')" style="animation-delay:.05s">
+      <span class="blocker-icon">🏔</span>It feels too big
+    </button>
+    <button class="blocker-btn chip-fade" onclick="showStrategy('wrong')" style="animation-delay:.10s">
+      <span class="blocker-icon">😬</span>Scared of getting it wrong
+    </button>
+    <button class="blocker-btn chip-fade" onclick="showStrategy('unclear')" style="animation-delay:.15s">
+      <span class="blocker-icon">🌫</span>I don't know what's expected
+    </button>
+    <button class="blocker-btn chip-fade" onclick="showStrategy('wontstart')" style="animation-delay:.20s">
+      <span class="blocker-icon">🧱</span>Brain just won't engage
+    </button>
+    <button class="blocker-btn chip-fade" onclick="showStrategy('overwhelmed')" style="animation-delay:.25s">
+      <span class="blocker-icon">🌪</span>Too many thoughts at once
+    </button>
+    <button class="blocker-btn chip-fade" onclick="showStrategy('flat')" style="animation-delay:.30s">
+      <span class="blocker-icon">🪫</span>Low energy, feel flat
+    </button>
+    <button class="blocker-btn chip-fade" onclick="showStrategy('avoiding')" style="animation-delay:.35s">
+      <span class="blocker-icon">👀</span>I'm avoiding it
+    </button>
+  </div>
+</div>
+
+<!-- STRATEGY -->
+<div class="screen" id="s-strategy">
+  <div class="strategy-box">
+    <div class="strategy-name" id="stratName"></div>
+    <div class="strategy-text" id="stratText"></div>
+    <div class="strategy-action">
+      <div class="strategy-action-label">try this now</div>
+      <div class="strategy-action-text" id="stratAction"></div>
+    </div>
+  </div>
+  <button class="next-btn go" onclick="startMode()" style="max-width:380px;margin-top:4px">
+    I'm ready — give me a first step →
+  </button>
+  <button class="next-btn" onclick="stuckMode()"
+    style="max-width:380px;background:transparent;border:1.5px solid var(--border);color:var(--dim);margin-top:0">
+    That's not it — try again
+  </button>
+</div>
+
+<script>
+// RIPPLE
+const rc=document.getElementById('rippleCanvas');
+const rx=rc.getContext('2d');
+let rW,rH,ripples=[];
+function rsz(){const d=devicePixelRatio||1;rW=innerWidth;rH=innerHeight;rc.width=rW*d;rc.height=rH*d;rc.style.width=rW+'px';rc.style.height=rH+'px';rx.setTransform(1,0,0,1,0,0);rx.scale(d,d);}
+window.addEventListener('resize',rsz);rsz();
+function spawnRipple(x,y,rgb,size){const m=Math.max(rW,rH);const maxR=size==='xl'?m*.85:size==='large'?m*.55:m*.30;ripples.push({x,y,r:2,maxR,rgb,alpha:.70});}
+(function loop(){requestAnimationFrame(loop);rx.clearRect(0,0,rW,rH);ripples=ripples.filter(r=>r.alpha>0.004);ripples.forEach(rp=>{rp.r+=(rp.maxR-rp.r)*.018;rp.alpha=Math.max(0,rp.alpha-.005);for(let i=0;i<3;i++){const ringR=rp.r*(1-i*.20);if(ringR<1)return;const a=rp.alpha*(1-i*.28);rx.save();rx.beginPath();rx.arc(rp.x,rp.y,ringR,0,Math.PI*2);rx.strokeStyle=`rgba(${rp.rgb},${a.toFixed(3)})`;rx.lineWidth=Math.max(1.5,4-i*1.2);rx.shadowColor=`rgba(${rp.rgb},${(a*.5).toFixed(3)})`;rx.shadowBlur=14;rx.stroke();rx.restore();}});})();
+
+// SCREENS
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.style.opacity='0';s.style.pointerEvents='none';s.classList.remove('active');});
+  const next=document.getElementById(id);
+  if(!next)return;
+  setTimeout(()=>{next.classList.add('active');next.style.opacity='';next.style.pointerEvents='';},50);
+}
+function goHome(){
+  clearCountdown();
+  showScreen('s-home');
+  document.getElementById('chrome').style.display='none';
+  spawnRipple(rW/2,rH/2,'240,238,232','large');
+}
+function showChrome(){document.getElementById('chrome').style.display='flex';}
+
+// START MODE
+function startMode(){
+  showScreen('s-start-input');
+  showChrome();
+  document.getElementById('taskInput').value='';
+  spawnRipple(rW/2,rH/2,'120,240,177','large');
+}
+
+// FIRST STEP GENERATOR
+function getFirstStep(task){
+  const t=task.toLowerCase().trim();
+  // Essay / writing
+  if(/essay|writ|draft|paragraph|intro|conclusion|assignment|report/.test(t))
+    return 'Open a blank document and type the title. Nothing else.';
+  // Reading
+  if(/read|chapter|article|journal|textbook/.test(t))
+    return 'Open the reading. Read just the first paragraph.';
+  // Email
+  if(/email|message|reply|contact|tutor|lecturer/.test(t))
+    return 'Open a new email. Type "Hi [name]," — that\'s it for now.';
+  // Research
+  if(/research|find|search|look up|google/.test(t))
+    return 'Open one tab. Search one thing. Don\'t click more than 2 results.';
+  // Study / revision
+  if(/study|revise|review|notes|flashcard/.test(t))
+    return 'Open your notes. Read the first heading only.';
+  // Presentation / slides
+  if(/slides|presentation|powerpoint|keynote/.test(t))
+    return 'Open the app. Create one blank slide with a title.';
+  // Default
+  return 'Open whatever you need for this task. Nothing else yet — just open it.';
+}
+
+function showFirstStep(){
+  const task=document.getElementById('taskInput').value.trim();
+  if(!task)return;
+  const step=getFirstStep(task);
+  document.getElementById('firstStepText').textContent=step;
+  showScreen('s-start-step');
+  startCountdown();
+}
+
+// COUNTDOWN
+let countTimer=null,countVal=30;
+const CIRC=2*Math.PI*54;
+function startCountdown(){
+  clearCountdown();
+  countVal=30;
+  updateRing(5);
+  countTimer=setInterval(()=>{
+    countVal--;
+    updateRing(countVal);
+    if(countVal<=0){clearCountdown();launchGo();}
+  },1000);
+}
+function updateRing(n){
+  document.getElementById('countdownNum').textContent=n<=0?'GO!':n;
+  const pct=n/30;
+  document.getElementById('ringFill').style.strokeDashoffset=CIRC*(1-pct);
+  if(n<=0){document.getElementById('countdownNum').style.color='var(--go)';}
+}
+function clearCountdown(){clearInterval(countTimer);countTimer=null;}
+function ringTapped(){clearCountdown();launchGo();}
+function launchGo(){
+  spawnRipple(rW/2,rH/2,'120,240,177','xl');
+  setTimeout(()=>showScreen('s-done'),400);
+}
+
+// STUCK MODE
+function stuckMode(){
+  showScreen('s-stuck-q');
+  showChrome();
+  spawnRipple(rW/2,rH/2,'167,139,250','large');
+}
+
+// STRATEGIES
+const STRATEGIES={
+  big:{
+    name:'It feels too big',
+    text:'Big tasks overwhelm the brain before you even start.\n\nYour brain isn\'t broken — it\'s doing exactly what brains do with big things.',
+    action:'Write down just ONE part of this task. The smallest possible piece. Start there only.'
+  },
+  wrong:{
+    name:'Scared of getting it wrong',
+    text:'Perfectionism often shows up as procrastination.\n\nYou can\'t edit a blank page. A messy start is still a start.',
+    action:'Give yourself permission to write or do something bad first. Call it a rough draft. That\'s its whole job.'
+  },
+  unclear:{
+    name:'Don\'t know what\'s expected',
+    text:'When the task is unclear, the brain stalls — it\'s not laziness, it\'s confusion.\n\nClarity is the first task.',
+    action:'Write down what you DO know about the task. Then write one question you need answered. Ask it — to a person, your notes, or Google.'
+  },
+  wontstart:{
+    name:'Brain won\'t engage',
+    text:'ADHD brains often need a spark to activate — interest, urgency, novelty, or challenge.\n\nForce doesn\'t work. Spark does.',
+    action:'Change one thing: location, music, body position, or time. Even moving to a different seat can shift brain state.'
+  },
+  overwhelmed:{
+    name:'Too many thoughts at once',
+    text:'When everything feels urgent, nothing gets done.\n\nYour brain needs to offload before it can focus.',
+    action:'Grab a piece of paper. Write every single thought that\'s competing for attention. Don\'t organise it — just dump it. Then pick ONE thing.'
+  },
+  flat:{
+    name:'Low energy, feeling flat',
+    text:'Low dopamine makes starting feel impossible.\n\nThis is physiological, not a character flaw.',
+    action:'Do 2 minutes of movement first — walk, stretch, shake it out. Then come back. Even small movement shifts brain chemistry.'
+  },
+  avoiding:{
+    name:'Avoiding it',
+    text:'Avoidance usually means something about this task feels threatening — hard, boring, scary, or tied to something bigger.\n\nThe task isn\'t the enemy. The feeling is.',
+    action:'Ask yourself: what\'s the worst that actually happens if this isn\'t perfect? Write your answer. Then take the smallest possible action.'
+  }
+};
+
+function showStrategy(key){
+  const s=STRATEGIES[key];
+  document.getElementById('stratName').textContent=s.name;
+  document.getElementById('stratText').textContent=s.text;
+  document.getElementById('stratAction').textContent=s.action;
+  showScreen('s-strategy');
+  spawnRipple(rW/2,rH/2,'167,139,250','medium');
+}
+</script>
 </body>
 </html>

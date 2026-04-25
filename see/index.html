@@ -1,35 +1,532 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>See - Coherence Nikolai</title>
-  <meta name="description" content="See is an earlier Coherence Nikolai experiment in noticing sense, tone, and emotion.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/see/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>See</title>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d12;--text:#f0eee8;--text-dim:rgba(240,238,232,.50);
+      --border:rgba(255,255,255,.10);--surface:rgba(255,255,255,.05);
+      --thread:#8abfb8;
+      --serif:'Outfit',system-ui,sans-serif;
+      --sans:'Syne',system-ui,sans-serif;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);
+      font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+    #rippleCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .55s ease;z-index:10}
+    .screen.active{opacity:1;pointer-events:all}
+
+    /* ── SPLASH ── */
+    #s-splash{justify-content:center;padding:0;gap:0}
+    .splash-wordmark{
+      font-family:var(--sans);font-weight:600;
+      font-size:clamp(88px,24vw,130px);color:var(--text);
+      letter-spacing:.18em;line-height:1;text-transform:uppercase;
+      animation:wGlow 6s ease-in-out infinite;
+      margin-top:auto;margin-bottom:clamp(8px,2vw,16px)}
+    @keyframes wGlow{
+      0%,100%{text-shadow:0 0 30px rgba(240,238,232,.12)}
+      50%{text-shadow:0 0 60px rgba(240,238,232,.30)}}
+    .splash-sub{
+      font-family:var(--serif);font-weight:300;
+      font-size:clamp(15px,3.8vw,20px);color:rgba(240,238,232,.45);
+      letter-spacing:.28em;text-transform:lowercase;
+      margin-bottom:auto}
+    .splash-btn{
+      font-family:var(--sans);font-size:clamp(12px,3vw,15px);
+      font-weight:400;letter-spacing:.22em;text-transform:uppercase;
+      color:rgba(240,238,232,.92);
+      background:rgba(13,13,18,.90);border:1.5px solid rgba(255,255,255,.28);
+      border-radius:6px;padding:20px 0;width:calc(100% - 48px);
+      margin-bottom:clamp(40px,10vw,64px);
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:border-color .3s,box-shadow .3s}
+    .splash-btn:active{border-color:rgba(255,255,255,.55);box-shadow:0 0 28px rgba(255,255,255,.08)}
+
+    /* ── CHROME ── */
+    #chrome{position:fixed;top:0;left:0;right:0;display:none;align-items:center;
+      padding:max(env(safe-area-inset-top),18px) 20px 12px;z-index:100}
+    .back-btn{background:none;border:none;cursor:pointer;
+      color:rgba(240,238,232,.45);font-size:24px;padding:8px;
+      -webkit-tap-highlight-color:transparent;transition:color .2s}
+    .back-btn:active{color:var(--text)}
+    .gear-btn{margin-left:auto;background:none;border:none;cursor:pointer;
+      color:rgba(240,238,232,.30);font-size:18px;padding:8px;
+      -webkit-tap-highlight-color:transparent}
+
+    /* ── HOME ── */
+    #s-home{padding:0;justify-content:stretch}
+    .home-inner{display:flex;flex-direction:column;align-items:center;
+      width:100%;height:100%;
+      padding:max(env(safe-area-inset-top),52px) 0 max(env(safe-area-inset-bottom),32px)}
+    .wordmark{font-family:var(--sans);font-weight:600;
+      font-size:clamp(96px,26vw,140px);color:var(--text);
+      letter-spacing:.14em;line-height:1;text-transform:uppercase;
+      text-shadow:0 0 60px rgba(255,255,255,.10);
+      margin-bottom:4px;margin-top:auto}
+    .wordmark-sub{font-family:var(--serif);font-weight:300;
+      font-size:clamp(13px,3.2vw,17px);color:rgba(240,238,232,.38);
+      letter-spacing:.24em;text-transform:lowercase;
+      margin-bottom:clamp(16px,4vw,28px)}
+    .mode-grid{display:flex;flex-direction:column;width:100%;
+      border-top:1px solid var(--border);margin-top:auto}
+    .mode-card{display:flex;align-items:center;justify-content:space-between;
+      padding:clamp(16px,4vw,24px) 28px;border-bottom:1px solid var(--border);
+      cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s;
+      position:relative;overflow:hidden}
+    .mode-card:active{background:rgba(255,255,255,.04)}
+    .mc-left{display:flex;flex-direction:column;gap:3px}
+    .mc-title{font-size:clamp(24px,6vw,32px);font-weight:300;
+      letter-spacing:-.01em;color:var(--text)}
+    .mc-sub{font-size:clamp(11px,2.8vw,13px);color:var(--text-dim);letter-spacing:.06em}
+    .mc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    /* colour tint on each card */
+    .mode-card[data-col="amber"]{background:linear-gradient(90deg,rgba(245,166,35,.04) 0%,transparent 60%)}
+    .mode-card[data-col="sky"]{background:linear-gradient(90deg,rgba(90,181,212,.04) 0%,transparent 60%)}
+    .mode-card[data-col="sage"]{background:linear-gradient(90deg,rgba(138,191,184,.04) 0%,transparent 60%)}
+    .mode-card[data-col="violet"]{background:linear-gradient(90deg,rgba(148,120,200,.04) 0%,transparent 60%)}
+    .mode-card[data-col="purple"]{background:linear-gradient(90deg,rgba(155,111,232,.04) 0%,transparent 60%)}
+    .gear-home{position:absolute;top:18px;right:18px;z-index:20;
+      background:none;border:none;cursor:pointer;
+      color:rgba(240,238,232,.30);font-size:18px;padding:8px;
+      -webkit-tap-highlight-color:transparent}
+
+    /* ── NOTING ── */
+    .note-screen{padding:max(env(safe-area-inset-top),80px) 28px max(env(safe-area-inset-bottom),48px);
+      justify-content:flex-start;gap:0}
+    .step-lbl{font-size:clamp(11px,2.6vw,13px);letter-spacing:.20em;
+      text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;margin-top:8px}
+    .step-title{font-family:var(--serif);font-weight:300;
+      font-size:clamp(32px,8vw,44px);
+      color:var(--text);margin-bottom:8px;text-align:center}
+    .step-hint{font-size:clamp(12px,3vw,14px);color:var(--text-dim);
+      letter-spacing:.10em;text-align:center;
+      margin-bottom:clamp(20px,5vw,32px)}
+    /* grid fade animation */
+    .chip-fade{animation:chipIn .4s ease forwards}
+    @keyframes chipIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .sense-grid{display:grid;grid-template-columns:1fr 1fr;
+      gap:clamp(12px,3vw,16px);width:100%;max-width:360px}
+    .sense-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:10px;padding:clamp(20px,5vw,28px) 12px;
+      border:none;border-radius:16px;cursor:pointer;
+      color:#0d0d12;font-family:var(--serif);
+      font-size:clamp(18px,4.5vw,24px);font-weight:500;
+      -webkit-tap-highlight-color:transparent;transition:transform .15s,filter .15s,opacity .3s}
+    .sense-btn:active{transform:scale(.94);filter:brightness(.88)}
+    .sense-icon{width:clamp(32px,8vw,42px);height:clamp(32px,8vw,42px)}
+    .sense-icon svg{width:100%;height:100%}
+    .vedana-grid{display:flex;flex-direction:column;
+      gap:clamp(14px,3.5vw,18px);width:100%;max-width:320px}
+    .vedana-btn{display:flex;align-items:center;justify-content:center;
+      padding:clamp(20px,5vw,26px) 24px;
+      border:none;border-radius:14px;cursor:pointer;
+      color:#0d0d12;font-family:var(--serif);
+      font-size:clamp(24px,6vw,32px);font-weight:400;
+      letter-spacing:.02em;
+      -webkit-tap-highlight-color:transparent;transition:transform .15s,filter .15s}
+    .vedana-btn:active{transform:scale(.96);filter:brightness(.88)}
+    .emotion-grid{display:grid;grid-template-columns:1fr 1fr;
+      gap:clamp(11px,2.8vw,14px);width:100%;max-width:360px}
+    .emotion-btn{display:flex;align-items:center;justify-content:center;
+      padding:clamp(16px,4vw,22px) 12px;
+      border:none;border-radius:14px;cursor:pointer;
+      color:#0d0d12;font-family:var(--serif);
+      font-size:clamp(17px,4.2vw,22px);font-weight:400;
+      -webkit-tap-highlight-color:transparent;transition:transform .15s,filter .15s}
+    .emotion-btn:active{transform:scale(.95);filter:brightness(.88)}
+    .ai-w{font-size:clamp(13px,3.2vw,16px);letter-spacing:.08em;
+      color:rgba(138,191,184,.9);text-align:center;margin-top:24px;
+      min-height:24px;opacity:0;transition:opacity 1.2s ease;font-style:italic}
+    .ai-w.show{opacity:1}
+    /* noted flash */
+    .noted-flash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:12px;z-index:500;pointer-events:none;
+      background:rgba(13,13,18,.88);
+      opacity:0;transition:opacity .4s ease}
+    .noted-flash.show{opacity:1}
+    .noted-words{font-family:var(--serif);font-weight:200;
+      font-size:clamp(22px,5.5vw,30px);color:var(--text);
+      letter-spacing:.06em;text-align:center;line-height:1.5}
+    .noted-label{font-family:var(--sans);font-size:clamp(10px,2.5vw,12px);
+      letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim)}
+
+    /* ── ANCHOR ── */
+    #s-anchor{gap:0;position:relative;justify-content:center;align-items:center}
+    .anchor-centre{position:relative;z-index:2;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:0}
+    #anchorOrbCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+    .a-instr{font-family:var(--serif);font-weight:300;
+      font-size:clamp(20px,5vw,28px);color:var(--text-dim);
+      text-align:center;line-height:1.75;max-width:300px;
+      transition:opacity 2s ease;margin-bottom:0;position:relative;z-index:2}
+    .a-instr.fade{opacity:0;pointer-events:none}
+    .b-orb-tap{position:relative;z-index:2;
+      width:clamp(170px,44vw,210px);height:clamp(170px,44vw,210px);
+      border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;
+      flex-shrink:0}
+    .b-lbl{font-family:var(--sans);font-weight:400;
+      font-size:clamp(22px,5.5vw,28px);color:rgba(90,181,212,.75);
+      letter-spacing:.18em;text-transform:uppercase;
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+    .anchor-tap-hint{position:relative;z-index:2;
+      font-family:var(--sans);font-size:clamp(11px,2.8vw,13px);
+      letter-spacing:.16em;text-transform:lowercase;
+      color:rgba(240,238,232,.22);margin-top:12px}
+    .w-btn{position:relative;z-index:2;margin-top:28px;background:none;
+      border:1px solid rgba(240,238,232,.22);border-radius:999px;
+      padding:16px 36px;
+      font-family:var(--sans);font-size:clamp(16px,4vw,20px);
+      font-weight:400;letter-spacing:.08em;text-transform:lowercase;
+      color:rgba(240,238,232,.65);cursor:pointer;
+      -webkit-tap-highlight-color:transparent;transition:all .3s}
+    .w-btn:active{border-color:rgba(240,238,232,.55);color:var(--text)}
+    .ret-txt{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      font-family:var(--serif);font-weight:200;
+      font-size:clamp(48px,13vw,72px);color:var(--text);letter-spacing:.10em;
+      opacity:0;pointer-events:none;transition:opacity 1s ease;z-index:50}
+    .ret-txt.show{opacity:1}
+
+    /* ── VERBAL ── */
+    #s-verbal{gap:0}
+    .verbal-inner{display:flex;flex-direction:column;align-items:center;
+      justify-content:center;width:100%;height:100%;padding:80px 32px 60px;gap:0}
+    .verbal-instr{font-family:var(--serif);font-weight:200;
+      font-size:clamp(24px,6vw,32px);color:var(--text-dim);
+      text-align:center;line-height:1.55;max-width:300px;margin-bottom:12px}
+    .verbal-prompt{font-family:var(--sans);font-size:clamp(12px,3vw,14px);
+      letter-spacing:.16em;text-transform:lowercase;
+      color:rgba(240,238,232,.30);margin-bottom:36px}
+    .verbal-mic{width:clamp(100px,26vw,130px);height:clamp(100px,26vw,130px);
+      border-radius:50%;background:rgba(148,120,200,.08);
+      border:1.5px solid rgba(148,120,200,.28);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;
+      transition:all .4s ease}
+    .verbal-mic.listening{background:rgba(148,120,200,.18);
+      border-color:rgba(148,120,200,.7);box-shadow:0 0 40px rgba(148,120,200,.25)}
+    .verbal-mic svg{color:rgba(148,120,200,.6);transition:color .3s}
+    .verbal-mic.listening svg{color:rgba(148,120,200,.95)}
+    .verbal-pulse{position:absolute;inset:-8px;border-radius:50%;
+      border:1.5px solid rgba(148,120,200,.4);opacity:0;pointer-events:none}
+    .verbal-mic.listening .verbal-pulse{animation:vPulse 1.4s ease-out infinite}
+    @keyframes vPulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.65);opacity:0}}
+    .verbal-hint{font-family:var(--sans);font-size:clamp(13px,3.2vw,16px);
+      font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--text-dim);margin-top:24px}
+    .verbal-transcript{font-family:var(--serif);font-size:clamp(16px,4vw,20px);
+      font-weight:300;color:var(--text-dim);text-align:center;max-width:300px;
+      margin-top:12px;line-height:1.5;font-style:italic;min-height:24px}
+    .verbal-reflection{font-family:var(--serif);font-size:clamp(18px,4.5vw,24px);
+      font-weight:300;color:var(--thread);text-align:center;max-width:300px;
+      margin-top:24px;letter-spacing:.04em;line-height:1.5;
+      opacity:0;transition:opacity 1.6s ease;min-height:40px}
+    .verbal-reflection.show{opacity:1}
+
+    /* ── GUIDED ── */
+    #s-guided{gap:0}
+    .guided-inner{display:flex;flex-direction:column;align-items:center;
+      justify-content:center;width:100%;height:100%;padding:80px 32px 60px;gap:0}
+    .guided-setup{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+    .guided-title{font-family:var(--serif);font-weight:300;
+      font-size:clamp(28px,7vw,38px);color:var(--text);margin-bottom:4px}
+    .guided-sub{font-size:clamp(13px,3.2vw,15px);color:var(--text-dim);
+      letter-spacing:.06em;text-align:center;max-width:280px;line-height:1.6;margin-bottom:8px}
+    .setup-row{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+    .setup-label{font-family:var(--sans);font-size:clamp(10px,2.5vw,12px);
+      letter-spacing:.20em;text-transform:uppercase;color:var(--text-dim)}
+    .duration-grid,.speed-grid{display:flex;gap:10px}
+    .dur-btn,.spd-btn{font-family:var(--sans);font-size:clamp(16px,4vw,20px);
+      font-weight:300;color:var(--text);
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:12px;padding:14px 20px;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:all .25s;min-width:64px;text-align:center}
+    .dur-btn:active,.dur-btn.sel,
+    .spd-btn:active,.spd-btn.sel{background:rgba(255,255,255,.12);
+      border-color:rgba(255,255,255,.35);color:var(--text)}
+    .guided-start-btn{font-family:var(--sans);font-size:clamp(12px,3vw,14px);
+      letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(240,238,232,.85);
+      background:rgba(255,255,255,.07);
+      border:1.5px solid rgba(255,255,255,.25);
+      border-radius:8px;padding:16px 40px;
+      cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:all .25s;margin-top:4px}
+    .guided-start-btn:active{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45)}
+    .guided-active{display:none;flex-direction:column;align-items:center;
+      justify-content:center;gap:32px;width:100%}
+    .guided-active.show{display:flex}
+    .guided-prompt{font-family:var(--serif);font-weight:200;
+      font-size:clamp(42px,11vw,64px);color:var(--text);
+      letter-spacing:.10em;text-align:center;
+      opacity:0;transition:opacity .6s ease}
+    .guided-prompt.show{opacity:1}
+    .guided-timer{font-size:clamp(14px,3.5vw,18px);letter-spacing:.14em;
+      color:var(--text-dim);font-variant-numeric:tabular-nums}
+    .guided-progress{width:200px;height:2px;background:rgba(255,255,255,.08);
+      border-radius:2px;overflow:hidden}
+    .guided-progress-bar{height:100%;background:rgba(255,255,255,.35);
+      transition:width .5s linear;width:0%}
+    .guided-stop{margin-top:8px;background:none;border:none;
+      font-family:var(--sans);font-size:clamp(11px,2.8vw,13px);
+      letter-spacing:.16em;text-transform:lowercase;
+      color:rgba(240,238,232,.22);cursor:pointer;
+      -webkit-tap-highlight-color:transparent;transition:color .3s}
+    .guided-stop:active{color:rgba(240,238,232,.50)}
+    .guided-result{display:none;flex-direction:column;align-items:center;
+      gap:20px;max-width:300px;text-align:center}
+    .guided-result.show{display:flex}
+    .guided-result-text{font-size:clamp(14px,3.5vw,17px);
+      color:rgba(138,191,184,.9);line-height:1.7;font-style:italic}
+    .guided-again{font-family:var(--sans);font-size:clamp(12px,3vw,14px);
+      letter-spacing:.16em;text-transform:lowercase;color:var(--text-dim);
+      background:none;border:1px solid var(--border);border-radius:999px;
+      padding:10px 28px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+      transition:all .25s}
+    .guided-again:active{border-color:rgba(255,255,255,.3);color:var(--text)}
+
+    /* ── STORM ── */
+    #s-storm{}
+    .storm-inner{display:flex;flex-direction:column;align-items:center;
+      justify-content:center;width:100%;height:100%;
+      padding:80px 32px 60px;gap:20px}
+    .storm-toggle{display:flex;gap:0;border:1.5px solid var(--border);
+      border-radius:999px;overflow:hidden;margin-bottom:8px}
+    .storm-toggle-btn{background:none;border:none;
+      font-family:var(--sans);font-size:clamp(11px,2.8vw,13px);
+      letter-spacing:.14em;text-transform:lowercase;
+      color:var(--text-dim);padding:9px 22px;cursor:pointer;
+      transition:all .2s;-webkit-tap-highlight-color:transparent}
+    .storm-toggle-btn.active{background:rgba(255,255,255,.10);color:var(--text)}
+    .storm-word{font-family:var(--serif);font-weight:200;
+      font-size:clamp(52px,14vw,80px);color:var(--text);
+      letter-spacing:.06em;text-align:center;opacity:0;
+      transition:opacity .32s ease;cursor:pointer;
+      -webkit-tap-highlight-color:transparent;line-height:1.1}
+    .storm-word.show{opacity:1}
+    .storm-sub{font-size:clamp(12px,3vw,14px);letter-spacing:.14em;
+      color:var(--text-dim);text-transform:lowercase}
+    .storm-wit{font-size:clamp(13px,3.2vw,16px);letter-spacing:.08em;
+      color:rgba(138,191,184,.9);text-align:center;max-width:80vw;
+      opacity:0;transition:opacity 1.5s ease;font-style:italic}
+    .storm-wit.show{opacity:1}
+
+    /* ── SETTINGS ── */
+    #s-settings{background:rgba(13,13,18,.97);z-index:200;padding:60px 28px;gap:14px}
+    .st-title{font-family:var(--serif);font-weight:300;
+      font-size:clamp(24px,6vw,32px);color:var(--text);margin-bottom:8px}
+    .st-inp{width:100%;max-width:340px;font-family:var(--sans);font-size:14px;
+      color:var(--text);background:rgba(255,255,255,.06);
+      border:1.5px solid var(--border);border-radius:8px;padding:13px 16px;outline:none}
+    .st-inp::placeholder{color:rgba(240,238,232,.28)}
+    .st-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .st-btn{font-family:var(--sans);font-size:12px;letter-spacing:.14em;
+      text-transform:lowercase;color:var(--text-dim);
+      background:rgba(255,255,255,.06);border:1.5px solid var(--border);
+      border-radius:999px;padding:10px 24px;cursor:pointer;
+      transition:all .25s;-webkit-tap-highlight-color:transparent}
+    .st-btn:active{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.28)}
+    .st-note{font-size:11px;letter-spacing:.10em;color:rgba(240,238,232,.28)}
+    .st-close{position:absolute;top:18px;right:18px;background:none;border:none;
+      cursor:pointer;color:var(--text-dim);font-size:26px;
+      -webkit-tap-highlight-color:transparent}
+    .st-link{font-size:12px;letter-spacing:.10em;color:rgba(138,191,184,.7);text-decoration:none}
+    .st-link:active{color:rgba(138,191,184,1)}
+  </style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Noting</p>
-      <h1>See</h1>
-      <p>Sense, tone, emotion, and present-moment practice.</p>
-      <p class="muted">This earlier experiment is being kept in the Coherence archive while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+<canvas id="rippleCanvas"></canvas>
+
+<!-- NOTED FLASH -->
+<div class="noted-flash" id="notedFlash">
+  <div class="noted-label">noted</div>
+  <div class="noted-words" id="notedWords"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="screen" id="s-settings">
+  <button class="st-close" onclick="closeSettings()">×</button>
+  <div class="st-title">See · Settings</div>
+  <input class="st-inp" id="apiInput" type="password"
+    placeholder="Anthropic API key (optional)" autocomplete="off"/>
+  <div class="st-btns">
+    <button class="st-btn" onclick="saveKey()">save key</button>
+    <button class="st-btn" onclick="clearKey()">clear key</button>
+  </div>
+  <div class="st-note">stored locally · never transmitted</div>
+  <a class="st-link" href="https://buymeacoffee.com/coherence_nikolai"
+    target="_blank" rel="noopener">support this work</a>
+</div>
+
+<!-- SPLASH -->
+<div class="screen active" id="s-splash">
+  <div class="splash-wordmark">See</div>
+  <div class="splash-sub">sense · tone · emotion</div>
+  <button class="splash-btn" onclick="goHome()">begin practice</button>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="s-home">
+  <button class="gear-home" onclick="openSettings()">⚙</button>
+  <div class="home-inner">
+    <div class="wordmark">See</div>
+    <div class="wordmark-sub">sense · tone · emotion</div>
+    <div class="mode-grid">
+      <div class="mode-card" data-col="amber" onclick="startNoting()">
+        <div class="mc-left">
+          <div class="mc-title">Noting</div>
+          <div class="mc-sub">sense · tone · emotion</div>
+        </div>
+        <div class="mc-dot" style="background:#F5A623"></div>
+      </div>
+      <div class="mode-card" data-col="sky" onclick="startAnchor()">
+        <div class="mc-left">
+          <div class="mc-title">Anchor</div>
+          <div class="mc-sub">breath · return · presence</div>
+        </div>
+        <div class="mc-dot" style="background:#5ab5d4"></div>
+      </div>
+      <div class="mode-card" data-col="sage" onclick="startGuided()">
+        <div class="mc-left">
+          <div class="mc-title">Guided Noting</div>
+          <div class="mc-sub">timed · instructed · step by step</div>
+        </div>
+        <div class="mc-dot" style="background:#8abfb8"></div>
+      </div>
+      <div class="mode-card" data-col="violet" onclick="startVerbal()">
+        <div class="mc-left">
+          <div class="mc-title">Verbal Noting</div>
+          <div class="mc-sub">name what you notice · AI reflects</div>
+        </div>
+        <div class="mc-dot" style="background:#9478c8"></div>
+      </div>
+      <div class="mode-card" data-col="purple" onclick="startStorm()">
+        <div class="mc-left">
+          <div class="mc-title">Storm</div>
+          <div class="mc-sub">liberation notes · rapid fire</div>
+        </div>
+        <div class="mc-dot" style="background:#9B6FE8"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHROME -->
+<div id="chrome">
+  <button class="back-btn" onclick="goHome()">←</button>
+  <button class="gear-btn" onclick="openSettings()">⚙</button>
+</div>
+
+<!-- NOTING -->
+<div class="screen note-screen" id="s-noting">
+  <div class="step-lbl" id="stepLbl"></div>
+  <div class="step-title" id="stepTitle"></div>
+  <div class="step-hint" id="stepHint"></div>
+  <div id="chipGrid"></div>
+  <div class="ai-w" id="noteAI"></div>
+</div>
+
+<!-- ANCHOR -->
+<div class="screen" id="s-anchor">
+  <canvas id="anchorOrbCanvas"></canvas>
+  <div class="anchor-centre">
+    <div class="a-instr" id="aInstr">
+      Observe the incoming<br>and outgoing breath.<br>Note it.
+    </div>
+    <div class="b-orb-tap" id="bOrbTap" onclick="orbTap(event)">
+      <span class="b-lbl" id="bLbl"></span>
+    </div>
+    <div class="anchor-tap-hint" id="anchorTapHint">tap the orb to note presence</div>
+    <button class="w-btn" id="wBtn" onclick="mindWandered(event)">mind wandered →</button>
+  </div>
+</div>
+<div class="ret-txt" id="retTxt"></div>
+
+<!-- VERBAL NOTING -->
+<div class="screen" id="s-verbal">
+  <div class="verbal-inner">
+    <div class="verbal-instr">Speak your observation.</div>
+    <div class="verbal-prompt">name what you notice</div>
+    <div class="verbal-mic" id="verbalMic" onclick="toggleVerbal()">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="9" y="2" width="6" height="11" rx="3"/>
+        <path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6"/>
+      </svg>
+      <span class="verbal-pulse"></span>
+    </div>
+    <div class="verbal-hint" id="verbalHint">tap to speak</div>
+    <div class="verbal-transcript" id="verbalTranscript"></div>
+    <div class="verbal-reflection" id="verbalReflection"></div>
+  </div>
+</div>
+
+<!-- GUIDED NOTING -->
+<div class="screen" id="s-guided">
+  <div class="guided-inner">
+    <div class="guided-setup" id="guidedSetup">
+      <div class="guided-title">Guided Noting</div>
+      <div class="guided-sub">A timed session. Prompts cycle — sense, tone, emotion. Just keep noticing.</div>
+      <div class="setup-row">
+        <div class="setup-label">duration</div>
+        <div class="duration-grid">
+          <button class="dur-btn sel" data-min="1" onclick="selectDur(this)">1<br><span style="font-size:.6em;opacity:.6">min</span></button>
+          <button class="dur-btn" data-min="5" onclick="selectDur(this)">5<br><span style="font-size:.6em;opacity:.6">min</span></button>
+          <button class="dur-btn" data-min="10" onclick="selectDur(this)">10<br><span style="font-size:.6em;opacity:.6">min</span></button>
+        </div>
+      </div>
+      <div class="setup-row">
+        <div class="setup-label">speed</div>
+        <div class="speed-grid">
+          <button class="spd-btn" data-sec="12" onclick="selectSpd(this)">slow</button>
+          <button class="spd-btn sel" data-sec="7" onclick="selectSpd(this)">medium</button>
+          <button class="spd-btn" data-sec="4" onclick="selectSpd(this)">fast</button>
+        </div>
+      </div>
+      <button class="guided-start-btn" onclick="beginGuided()">begin</button>
+    </div>
+    <div class="guided-active" id="guidedActive">
+      <div class="guided-prompt" id="guidedPrompt"></div>
+      <div class="guided-timer" id="guidedTimer"></div>
+      <div class="guided-progress"><div class="guided-progress-bar" id="guidedBar"></div></div>
+      <button class="guided-stop" onclick="stopGuided()">end session</button>
+    </div>
+    <div class="guided-result" id="guidedResult">
+      <div class="guided-result-text" id="guidedResultText"></div>
+      <button class="guided-again" onclick="resetGuided()">again</button>
+    </div>
+  </div>
+</div>
+
+<!-- STORM -->
+<div class="screen" id="s-storm">
+  <div class="storm-inner">
+    <div class="storm-toggle">
+      <button class="storm-toggle-btn active" id="stormTapBtn" onclick="setStormMode('tap')">tap</button>
+      <button class="storm-toggle-btn" id="stormWatchBtn" onclick="setStormMode('watch')">watch</button>
+    </div>
+    <div class="storm-word" id="sWord" onclick="stormAdvance(event)"></div>
+    <div class="storm-sub" id="sHint">tap to release</div>
+    <div class="storm-wit" id="sWit"></div>
+  </div>
+</div>
+
+<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');</script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

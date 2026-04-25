@@ -1,35 +1,759 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flux Notes - Coherence Nikolai</title>
-  <meta name="description" content="Flux Notes is an earlier Coherence Nikolai notes and transition support.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/flux-notes/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Flux Notes v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #0f1117; color: #e8eaf0; min-height: 100vh; padding: 20px 16px 100px; }
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  font-family: sans-serif;
+}
+
+.topbar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+.top-btn { background: #1a1d27; border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; color: #8b90a8; font-size: 0.85rem; font-weight: 600; padding: 8px 16px; }
+.top-btn.on { border-color: #7eb8f7; color: #7eb8f7; }
+
+.session-bar { background: #1a1d27; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.session-input { flex: 1; background: transparent; border: none; color: #e8eaf0; font-size: 0.95rem; outline: none; }
+.session-input::placeholder { color: #8b90a8; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #6ee7b7; display: none; animation: blink 2s infinite; }
+.live-dot.on { display: block; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.start-btn { background: linear-gradient(135deg, #7eb8f7, #a78bfa); border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 700; padding: 9px 18px; }
+
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { background: #1a1d27; border: 1px solid rgba(255,255,255,0.08); border-radius: 50px; color: #8b90a8; font-size: 0.82rem; font-weight: 600; padding: 7px 16px; white-space: nowrap; flex-shrink: 0; }
+.tab.active { border-color: #7eb8f7; color: #7eb8f7; background: rgba(126,184,247,0.1); }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.note-area { background: #1a1d27; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; min-height: 300px; }
+textarea { width: 100%; background: transparent; border: none; color: #e8eaf0; font-size: 1rem; line-height: 1.8; outline: none; resize: none; min-height: 260px; font-family: sans-serif; }
+textarea::placeholder { color: #8b90a8; }
+
+.confusion-zone { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 100; }
+.confusion-btn { background: linear-gradient(135deg, #fb923c, #f97316); border-radius: 50px; color: #fff; font-size: 0.95rem; font-weight: 800; padding: 14px 28px; box-shadow: 0 4px 24px rgba(251,146,60,0.4); }
+
+.toast { position: fixed; top: 20px; right: 20px; background: #fb923c; color: #fff; font-size: 0.88rem; font-weight: 700; padding: 11px 18px; border-radius: 10px; z-index: 400; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+</style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Support</p>
-      <h1>Flux Notes</h1>
-      <p>A small notes and transition support from the Coherence archive.</p>
-      <p class="muted">This earlier experiment is being kept available as an archive path while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+
+<div class="topbar">
+  <button class="top-btn" id="themeBtn">☀️ Day</button>
+  <button class="top-btn" id="soundBtn">🔉 Sound</button>
+</div>
+
+<div class="session-bar">
+  <input class="session-input" id="sessionName" type="text" placeholder="Session name...">
+  <div class="live-dot" id="liveDot"></div>
+  <button class="start-btn" id="startBtn">Start Session</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-panel="free">✏️ Free Notes</button>
+  <button class="tab" data-panel="cornell">📋 Cornell</button>
+  <button class="tab" data-panel="voice">🎙️ Voice</button>
+  <button class="tab" data-panel="scan">📷 Scan</button>
+  <button class="tab" data-panel="research">🔬 Research</button>
+  <button class="tab" data-panel="visual">🎨 Visual</button>
+  <button class="tab" data-panel="review">🔍 Review</button>
+  <button class="tab" data-panel="tools">🔗 Tools</button>
+</div>
+
+<div class="panel active" id="panel-free">
+  <div class="note-area">
+    <textarea id="freeNotes" placeholder="Just start writing. No rules. No judgment. Your thoughts belong here…"></textarea>
+  </div>
+</div>
+
+<div class="panel" id="panel-cornell">
+  <div class="note-area">
+    <p style="color:#8b90a8;font-size:0.85rem;margin-bottom:12px">❓ Questions &amp; Cues</p>
+    <textarea id="cornellCue" placeholder="Key questions…" style="min-height:120px"></textarea>
+    <hr style="border-color:rgba(255,255,255,0.08);margin:12px 0">
+    <p style="color:#8b90a8;font-size:0.85rem;margin-bottom:8px">📝 Main Notes</p>
+    <textarea id="cornellMain" placeholder="Your notes…" style="min-height:180px"></textarea>
+    <hr style="border-color:rgba(255,255,255,0.08);margin:12px 0">
+    <p style="color:#8b90a8;font-size:0.85rem;margin-bottom:8px">💡 Summary</p>
+    <textarea id="cornellSummary" placeholder="3 key things from this lecture…" style="min-height:80px"></textarea>
+  </div>
+</div>
+
+<div class="panel" id="panel-voice">
+  <div class="note-area" style="text-align:center;padding:40px 20px">
+    <button id="voiceBtn" style="width:90px;height:90px;border-radius:50%;border:3px solid #7eb8f7;background:rgba(126,184,247,0.1);font-size:2rem;margin-bottom:16px">🎙️</button>
+    <p id="voiceStatus" style="color:#8b90a8;font-size:0.9rem">Tap to record</p>
+    <div id="voiceRecordings" style="margin-top:20px;text-align:left"></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-scan">
+  <div class="note-area">
+    <p style="color:#8b90a8;font-size:0.85rem;margin-bottom:12px">Point camera at a slide or upload an image</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <button id="startCameraBtn" style="background:linear-gradient(135deg,#7eb8f7,#a78bfa);border-radius:10px;color:#fff;font-weight:700;padding:9px 18px">📷 Camera</button>
+      <button id="captureBtn" style="display:none;background:linear-gradient(135deg,#7eb8f7,#a78bfa);border-radius:10px;color:#fff;font-weight:700;padding:9px 18px">⚡ Capture</button>
+      <button id="stopCameraBtn" style="display:none;background:#232638;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#e8eaf0;padding:9px 18px">✕ Stop</button>
+      <label style="background:#232638;border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#e8eaf0;padding:9px 18px;cursor:pointer;touch-action:manipulation">📁 Upload
+        <input type="file" id="imageUpload" accept="image/*" style="display:none">
+      </label>
+    </div>
+    <video id="cameraPreview" style="display:none;width:100%;border-radius:10px;max-height:220px;object-fit:cover" autoplay playsinline></video>
+    <canvas id="scanCanvas" style="display:none"></canvas>
+    <div id="scanCards"><p style="color:#8b90a8;font-size:0.85rem">No captures yet.</p></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-research">
+  <div style="background:rgba(126,184,247,0.08);border:1px solid rgba(126,184,247,0.2);border-radius:12px;padding:12px 16px;margin-bottom:14px;position:sticky;top:0;z-index:10">
+    <p style="font-size:0.7rem;font-weight:700;color:#7eb8f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">📌 Assignment Question</p>
+    <input id="assignmentQ" type="text" placeholder="Type your assignment question here…" style="width:100%;background:transparent;border:none;color:#e8eaf0;font-size:1rem;font-weight:700;outline:none">
+  </div>
+  <div id="sourceCards"></div>
+  <button id="addSourceBtn" style="width:100%;background:#1a1d27;border:2px dashed rgba(255,255,255,0.1);border-radius:16px;color:#8b90a8;font-size:0.9rem;font-weight:600;padding:14px;margin-bottom:16px;touch-action:manipulation">+ Add a source</button>
+</div>
+
+<div class="panel" id="panel-visual">
+  <div class="note-area" style="padding:12px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+      <button class="vtool active" data-tool="draw" style="background:#232638;border:1px solid #7eb8f7;border-radius:8px;color:#7eb8f7;padding:6px 12px;font-size:0.82rem;font-weight:600">✏️ Draw</button>
+      <button class="vtool" data-tool="erase" style="background:#232638;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8b90a8;padding:6px 12px;font-size:0.82rem;font-weight:600">⌫ Erase</button>
+      <select id="vBrushSize" style="background:#232638;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e8eaf0;padding:6px 8px;font-size:0.82rem;outline:none">
+        <option value="3">Thin</option>
+        <option value="6" selected>Medium</option>
+        <option value="12">Thick</option>
+      </select>
+      <div style="width:22px;height:22px;border-radius:50%;background:#7eb8f7;border:2px solid #fff;cursor:pointer;touch-action:manipulation" class="vcolor" data-color="#7eb8f7"></div>
+      <div style="width:22px;height:22px;border-radius:50%;background:#a78bfa;border:2px solid transparent;cursor:pointer;touch-action:manipulation" class="vcolor" data-color="#a78bfa"></div>
+      <div style="width:22px;height:22px;border-radius:50%;background:#6ee7b7;border:2px solid transparent;cursor:pointer;touch-action:manipulation" class="vcolor" data-color="#6ee7b7"></div>
+      <div style="width:22px;height:22px;border-radius:50%;background:#fb923c;border:2px solid transparent;cursor:pointer;touch-action:manipulation" class="vcolor" data-color="#fb923c"></div>
+      <div style="width:22px;height:22px;border-radius:50%;background:#e8eaf0;border:2px solid transparent;cursor:pointer;touch-action:manipulation" class="vcolor" data-color="#e8eaf0"></div>
+      <button id="vClear" style="background:#232638;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8b90a8;padding:6px 12px;font-size:0.82rem;font-weight:600;margin-left:auto">🗑️ Clear</button>
+      <button id="vSave" style="background:#232638;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8b90a8;padding:6px 12px;font-size:0.82rem;font-weight:600">⬇️ Save</button>
+    </div>
+    <canvas id="vCanvas" style="width:100%;border-radius:8px;cursor:crosshair;display:block;touch-action:none"></canvas>
+    <div style="margin-top:14px">
+      <p style="font-size:0.78rem;font-weight:700;color:#7eb8f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🖼️ Pixabay Image Search</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="pbInput" type="text" placeholder="Search e.g. brain, photosynthesis…" style="flex:1;background:#232638;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 12px;color:#e8eaf0;font-size:0.9rem;outline:none">
+        <button id="pbSearch" style="background:linear-gradient(135deg,#7eb8f7,#a78bfa);border-radius:10px;color:#fff;font-weight:700;padding:9px 16px">Search</button>
+      </div>
+      <div id="pbGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:8px;max-height:200px;overflow-y:auto">
+        <p style="color:#8b90a8;font-size:0.85rem;grid-column:1/-1">Search for an image above.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="panel-review">
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <button id="bionicBtn" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:50px;color:#8b90a8;font-size:0.82rem;font-weight:600;padding:7px 14px">⚡ Bionic</button>
+    <button id="rulerBtn" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:50px;color:#8b90a8;font-size:0.82rem;font-weight:600;padding:7px 14px">📏 Ruler</button>
+    <button id="copyBtn" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:50px;color:#8b90a8;font-size:0.82rem;font-weight:600;padding:7px 14px">📋 Copy</button>
+    <button id="downloadBtn" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:50px;color:#8b90a8;font-size:0.82rem;font-weight:600;padding:7px 14px">⬇️ Download</button>
+  </div>
+  <div id="reviewContent" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;font-size:0.93rem;line-height:1.85;color:#8b90a8;white-space:pre-wrap;word-break:break-word;min-height:200px">
+    End your session to see your notes here.
+  </div>
+  <div id="confusionReview" style="margin-top:14px"></div>
+</div>
+
+<div class="panel" id="panel-tools">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+    <a href="https://otter.ai" target="_blank" rel="noopener" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;text-decoration:none;color:#e8eaf0;display:block"><div style="font-size:1.5rem;margin-bottom:6px">🎧</div><div style="font-weight:700;margin-bottom:3px">Otter.ai</div><div style="font-size:0.8rem;color:#8b90a8">Live transcription</div></a>
+    <a href="https://ankiweb.net" target="_blank" rel="noopener" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;text-decoration:none;color:#e8eaf0;display:block"><div style="font-size:1.5rem;margin-bottom:6px">🃏</div><div style="font-weight:700;margin-bottom:3px">Anki</div><div style="font-size:0.8rem;color:#8b90a8">Spaced repetition</div></a>
+    <a href="https://speechify.com" target="_blank" rel="noopener" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;text-decoration:none;color:#e8eaf0;display:block"><div style="font-size:1.5rem;margin-bottom:6px">🔊</div><div style="font-weight:700;margin-bottom:3px">Speechify</div><div style="font-size:0.8rem;color:#8b90a8">Text to speech</div></a>
+    <a href="https://owl.purdue.edu/owl/research_and_citation/apa_style/apa_formatting_and_style_guide/general_format.html" target="_blank" rel="noopener" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;text-decoration:none;color:#e8eaf0;display:block"><div style="font-size:1.5rem;margin-bottom:6px">📚</div><div style="font-weight:700;margin-bottom:3px">Purdue OWL</div><div style="font-size:0.8rem;color:#8b90a8">APA 7 guide</div></a>
+    <a href="https://www.scribbr.com/apa-citation-generator/" target="_blank" rel="noopener" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;text-decoration:none;color:#e8eaf0;display:block"><div style="font-size:1.5rem;margin-bottom:6px">⚡</div><div style="font-weight:700;margin-bottom:3px">Scribbr</div><div style="font-size:0.8rem;color:#8b90a8">Citation generator</div></a>
+    <a href="https://www.mindmeister.com" target="_blank" rel="noopener" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;text-decoration:none;color:#e8eaf0;display:block"><div style="font-size:1.5rem;margin-bottom:6px">🕸️</div><div style="font-weight:700;margin-bottom:3px">MindMeister</div><div style="font-size:0.8rem;color:#8b90a8">Mind mapping</div></a>
+  </div>
+</div>
+
+<div class="confusion-zone">
+  <button class="confusion-btn" id="confusionBtn">🤯 Lost the thread <span id="confusionCount" style="background:rgba(255,255,255,0.2);border-radius:50px;padding:2px 9px;font-size:0.82rem">0</span></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+window.addEventListener('load', function() {
+
+  // STATE
+  var sessionActive = false;
+  var sessionStart = null;
+  var confusions = [];
+  var bionicOn = false;
+  var rulerOn = false;
+  var isDark = true;
+  var isRecording = false;
+  var mediaRec = null;
+  var audioChunks = [];
+  var recCount = 0;
+  var camStream = null;
+  var srcCount = 0;
+  var scanCount = 0;
+  var vTool = 'draw';
+  var vColor = '#7eb8f7';
+  var vBrush = 6;
+  var vDrawing = false;
+  var vLX = 0, vLY = 0;
+  var audioCtx = null;
+  var noiseNode = null;
+
+  // TOAST
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+  }
+
+  // TABS
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(btn) {
+    btn.addEventListener('click', function() {
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b) { b.classList.remove('active'); });
+      Array.prototype.forEach.call(document.querySelectorAll('.panel'), function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var panel = document.getElementById('panel-' + btn.getAttribute('data-panel'));
+      if (panel) panel.classList.add('active');
+      if (btn.getAttribute('data-panel') === 'review') buildReview();
+    });
+  });
+
+  // THEME
+  document.getElementById('themeBtn').addEventListener('click', function() {
+    isDark = !isDark;
+    document.body.style.background = isDark ? '#0f1117' : '#f5f0e8';
+    document.body.style.color = isDark ? '#e8eaf0' : '#1a1a2e';
+    this.textContent = isDark ? '☀️ Day' : '🌙 Night';
+  });
+
+  // SOUND (simple pink noise loop)
+  document.getElementById('soundBtn').addEventListener('click', function() {
+    if (noiseNode) {
+      try { noiseNode.stop(); } catch(e) {}
+      noiseNode = null;
+      this.textContent = '🔉 Sound';
+      this.classList.remove('on');
+      return;
+    }
+
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+
+      var size = 2 * audioCtx.sampleRate;
+      var buf = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
+      var data = buf.getChannelData(0);
+
+      var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+      for (var i=0;i<size;i++) {
+        var w=Math.random()*2-1;
+        b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
+        b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
+        b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5-w*0.0168980;
+        data[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
+        b6=w*0.115926;
+      }
+
+      var src = audioCtx.createBufferSource();
+      src.buffer = buf; src.loop = true;
+
+      var gain = audioCtx.createGain();
+      gain.gain.value = 0.15;
+
+      src.connect(gain);
+      gain.connect(audioCtx.destination);
+      src.start();
+
+      noiseNode = src;
+      this.textContent = '🔇 Stop Sound';
+      this.classList.add('on');
+    } catch(e) {
+      toast('Audio not available');
+    }
+  });
+
+  // SESSION
+  document.getElementById('startBtn').addEventListener('click', function() {
+    if (!sessionActive) {
+      sessionActive = true;
+      sessionStart = new Date();
+      this.textContent = 'End Session';
+      this.style.background = 'linear-gradient(135deg,#6b7280,#4b5563)';
+      document.getElementById('liveDot').classList.add('on');
+      toast('Session started ✓');
+    } else {
+      sessionActive = false;
+      this.textContent = 'Start Session';
+      this.style.background = 'linear-gradient(135deg,#7eb8f7,#a78bfa)';
+      document.getElementById('liveDot').classList.remove('on');
+      buildReview();
+
+      // switch to review tab
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b) { b.classList.remove('active'); });
+      Array.prototype.forEach.call(document.querySelectorAll('.panel'), function(p) { p.classList.remove('active'); });
+      var reviewTab = document.querySelector('[data-panel="review"]');
+      if (reviewTab) reviewTab.classList.add('active');
+      document.getElementById('panel-review').classList.add('active');
+      toast('Session ended ✓');
+    }
+  });
+
+  // CONFUSION
+  document.getElementById('confusionBtn').addEventListener('click', function() {
+    var now = new Date();
+    var t;
+    if (sessionStart) {
+      var s = Math.floor((now - sessionStart) / 1000);
+      t = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+    } else {
+      t = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    }
+    confusions.push({ time: t, note: '' });
+    document.getElementById('confusionCount').textContent = confusions.length;
+    toast('Logged ✓ — find this in Review');
+  });
+
+  // VOICE
+  document.getElementById('voiceBtn').addEventListener('click', function() {
+    if (!isRecording) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('voiceStatus').textContent = 'Microphone not supported in this browser';
+        return;
+      }
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+        mediaRec = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRec.ondataavailable = function(e) { audioChunks.push(e.data); };
+        mediaRec.onstop = function() {
+          var blob = new Blob(audioChunks, { type: 'audio/webm' });
+          var url = URL.createObjectURL(blob);
+          recCount++;
+
+          var c = document.getElementById('voiceRecordings');
+          var d = document.createElement('div');
+          d.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:0.85rem';
+          d.innerHTML = '🎙️ #' + recCount + ' ';
+
+          var a = document.createElement('audio');
+          a.controls = true;
+          a.src = url;
+          a.style.flex = '1';
+          a.style.height = '34px';
+
+          d.appendChild(a);
+          c.appendChild(d);
+
+          stream.getTracks().forEach(function(t) { t.stop(); });
+        };
+
+        mediaRec.start();
+        isRecording = true;
+        document.getElementById('voiceBtn').textContent = '⏹️';
+        document.getElementById('voiceBtn').style.borderColor = '#ef4444';
+        document.getElementById('voiceStatus').textContent = 'Recording… tap to stop';
+      }).catch(function() {
+        document.getElementById('voiceStatus').textContent = 'Microphone needed — check browser settings';
+      });
+    } else {
+      if (mediaRec) mediaRec.stop();
+      isRecording = false;
+      document.getElementById('voiceBtn').textContent = '🎙️';
+      document.getElementById('voiceBtn').style.borderColor = '#7eb8f7';
+      document.getElementById('voiceStatus').textContent = 'Saved ✓ Tap to record another';
+    }
+  });
+
+  // SCAN
+  document.getElementById('startCameraBtn').addEventListener('click', function() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast('Camera not supported');
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function(s) {
+      camStream = s;
+      var v = document.getElementById('cameraPreview');
+      v.srcObject = s;
+      v.style.display = 'block';
+      document.getElementById('captureBtn').style.display = 'inline-block';
+      document.getElementById('stopCameraBtn').style.display = 'inline-block';
+      document.getElementById('startCameraBtn').style.display = 'none';
+    }).catch(function() { toast('Camera access needed'); });
+  });
+
+  document.getElementById('stopCameraBtn').addEventListener('click', function() {
+    if (camStream) camStream.getTracks().forEach(function(t) { t.stop(); });
+    camStream = null;
+    document.getElementById('cameraPreview').style.display = 'none';
+    document.getElementById('captureBtn').style.display = 'none';
+    document.getElementById('stopCameraBtn').style.display = 'none';
+    document.getElementById('startCameraBtn').style.display = 'inline-block';
+  });
+
+  document.getElementById('captureBtn').addEventListener('click', function() {
+    var v = document.getElementById('cameraPreview');
+    var c = document.getElementById('scanCanvas');
+    var w = v.videoWidth || 0;
+    var h = v.videoHeight || 0;
+    if (!w || !h) { toast('Camera not ready'); return; }
+    c.width = w; c.height = h;
+    c.getContext('2d').drawImage(v, 0, 0);
+    addScanCard(c.toDataURL('image/png'));
+    toast('Captured ✓');
+  });
+
+  document.getElementById('imageUpload').addEventListener('change', function(e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function(ev) { addScanCard(ev.target.result); };
+    r.readAsDataURL(f);
+  });
+
+  function addScanCard(src) {
+    scanCount++;
+    var c = document.getElementById('scanCards');
+    if (scanCount === 1) c.innerHTML = '';
+
+    var d = document.createElement('div');
+    d.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:0;background:#232638;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)';
+
+    d.innerHTML =
+      '<div style="padding:10px;border-right:1px solid rgba(255,255,255,0.08)">' +
+        '<p style="font-size:0.7rem;color:#a78bfa;font-weight:700;text-transform:uppercase;margin-bottom:6px">📸 Capture ' + scanCount + '</p>' +
+        '<img src="' + src + '" style="width:100%;border-radius:6px;max-height:120px;object-fit:contain">' +
+      '</div>' +
+      '<div style="padding:10px">' +
+        '<p style="font-size:0.7rem;color:#a78bfa;font-weight:700;text-transform:uppercase;margin-bottom:6px">✏️ Your Notes</p>' +
+        '<textarea placeholder="Your thoughts…" style="min-height:100px;font-size:0.85rem"></textarea>' +
+      '</div>';
+
+    c.appendChild(d);
+  }
+
+  // RESEARCH
+  document.getElementById('addSourceBtn').addEventListener('click', function() { addSource(); });
+
+  function addSource() {
+    srcCount++;
+    var id = 'src' + srcCount;
+    var c = document.getElementById('sourceCards');
+    var d = document.createElement('div');
+    d.id = id;
+    d.style.cssText = 'background:#1a1d27;border:1px solid rgba(255,255,255,0.08);border-radius:16px;margin-bottom:12px;overflow:hidden';
+
+    d.innerHTML =
+      '<div style="padding:10px 14px;background:#232638;display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+        '<select style="background:#1a1d27;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e8eaf0;padding:4px 8px;font-size:0.8rem;outline:none">' +
+          '<option>Journal Article</option><option>Book</option><option>Website</option><option>Book Chapter</option><option>Video</option><option>Lecture</option>' +
+        '</select>' +
+        '<input type="text" placeholder="Title or URL…" style="flex:1;background:transparent;border:none;color:#e8eaf0;font-size:0.9rem;outline:none;min-width:120px">' +
+        '<button type="button" style="background:transparent;border:none;color:#8b90a8;font-size:0.9rem;padding:4px 8px;touch-action:manipulation">✕</button>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr">' +
+        '<div style="padding:12px;border-right:1px solid rgba(255,255,255,0.08)">' +
+          '<p style="font-size:0.7rem;color:#a78bfa;font-weight:700;text-transform:uppercase;margin-bottom:6px">💬 Quote</p>' +
+          '<textarea id="' + id + '-q" placeholder="Exact quote…" style="min-height:70px;font-size:0.85rem"></textarea>' +
+          '<p style="font-size:0.7rem;color:#a78bfa;font-weight:700;text-transform:uppercase;margin:8px 0 6px">🔄 Your Words</p>' +
+          '<textarea id="' + id + '-p" placeholder="Paraphrase…" style="min-height:70px;font-size:0.85rem"></textarea>' +
+        '</div>' +
+        '<div style="padding:12px">' +
+          '<p style="font-size:0.7rem;color:#a78bfa;font-weight:700;text-transform:uppercase;margin-bottom:6px">💡 Why It Matters</p>' +
+          '<textarea id="' + id + '-w" placeholder="Relevance to your question…" style="min-height:150px;font-size:0.85rem"></textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div style="padding:10px 14px;background:#232638;border-top:1px solid rgba(255,255,255,0.08)">' +
+        '<p style="font-size:0.7rem;color:#7eb8f7;font-weight:700;text-transform:uppercase;margin-bottom:8px">📎 APA 7</p>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:8px">' +
+          '<input id="' + id + '-au" type="text" placeholder="Author(s)" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#e8eaf0;font-size:0.82rem;outline:none">' +
+          '<input id="' + id + '-yr" type="text" placeholder="Year" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#e8eaf0;font-size:0.82rem;outline:none">' +
+          '<input id="' + id + '-ti" type="text" placeholder="Title" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#e8eaf0;font-size:0.82rem;outline:none">' +
+          '<input id="' + id + '-jo" type="text" placeholder="Journal/Publisher" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#e8eaf0;font-size:0.82rem;outline:none">' +
+          '<input id="' + id + '-do" type="text" placeholder="DOI or URL" style="background:#1a1d27;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#e8eaf0;font-size:0.82rem;outline:none">' +
+        '</div>' +
+        '<div id="' + id + '-ref" style="font-size:0.82rem;color:#8b90a8;font-style:italic">Fill in Author, Year, Title →</div>' +
+        '<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">' +
+          '<a href="https://owl.purdue.edu/owl/research_and_citation/apa_style/apa_formatting_and_style_guide/general_format.html" target="_blank" rel="noopener" style="font-size:0.78rem;color:#7eb8f7;border:1px solid rgba(126,184,247,0.2);border-radius:50px;padding:3px 10px;text-decoration:none">📚 Purdue OWL</a>' +
+          '<a href="https://www.scribbr.com/apa-citation-generator/" target="_blank" rel="noopener" style="font-size:0.78rem;color:#7eb8f7;border:1px solid rgba(126,184,247,0.2);border-radius:50px;padding:3px 10px;text-decoration:none">⚡ Scribbr</a>' +
+        '</div>' +
+      '</div>';
+
+    c.appendChild(d);
+
+    // wire the close button (last button inside the top row)
+    var closeBtn = d.querySelector('div:first-child button');
+    if (closeBtn) closeBtn.addEventListener('click', function() { d.remove(); });
+
+    // APA live preview
+    ['au','yr','ti','jo','do'].forEach(function(f) {
+      var inp = document.getElementById(id + '-' + f);
+      if (inp) inp.addEventListener('input', function() { updateAPA(id); });
+    });
+
+    updateAPA(id);
+  }
+
+  function gv(id) {
+    var e = document.getElementById(id);
+    return e ? (e.value || '').trim() : '';
+  }
+
+  function updateAPA(id) {
+    var au = gv(id+'-au'), yr = gv(id+'-yr'), ti = gv(id+'-ti'), jo = gv(id+'-jo'), doi = gv(id+'-do');
+    var ref = document.getElementById(id + '-ref');
+    if (!ref) return;
+
+    if (au && yr && ti) {
+      ref.innerHTML = au + ' (' + yr + '). ' + ti + '. <em>' + (jo || 'Source') + '</em>. ' + (doi || '');
+    } else {
+      ref.innerHTML = 'Fill in Author, Year, Title →';
+    }
+  }
+
+  addSource(); // start with one source card
+
+  // VISUAL CANVAS
+  var vc = document.getElementById('vCanvas');
+  var vx = vc ? vc.getContext('2d') : null;
+
+  function initCanvas() {
+    if (!vc || !vx) return;
+    var wrap = vc.parentNode;
+    vc.width = wrap.offsetWidth || 300;
+    vc.height = Math.max(380, vc.width * 0.55);
+    vx.fillStyle = '#0f1117';
+    vx.fillRect(0, 0, vc.width, vc.height);
+  }
+  initCanvas();
+  window.addEventListener('resize', initCanvas);
+
+  function vPos(e) {
+    var r = vc.getBoundingClientRect();
+    var sx = vc.width / r.width;
+    var sy = vc.height / r.height;
+
+    if (e.touches && e.touches.length) {
+      return { x: (e.touches[0].clientX - r.left) * sx, y: (e.touches[0].clientY - r.top) * sy };
+    }
+    return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+  }
+
+  function vDot(x, y) {
+    vx.beginPath();
+    vx.arc(x, y, (vTool === 'erase' ? vBrush * 3 : vBrush) / 2, 0, Math.PI * 2);
+    vx.fillStyle = vTool === 'erase' ? '#0f1117' : vColor;
+    vx.fill();
+  }
+
+  function vLine(x, y) {
+    vx.beginPath();
+    vx.moveTo(vLX, vLY);
+    vx.lineTo(x, y);
+    vx.strokeStyle = vTool === 'erase' ? '#0f1117' : vColor;
+    vx.lineWidth = vTool === 'erase' ? vBrush * 3 : vBrush;
+    vx.lineCap = 'round';
+    vx.lineJoin = 'round';
+    vx.stroke();
+    vLX = x; vLY = y;
+  }
+
+  if (vc) {
+    vc.addEventListener('mousedown', function(e) { vDrawing = true; var p = vPos(e); vLX = p.x; vLY = p.y; vDot(p.x,p.y); });
+    vc.addEventListener('mousemove', function(e) { if (!vDrawing) return; var p = vPos(e); vLine(p.x,p.y); });
+    vc.addEventListener('mouseup', function() { vDrawing = false; });
+    vc.addEventListener('mouseleave', function() { vDrawing = false; });
+
+    vc.addEventListener('touchstart', function(e) { e.preventDefault(); vDrawing = true; var p = vPos(e); vLX = p.x; vLY = p.y; vDot(p.x,p.y); }, {passive:false});
+    vc.addEventListener('touchmove', function(e) { e.preventDefault(); if (!vDrawing) return; var p = vPos(e); vLine(p.x,p.y); }, {passive:false});
+    vc.addEventListener('touchend', function(e) { e.preventDefault(); vDrawing = false; }, {passive:false});
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.vtool'), function(btn) {
+    btn.addEventListener('click', function() {
+      vTool = this.getAttribute('data-tool');
+      Array.prototype.forEach.call(document.querySelectorAll('.vtool'), function(b) {
+        b.style.borderColor = 'rgba(255,255,255,0.1)';
+        b.style.color = '#8b90a8';
+      });
+      this.style.borderColor = '#7eb8f7';
+      this.style.color = '#7eb8f7';
+    });
+  });
+
+  document.getElementById('vBrushSize').addEventListener('change', function() { vBrush = parseInt(this.value, 10); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.vcolor'), function(dot) {
+    dot.addEventListener('click', function() {
+      Array.prototype.forEach.call(document.querySelectorAll('.vcolor'), function(d) { d.style.border = '2px solid transparent'; });
+      this.style.border = '2px solid #fff';
+      vColor = this.getAttribute('data-color');
+    });
+  });
+
+  document.getElementById('vClear').addEventListener('click', function() {
+    if (vc && vx) { vx.fillStyle = '#0f1117'; vx.fillRect(0, 0, vc.width, vc.height); }
+  });
+
+  document.getElementById('vSave').addEventListener('click', function() {
+    if (!vc) return;
+    var a = document.createElement('a');
+    a.download = 'flux-visual.png';
+    a.href = vc.toDataURL('image/png');
+    a.click();
+  });
+
+  // PIXABAY
+  document.getElementById('pbSearch').addEventListener('click', function() { pbSearch(); });
+  document.getElementById('pbInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') pbSearch(); });
+
+  function pbSearch() {
+    var q = document.getElementById('pbInput').value.trim();
+    if (!q) return;
+
+    var grid = document.getElementById('pbGrid');
+    grid.innerHTML = '<p style="color:#8b90a8;font-size:0.85rem;grid-column:1/-1">Searching…</p>';
+
+    fetch('https://pixabay.com/api/?key=46494683-e5e2e2d4a3c28e05f8a8a7d8a&q=' + encodeURIComponent(q) + '&image_type=photo&per_page=18&safesearch=true')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.hits || !data.hits.length) {
+          grid.innerHTML = '<p style="color:#8b90a8;font-size:0.85rem;grid-column:1/-1">No results.</p>';
+          return;
+        }
+        grid.innerHTML = '';
+        data.hits.forEach(function(hit) {
+          var img = document.createElement('img');
+          img.src = hit.previewURL;
+          img.alt = hit.tags || 'Pixabay image';
+          img.style.cssText = 'width:100%;height:65px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent;touch-action:manipulation';
+          img.addEventListener('click', function() {
+            if (!vc || !vx) return;
+            var full = new Image();
+            full.crossOrigin = 'anonymous';
+            full.onload = function() {
+              var s = Math.min((vc.width * 0.45) / full.width, 1);
+              vx.drawImage(full,
+                Math.floor(vc.width/2 - full.width*s/2),
+                Math.floor(vc.height/2 - full.height*s/2),
+                full.width*s,
+                full.height*s
+              );
+              toast('Image added ✓');
+            };
+            full.onerror = function() { toast('Could not load image'); };
+            full.src = hit.webformatURL;
+          });
+          grid.appendChild(img);
+        });
+      })
+      .catch(function() {
+        grid.innerHTML = '<p style="color:#8b90a8;font-size:0.85rem;grid-column:1/-1">Search failed.</p>';
+      });
+  }
+
+  // REVIEW helpers
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function bionic(text) {
+    if (!bionicOn) return esc(text);
+    return text.split(/\b/).map(function(w) {
+      if (/[a-zA-Z]/.test(w) && w.length > 1) {
+        var c = Math.ceil(w.length * 0.45);
+        return '<b>' + esc(w.slice(0,c)) + '</b>' + esc(w.slice(c));
+      }
+      return esc(w);
+    }).join('');
+  }
+
+  function buildReview() {
+    var out = '';
+    var fn = document.getElementById('freeNotes').value || '';
+    if (fn.trim()) out += '── FREE NOTES ──\n' + fn + '\n\n';
+
+    var cc = document.getElementById('cornellCue').value || '';
+    var cm = document.getElementById('cornellMain').value || '';
+    var cs = document.getElementById('cornellSummary').value || '';
+    if (cc.trim() || cm.trim() || cs.trim()) {
+      out += '── CORNELL ──\nCues: ' + cc + '\n\nNotes: ' + cm + '\n\nSummary: ' + cs + '\n\n';
+    }
+
+    if (!out) out = 'No notes yet this session.';
+
+    var rc = document.getElementById('reviewContent');
+    rc.innerHTML = bionic(out);
+
+    var cr = document.getElementById('confusionReview');
+    if (confusions.length) {
+      cr.innerHTML =
+        '<p style="font-size:0.78rem;font-weight:700;color:#fb923c;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🟠 Confusion Moments</p>' +
+        confusions.map(function(c) {
+          return '<div style="background:#1a1d27;border-left:3px solid #fb923c;border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:0.88rem;color:#8b90a8">⏱ ' +
+            esc(c.time) + (c.note ? ' — ' + esc(c.note) : '') + '</div>';
+        }).join('');
+    } else {
+      cr.innerHTML = '';
+    }
+  }
+
+  // BIONIC toggle
+  document.getElementById('bionicBtn').addEventListener('click', function() {
+    bionicOn = !bionicOn;
+    this.style.borderColor = bionicOn ? '#7eb8f7' : 'rgba(255,255,255,0.08)';
+    this.style.color = bionicOn ? '#7eb8f7' : '#8b90a8';
+    buildReview();
+  });
+
+  // RULER toggle
+  document.getElementById('rulerBtn').addEventListener('click', function() {
+    rulerOn = !rulerOn;
+    this.style.borderColor = rulerOn ? '#7eb8f7' : 'rgba(255,255,255,0.08)';
+    this.style.color = rulerOn ? '#7eb8f7' : '#8b90a8';
+    var rc = document.getElementById('reviewContent');
+    rc.style.backgroundImage = rulerOn
+      ? 'repeating-linear-gradient(to bottom,transparent,transparent calc(1.85em - 1px),rgba(126,184,247,0.12) calc(1.85em - 1px),rgba(126,184,247,0.12) 1.85em)'
+      : 'none';
+  });
+
+  // COPY / DOWNLOAD
+  document.getElementById('copyBtn').addEventListener('click', function() {
+    var text = document.getElementById('reviewContent').innerText;
+    if (!navigator.clipboard) {
+      toast('Clipboard not available');
+      return;
+    }
+    navigator.clipboard.writeText(text).then(function() { toast('Copied ✓'); });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function() {
+    var name = document.getElementById('sessionName').value || 'flux-notes';
+    var text = document.getElementById('reviewContent').innerText;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], {type:'text/plain'}));
+    a.download = name.replace(/\s+/g,'-') + '.txt';
+    a.click();
+  });
+
+}); // end load
+</script>
+
 </body>
 </html>

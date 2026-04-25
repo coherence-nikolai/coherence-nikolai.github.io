@@ -1,35 +1,1418 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Resonance - Coherence Nikolai</title>
-  <meta name="description" content="Resonance is an earlier Coherence Nikolai sound and presence experiment.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/resonance/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080610">
+<title>Resonance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* Force text visible immediately with system font fallback while web font loads */
+.home-enter-question, .field-wordmark, .phase-carrying, .polarity-heavy, .polarity-light,
+.enter-question, .integrate-witnessed, .ai-thread, .integrate-ai-response {
+  font-display: swap;
+}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+/* ── ROOT ── */
+:root {
+  /* Warm dawn palette — deep indigo-black, rose-gold, violet-cream */
+  --bg:       #080610;
+  --bg-warm:  #0e0a18;
+  --rose:     #c8826e;
+  --rose-bright: #e0a090;
+  --rose-dim: rgba(200,130,110,.72);
+  --violet:   #9880b8;
+  --violet-bright: #c8aae0;
+  --violet-dim: rgba(152,128,184,.65);
+  --cream:    #ede0d4;
+  --cream-dim: rgba(237,224,212,.88);
+  --cream-ghost: rgba(237,224,212,.55);
+  --gold:     #c9a96e;
+  --gold-bright: #e8c88a;
+  --thread:   #8abfb8; /* AI witnessing frequency — aqua-sage */
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
+
+  --fs:  clamp(22px,5.5vw,28px);
+  --fl:  clamp(20px,5vw,26px);
+  --fh:  clamp(28px,7vw,36px);
+  --fxl: clamp(36px,9vw,52px);
+  --fwm: clamp(52px,14vw,80px);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
+  background: var(--bg);
+  font-family: var(--sans);
+  font-weight: 300;
+  color: var(--cream);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+}
+a { color: inherit; text-decoration: none; }
+b, strong { font-weight: 400; }
+
+/* ── CANVAS ── */
+#cv {
+  position: fixed; inset: 0;
+  z-index: 1; pointer-events: none;
+}
+
+/* ── AURORA — warm violet/rose gradients ── */
+.aurora {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none; overflow: hidden;
+}
+.al {
+  position: absolute; border-radius: 50%;
+  filter: blur(100px); opacity: 0;
+  transition: opacity 5s ease;
+}
+.al.on { opacity: 1; }
+.a1 {
+  width: 80vw; height: 80vw;
+  background: radial-gradient(circle, rgba(152,128,184,.12) 0%, transparent 70%);
+  top: -20%; left: -20%;
+  animation: da1 28s ease-in-out infinite;
+}
+.a2 {
+  width: 60vw; height: 60vw;
+  background: radial-gradient(circle, rgba(200,130,110,.10) 0%, transparent 70%);
+  bottom: -10%; right: -10%;
+  animation: da2 34s ease-in-out infinite;
+}
+.a3 {
+  width: 40vw; height: 40vw;
+  background: radial-gradient(circle, rgba(138,191,184,.08) 0%, transparent 70%);
+  top: 30%; right: -5%;
+  animation: da3 22s ease-in-out infinite;
+}
+@keyframes da1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(6vw,4vw)} }
+@keyframes da2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-4vw,-6vw)} }
+@keyframes da3 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(-3vw,5vw)} 66%{transform:translate(4vw,-3vw)} }
+
+/* ── SCREENS ── */
+/* Wave zones: top 76px (chrome + rose wave strip), bottom 100px (nav + violet wave strip) */
+:root {
+  --wave-top: 76px;    /* rose wave zone bottom edge */
+  --wave-bot: 100px;   /* violet wave zone top edge from bottom */
+}
+.screen {
+  position: fixed; inset: 0;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--wave-top) + 16px) clamp(20px,5vw,40px) calc(var(--wave-bot) + 16px);
+  pointer-events: none;
+}
+.screen.active {
+  display: flex;
+  pointer-events: all;
+}
+@media(min-width:600px) {
+  .screen.active {
+    left: 50%; transform: translateX(-50%);
+    width: min(480px,100vw); right: auto;
+  }
+  #chrome, #settings-panel {
+    left: 50%; transform: translateX(-50%);
+    width: min(480px,100vw);
+  }
+}
+
+/* ── CHROME ── */
+#chrome {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; z-index: 300;
+}
+.chrome-btn {
+  font-family: var(--sans);
+  font-size: var(--fl);
+  letter-spacing: .08em;
+  color: var(--rose-dim);
+  background: none; border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  min-height: 44px; min-width: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .4s ease;
+  font-weight: 300;
+}
+.chrome-btn:hover { color: var(--rose); }
+#backBtn { text-align: left; }
+#settingsBtn { font-size: clamp(15px,3.8vw,18px); text-align: right; }
+
+/* ── SETTINGS ── */
+#settings-panel {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 500;
+  background: rgba(8,6,16,.97);
+  border-top: 1px solid rgba(152,128,184,.14);
+  border-radius: 20px 20px 0 0;
+  padding: 28px 28px 52px;
+  transform: translateY(100%);
+  transition: transform .45s cubic-bezier(.32,.72,0,1);
+  max-height: 88vh; overflow-y: auto;
+}
+#settings-panel.open { transform: translateY(0); }
+.settings-wordmark {
+  font-family: var(--serif);
+  font-size: clamp(14px,3.5vw,17px);
+  letter-spacing: .18em;
+  color: var(--rose-dim);
+  text-align: center;
+  margin-bottom: 28px;
+  font-style: italic;
+}
+.settings-section { margin-bottom: 28px; }
+.settings-label {
+  font-size: clamp(10px,2.5vw,12px);
+  letter-spacing: .18em;
+  color: var(--rose-dim);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.settings-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.api-input {
+  flex: 1; background: none;
+  border: 1px solid rgba(152,128,184,.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: var(--sans);
+  font-size: var(--fl);
+  color: var(--cream-dim);
+  min-height: 44px; min-width: 0;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color .3s ease;
+}
+.api-input:focus { border-color: rgba(152,128,184,.6); }
+.api-input::placeholder { color: rgba(237,224,212,.35); }
+.settings-btn {
+  background: none;
+  border: 1px solid rgba(152,128,184,.18);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: var(--sans);
+  font-size: var(--fl);
+  color: var(--rose-dim);
+  cursor: pointer;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .3s ease;
+  white-space: nowrap;
+}
+.settings-btn:hover { border-color: rgba(200,130,110,.5); color: var(--rose); }
+.api-status {
+  font-size: clamp(10px,2.4vw,12px);
+  letter-spacing: .10em;
+  color: var(--rose-dim);
+  width: 100%; margin-top: 6px;
+}
+.api-note {
+  font-size: clamp(10px,2.4vw,11px);
+  color: var(--cream-ghost);
+  margin-top: 4px; line-height: 1.5;
+}
+.toggle-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.toggle-pill {
+  background: none;
+  border: 1px solid rgba(152,128,184,.18);
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-family: var(--sans);
+  font-size: var(--fl);
+  letter-spacing: .08em;
+  color: rgba(152,128,184,.55);
+  cursor: pointer; min-height: 42px;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .3s ease;
+}
+.toggle-pill.active {
+  border-color: rgba(152,128,184,.7);
+  color: var(--violet-bright);
+  box-shadow: 0 0 14px rgba(152,128,184,.12);
+}
+.kofi-line {
+  font-size: clamp(11px,2.6vw,13px);
+  color: var(--rose-dim);
+  text-align: center; margin-top: 4px; line-height: 1.7;
+}
+.kofi-line a { color: var(--rose); }
+#settings-backdrop {
+  position: fixed; inset: 0;
+  z-index: 490;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background .35s ease;
+}
+#settings-backdrop.open {
+  background: rgba(0,0,0,.5);
+  pointer-events: all;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fieldBreathe {
+  0%,100% { text-shadow: 0 0 24px rgba(200,130,110,.18), 0 0 48px rgba(152,128,184,.08); }
+  50%      { text-shadow: 0 0 40px rgba(200,130,110,.45), 0 0 80px rgba(152,128,184,.22), 0 0 130px rgba(200,130,110,.10); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%,100% { opacity: .35; }
+  50%     { opacity: .85; }
+}
+@keyframes waveFloat {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%     { transform: translateX(-50%) translateY(-6px); }
+}
+
+/* ── INTRO ANIMATION ── */
+#s-intro {
+  padding: 0;
+  background: var(--bg);
+}
+.intro-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.intro-skip {
+  position: absolute;
+  bottom: clamp(28px,7vw,40px);
+  left: 50%; transform: translateX(-50%);
+  font-family: var(--sans);
+  font-size: clamp(11px,2.8vw,13px);
+  letter-spacing: .22em;
+  color: rgba(237,224,212,.22);
+  text-transform: lowercase;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 20;
+}
+.intro-skip.visible { opacity: 1; pointer-events: all; cursor: pointer; }
+
+.intro-lang {
+  position: absolute;
+  top: clamp(14px,3vw,20px);
+  left: 50%; transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid rgba(152,128,184,.22);
+  border-radius: 999px;
+  background: rgba(8,6,16,.7);
+  z-index: 20;
+}
+
+/* Revisit glyph on home screen */
+.intro-glyph {
+  font-family: var(--sans);
+  font-size: clamp(11px,2.8vw,13px);
+  letter-spacing: .14em;
+  color: rgba(200,130,110,.38);
+  background: none; border: none;
+  cursor: pointer;
+  padding: 10px 16px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .4s ease;
+  text-transform: lowercase;
+  margin-top: -8px;
+}
+.intro-glyph:hover { color: rgba(200,130,110,.65); }
+
+/* ── HOME SCREEN ── */
+#s-home {
+  justify-content: center;
+  gap: 0;
+}
+
+.field-wordmark {
+  font-family: var(--serif);
+  font-size: clamp(36px,10vw,58px);
+  font-weight: 300;
+  letter-spacing: .18em;
+  color: var(--rose);
+  line-height: 1;
+  margin-bottom: clamp(48px,12vw,72px);
+  animation: fieldBreathe 7s ease-in-out infinite;
+  font-style: italic;
+}
+
+/* Single entry — the question is the button */
+.home-enter-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 20px 28px;
+  -webkit-tap-highlight-color: transparent;
+  margin-bottom: clamp(48px,12vw,72px);
+  max-width: 320px;
+}
+.home-enter-btn:active { opacity: .7; }
+
+.home-begin-btn {
+  font-family: var(--sans);
+  font-size: clamp(13px,3.2vw,16px);
+  letter-spacing: .16em;
+  color: rgba(237,200,175,.88);
+  background: rgba(18,10,24,.92);
+  border: 1px solid rgba(200,130,110,.45);
+  border-radius: 999px;
+  padding: 14px 40px;
+  cursor: pointer;
+  margin-top: clamp(20px,5vw,28px);
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .3s ease, color .3s ease, box-shadow .3s ease;
+  animation: pulse 2.8s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(200,130,110,.12);
+}
+.home-begin-btn:hover {
+  border-color: rgba(200,130,110,.75);
+  box-shadow: 0 0 28px rgba(200,130,110,.22);
+}
+
+.home-enter-question {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-size: clamp(24px,6.5vw,36px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--cream-dim);
+  letter-spacing: .04em;
+  line-height: 1.5;
+  text-align: center;
+  animation: fieldBreathe 9s ease-in-out infinite;
+  min-height: 1em; /* ensures space even if empty */
+}
+
+.home-enter-sub {
+  font-family: var(--sans);
+  font-size: clamp(11px,2.8vw,13px);
+  letter-spacing: .22em;
+  color: rgba(152,128,184,.45);
+  text-transform: uppercase;
+}
+
+/* Home bottom row */
+.home-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.home-pattern {
+  font-family: var(--serif);
+  font-size: clamp(15px,3.8vw,19px);
+  font-style: italic;
+  color: var(--thread);
+  text-align: center;
+  letter-spacing: .03em;
+  line-height: 1.6;
+  max-width: 88vw;
+  min-height: 1em;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.home-pattern.visible { opacity: 1; }
+
+.home-count {
+  font-size: var(--fl);
+  color: rgba(200,130,110,.55);
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.home-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid rgba(152,128,184,.14);
+  border-radius: 999px;
+  background: rgba(237,224,212,.02);
+}
+.lang-seg {
+  background: none; border: none;
+  color: rgba(237,224,212,.35);
+  font-family: var(--sans);
+  font-size: clamp(10px,2.5vw,12px);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .28s ease, color .28s ease;
+  min-width: 52px;
+}
+.lang-seg.active {
+  color: var(--violet-bright);
+  background: rgba(152,128,184,.14);
+}
+
+/* ── ENTER SCREEN — the river begins ── */
+#s-enter {
+  justify-content: flex-start;
+  gap: 0;
+  text-align: center;
+  padding-top: calc(var(--wave-top) + 24px);
+  padding-bottom: calc(var(--wave-bot) + 120px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.enter-title {
+  font-family: var(--serif);
+  font-size: clamp(13px,3.2vw,16px);
+  letter-spacing: .24em;
+  color: var(--rose-dim);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.enter-question {
+  font-family: var(--serif);
+  font-size: clamp(28px,7vw,40px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--cream-dim);
+  line-height: 1.5;
+  max-width: 300px;
+  margin-bottom: 28px;
+}
+
+.enter-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.enter-input {
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(152,128,184,.25);
+  outline: none;
+  font-family: var(--serif);
+  font-size: clamp(18px,4.8vw,24px);
+  font-style: italic;
+  letter-spacing: .04em;
+  color: var(--cream-dim);
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+  caret-color: var(--rose);
+  transition: border-color .4s ease;
+}
+.enter-input:focus { border-bottom-color: rgba(200,130,110,.55); }
+.enter-input::placeholder { color: rgba(237,224,212,.22); }
+
+.enter-or {
+  font-size: var(--fl);
+  color: rgba(237,224,212,.28);
+  letter-spacing: .18em;
+}
+
+/* Contraction grid — scrollable field of states */
+.contraction-scroll {
+  width: 100%;
+  max-width: 340px;
+}
+
+/* Contraction grid — what people carry in */
+.contraction-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 8px;
+}
+.contraction-pill {
+  font-family: var(--serif);
+  font-size: clamp(22px,5.5vw,28px);
+  font-style: italic;
+  color: rgba(237,200,180,.92);
+  background: rgba(200,130,110,.13);
+  border: 1px solid rgba(200,130,110,.35);
+  border-radius: 999px;
+  padding: 12px 24px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .25s ease;
+  animation: shadowAgitate var(--drift-dur, 3s) ease-in-out infinite;
+}
+.contraction-pill:hover, .contraction-pill:active {
+  background: rgba(200,130,110,.22);
+  border-color: rgba(200,130,110,.7);
+  color: rgba(255,230,210,1);
+}
+@keyframes shadowAgitate {
+  0%,100% { transform: translate(0,0); }
+  20%  { transform: translate(-0.5px, 0.5px); }
+  50%  { transform: translate(0.5px,-0.5px); }
+  80%  { transform: translate(-0.3px, 0.3px); }
+}
+
+.something-else-btn {
+  font-family: var(--serif);
+  font-size: clamp(16px,4vw,20px);
+  font-style: italic;
+  color: rgba(237,224,212,.32);
+  background: none; border: none;
+  cursor: pointer;
+  padding: 16px 24px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .3s ease;
+  letter-spacing: .04em;
+  margin-top: 8px;
+}
+.something-else-btn:hover { color: rgba(237,224,212,.55); }
+
+.enter-whisper {
+  position: fixed;
+  bottom: 90px;
+  left: 50%; transform: translateX(-50%);
+  font-family: var(--serif);
+  font-size: clamp(16px,4vw,20px);
+  font-style: italic;
+  color: var(--thread);
+  text-align: center;
+  width: 88vw;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+  pointer-events: none;
+  z-index: 45;
+  line-height: 1.6;
+}
+.enter-whisper.visible { opacity: 1; }
+
+/* Freq screen */
+#s-freq {
+  justify-content: center;
+  gap: clamp(18px,4.5vw,28px);
+  padding-left: 16px;
+  padding-right: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.enter-continue {
+  position: fixed;
+  bottom: 32px;
+  left: 50%; transform: translateX(-50%);
+  font-family: var(--sans);
+  font-size: var(--fl);
+  letter-spacing: .14em;
+  color: rgba(237,200,175,.95);
+  background: rgba(18,10,24,.96);
+  border: 1px solid rgba(200,130,110,.55);
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 16px 44px; min-height: 56px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .4s ease, border-color .4s ease, opacity .4s ease, box-shadow .4s ease;
+  opacity: 0; pointer-events: none;
+  animation: pulse 2.8s ease-in-out infinite;
+  z-index: 50;
+  white-space: nowrap;
+  box-shadow: 0 0 24px rgba(200,130,110,.18);
+}
+.enter-continue.ready { opacity: 1; pointer-events: all; }
+.enter-continue.ready:hover {
+  border-color: rgba(200,130,110,.85);
+  box-shadow: 0 0 32px rgba(200,130,110,.30);
+}
+
+/* ── PHASE SCREENS — Notice, Hold, Anchor, Integrate ── */
+.phase-screen {
+  justify-content: center;
+  gap: clamp(16px,4vw,24px);
+  text-align: center;
+}
+
+.phase-indicator {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.phase-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(152,128,184,.18);
+  transition: background .6s ease, transform .4s ease;
+}
+.phase-dot.active {
+  background: var(--rose);
+  transform: scale(1.3);
+}
+.phase-dot.done {
+  background: rgba(200,130,110,.45);
+}
+
+.phase-name {
+  font-family: var(--sans);
+  font-size: clamp(13px,3.2vw,16px);
+  letter-spacing: .22em;
+  color: var(--rose-dim);
+  text-transform: uppercase;
+}
+
+.phase-carrying {
+  font-family: var(--serif);
+  font-size: clamp(36px,10vw,56px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--rose-bright);
+  letter-spacing: .04em;
+  line-height: 1.2;
+  max-width: 90vw;
+  word-break: break-word;
+  animation: fieldBreathe 5s ease-in-out infinite;
+}
+
+.phase-prompt {
+  font-family: var(--serif);
+  font-size: clamp(22px,5.5vw,28px);
+  font-style: italic;
+  color: var(--cream-dim);
+  line-height: 1.7;
+  max-width: 88vw;
+  padding: 0 16px;
+}
+
+/* Body location selector */
+.body-prompt {
+  font-size: var(--fl);
+  color: var(--cream-ghost);
+  letter-spacing: .10em;
+  margin-bottom: 4px;
+}
+.body-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 90vw;
+}
+.body-zone {
+  font-family: var(--sans);
+  font-size: clamp(16px,4vw,20px);
+  letter-spacing: .08em;
+  color: rgba(152,128,184,.72);
+  background: none;
+  border: 1px solid rgba(152,128,184,.22);
+  border-radius: 999px;
+  padding: 12px 22px; min-height: 48px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .25s ease;
+}
+.body-zone.active {
+  border-color: rgba(152,128,184,.65);
+  color: var(--violet-bright);
+  background: rgba(152,128,184,.08);
+}
+
+/* AI thread — witnessing presence */
+.ai-thread {
+  font-family: var(--serif);
+  font-size: clamp(20px,5vw,26px);
+  font-style: italic;
+  color: var(--thread);
+  letter-spacing: .03em;
+  line-height: 1.7;
+  max-width: 88vw;
+  padding: 0 16px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 2s ease;
+  min-height: 28px;
+}
+.ai-thread.visible { opacity: 1; }
+
+/* Phase nav */
+.phase-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.phase-forward {
+  font-family: var(--sans);
+  font-size: var(--fl);
+  letter-spacing: .14em;
+  color: rgba(237,200,175,.90);
+  background: none; border: none;
+  cursor: pointer;
+  padding: 14px 28px; min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .4s ease;
+  animation: pulse 2.8s ease-in-out infinite;
+}
+.phase-forward:hover { color: rgba(255,225,200,1); }
+.phase-forward.pinned {
+  position: fixed;
+  bottom: 32px;
+  left: 50%; transform: translateX(-50%);
+  background: rgba(12,8,20,.95);
+  border: 1px solid rgba(200,130,110,.50);
+  border-radius: 999px;
+  padding: 16px 44px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+  white-space: nowrap;
+  box-shadow: 0 0 24px rgba(200,130,110,.15);
+}
+.phase-forward.pinned.ready {
+  opacity: 1;
+  pointer-events: all;
+}
+.phase-skip {
+  font-size: clamp(16px,4vw,20px);
+  letter-spacing: .14em;
+  color: var(--cream-ghost);
+  background: none; border: none;
+  cursor: pointer;
+  padding: 12px 20px; min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .3s ease;
+}
+
+/* ── ANCHOR PHASE — the polarity reveal ── */
+#s-anchor {
+  justify-content: center;
+  gap: clamp(16px,4vw,24px);
+}
+
+.polarity-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px,3.5vw,22px);
+  width: 100%;
+  max-width: 320px;
+}
+
+.polarity-heavy {
+  font-family: var(--serif);
+  font-size: clamp(24px,6vw,32px);
+  font-style: italic;
+  color: rgba(200,130,110,.75);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 88vw;
+  padding: 0 12px;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.polarity-heavy.visible { opacity: 1; }
+
+.polarity-and {
+  font-family: var(--sans);
+  font-size: clamp(14px,3.5vw,18px);
+  letter-spacing: .28em;
+  color: var(--cream-ghost);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.polarity-and.visible { opacity: 1; }
+
+.polarity-light {
+  font-family: var(--serif);
+  font-size: clamp(24px,6vw,32px);
+  font-style: italic;
+  color: var(--violet-bright);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 88vw;
+  padding: 0 12px;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.polarity-light.visible { opacity: 1; }
+
+.polarity-hold {
+  font-family: var(--sans);
+  font-size: clamp(18px,4.5vw,22px);
+  letter-spacing: .12em;
+  color: rgba(237,224,212,.82);
+  text-align: center;
+  text-transform: lowercase;
+  opacity: 0;
+  transition: opacity 2.5s ease;
+  margin-top: clamp(20px,5vw,32px);
+  padding: 0 24px;
+  line-height: 1.6;
+}
+.polarity-hold.visible { opacity: 1; }
+
+.polarity-both {
+  font-family: var(--sans);
+  font-size: clamp(16px,4vw,20px);
+  letter-spacing: .06em;
+  color: var(--cream-ghost);
+  text-align: center;
+  line-height: 1.7;
+  max-width: 88vw;
+  padding: 0 16px;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+.polarity-both.visible { opacity: 1; }
+
+/* Frequency selection */
+.freq-label {
+  font-size: clamp(14px,3.5vw,17px);
+  letter-spacing: .18em;
+  color: var(--rose-dim);
+  text-transform: uppercase;
+}
+.freq-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 88vw;
+}
+.freq-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 10px;
+  background: rgba(237,224,212,.02);
+  border: 1px solid rgba(152,128,184,.12);
+  border-radius: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all .25s ease;
+}
+.freq-btn:hover, .freq-btn.chosen {
+  background: rgba(152,128,184,.08);
+  border-color: rgba(152,128,184,.45);
+}
+.freq-name {
+  font-family: var(--serif);
+  font-size: clamp(22px,5.5vw,28px);
+  font-style: italic;
+  color: var(--violet-bright);
+}
+.freq-hint {
+  font-size: clamp(13px,3.2vw,16px);
+  letter-spacing: .04em;
+  color: var(--cream-ghost);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── BREATH PHASE — inside anchor ── */
+#s-breath {
+  justify-content: center;
+  gap: 0;
+  overflow: hidden;
+}
+
+.breath-word {
+  position: fixed;
+  top: calc(50% - clamp(110px,24vw,150px));
+  left: 50%; transform: translateX(-50%);
+  width: 88vw;
+  font-family: var(--sans);
+  font-size: clamp(16px,4vw,20px);
+  letter-spacing: .18em;
+  color: var(--cream-dim);
+  text-align: center;
+  text-transform: lowercase;
+  opacity: 0;
+  transition: opacity .6s ease;
+  z-index: 22; pointer-events: none;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.breath-dots {
+  position: fixed;
+  bottom: clamp(55px,12vw,80px);
+  left: 50%; transform: translateX(-50%);
+  display: flex; gap: 12px;
+  z-index: 20; pointer-events: none;
+}
+.bdot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(152,128,184,.18);
+  transition: background .6s ease, box-shadow .6s ease;
+}
+.bdot.done {
+  background: var(--rose);
+  box-shadow: 0 0 8px rgba(200,130,110,.7);
+}
+
+/* ── INTEGRATE SCREEN ── */
+#s-integrate {
+  justify-content: center;
+  gap: clamp(24px,6vw,40px);
+  text-align: center;
+}
+
+.integrate-witnessed {
+  font-family: var(--serif);
+  font-size: clamp(24px,6vw,32px);
+  font-style: italic;
+  color: var(--cream-dim);
+  line-height: 1.6;
+  max-width: 88vw;
+  padding: 0 16px;
+  opacity: 0;
+  transition: opacity 2.5s ease;
+}
+.integrate-witnessed.visible { opacity: 1; }
+
+.integrate-insight {
+  font-family: var(--sans);
+  font-size: clamp(14px,3.5vw,17px);
+  letter-spacing: .10em;
+  color: rgba(152,128,184,.72);
+  text-align: center;
+  line-height: 1.7;
+  max-width: 78vw;
+  opacity: 0;
+  transition: opacity 2s ease;
+  margin-top: clamp(14px,3.5vw,20px);
+  font-style: italic;
+}
+.integrate-insight.visible { opacity: 1; }
+
+.integrate-thread-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%; max-width: 88vw;
+  padding: 0 16px;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+  pointer-events: none;
+}
+.integrate-thread-wrap.visible {
+  opacity: 1; pointer-events: all;
+}
+
+.integrate-prompt {
+  font-size: clamp(16px,4vw,20px);
+  letter-spacing: .14em;
+  color: var(--cream-ghost);
+  text-transform: lowercase;
+}
+
+.integrate-input {
+  background: none; border: none;
+  border-bottom: 1px solid rgba(152,128,184,.22);
+  outline: none;
+  font-family: var(--serif);
+  font-size: clamp(22px,5.5vw,28px);
+  font-style: italic;
+  color: var(--cream-dim);
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+  caret-color: var(--rose);
+  transition: border-color .4s ease;
+}
+.integrate-input:focus { border-bottom-color: rgba(200,130,110,.5); }
+.integrate-input::placeholder { color: rgba(237,224,212,.22); }
+
+.integrate-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.integrate-mic {
+  flex-shrink: 0;
+  position: relative;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(152,128,184,.08);
+  border: 1px solid rgba(152,128,184,.22);
+  color: rgba(152,128,184,.55);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .3s ease, border-color .3s ease, background .3s ease;
+}
+.integrate-mic:hover {
+  color: rgba(152,128,184,.85);
+  border-color: rgba(152,128,184,.45);
+}
+.integrate-mic.listening {
+  color: rgba(200,130,110,.9);
+  border-color: rgba(200,130,110,.6);
+  background: rgba(200,130,110,.10);
+}
+.integrate-mic.captured {
+  color: rgba(160,210,160,.9);
+  border-color: rgba(160,210,160,.5);
+  background: rgba(160,210,160,.08);
+}
+.integrate-mic.hidden { display: none; }
+
+.mic-icon { width: 18px; height: 18px; }
+
+.mic-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(200,130,110,.5);
+  opacity: 0;
+  pointer-events: none;
+}
+.integrate-mic.listening .mic-pulse {
+  animation: micPulse 1.2s ease-out infinite;
+}
+@keyframes micPulse {
+  0%   { transform: scale(1);   opacity: .6; }
+  100% { transform: scale(1.6); opacity: 0;  }
+}
+
+.integrate-ai-response {
+  font-family: var(--serif);
+  font-size: clamp(22px,5.5vw,28px);
+  font-style: italic;
+  color: var(--thread);
+  text-align: center;
+  line-height: 1.7;
+  max-width: 88vw;
+  padding: 0 16px;
+  opacity: 0;
+  transition: opacity 2.2s ease;
+  min-height: 24px;
+}
+.integrate-ai-response.visible { opacity: 1; }
+
+.integrate-return {
+  font-family: var(--sans);
+  font-size: var(--fl);
+  letter-spacing: .14em;
+  color: rgba(200,130,110,.55);
+  background: none; border: none;
+  cursor: pointer;
+  padding: clamp(14px,4vh,22px) 28px;
+  min-height: 52px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .4s ease, opacity .6s ease;
+  opacity: 0;
+}
+.integrate-return.visible { opacity: 1; }
+.integrate-return:hover { color: var(--rose); }
+
+/* Whisper — past session echo */
+.integrate-whisper {
+  font-family: var(--serif);
+  font-size: clamp(13px,3.2vw,16px);
+  font-style: italic;
+  color: rgba(152,128,184,.55);
+  text-align: center;
+  max-width: 260px;
+  line-height: 1.7;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+.integrate-whisper.visible { opacity: 1; }
+
+/* ── BURST ── */
+.burst-el {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 0; height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,130,110,.5) 0%, rgba(152,128,184,.18) 35%, transparent 70%);
+  pointer-events: none; z-index: 200; opacity: 0;
+}
+.burst-el.go { animation: burst 1.1s cubic-bezier(.16,1,.3,1) forwards; }
+@keyframes burst {
+  0%   { width:0; height:0; opacity:.75; margin:0; }
+  100% { width:200vmax; height:200vmax; margin:-100vmax; opacity:0; }
+}
+
+/* ── SMALL HEIGHT ADJUSTMENT ── */
+@media(max-height:720px) {
+  #s-home { padding-top: 52px; }
+  .field-arrival { margin-bottom: 20px; }
+  .phases { gap: 8px; }
+  .phase-btn { padding: 14px 10px; }
+}
+
+/* ── FONT LARGE ── */
+body.fs-large .phase-label   { font-size: clamp(13px,3.2vw,15px); }
+body.fs-large .phase-hint    { font-size: clamp(13px,3.2vw,15px); }
+body.fs-large .phase-prompt  { font-size: clamp(18px,4.8vw,26px); }
+body.fs-large .enter-question { font-size: clamp(26px,7vw,40px); }
+</style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Sound</p>
-      <h1>Resonance</h1>
-      <p>Wave, frequency, and presence experiments.</p>
-      <p class="muted">This earlier experiment is being kept in the Coherence archive while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+
+<canvas id="cv"></canvas>
+<div class="aurora">
+  <div class="al a1"></div>
+  <div class="al a2"></div>
+  <div class="al a3"></div>
+</div>
+<div class="burst-el" id="burst"></div>
+
+<div id="settings-backdrop" onclick="closeSettings()"></div>
+
+<div id="settings-panel">
+  <div class="settings-wordmark">Resonance · Settings</div>
+  <div class="settings-section">
+    <div class="settings-label">Anthropic API Key</div>
+    <div class="settings-row">
+      <input class="api-input" id="st-api-input" type="password"
+        placeholder="sk-ant-..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="settings-btn" onclick="saveApiKey()">save</button>
+      <button class="settings-btn" onclick="clearApiKey()">clear</button>
+    </div>
+    <div class="api-status" id="st-api-status">no key</div>
+    <div class="api-note" id="st-api-note"></div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-label">Audio</div>
+    <div class="toggle-row">
+      <button class="toggle-pill active" id="st-audio" onclick="settingsToggleAudio()">sound on</button>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-label">Text Size</div>
+    <div class="toggle-row">
+      <button class="toggle-pill" id="st-font" onclick="settingsToggleFont()">larger text</button>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-label">Language</div>
+    <div class="toggle-row">
+      <button class="toggle-pill" id="st-lang" onclick="settingsToggleLang()">EN</button>
+    </div>
+  </div>
+  <div class="kofi-line">
+    if this has been useful ·
+    <a href="https://buymeacoffee.com/coherence_nikolai" target="_blank" rel="noopener">buymeacoffee.com/coherence_nikolai</a>
+  </div>
+</div>
+
+<div id="chrome">
+  <button class="chrome-btn" id="backBtn" onclick="goHome()"
+    style="opacity:0;pointer-events:none;">←</button>
+  <button class="chrome-btn" id="settingsBtn" onclick="toggleSettings()">⚙</button>
+</div>
+
+<!-- INTRO ANIMATION SCREEN -->
+<div class="screen active" id="s-intro">
+  <canvas class="intro-canvas" id="introCanvas"></canvas>
+  <div class="intro-lang">
+    <button class="lang-seg" id="introLangEn" onclick="setLang('en');updateIntroLang()">EN</button>
+    <button class="lang-seg" id="introLangEs" onclick="setLang('es');updateIntroLang()">ES</button>
+  </div>
+  <div class="intro-skip" id="introSkip">tap to enter</div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="s-home">
+  <div class="field-wordmark">Resonance</div>
+  <button class="intro-glyph" id="introGlyph" onclick="playIntroAnimation()">what is this?</button>
+
+  <button class="home-enter-btn" id="homeEnterBtn" onclick="startNotice()" ontouchend="this._t=1" onmousedown="this._t=1">
+    <span class="home-enter-question" id="homeArrival">What are you holding right now?</span>
+  </button>
+  <button class="home-begin-btn" onclick="startNotice()">begin →</button>
+
+  <div class="home-bottom">
+    <div class="home-pattern" id="homePattern"></div>
+    <div class="home-count" id="homeCount"></div>
+    <div class="home-lang-toggle">
+      <button class="lang-seg" id="langEn" onclick="setLang('en')">EN</button>
+      <button class="lang-seg" id="langEs" onclick="setLang('es')">ES</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENTER — what are you holding? -->
+<div class="screen" id="s-enter">
+  <div class="enter-question" id="enterQuestion"></div>
+
+  <div class="enter-input-wrap">
+    <div class="contraction-scroll">
+      <div class="contraction-grid" id="contractionGrid"></div>
+      <button class="something-else-btn" id="somethingElseBtn" onclick="toggleSomethingElse()"></button>
+      <input class="enter-input" id="enterInput" type="text"
+        autocomplete="off" autocorrect="off" autocapitalize="off"
+        spellcheck="false" style="display:none;" />
+    </div>
+  </div>
+
+  <button class="enter-continue" id="enterContinue" onclick="confirmEntry()"></button>
+  <div class="enter-whisper" id="enterWhisper"></div>
+</div>
+
+<!-- NOTICE PHASE -->
+<div class="screen phase-screen" id="s-notice">
+  <div class="phase-indicator" id="pi-notice">
+    <div class="phase-dot active" id="pd0"></div>
+    <div class="phase-dot" id="pd1"></div>
+    <div class="phase-dot" id="pd2"></div>
+    <div class="phase-dot" id="pd3"></div>
+  </div>
+  <div class="phase-name" id="pname-notice"></div>
+  <div class="phase-carrying" id="carrying-notice"></div>
+  <div class="phase-prompt" id="prompt-notice"></div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:300px;">
+    <div class="body-prompt" id="bodyPrompt"></div>
+    <div class="body-zones" id="bodyZones"></div>
+  </div>
+
+  <div class="ai-thread" id="aiNotice"></div>
+
+  <div class="phase-nav">
+    <button class="phase-forward" id="fwdNotice" onclick="advanceToHold()"></button>
+    <button class="phase-skip" id="skipNotice" onclick="advanceToHold()"></button>
+  </div>
+</div>
+
+<!-- HOLD PHASE -->
+<div class="screen phase-screen" id="s-hold">
+  <div class="phase-indicator">
+    <div class="phase-dot done"></div>
+    <div class="phase-dot active"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+  </div>
+  <div class="phase-name" id="pname-hold"></div>
+  <div class="phase-carrying" id="carrying-hold"></div>
+  <div class="phase-prompt" id="prompt-hold"></div>
+  <div class="ai-thread" id="aiHold"></div>
+  <div class="phase-nav">
+    <button class="phase-forward" id="fwdHold" onclick="advanceToAnchor()"></button>
+    <button class="phase-skip" id="skipHold" onclick="advanceToAnchor()"></button>
+  </div>
+</div>
+
+<!-- ANCHOR SCREEN 1 — polarity reveal -->
+<div class="screen" id="s-anchor">
+  <div class="phase-indicator">
+    <div class="phase-dot done"></div>
+    <div class="phase-dot done"></div>
+    <div class="phase-dot active"></div>
+    <div class="phase-dot"></div>
+  </div>
+  <div class="phase-name" id="pname-anchor"></div>
+
+  <div class="polarity-wrap">
+    <div class="polarity-heavy" id="polarityHeavy"></div>
+    <div class="polarity-and" id="polarityAnd">and</div>
+    <div class="polarity-light" id="polarityLight"></div>
+    <div class="polarity-hold" id="polarityHold"></div>
+  </div>
+
+  <div class="phase-nav">
+    <button class="phase-forward" id="fwdAnchor1" style="opacity:0;pointer-events:none;" onclick="advanceToFreq()"></button>
+  </div>
+</div>
+
+<!-- ANCHOR SCREEN 2 — frequency selection -->
+<div class="screen" id="s-freq">
+  <div class="phase-indicator">
+    <div class="phase-dot done"></div>
+    <div class="phase-dot done"></div>
+    <div class="phase-dot active"></div>
+    <div class="phase-dot"></div>
+  </div>
+  <div class="freq-label" id="freqLabel"></div>
+  <div class="freq-grid" id="freqGrid"></div>
+  <button class="phase-forward pinned" id="fwdAnchor" onclick="startBreath()"></button>
+</div>
+
+<!-- BREATH — inside anchor -->
+<div class="screen" id="s-breath">
+  <div class="breath-word" id="breathWord"></div>
+  <div class="breath-dots">
+    <div class="bdot" id="bdot0"></div>
+    <div class="bdot" id="bdot1"></div>
+    <div class="bdot" id="bdot2"></div>
+  </div>
+</div>
+
+<!-- INTEGRATE PHASE -->
+<div class="screen" id="s-integrate">
+  <div class="phase-indicator">
+    <div class="phase-dot done"></div>
+    <div class="phase-dot done"></div>
+    <div class="phase-dot done"></div>
+    <div class="phase-dot active"></div>
+  </div>
+  <div class="phase-name" id="pname-integrate"></div>
+
+  <div class="integrate-witnessed" id="integrateWitnessed"></div>
+  <div class="integrate-insight" id="integrateInsight"></div>
+  <div class="integrate-whisper" id="integrateWhisper"></div>
+
+  <div class="integrate-thread-wrap" id="integrateThreadWrap">
+    <div class="integrate-prompt" id="integratePromptLbl"></div>
+    <div class="integrate-input-row">
+      <input class="integrate-input" id="integrateInput" type="text"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      <button class="integrate-mic" id="integrateMic" onclick="toggleVoiceNote()" title="speak it">
+        <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="9" y="2" width="6" height="11" rx="3"/>
+          <path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6"/>
+        </svg>
+        <span class="mic-pulse"></span>
+      </button>
+    </div>
+    <div class="integrate-ai-response" id="integrateAI"></div>
+  </div>
+
+  <button class="integrate-return" id="integrateReturn" onclick="goHome()"></button>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

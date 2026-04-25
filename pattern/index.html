@@ -1,35 +1,568 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pattern - Coherence Nikolai</title>
-  <meta name="description" content="Pattern is an earlier Coherence Nikolai pattern and reflection support.">
-  <meta name="theme-color" content="#0b0707">
-  <link rel="canonical" href="https://coherence-nikolai.app/pattern/">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/site.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Pattern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d10;--text:#f5f0e8;--dim:rgba(245,240,232,.48);--border:rgba(255,255,255,.09);
+      --coral:#FF8C69;--coral-dim:rgba(255,140,105,.11);--coral-glow:rgba(255,140,105,.22);
+      --amber:#FFD166;--amber-dim:rgba(255,209,102,.11);
+      --sage:#78c9a0;--sage-dim:rgba(120,201,160,.11);
+      --sky:#7ec8e3;--sky-dim:rgba(126,200,227,.11);
+      --lav:#b39ddb;--lav-dim:rgba(179,157,219,.11);
+      --font:'Lexend',system-ui,sans-serif;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+    #rippleCanvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(env(safe-area-inset-top),20px) 28px max(env(safe-area-inset-bottom),20px);opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:10;overflow-y:auto}
+    .screen.active{opacity:1;pointer-events:all}
+    #chrome{position:fixed;top:0;left:0;right:0;padding:max(env(safe-area-inset-top),16px) 20px 10px;display:none;align-items:center;justify-content:space-between;z-index:100}
+    .back-btn{background:none;border:none;cursor:pointer;color:rgba(245,240,232,.35);font-size:26px;padding:8px;font-family:var(--font);-webkit-tap-highlight-color:transparent}
+    .progress-bar-wrap{flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin:0 16px}
+    .progress-bar-fill{height:100%;background:var(--coral);border-radius:99px;transition:width .5s ease}
+    .q-counter{font-size:13px;color:var(--dim);font-weight:400;white-space:nowrap}
+    #s-home{gap:0;justify-content:center}
+    .home-title{font-size:clamp(52px,15vw,80px);font-weight:700;color:var(--coral);text-align:center;margin-bottom:10px;text-shadow:0 0 60px var(--coral-glow)}
+    .home-sub{font-size:clamp(16px,4vw,20px);font-weight:300;color:var(--dim);text-align:center;letter-spacing:.06em;margin-bottom:12px;max-width:320px;line-height:1.5}
+    .home-desc{font-size:clamp(14px,3.5vw,17px);font-weight:300;color:var(--dim);text-align:center;max-width:300px;line-height:1.7;margin-bottom:48px;opacity:.7}
+    .start-btn{width:100%;max-width:320px;padding:22px;border-radius:18px;border:1.5px solid rgba(255,140,105,.40);background:var(--coral-dim);font-family:var(--font);font-size:clamp(18px,4.5vw,22px);font-weight:600;color:var(--coral);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:box-shadow .2s}
+    .start-btn:active{box-shadow:0 0 40px var(--coral-glow)}
+    .api-link{margin-top:20px;font-size:13px;color:var(--dim);background:none;border:none;font-family:var(--font);cursor:pointer;text-decoration:underline;text-underline-offset:3px;-webkit-tap-highlight-color:transparent}
+    #s-question{gap:0;justify-content:center;padding-top:80px}
+    .q-area{width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px}
+    .q-category{font-size:clamp(11px,2.8vw,13px);letter-spacing:.18em;text-transform:uppercase;color:var(--coral);font-weight:600;opacity:.75}
+    .q-text{font-size:clamp(22px,5.5vw,28px);font-weight:600;color:var(--text);line-height:1.35}
+    .q-hint{font-size:clamp(14px,3.5vw,16px);font-weight:300;color:var(--dim);line-height:1.6;min-height:20px}
+    .options{display:flex;flex-direction:column;gap:11px;margin-top:4px}
+    .option-btn{padding:18px 20px;border-radius:16px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);font-family:var(--font);font-size:clamp(16px,4vw,19px);font-weight:400;color:var(--text);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:14px;line-height:1.4;transition:border-color .2s,background .2s}
+    .option-btn:active{border-color:rgba(255,140,105,.55);background:var(--coral-dim);color:var(--coral)}
+    .option-icon{font-size:22px;flex-shrink:0}
+    #s-profile{justify-content:flex-start;padding-top:80px;padding-bottom:40px;overflow-y:auto;gap:0}
+    .profile-inner{width:100%;max-width:440px;display:flex;flex-direction:column;gap:20px;padding-bottom:20px}
+    .profile-title{font-size:clamp(28px,7vw,36px);font-weight:700;color:var(--coral);text-align:center}
+    .profile-subtitle{font-size:clamp(14px,3.5vw,17px);font-weight:300;color:var(--dim);text-align:center;line-height:1.6}
+    .profile-section{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:18px;padding:22px 20px}
+    .profile-section-title{font-size:clamp(12px,3vw,14px);letter-spacing:.16em;text-transform:uppercase;color:var(--coral);font-weight:600;margin-bottom:12px}
+    .profile-text{font-size:clamp(16px,4vw,18px);font-weight:300;color:var(--text);line-height:1.75}
+    .trait-chips{display:flex;flex-wrap:wrap;gap:8px}
+    .trait-chip{padding:6px 14px;border-radius:999px;font-size:clamp(13px,3.2vw,15px);font-weight:600;border:1.5px solid var(--border)}
+    .chip-coral{color:var(--coral);border-color:rgba(255,140,105,.35);background:var(--coral-dim)}
+    .chip-amber{color:var(--amber);border-color:rgba(255,209,102,.35);background:var(--amber-dim)}
+    .chip-sage{color:var(--sage);border-color:rgba(120,201,160,.35);background:var(--sage-dim)}
+    .chip-sky{color:var(--sky);border-color:rgba(126,200,227,.35);background:var(--sky-dim)}
+    .chip-lav{color:var(--lav);border-color:rgba(179,157,219,.35);background:var(--lav-dim)}
+    .strategy-item{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)}
+    .strategy-item:last-child{border-bottom:none;padding-bottom:0}
+    .strategy-num{font-size:22px;flex-shrink:0}
+    .strategy-text{font-size:clamp(15px,3.8vw,17px);font-weight:300;color:var(--text);line-height:1.65}
+    .ai-box{background:var(--amber-dim);border:1.5px solid rgba(255,209,102,.28);border-radius:18px;padding:22px 20px}
+    .ai-box-title{font-size:clamp(14px,3.5vw,16px);font-weight:600;color:var(--amber);margin-bottom:10px}
+    .ai-box-text{font-size:clamp(15px,3.8vw,17px);font-weight:300;color:var(--text);line-height:1.75}
+    .ai-loading{color:var(--dim);font-style:italic}
+    .next-section{background:rgba(120,201,160,.06);border:1.5px solid rgba(120,201,160,.20);border-radius:18px;padding:22px 20px}
+    .next-section-title{font-size:clamp(12px,3vw,14px);letter-spacing:.16em;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:12px}
+    .profile-btns{display:flex;flex-direction:column;gap:12px}
+    .profile-btn{padding:18px;border-radius:14px;font-family:var(--font);font-size:clamp(16px,4vw,18px);font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .profile-btn.primary{background:var(--coral-dim);border:1.5px solid rgba(255,140,105,.40);color:var(--coral)}
+    .profile-btn.secondary{background:transparent;border:1.5px solid var(--border);color:var(--dim)}
+    .retake-note{font-size:13px;color:var(--dim);text-align:center;line-height:1.6;padding:0 8px}
+    #s-api{justify-content:flex-start;padding-top:80px;overflow-y:auto;gap:0}
+    .api-inner{width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px}
+    .api-title{font-size:clamp(24px,6vw,30px);font-weight:700;color:var(--amber);text-align:center}
+    .api-box{background:var(--amber-dim);border:1.5px solid rgba(255,209,102,.25);border-radius:18px;padding:24px 20px;display:flex;flex-direction:column;gap:14px}
+    .api-text{font-size:clamp(16px,4vw,18px);font-weight:300;color:var(--text);line-height:1.75}
+    .api-input{width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;font-family:var(--font);font-size:clamp(16px,4vw,18px);color:var(--text);outline:none}
+    .api-input::placeholder{color:rgba(245,240,232,.28)}
+    .api-save-btn{padding:16px;border-radius:12px;background:var(--amber-dim);border:1.5px solid rgba(255,209,102,.40);font-family:var(--font);font-size:clamp(16px,4vw,18px);font-weight:600;color:var(--amber);cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .api-back-btn{background:none;border:none;font-family:var(--font);font-size:15px;color:var(--dim);cursor:pointer;padding:8px;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:3px;text-align:center}
+    .fade-in{animation:fadeUp .35s ease forwards}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  </style>
 </head>
 <body>
-  <header class="site-header compact">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
-      <span>coherence</span>
-      <span>nikolai</span>
-    </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#labs">Labs</a>
-      <a href="/support/">Support</a>
-    </nav>
-  </header>
-  <main class="legal-page">
-    <article class="legal-card">
-      <p class="label">Support</p>
-      <h1>Pattern</h1>
-      <p>A small pattern and reflection support from the Coherence archive.</p>
-      <p class="muted">This earlier experiment is being kept available as an archive path while Tone Recall becomes the flagship app.</p>
-      <p><a href="/#labs">Back to the lab</a> · <a href="/tone/">Tone Recall</a></p>
-    </article>
-  </main>
+<canvas id="rippleCanvas"></canvas>
+<div id="chrome">
+  <button class="back-btn" onclick="goBack()">&#8592;</button>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="q-counter" id="qCounter">1 / 14</div>
+</div>
+
+<div class="screen active" id="s-home">
+  <div class="home-title">Pattern</div>
+  <div class="home-sub">understand your brain</div>
+  <div class="home-desc">No two neurodivergent brains are the same. This helps you find yours and work with it, not against it.</div>
+  <button class="start-btn" onclick="startQuiz()">Discover my pattern &#8594;</button>
+  <button class="api-link" onclick="showAPIScreen()">What&#39;s an API key?</button>
+  <button class="api-link" onclick="showFacilitator()" style="margin-top:8px">Workshop facilitator mode</button>
+</div>
+
+<div class="screen" id="s-question">
+  <div class="q-area">
+    <div class="q-category" id="qCategory"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="q-hint" id="qHint"></div>
+    <div class="options" id="qOptions"></div>
+  </div>
+</div>
+
+<div class="screen" id="s-profile">
+  <div class="profile-inner">
+    <div class="profile-title">Your Brain Pattern</div>
+    <div class="profile-subtitle" id="profileSubtitle"></div>
+    <div class="profile-section">
+      <div class="profile-section-title">How your brain shows up</div>
+      <div class="trait-chips" id="traitChips"></div>
+    </div>
+    <div class="profile-section">
+      <div class="profile-section-title">What this means for you</div>
+      <div class="profile-text" id="profileText"></div>
+    </div>
+    <div class="profile-section">
+      <div class="profile-section-title">Strategies that fit your brain</div>
+      <div id="strategiesList"></div>
+    </div>
+    <div class="ai-box" id="aiBox" style="display:none">
+      <div class="ai-box-title">&#10022; Your personalised AI guidance</div>
+      <div class="ai-box-text" id="aiText"><span class="ai-loading">Generating your profile...</span></div>
+    </div>
+    <div class="next-section">
+      <div class="next-section-title">What to do next</div>
+      <div class="strategy-item">
+        <span class="strategy-num">&#9889;</span>
+        <div class="strategy-text">Use <strong>Spark</strong> when you need help starting a specific task right now.</div>
+      </div>
+      <div class="strategy-item">
+        <span class="strategy-num">&#129299;</span>
+        <div class="strategy-text">Use <strong>Clear Path</strong> when you need step-by-step academic support.</div>
+      </div>
+      <div class="strategy-item" style="border-bottom:none;padding-bottom:0">
+        <span class="strategy-num">&#129310;</span>
+        <div class="strategy-text">Consider booking an <strong>Academic Skills appointment</strong> and bring this profile with you.</div>
+      </div>
+    </div>
+    <div class="retake-note">Your pattern can shift over time. Come back and retake this whenever something feels different.</div>
+    <div class="profile-btns">
+      <button class="profile-btn primary" onclick="startQuiz()">Take it again</button>
+      <button class="profile-btn secondary" onclick="copyProfile()" id="copyBtn">Copy my profile</button>
+      <button class="profile-btn secondary" onclick="goHome()">Back to home</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="s-api">
+  <div class="api-inner">
+    <div class="api-title">API Keys</div>
+    <div class="api-box">
+      <div class="api-text"><strong>What is it?</strong> An API key connects this app to an AI that reads your answers and writes a personalised profile just for you.</div>
+      <div class="api-text"><strong>Does it cost money?</strong> A small amount, a few cents per use. You need an account at anthropic.com.</div>
+      <div class="api-text"><strong>Do I need one?</strong> No. Pattern works fully without it. The AI adds a deeper personal reflection at the end.</div>
+      <div class="api-text"><strong>Is it private?</strong> Your key is stored only on your device. It is never shared anywhere else.</div>
+      <input class="api-input" id="apiKeyInput" type="password" placeholder="Paste your API key here (optional)"/>
+      <button class="api-save-btn" onclick="saveAPIKey()">Save key</button>
+    </div>
+    <button class="api-back-btn" onclick="goHome()">&#8592; Back to home</button>
+  </div>
+</div>
+
+<script>
+var rc = document.getElementById('rippleCanvas');
+var rx = rc.getContext('2d');
+var rW, rH, ripples = [];
+function rsz() {
+  var d = devicePixelRatio || 1;
+  rW = innerWidth; rH = innerHeight;
+  rc.width = rW * d; rc.height = rH * d;
+  rc.style.width = rW + 'px'; rc.style.height = rH + 'px';
+  rx.setTransform(1,0,0,1,0,0); rx.scale(d,d);
+}
+window.addEventListener('resize', rsz); rsz();
+function spawnRipple(x, y, rgb, size) {
+  var m = Math.max(rW, rH);
+  var maxR = size === 'xl' ? m*.85 : size === 'large' ? m*.55 : m*.32;
+  ripples.push({x:x, y:y, r:2, maxR:maxR, rgb:rgb, alpha:.60});
+}
+(function loop() {
+  requestAnimationFrame(loop);
+  rx.clearRect(0, 0, rW, rH);
+  ripples = ripples.filter(function(r) { return r.alpha > 0.004; });
+  ripples.forEach(function(rp) {
+    rp.r += (rp.maxR - rp.r) * .015;
+    rp.alpha = Math.max(0, rp.alpha - .004);
+    for (var i = 0; i < 3; i++) {
+      var ringR = rp.r * (1 - i * .20);
+      if (ringR < 1) continue;
+      var a = rp.alpha * (1 - i * .28);
+      rx.save();
+      rx.beginPath();
+      rx.arc(rp.x, rp.y, ringR, 0, Math.PI*2);
+      rx.strokeStyle = 'rgba(' + rp.rgb + ',' + a.toFixed(3) + ')';
+      rx.lineWidth = Math.max(1.2, 3.5 - i * 1.0);
+      rx.shadowBlur = 12;
+      rx.shadowColor = 'rgba(' + rp.rgb + ',' + (a*.4).toFixed(3) + ')';
+      rx.stroke();
+      rx.restore();
+    }
+  });
+})();
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+  });
+  var n = document.getElementById(id);
+  if (n) { n.classList.add('active'); n.scrollTop = 0; }
+}
+function goHome() { showScreen('s-home'); document.getElementById('chrome').style.display = 'none'; spawnRipple(rW/2, rH/2, '255,140,105', 'large'); }
+function showAPIScreen() { showScreen('s-api'); document.getElementById('chrome').style.display = 'none'; var k = localStorage.getItem('pattern_api_key'); if (k) document.getElementById('apiKeyInput').value = k; }
+function saveAPIKey() { var k = document.getElementById('apiKeyInput').value.trim(); if (k) { localStorage.setItem('pattern_api_key', k); alert('Saved! Your key is stored on this device only.'); } else { localStorage.removeItem('pattern_api_key'); alert('Key cleared.'); } }
+function goBack() { if (currentQ > 0) { currentQ--; showQ(currentQ); } else { goHome(); } }
+
+var QUESTIONS = [
+  { cat: 'Focus & Attention', text: 'When you sit down to work, what usually happens?', hint: 'Pick the one that sounds most like you.', opts: [
+    { i: '🎯', t: 'I can hyperfocus for hours on things I care about', tags: ['hyperfocus','adhd'] },
+    { i: '🦋', t: 'My attention jumps around and it is hard to stay on one thing', tags: ['distractible','adhd'] },
+    { i: '🌫', t: 'I zone out without realising and then time has disappeared', tags: ['zoning','time-blind'] },
+    { i: '⚡', t: 'I focus best when there is urgency or a deadline looming', tags: ['urgency-driven','adhd'] }
+  ]},
+  { cat: 'Processing & Reading', text: 'How do you take in information?', hint: '', opts: [
+    { i: '🔄', t: 'I read the same line multiple times before it sticks', tags: ['dyslexia','processing'] },
+    { i: '🖼', t: 'I understand better when I can see it with diagrams, images, or colour', tags: ['visual-learner'] },
+    { i: '🎧', t: 'Listening works better for me than reading', tags: ['auditory','dyslexia'] },
+    { i: '📖', t: 'Reading is okay but getting thoughts into writing is really hard', tags: ['writing-difficulty','processing'] }
+  ]},
+  { cat: 'Starting Tasks', text: 'When you have something important to do, you tend to...', hint: 'Be honest. This is not about judgement.', opts: [
+    { i: '🧱', t: 'Stare at it and not start, even when I want to', tags: ['task-initiation','adhd'] },
+    { i: '🌀', t: 'Do everything else first like clean, scroll, or do easier tasks', tags: ['avoidance','procrastination'] },
+    { i: '⏰', t: 'Wait until the last minute then do it in a rush', tags: ['urgency-driven','deadline-dependent'] },
+    { i: '📋', t: 'Need to plan it perfectly before I can begin', tags: ['perfectionism','planning'] }
+  ]},
+  { cat: 'Perfectionism', text: 'Which feels most like you when it comes to your work?', hint: '', opts: [
+    { i: '😬', t: 'I will not submit unless it feels perfect, even if it is late', tags: ['perfectionism','fear-of-failure'] },
+    { i: '🔁', t: 'I redo things over and over because nothing feels good enough', tags: ['perfectionism','rework'] },
+    { i: '💀', t: 'Sometimes I do not submit at all because it is not good enough', tags: ['perfectionism','avoidance','shutdown'] },
+    { i: '🤷', t: 'I do not really struggle with this and can submit imperfect work', tags: ['flexible'] }
+  ]},
+  { cat: 'Time & Planning', text: 'How do you experience time?', hint: 'This one is really common with ADHD brains.', opts: [
+    { i: '🕳', t: 'Time just disappears and I lose hours without noticing', tags: ['time-blind','adhd'] },
+    { i: '📅', t: 'I always underestimate how long things take', tags: ['time-estimation','adhd'] },
+    { i: '⏳', t: 'I have now and not-now. Deadlines do not feel real until they are close', tags: ['now-not-now','adhd','time-blind'] },
+    { i: '🗓', t: 'I need structure and plans. Without them I fall apart', tags: ['structure-dependent','anxiety'] }
+  ]},
+  { cat: 'Sensory & Environment', text: 'What does your ideal work environment look like?', hint: '', opts: [
+    { i: '🎵', t: 'Music or background noise helps me focus', tags: ['noise-helpful','sensory'] },
+    { i: '🔇', t: 'I need complete quiet. Any noise throws me off', tags: ['noise-sensitive','sensory','autism'] },
+    { i: '🌪', t: 'I can work anywhere. Environment does not affect me much', tags: ['flexible-sensory'] },
+    { i: '😵', t: 'Busy environments completely overwhelm me', tags: ['sensory-overwhelm','autism','anxiety'] }
+  ]},
+  { cat: 'Emotions & Regulation', text: 'When something goes wrong or you get critical feedback...', hint: '', opts: [
+    { i: '💔', t: 'It hits really hard, harder than it probably should', tags: ['rejection-sensitive','RSD','adhd'] },
+    { i: '🌋', t: 'I feel it intensely but it passes quickly', tags: ['emotional-intensity','adhd'] },
+    { i: '🧊', t: 'I shut down and cannot work for a while', tags: ['shutdown','autism','overwhelm'] },
+    { i: '😤', t: 'I get frustrated but I push through it', tags: ['resilient'] }
+  ]},
+  { cat: 'Social & Communication', text: 'In group work or asking for help...', hint: '', opts: [
+    { i: '😶', t: 'I find it really hard to ask for help even when I need it', tags: ['help-avoidance','autism','anxiety'] },
+    { i: '🎭', t: 'I work hard to seem normal and it is exhausting', tags: ['masking','autism'] },
+    { i: '💬', t: 'I prefer written communication over talking', tags: ['written-preferred','autism'] },
+    { i: '🤝', t: 'Group work is fine. I do not find this particularly hard', tags: ['socially-comfortable'] }
+  ]},
+  { cat: 'Energy & Burnout', text: 'How does your energy move across a day or week?', hint: '', opts: [
+    { i: '🚀', t: 'Bursts of high energy then crashes, boom and bust', tags: ['boom-bust','adhd','burnout'] },
+    { i: '🪫', t: 'I often feel exhausted even when I have not done much', tags: ['fatigue','burnout','autism'] },
+    { i: '🌊', t: 'My energy is unpredictable. I never know what I will get', tags: ['dysregulated-energy','adhd'] },
+    { i: '⚙️', t: 'Consistent but slow. I warm up gradually', tags: ['slow-start'] }
+  ]},
+  { cat: 'Finishing & Following Through', text: 'When it comes to finishing things...', hint: '', opts: [
+    { i: '🏁', t: 'I start lots of things but rarely finish them', tags: ['completion-difficulty','adhd'] },
+    { i: '📦', t: 'I finish but then forget to submit or do the final step', tags: ['follow-through','adhd','executive-function'] },
+    { i: '🔚', t: 'The last 10 percent is hardest. I lose interest near the end', tags: ['novelty-seeking','adhd'] },
+    { i: '✅', t: 'Finishing is not my problem. Starting is', tags: ['completion-ok','initiation-hard'] }
+  ]},
+  { cat: 'Working Memory', text: 'In the middle of doing something, what tends to happen?', hint: 'Working memory is like your brain sticky note. ND brains often have smaller ones.', opts: [
+    { i: '💨', t: 'I forget what I was doing mid-task. My train of thought just vanishes', tags: ['working-memory','adhd','executive-function'] },
+    { i: '🔀', t: 'I lose my place when interrupted and cannot get back', tags: ['working-memory','adhd'] },
+    { i: '📝', t: 'I have to write everything down or I will forget it immediately', tags: ['working-memory','compensating'] },
+    { i: '🧠', t: 'My memory is pretty reliable. This is not a big issue for me', tags: ['memory-ok'] }
+  ]},
+  { cat: 'Numbers & Maths', text: 'When you deal with numbers, data, or calculations...', hint: '', opts: [
+    { i: '🌀', t: 'Numbers feel chaotic. I mix them up, lose my place, make errors', tags: ['dyscalculia','processing'] },
+    { i: '⏱', t: 'Time calculations and estimating are really hard for me', tags: ['dyscalculia','time-blind'] },
+    { i: '💸', t: 'Managing money, budgets, or schedules stresses me out a lot', tags: ['dyscalculia','executive-function'] },
+    { i: '🔢', t: 'Numbers and maths are not a particular struggle for me', tags: ['numbers-ok'] }
+  ]},
+  { cat: 'Sleep & Routine', text: 'How does your sleep and daily routine affect you?', hint: '', opts: [
+    { i: '🌙', t: 'My sleep is all over the place and it really affects how I function', tags: ['sleep-disruption','adhd','autism'] },
+    { i: '🔄', t: 'Any change to my routine throws off my whole day', tags: ['routine-dependent','autism','anxiety'] },
+    { i: '😴', t: 'I am almost always tired no matter how much I sleep', tags: ['fatigue','burnout','sleep-disruption'] },
+    { i: '☀️', t: 'Sleep and routine are not major issues for me', tags: ['routine-ok'] }
+  ]},
+  { cat: 'Masking & the Cost of it', text: 'How much energy do you spend trying to seem normal or holding yourself together in public?', hint: 'Masking means hiding how you really think or feel to fit in. It is exhausting.', opts: [
+    { i: '🎭', t: 'A lot. I perform all day and crash when I get home', tags: ['masking','autism','burnout','exhaustion'] },
+    { i: '😶', t: 'I hold a lot in. Emotions, needs, confusion, and it builds up', tags: ['masking','suppression','shutdown'] },
+    { i: '🤔', t: 'I am not sure. I have done it so long I do not know what is real anymore', tags: ['masking','identity','autism'] },
+    { i: '😌', t: 'I do not feel like I have to mask. I can be myself', tags: ['low-masking'] }
+  ]}
+];
+
+var STRAT_MAP = {
+  'hyperfocus': ['Schedule your most important work during your interest peaks. Use hyperfocus intentionally rather than hoping it arrives.', 'Pair less interesting tasks with something engaging like a new location or a specific playlist.'],
+  'distractible': ['Work in short bursts of 15 to 25 minutes with a clear stopping point. Your brain needs permission to stop.', 'Try body doubling. Work alongside someone else, even virtually. It regulates attention naturally.'],
+  'zoning': ['Set phone alarms every 25 minutes as external time anchors. Your brain needs outside reminders to stay present.', 'Before starting, write one specific thing you want done in 30 minutes. Make it small and concrete.'],
+  'urgency-driven': ['Create artificial urgency. Set a timer, tell a friend your deadline, or book a specific submission slot.', 'Break tasks into micro-deadlines. Each small deadline gives your brain a finish line to run toward.'],
+  'dyslexia': ['Use text-to-speech tools to hear what you are reading. Your brain often processes audio better than text.', 'Write rough and messy first. Get thoughts out, then fix the words. Voice-to-text can help bypass the writing block.'],
+  'visual-learner': ['Draw or diagram the task before writing. Mind maps and flowcharts help your brain organise ideas.', 'Use colour-coded notes and visual summaries instead of plain text whenever possible.'],
+  'auditory': ['Record yourself explaining a concept. Hearing your own voice reinforces it more effectively than reading.', 'Listen to lectures or readings first, then read. Let audio be your entry point.'],
+  'task-initiation': ['The two-minute rule. Make your first action take literally 2 minutes or less. Opening the document counts.', 'Remove friction before you sit down. Have everything open and ready. Setup is half the battle.'],
+  'avoidance': ['Name what you are avoiding and why. Say it out loud. Naming the feeling breaks the automatic loop.', 'Set a 5-minute thinking timer. Just sit with the task before deciding what to do. Often that is enough.'],
+  'perfectionism': ['Set a good-enough standard before you start. Write it down. Hold yourself to that, not perfect.', 'Use a draft mentality. Everything is a draft until the moment you submit. Drafts are allowed to be messy.'],
+  'fear-of-failure': ['A late imperfect submission scores higher than nothing. Done beats perfect every time.', 'Talk to your lecturer early if you are struggling. Most prefer a conversation to a missed submission.'],
+  'shutdown': ['Build recovery time into your schedule. Shutdown is your brain circuit breaker and it genuinely needs reset time.', 'Learn your early warning signs and act before full shutdown. Change environment, take a short walk, take a sensory break.'],
+  'time-blind': ['Use visual timers. Seeing time disappear is more effective for ND brains than watching numbers.', 'Always add 50 percent to your time estimates. If you think something takes 1 hour, plan for 1.5.'],
+  'now-not-now': ['Make deadlines feel real by anchoring them to something concrete like a friend birthday or a specific event.', 'Break future tasks into something you can do NOW. Future-you is not reliable. Present-you is.'],
+  'sensory-overwhelm': ['Design a consistent work signal. Same spot, same ritual, headphones on. Predictability reduces overwhelm.', 'Limit decisions before starting. Lay out what you need, close other tabs, clear your space first.'],
+  'rejection-sensitive': ['Separate feedback about your work from feedback about you. They are genuinely not the same thing.', 'Ask for written feedback when possible. It is easier to process at your own pace than in real time.'],
+  'masking': ['Masking costs enormous energy. Find one safe space or person where you do not have to perform.', 'Advocate for adjustments like extensions, quiet rooms, or written instructions. They exist exactly for this reason.'],
+  'boom-bust': ['Track your energy for one week. Most ND people have predictable windows. Schedule hard work in the peaks.', 'After a crash, rest without guilt. Rest is maintenance, not failure. It is part of the cycle.'],
+  'fatigue': ['Cognitive rest is different from physical rest. Screens do not rest your brain. Try walking, music, or silence.', 'On low-energy days, one important thing done is a success. Stop trying to do everything.'],
+  'completion-difficulty': ['Use a closing ritual. At the end of each session write what you did and exactly what is next. This bridges sessions.', 'Pair submission with something enjoyable immediately after. Train your brain to associate finishing with reward.'],
+  'follow-through': ['Create an external system for final steps. A checklist pinned somewhere visible, not just in your head.', 'Ask someone to check in with you at submission time. Accountability bridges the gap executive function leaves.'],
+  'emotional-intensity': ['Your emotional intensity is not a character flaw. It often comes with genuine empathy and deep engagement.', 'When emotions spike, name them before acting. Saying this is disappointment activates the thinking brain.'],
+  'working-memory': ['Externalise everything. Write it down the moment you think it. Your brain needs a filing system outside your head.', 'Before switching tasks, write a one-line note about what you were doing and what is next. This bridges the gap.'],
+  'dyscalculia': ['Use visual tools for numbers like calendars, timelines, and colour-coded schedules. Pictures of time are easier than abstract numbers.', 'Always double-check number-based tasks with a calculator or a trusted person. This is smart strategy, not weakness.'],
+  'sleep-disruption': ['Protect your sleep environment like a priority, not a luxury. Even one hour more makes a measurable difference to focus.', 'If routine keeps breaking down, design the smallest possible consistent anchor. One thing at the same time each day.'],
+  'routine-dependent': ['Build predictable rituals around work. Same place, same signal, same starting sequence. Your brain needs to know what is coming.', 'When disruption happens, name it explicitly. Then choose one small anchor to re-establish it.'],
+  'suppression': ['What you suppress does not disappear. It builds up. Even 5 minutes of journalling or movement can act as a pressure valve.', 'Name the thing you are suppressing before entering a difficult situation. Naming it gives you just enough distance to manage it.'],
+  'compensating': ['Your compensating strategies like lists, reminders, and systems are not crutches. They are exactly how your brain works best. Build on them.']
+};
+
+var DESCRIPTIONS = {
+  adhd: 'Your brain is wired for novelty, urgency, and interest, not importance or arbitrary deadlines. This is not laziness. It is a different operating system, and it has real strengths.',
+  dyslexia: 'Your brain processes language differently, often thinking in images, patterns, and connections before words arrive. That is a real strength, even when writing is genuinely hard.',
+  perfectionism: 'Your standards are high because you care deeply. But perfectionism often protects you from the vulnerability of being seen and judged. The work is good enough.',
+  autism: 'You experience the world with intensity and precision. Sensory input, social energy, and unpredictability cost you more than they cost others. That is real, not an exaggeration.',
+  anxiety: 'Your nervous system is running on high alert. It is trying to protect you, but it often mistakes academic challenge for actual danger.',
+  burnout: 'You have been working hard for a long time, often without the accommodations your brain genuinely needs. Rest is not giving up. It is necessary maintenance.',
+  masking: 'You are spending enormous energy making yourself appear to function in ways that do not come naturally. That energy is real, and it is being spent on performance instead of learning. You deserve spaces where you do not have to perform.',
+  working_memory: 'Your working memory works differently, not worse, differently. Most strategies that work for ND brains involve getting things out of your head and into a system. That is not a weakness. It is the strategy.',
+  dyscalculia: 'Numbers, time, and data processing can work differently in ND brains. This often goes unrecognised because people assume it is just being bad at maths. It is a real processing difference, and there are real workarounds.'
+};
+
+var CHIP_COLS = ['chip-coral','chip-amber','chip-sage','chip-sky','chip-lav'];
+var CHIP_LABELS = {
+  'adhd':'ADHD tendencies','hyperfocus':'Hyperfocus','distractible':'Distractible',
+  'dyslexia':'Dyslexic processing','visual-learner':'Visual learner','auditory':'Auditory learner',
+  'task-initiation':'Task initiation','procrastination':'Procrastination','perfectionism':'Perfectionism',
+  'fear-of-failure':'Fear of failure','time-blind':'Time blindness','now-not-now':'Now/not-now thinking',
+  'autism':'Autistic traits','masking':'Masking','rejection-sensitive':'Rejection sensitivity',
+  'sensory-overwhelm':'Sensory sensitivity','burnout':'Burnout','boom-bust':'Boom and bust energy',
+  'shutdown':'Shutdown tendency','executive-function':'Executive function',
+  'completion-difficulty':'Completion challenges','anxiety':'Anxiety','urgency-driven':'Urgency-driven',
+  'writing-difficulty':'Writing challenges','emotional-intensity':'Emotional intensity',
+  'follow-through':'Follow-through gaps','working-memory':'Working memory challenges',
+  'dyscalculia':'Dyscalculia','sleep-disruption':'Sleep disruption',
+  'routine-dependent':'Routine dependent','exhaustion':'Masking exhaustion',
+  'suppression':'Suppression and holding in','compensating':'Compensating strategies'
+};
+
+var currentQ = 0, answers = [], allTags = [];
+
+function startQuiz() {
+  currentQ = 0; answers = []; allTags = [];
+  document.getElementById('chrome').style.display = 'flex';
+  showScreen('s-question');
+  showQ(0);
+  spawnRipple(rW/2, rH/2, '255,140,105', 'large');
+}
+
+function showQ(i) {
+  if (i >= QUESTIONS.length) { buildProfile(); return; }
+  var q = QUESTIONS[i];
+  var pct = (i / QUESTIONS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('qCounter').textContent = (i+1) + ' / ' + QUESTIONS.length;
+  document.getElementById('qCategory').textContent = q.cat;
+  document.getElementById('qText').textContent = q.text;
+  document.getElementById('qHint').textContent = q.hint || '';
+  var opts = document.getElementById('qOptions');
+  opts.innerHTML = '';
+  q.opts.forEach(function(opt, idx) {
+    var btn = document.createElement('button');
+    btn.className = 'option-btn fade-in';
+    btn.style.animationDelay = (idx * .07) + 's';
+    var icon = document.createElement('span');
+    icon.className = 'option-icon';
+    icon.textContent = opt.i;
+    var txt = document.createElement('span');
+    txt.textContent = opt.t;
+    btn.appendChild(icon);
+    btn.appendChild(txt);
+    btn.onclick = function() {
+      allTags = allTags.concat(opt.tags);
+      answers.push({q: q.text, a: opt.t, tags: opt.tags});
+      spawnRipple(rW/2, rH/2, '255,140,105', 'small');
+      currentQ++;
+      setTimeout(function() { showQ(currentQ); }, 180);
+    };
+    opts.appendChild(btn);
+  });
+}
+
+function buildProfile() {
+  document.getElementById('chrome').style.display = 'none';
+  showScreen('s-profile');
+  spawnRipple(rW/2, rH/2, '255,140,105', 'xl');
+  var tagCount = {};
+  allTags.forEach(function(t) { tagCount[t] = (tagCount[t] || 0) + 1; });
+  var topTags = Object.entries(tagCount).sort(function(a,b){ return b[1]-a[1]; }).slice(0,7).map(function(e){ return e[0]; });
+
+  var chipContainer = document.getElementById('traitChips');
+  chipContainer.innerHTML = '';
+  topTags.forEach(function(tag, i) {
+    if (CHIP_LABELS[tag]) {
+      var chip = document.createElement('span');
+      chip.className = 'trait-chip ' + CHIP_COLS[i % CHIP_COLS.length];
+      chip.textContent = CHIP_LABELS[tag];
+      chipContainer.appendChild(chip);
+    }
+  });
+
+  var nADHD = allTags.filter(function(t){ return ['adhd','hyperfocus','distractible','time-blind','urgency-driven','task-initiation','now-not-now','boom-bust'].indexOf(t) > -1; }).length;
+  var nAutism = allTags.filter(function(t){ return ['autism','masking','sensory-overwhelm','shutdown','written-preferred'].indexOf(t) > -1; }).length;
+  var nDyslexia = allTags.filter(function(t){ return ['dyslexia','visual-learner','auditory','writing-difficulty'].indexOf(t) > -1; }).length;
+  var nPerf = allTags.filter(function(t){ return ['perfectionism','fear-of-failure','rework'].indexOf(t) > -1; }).length;
+
+  var sub = 'Your brain has a unique pattern. Understanding it is the first step to working with it.';
+  if (nADHD > 4 && nAutism > 2) sub = 'Your brain shows both ADHD and autistic traits, a combination that is far more common than most people realise, and it comes with real strengths.';
+  else if (nADHD > 4) sub = 'Your brain shows strong ADHD patterns, wired for novelty, urgency, and interest. That is a real superpower in the right conditions.';
+  else if (nAutism > 3) sub = 'Your brain shows autistic traits, precision, intensity, and a need for predictability. That is a genuine strength, even when it is difficult.';
+  else if (nDyslexia > 2 && nADHD > 2) sub = 'Your brain processes information differently. Dyslexic and ADHD traits often come together, and often bring real creative and lateral thinking strengths.';
+  else if (nPerf > 2) sub = 'Perfectionism is shaping a lot of your experience. It is not a flaw. It is a strategy your brain developed. But it may be costing you more than it gives.';
+  document.getElementById('profileSubtitle').textContent = sub;
+
+  var ptext = '';
+  if (nADHD > 3) ptext += DESCRIPTIONS.adhd + '\n\n';
+  if (nDyslexia > 2) ptext += DESCRIPTIONS.dyslexia + '\n\n';
+  if (nPerf > 2) ptext += DESCRIPTIONS.perfectionism + '\n\n';
+  if (nAutism > 2) ptext += DESCRIPTIONS.autism + '\n\n';
+  if (allTags.indexOf('burnout') > -1 || allTags.indexOf('fatigue') > -1) ptext += DESCRIPTIONS.burnout + '\n\n';
+  if (allTags.indexOf('masking') > -1 || allTags.indexOf('exhaustion') > -1) ptext += DESCRIPTIONS.masking + '\n\n';
+  if (allTags.indexOf('working-memory') > -1) ptext += DESCRIPTIONS.working_memory + '\n\n';
+  if (allTags.indexOf('dyscalculia') > -1) ptext += DESCRIPTIONS.dyscalculia + '\n\n';
+  if (!ptext) ptext = 'Your answers show a mixed pattern, which is completely normal. Neurodivergent brains rarely fit one neat category. What matters is finding what actually works for you.';
+  document.getElementById('profileText').textContent = ptext.trim();
+
+  var sc = document.getElementById('strategiesList');
+  sc.innerHTML = '';
+  var used = {};
+  var emojis = ['🎯','🧩','⚡','🛠','💡','🌱','🔑'];
+  var si = 0;
+  topTags.forEach(function(tag) {
+    if (STRAT_MAP[tag]) {
+      STRAT_MAP[tag].forEach(function(s) {
+        if (!used[s] && si < 6) {
+          used[s] = true;
+          var item = document.createElement('div');
+          item.className = 'strategy-item';
+          var num = document.createElement('span');
+          num.className = 'strategy-num';
+          num.textContent = emojis[si % emojis.length];
+          var txt = document.createElement('div');
+          txt.className = 'strategy-text';
+          txt.textContent = s;
+          item.appendChild(num);
+          item.appendChild(txt);
+          sc.appendChild(item);
+          si++;
+        }
+      });
+    }
+  });
+
+  var key = localStorage.getItem('pattern_api_key');
+  if (key) { document.getElementById('aiBox').style.display = 'block'; callAI(key); }
+}
+
+function callAI(key) {
+  var summary = answers.map(function(a) { return 'Q: ' + a.q + '\nA: ' + a.a; }).join('\n\n');
+  var sys = 'You are a warm, knowledgeable academic skills advisor specialising in neurodivergent students. Plain language only. No clinical jargon. Non-judgmental, specific, and practical. Write in second person.';
+  var prompt = 'Based on these quiz answers, write a personalised 4-5 sentence profile of how this student brain works and what is actually going on neurologically. Then identify the single most important thing they should focus on first and explain why in 1-2 sentences. Then give 2-3 highly specific strategies tailored exactly to their pattern. Warm, honest, practical. Flowing prose. No bullet points.\n\n' + summary;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 350, system: sys, messages: [{ role: 'user', content: prompt }] })
+  }).then(function(res) { return res.json(); }).then(function(d) {
+    var text = d.content && d.content[0] && d.content[0].text ? d.content[0].text.trim() : 'Could not generate profile. Check your API key.';
+    document.getElementById('aiText').textContent = text;
+  }).catch(function() {
+    document.getElementById('aiText').textContent = 'Could not connect. Check your API key and try again.';
+  });
+}
+
+function copyProfile() {
+  var subtitle = document.getElementById('profileSubtitle').textContent;
+  var traits = Array.from(document.getElementById('traitChips').children).map(function(c){return c.textContent;}).join(', ');
+  var desc = document.getElementById('profileText').textContent;
+  var strats = Array.from(document.getElementById('strategiesList').querySelectorAll('.strategy-text')).map(function(s,i){return (i+1)+'. '+s.textContent;}).join('\n');
+  var text = 'MY BRAIN PATTERN\n\n' + subtitle + '\n\nTraits: ' + traits + '\n\n' + desc + '\n\nStrategies:\n' + strats + '\n\n— Generated by Pattern at coherence-nikolai.app';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){
+      var btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(function(){ btn.textContent = 'Copy my profile'; }, 2000);
+    });
+  }
+}
+
+function showFacilitator() {
+  showScreen('s-facilitator');
+  var container = document.getElementById('facilitatorQs');
+  container.innerHTML = '';
+  QUESTIONS.forEach(function(q, i) {
+    var block = document.createElement('div');
+    block.style.cssText = 'background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:16px;padding:20px;margin-bottom:12px';
+    var cat = document.createElement('div');
+    cat.style.cssText = 'font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);font-weight:600;margin-bottom:8px';
+    cat.textContent = (i+1) + '. ' + q.cat;
+    var qtext = document.createElement('div');
+    qtext.style.cssText = 'font-size:18px;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.4';
+    qtext.textContent = q.text;
+    var opts = document.createElement('div');
+    opts.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+    q.opts.forEach(function(opt) {
+      var o = document.createElement('div');
+      o.style.cssText = 'font-size:15px;font-weight:300;color:rgba(245,240,232,.55);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);display:flex;gap:10px';
+      o.innerHTML = '<span>' + opt.i + '</span><span>' + opt.t + '</span>';
+      opts.appendChild(o);
+    });
+    block.appendChild(cat);
+    block.appendChild(qtext);
+    if (q.hint) {
+      var hint = document.createElement('div');
+      hint.style.cssText = 'font-size:13px;font-weight:300;color:rgba(245,240,232,.35);margin-bottom:10px;font-style:italic';
+      hint.textContent = q.hint;
+      block.appendChild(hint);
+    }
+    block.appendChild(opts);
+    container.appendChild(block);
+  });
+}
+</script>
+<!-- FACILITATOR -->
+<div class="screen" id="s-facilitator" style="overflow-y:auto;justify-content:flex-start;padding-top:60px">
+  <div style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:20px;padding-bottom:40px">
+    <div style="font-size:clamp(24px,6vw,30px);font-weight:700;color:var(--coral);text-align:center">Workshop Guide</div>
+    <div style="font-size:clamp(14px,3.5vw,16px);font-weight:300;color:var(--dim);text-align:center;line-height:1.7">Use this to walk a group through the questions. Read each question aloud, let students answer on their own devices or discuss together.</div>
+    <div id="facilitatorQs"></div>
+    <button onclick="goHome()" style="padding:16px;border-radius:14px;background:transparent;border:1.5px solid var(--border);font-family:var(--font);font-size:16px;font-weight:600;color:var(--dim);cursor:pointer;-webkit-tap-highlight-color:transparent">Back to home</button>
+  </div>
+</div>
 </body>
 </html>
