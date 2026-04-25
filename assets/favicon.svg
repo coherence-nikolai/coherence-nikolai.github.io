@@ -2,24 +2,24 @@
   <title id="title">Tone Recall mark</title>
   <desc id="desc">A glowing orb with a wave passing through it.</desc>
   <defs>
-    <radialGradient id="backgroundGlow" cx="50%" cy="43%" r="72%">
-      <stop offset="0" stop-color="#6f6049"/>
-      <stop offset=".32" stop-color="#2d221c"/>
+    <radialGradient id="backgroundGlow" cx="50%" cy="50%" r="72%">
+      <stop offset="0" stop-color="#65543c"/>
+      <stop offset=".34" stop-color="#2c2118"/>
       <stop offset=".72" stop-color="#100b0a"/>
       <stop offset="1" stop-color="#070404"/>
     </radialGradient>
-    <radialGradient id="centerLight" cx="48%" cy="42%" r="54%">
+    <radialGradient id="centerLight" cx="50%" cy="50%" r="68%">
       <stop offset="0" stop-color="#fff7e8"/>
-      <stop offset=".18" stop-color="#f3dec0" stop-opacity=".98"/>
-      <stop offset=".42" stop-color="#b89a73" stop-opacity=".62"/>
-      <stop offset=".72" stop-color="#6b5b44" stop-opacity=".28"/>
+      <stop offset=".16" stop-color="#f3dec0" stop-opacity=".82"/>
+      <stop offset=".46" stop-color="#b89a73" stop-opacity=".36"/>
+      <stop offset=".74" stop-color="#6b5b44" stop-opacity=".14"/>
       <stop offset="1" stop-color="#f3dec0" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="orbBody" cx="48%" cy="42%" r="58%">
+    <radialGradient id="orbBody" cx="50%" cy="50%" r="62%">
       <stop offset="0" stop-color="#fff5dd"/>
-      <stop offset=".2" stop-color="#efd5ad"/>
-      <stop offset=".48" stop-color="#a98a63" stop-opacity=".5"/>
-      <stop offset=".78" stop-color="#4b3f31" stop-opacity=".2"/>
+      <stop offset=".22" stop-color="#efd5ad" stop-opacity=".8"/>
+      <stop offset=".5" stop-color="#a98a63" stop-opacity=".42"/>
+      <stop offset=".78" stop-color="#4b3f31" stop-opacity=".16"/>
       <stop offset="1" stop-color="#0b0707" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="ringStroke" x1="240" y1="230" x2="780" y2="820" gradientUnits="userSpaceOnUse">
@@ -51,13 +51,13 @@
   </defs>
 
   <rect width="1024" height="1024" rx="224" fill="url(#backgroundGlow)"/>
-  <circle cx="512" cy="512" r="364" fill="#d5b98a" opacity=".14" filter="url(#softHalo)"/>
-  <circle cx="512" cy="512" r="260" fill="url(#orbBody)" opacity=".92"/>
-  <circle cx="512" cy="512" r="116" fill="url(#centerLight)" opacity=".95" filter="url(#softHalo)"/>
-  <circle cx="512" cy="512" r="281" fill="none" stroke="url(#ringStroke)" stroke-width="14" stroke-opacity=".74"/>
-  <circle cx="512" cy="512" r="281" fill="none" stroke="#fff7e8" stroke-width="5" stroke-opacity=".36"/>
+  <circle cx="512" cy="512" r="372" fill="#d5b98a" opacity=".12" filter="url(#softHalo)"/>
+  <circle cx="512" cy="512" r="294" fill="url(#orbBody)" opacity=".68"/>
+  <circle cx="512" cy="512" r="218" fill="url(#centerLight)" opacity=".54" filter="url(#softHalo)"/>
+  <circle cx="512" cy="512" r="300" fill="none" stroke="url(#ringStroke)" stroke-width="13" stroke-opacity=".72"/>
+  <circle cx="512" cy="512" r="300" fill="none" stroke="#fff7e8" stroke-width="4" stroke-opacity=".34"/>
 
-  <path d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527" fill="none" stroke="#f7ead7" stroke-width="42" stroke-linecap="round" stroke-opacity=".22" filter="url(#waveGlow)"/>
-  <path d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527" fill="none" stroke="url(#waveStroke)" stroke-width="22" stroke-linecap="round" stroke-opacity=".96" filter="url(#waveGlow)"/>
-  <path d="M95 562 C177 487 245 421 340 528 C421 619 494 687 607 548 C705 427 795 439 929 527" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-opacity=".56"/>
+  <path d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514" fill="none" stroke="#f7ead7" stroke-width="46" stroke-linecap="round" stroke-opacity=".24" filter="url(#waveGlow)"/>
+  <path d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514" fill="none" stroke="url(#waveStroke)" stroke-width="24" stroke-linecap="round" stroke-opacity=".96" filter="url(#waveGlow)"/>
+  <path d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-opacity=".56"/>
 </svg>
