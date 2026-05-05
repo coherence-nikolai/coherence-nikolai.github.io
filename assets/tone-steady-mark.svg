@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Tone Steady mark</title>
+  <desc id="desc">A quiet mineral orb held by a luminous vertical plumb line.</desc>
+  <defs>
+    <radialGradient id="backgroundGlow" cx="50%" cy="48%" r="80%">
+      <stop offset="0" stop-color="#5c4932"/>
+      <stop offset=".34" stop-color="#2a1e16"/>
+      <stop offset=".74" stop-color="#100b09"/>
+      <stop offset="1" stop-color="#050303"/>
+    </radialGradient>
+    <radialGradient id="orbCore" cx="52%" cy="47%" r="66%">
+      <stop offset="0" stop-color="#fff9ec"/>
+      <stop offset=".16" stop-color="#ead9bd"/>
+      <stop offset=".44" stop-color="#9d835f"/>
+      <stop offset=".74" stop-color="#3c3025"/>
+      <stop offset="1" stop-color="#120d0a"/>
+    </radialGradient>
+    <radialGradient id="orbVeil" cx="50%" cy="47%" r="72%">
+      <stop offset="0" stop-color="#fff8ed" stop-opacity=".72"/>
+      <stop offset=".28" stop-color="#e4c795" stop-opacity=".34"/>
+      <stop offset=".72" stop-color="#6f5638" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#120d0a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ringStroke" x1="238" y1="224" x2="786" y2="798" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff8ed"/>
+      <stop offset=".48" stop-color="#cdbb98"/>
+      <stop offset="1" stop-color="#fff0d4"/>
+    </linearGradient>
+    <linearGradient id="plumbStroke" x1="512" y1="188" x2="512" y2="818" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffaf1"/>
+      <stop offset=".22" stop-color="#d6bf98"/>
+      <stop offset=".5" stop-color="#ffffff"/>
+      <stop offset=".78" stop-color="#d6ae77"/>
+      <stop offset="1" stop-color="#fff2dc"/>
+    </linearGradient>
+    <radialGradient id="anchorGlow" cx="50%" cy="50%" r="64%">
+      <stop offset="0" stop-color="#fff9ef"/>
+      <stop offset=".26" stop-color="#eed2a7" stop-opacity=".74"/>
+      <stop offset=".62" stop-color="#a87c4f" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#fff2dc" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softHalo" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="46" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="lineGlow" x="-45%" y="-80%" width="190%" height="260%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#backgroundGlow)"/>
+  <circle cx="512" cy="514" r="430" fill="#d7bb91" opacity=".09" filter="url(#softHalo)"/>
+  <circle cx="512" cy="508" r="334" fill="url(#orbCore)"/>
+  <circle cx="512" cy="508" r="352" fill="url(#orbVeil)" filter="url(#softHalo)"/>
+  <circle cx="512" cy="508" r="296" fill="none" stroke="url(#ringStroke)" stroke-width="12" stroke-opacity=".72"/>
+  <circle cx="512" cy="508" r="296" fill="none" stroke="#fff8ec" stroke-width="3.5" stroke-opacity=".28"/>
+
+  <path d="M512 188 L512 812" fill="none" stroke="#f7ebd8" stroke-width="24" stroke-linecap="round" stroke-opacity=".13" filter="url(#lineGlow)"/>
+  <path d="M512 188 L512 812" fill="none" stroke="url(#plumbStroke)" stroke-width="7" stroke-linecap="round" stroke-opacity=".96" filter="url(#lineGlow)"/>
+  <path d="M512 188 L512 812" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-opacity=".56"/>
+
+  <circle cx="512" cy="352" r="15" fill="#fff8ea" opacity=".84" filter="url(#lineGlow)"/>
+  <circle cx="512" cy="352" r="4" fill="#ffffff" opacity=".9"/>
+  <circle cx="512" cy="512" r="24" fill="#fff8ea" opacity=".5" filter="url(#lineGlow)"/>
+  <circle cx="512" cy="512" r="6" fill="#ffffff" opacity=".86"/>
+  <circle cx="512" cy="704" r="44" fill="url(#anchorGlow)" opacity=".68" filter="url(#softHalo)"/>
+  <circle cx="512" cy="704" r="14" fill="#fff8ea" opacity=".94"/>
+  <circle cx="512" cy="704" r="5" fill="#ffffff" opacity=".9"/>
+</svg>
