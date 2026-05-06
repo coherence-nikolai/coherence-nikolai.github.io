@@ -510,47 +510,6 @@ dd {
   filter: drop-shadow(0 0 30px rgba(232, 215, 178, 0.30));
 }
 
-.ritual-mark {
-  border: 1px solid rgba(242, 234, 223, 0.16);
-  background:
-    radial-gradient(circle, rgba(255, 248, 238, 0.28), rgba(235, 201, 123, 0.08) 36%, transparent 66%),
-    rgba(255, 255, 255, 0.03);
-}
-
-.ritual-mark span {
-  position: relative;
-  width: 58%;
-  aspect-ratio: 1;
-  border: 1.5px solid rgba(246, 226, 192, 0.58);
-  border-radius: 999px;
-  box-shadow:
-    0 0 0 16px rgba(246, 226, 192, 0.028),
-    0 0 42px rgba(232, 215, 178, 0.14);
-}
-
-.ritual-mark span::before,
-.ritual-mark span::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255, 247, 236, 0.86);
-  box-shadow: 0 0 20px rgba(232, 215, 178, 0.28);
-}
-
-.ritual-mark span::before {
-  left: 50%;
-  top: -4px;
-  transform: translateX(-50%);
-}
-
-.ritual-mark span::after {
-  left: 50%;
-  bottom: -4px;
-  transform: translateX(-50%);
-}
-
 .app-card strong {
   display: block;
   margin-bottom: 12px;
