@@ -1,32 +1,142 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Northstar logo">
   <defs>
-    <linearGradient id="northstar-stroke" x1="21" y1="25" x2="72" y2="72" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFF2CF" />
-      <stop offset="0.48" stop-color="#D8B463" />
-      <stop offset="1" stop-color="#76A49B" />
+    <linearGradient id="northstar-stroke" x1="22" y1="72" x2="73" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFE7A7" />
+      <stop offset="0.5" stop-color="#D6B160" />
+      <stop offset="1" stop-color="#8DB6AD" />
     </linearGradient>
-    <radialGradient id="northstar-dot" cx="34%" cy="28%" r="74%">
-      <stop offset="0" stop-color="#FFF0C5" />
-      <stop offset="0.62" stop-color="#D4A65A" />
-      <stop offset="1" stop-color="#A87542" />
+    <linearGradient id="northstar-edge" x1="22" y1="72" x2="73" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6E6D5C" />
+      <stop offset="1" stop-color="#3E5C55" />
+    </linearGradient>
+    <radialGradient id="northstar-star-fill" cx="42%" cy="30%" r="72%">
+      <stop offset="0" stop-color="#FFF3C4" />
+      <stop offset="0.55" stop-color="#D8AD58" />
+      <stop offset="1" stop-color="#8F6F3E" />
     </radialGradient>
+    <radialGradient id="northstar-star-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFE8A6" stop-opacity="0.75" />
+      <stop offset="1" stop-color="#FFE8A6" stop-opacity="0" />
+    </radialGradient>
+    <filter id="northstar-shadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#10211F" flood-opacity="0.22" />
+    </filter>
   </defs>
+  <style>
+    .northstar-sheen {
+      animation: northstar-trace 7.5s ease-in-out infinite;
+      stroke-dasharray: 14 118;
+      stroke-dashoffset: 118;
+    }
+
+    .northstar-star,
+    .northstar-halo {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .northstar-star {
+      animation: northstar-star-breathe 6.5s ease-in-out infinite;
+    }
+
+    .northstar-halo {
+      animation: northstar-glow-breathe 6.5s ease-in-out infinite;
+    }
+
+    @keyframes northstar-trace {
+      0%, 42%, 100% {
+        opacity: 0;
+        stroke-dashoffset: 118;
+      }
+
+      52% {
+        opacity: 0.52;
+      }
+
+      68% {
+        opacity: 0;
+        stroke-dashoffset: -18;
+      }
+    }
+
+    @keyframes northstar-star-breathe {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      52% {
+        transform: scale(1.055);
+      }
+    }
+
+    @keyframes northstar-glow-breathe {
+      0%, 100% {
+        opacity: 0.18;
+        transform: scale(0.95);
+      }
+
+      52% {
+        opacity: 0.42;
+        transform: scale(1.08);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .northstar-sheen,
+      .northstar-star,
+      .northstar-halo {
+        animation: none;
+      }
+
+      .northstar-sheen {
+        opacity: 0;
+      }
+    }
+  </style>
+  <circle class="northstar-halo" cx="70" cy="24" r="18" fill="url(#northstar-star-glow)" />
   <path
-    d="M24 70V27L68 70V27"
+    d="M24 70V28L68 70V24"
     fill="none"
-    stroke="#10211F"
+    stroke="#101C1A"
     stroke-linecap="round"
     stroke-linejoin="round"
     stroke-width="15"
-    opacity="0.58"
+    opacity="0.52"
   />
   <path
-    d="M24 70V27L68 70V27"
+    d="M24 70V28L68 70V24"
+    fill="none"
+    stroke="url(#northstar-edge)"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="12"
+    opacity="0.78"
+  />
+  <path
+    d="M24 70V28L68 70V24"
     fill="none"
     stroke="url(#northstar-stroke)"
     stroke-linecap="round"
     stroke-linejoin="round"
-    stroke-width="9.5"
+    stroke-width="8.4"
+    filter="url(#northstar-shadow)"
   />
-  <circle cx="68" cy="27" r="5.2" fill="url(#northstar-dot)" />
+  <path
+    class="northstar-sheen"
+    d="M24 70V28L68 70V24"
+    fill="none"
+    stroke="#FFF7D8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="4.2"
+  />
+  <path
+    class="northstar-star"
+    d="M70 10.5L73.9 20.1L84 24L73.9 27.9L70 37.5L66.1 27.9L56 24L66.1 20.1Z"
+    fill="url(#northstar-star-fill)"
+    stroke="#FFF4CF"
+    stroke-linejoin="round"
+    stroke-width="1.6"
+    filter="url(#northstar-shadow)"
+  />
 </svg>

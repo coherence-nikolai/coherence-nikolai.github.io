@@ -3162,6 +3162,16 @@ html[data-runtime="native"] .support-state-button {
     }
   }
 
+  @keyframes northstarBrandBreathe {
+    0%, 100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-0.12rem);
+    }
+  }
+
   body {
     background:
       radial-gradient(circle at 16% 4%, rgba(255, 249, 239, 0.96), transparent 22rem),
@@ -3379,10 +3389,11 @@ html[data-runtime="native"] .support-state-button {
     position: relative;
     display: flex;
     align-self: stretch;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
-    min-height: clamp(6.25rem, 18dvh, 10.5rem);
-    padding: 0.65rem clamp(0.3rem, 2vw, 0.65rem) 0.35rem;
+    gap: 1rem;
+    min-height: clamp(6.4rem, 18dvh, 10.75rem);
+    padding: 0.72rem clamp(0.55rem, 2.8vw, 1rem) 0.48rem;
     overflow: hidden;
     isolation: isolate;
   }
@@ -3390,36 +3401,52 @@ html[data-runtime="native"] .support-state-button {
   html[data-active-panel="dashboard"] .dashboard-brand-echo::before {
     content: "";
     position: absolute;
-    inset: auto 0 0;
-    height: 68%;
-    border-radius: 999px 999px 22px 22px;
+    inset: auto 0.25rem 0;
+    height: 72%;
+    border-top: 1px solid rgba(66, 109, 104, 0.12);
+    border-radius: 34px 34px 22px 22px;
     background:
-      radial-gradient(circle at 14% 60%, rgba(216, 180, 99, 0.22), transparent 7rem),
-      radial-gradient(circle at 76% 58%, rgba(66, 109, 104, 0.15), transparent 9rem);
-    filter: blur(0.2px);
-    opacity: 0.82;
+      linear-gradient(90deg, rgba(216, 180, 99, 0.18), rgba(255, 247, 233, 0.2) 46%, rgba(66, 109, 104, 0.12)),
+      radial-gradient(circle at 12% 68%, rgba(216, 180, 99, 0.2), transparent 7rem),
+      radial-gradient(circle at 88% 52%, rgba(66, 109, 104, 0.14), transparent 9rem);
+    opacity: 0.9;
     z-index: -1;
   }
 
-  html[data-active-panel="dashboard"] .dashboard-brand-echo img {
-    width: clamp(5.4rem, 24vw, 7.6rem);
-    height: clamp(5.4rem, 24vw, 7.6rem);
-    opacity: 0.82;
+  html[data-active-panel="dashboard"] .dashboard-brand-mark {
+    width: clamp(4.8rem, 21vw, 6.7rem);
+    height: clamp(4.8rem, 21vw, 6.7rem);
+    opacity: 0.95;
+    animation: northstarBrandBreathe 7s ease-in-out infinite;
     filter:
-      drop-shadow(0 0.7rem 1.4rem rgba(66, 109, 104, 0.14))
-      drop-shadow(0 0.2rem 0.8rem rgba(216, 180, 99, 0.16));
+      drop-shadow(0 0.75rem 1.35rem rgba(66, 109, 104, 0.16))
+      drop-shadow(0 0.24rem 0.8rem rgba(216, 180, 99, 0.2));
   }
 
-  html[data-active-panel="dashboard"] .dashboard-brand-echo span {
-    max-width: 13ch;
-    padding-bottom: clamp(0.55rem, 2.4dvh, 1.25rem);
-    color: rgba(65, 80, 72, 0.66);
-    font-family: var(--font-brand);
-    font-size: clamp(18px, 4.9vw, 23px);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 0.98;
+  html[data-active-panel="dashboard"] .dashboard-brand-wordmark {
+    display: grid;
+    justify-items: end;
+    gap: 0.16rem;
+    padding-bottom: clamp(0.2rem, 1.2dvh, 0.72rem);
     text-align: right;
+  }
+
+  html[data-active-panel="dashboard"] .dashboard-brand-wordmark strong {
+    color: rgba(47, 72, 66, 0.86);
+    font-family: var(--font-brand);
+    font-size: clamp(32px, 8.6vw, 43px);
+    font-weight: 700;
+    letter-spacing: -0.075em;
+    line-height: 0.9;
+  }
+
+  html[data-active-panel="dashboard"] .dashboard-brand-wordmark span {
+    max-width: 18ch;
+    color: rgba(65, 80, 72, 0.64);
+    font-size: clamp(12px, 3.2vw, 15px);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
   }
 
   html[data-active-panel="dashboard-options"] .panel-head-back {
