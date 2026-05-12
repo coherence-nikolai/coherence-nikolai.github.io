@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Northstar | Academic Skills Companion</title>
+  <meta name="theme-color" content="#f5efe6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Northstar">
+  <link rel="canonical" href="https://coherence-nikolai.app/northstar/">
+  <meta property="og:title" content="Northstar | Academic Skills Companion">
+  <meta
+    property="og:description"
+    content="A calmer, smarter academic skills companion for neurodivergent adult students."
+  >
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/northstar/">
+  <meta
+    name="description"
+    content="A calmer, smarter academic skills companion for neurodivergent adult students."
+  >
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css?v=20260511e">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <nav class="nav-card card" aria-label="Primary sections" role="tablist">
+        <div class="rail-brand">
+          <img class="rail-mark" src="./brand-mark.svg" alt="">
+          <div>
+            <p class="eyebrow">Northstar</p>
+            <strong>Workspace</strong>
+          </div>
+        </div>
+        <button class="nav-link is-active" id="nav-dashboard" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
+        <button class="nav-link" id="nav-planner" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
+        <button class="nav-link" id="nav-unpack" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
+        <button class="nav-link" id="nav-notes" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
+        <button class="nav-link" id="nav-profile" role="tab" aria-selected="false" aria-controls="panel-profile" data-panel-target="profile">Profile</button>
+        <button class="nav-link" id="nav-finish" role="tab" aria-selected="false" aria-controls="panel-finish" data-panel-target="finish">Finish</button>
+      </nav>
+
+      <details class="snapshot-card disclosure card">
+        <summary class="disclosure-summary">
+          <p class="eyebrow">Advisor Snapshot</p>
+          <h2>Bring the useful bits to your appointment</h2>
+        </summary>
+        <div class="disclosure-body">
+          <p class="microcopy">
+            Northstar can turn your task, blockers, questions, and study profile into one shareable summary.
+          </p>
+          <div class="button-row">
+            <button class="button primary" id="copySnapshotBtn">Copy snapshot</button>
+            <button class="button subtle" id="jumpToProfileBtn">Review profile</button>
+          </div>
+          <div class="mini-output" id="snapshotPreview">
+            Your snapshot will appear here after you use the planner, unpacker, notes, or profile tools.
+          </div>
+        </div>
+      </details>
+
+      <details class="resource-card disclosure card">
+        <summary class="disclosure-summary">
+          <p class="eyebrow">Support</p>
+          <h2>Customise for your institution</h2>
+        </summary>
+        <div class="disclosure-body">
+          <div id="resourceList" class="stack-sm"></div>
+        </div>
+      </details>
+    </aside>
+
+    <main class="main">
+      <header class="app-topbar card">
+        <div class="topbar-row">
+          <div class="topbar-identity">
+            <p class="eyebrow">Study workspace</p>
+            <div class="app-brand">
+              <img class="brand-mark" src="./brand-mark.svg" alt="Northstar logo">
+              <div class="app-brand-copy">
+                <h1>Northstar</h1>
+                <p class="microcopy">Built for neurodivergent ways of studying.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="topbar-actions">
+            <button class="button subtle utility-button" id="focusModeBtn" type="button" aria-pressed="false">
+              Focus mode off
+            </button>
+
+            <details class="settings-panel disclosure toolbar-panel">
+              <summary class="disclosure-summary settings-summary">
+                <p class="eyebrow">Display</p>
+                <h3>Reading settings</h3>
+                <p class="microcopy">Text, contrast, and motion.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div class="settings-grid">
+                  <label class="setting">
+                    <span>Font size</span>
+                    <select id="fontScaleSelect">
+                      <option value="standard">Standard</option>
+                      <option value="large">Large</option>
+                      <option value="xlarge">Extra large</option>
+                    </select>
+                  </label>
+
+                  <label class="setting">
+                    <span>Reading font</span>
+                    <select id="fontFamilySelect">
+                      <option value="standard">Northstar default</option>
+                      <option value="dyslexia">Dyslexia-friendly</option>
+                    </select>
+                  </label>
+
+                  <label class="setting">
+                    <span>Contrast</span>
+                    <select id="contrastSelect">
+                      <option value="soft">Soft</option>
+                      <option value="high">High</option>
+                    </select>
+                  </label>
+
+                  <label class="setting">
+                    <span>Motion</span>
+                    <select id="motionSelect">
+                      <option value="normal">Standard</option>
+                      <option value="reduced">Reduced</option>
+                      <option value="minimal">Minimal</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="button-row">
+                  <button class="button subtle" id="resetDataBtn">Reset Northstar data</button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="topbar-context">
+          <article class="workspace-pill" aria-label="Current workspace">
+            <span class="workspace-pill-label">Current space</span>
+            <strong id="currentPanelLabel">Today</strong>
+          </article>
+
+          <details class="support-state-panel disclosure" id="supportStatePanel">
+            <summary class="disclosure-summary support-state-summary">
+              <div class="support-state-copy">
+                <p class="eyebrow">Support level</p>
+                <h3 id="supportStateSummaryTitle">Standard support</h3>
+                <p class="microcopy" id="supportStateHint">Balanced guidance with one clear next move and optional detail when you want it.</p>
+              </div>
+            </summary>
+            <div class="disclosure-body">
+              <div class="support-state-buttons" id="supportStateButtons" role="radiogroup" aria-label="Support level">
+                <button class="support-state-button" type="button" role="radio" aria-checked="false" data-support-state="low">Low energy</button>
+                <button class="support-state-button" type="button" role="radio" aria-checked="false" data-support-state="standard">Standard</button>
+                <button class="support-state-button" type="button" role="radio" aria-checked="false" data-support-state="detailed">Detailed</button>
+              </div>
+              <p class="microcopy support-state-footer">Open this when you want more or less structure than the default.</p>
+            </div>
+          </details>
+        </div>
+      </header>
+
+      <nav class="mobile-nav card" aria-label="Study sections" role="tablist">
+        <button class="nav-link is-active" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-profile" data-panel-target="profile">Profile</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-finish" data-panel-target="finish">Finish</button>
+      </nav>
+
+      <section class="resume-banner card" aria-label="Resume your last study thread">
+        <div class="resume-copy">
+          <p class="eyebrow">Resume</p>
+          <h3 id="resumePanelLabel">Pick up where you left off</h3>
+          <p class="microcopy" id="resumePanelCopy">
+            Northstar keeps your place, drafts, and next step visible so re-entry costs less.
+          </p>
+          <p class="resume-meta" id="resumePanelMeta">Last save not available yet.</p>
+          <p class="resume-summary" id="resumeSummary">
+            If you stop now, Northstar will reopen here and keep your current notes, task, and reflection drafts.
+          </p>
+          <div class="resume-stats" aria-label="Saved thread snapshot">
+            <article class="resume-stat">
+              <span class="status-label">Last route</span>
+              <strong id="statusRoute">Not set yet</strong>
+            </article>
+            <article class="resume-stat">
+              <span class="status-label">Saved notes</span>
+              <strong id="statusNotes">0 sessions</strong>
+            </article>
+            <article class="resume-stat">
+              <span class="status-label">Finish progress</span>
+              <strong id="statusFinish">0 of 0</strong>
+            </article>
+            <article class="resume-stat">
+              <span class="status-label">Return point</span>
+              <strong id="statusResume">Dashboard</strong>
+            </article>
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="button primary" id="resumeNowBtn">Resume now</button>
+          <button class="button subtle" id="saveThreadBtn">Pause here</button>
+        </div>
+      </section>
+
+      <button class="button subtle mobile-home-button" id="mobileHomeBtn" type="button">
+        Back to Northstar home
+      </button>
+
+      <section class="panel mobile-result-panel" id="panel-mobile-result" role="tabpanel" aria-labelledby="mobileResultTitle">
+        <div class="mobile-result-shell">
+          <div class="mobile-result-top">
+            <button class="button subtle back-button" id="mobileResultBackBtn" type="button">Back</button>
+            <span class="mobile-result-icon" id="mobileResultIcon" aria-hidden="true"></span>
+          </div>
+          <div class="mobile-result-copy">
+            <p class="eyebrow" id="mobileResultKicker">Result</p>
+            <h2 id="mobileResultTitle">Your next step</h2>
+            <p id="mobileResultSummary">Northstar will keep the result narrow and usable.</p>
+          </div>
+          <div class="mobile-result-body" id="mobileResultBody"></div>
+          <div class="mobile-result-actions">
+            <button class="button primary" id="mobileResultPrimaryBtn" type="button">Continue</button>
+            <button class="button subtle" id="mobileResultCopyBtn" type="button">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel is-active" id="panel-dashboard" role="tabpanel" aria-labelledby="nav-dashboard">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Today</p>
+            <h2>Start with one kind of help</h2>
+            <p class="panel-copy">
+              Pick the gentlest useful entry point. You can tune the route afterward if you want.
+            </p>
+          </div>
+        </div>
+
+        <article class="card today-quickstart-card">
+          <div class="today-quickstart-shell">
+            <div class="today-entry-copy">
+              <div class="today-mobile-brand" aria-hidden="true">
+                <img class="brand-mark" src="./brand-mark.svg" alt="">
+                <div class="today-mobile-brand-copy">
+                  <p class="eyebrow">Northstar</p>
+                  <strong>Built for neurodivergent ways of studying</strong>
+                </div>
+              </div>
+
+              <div class="section-heading today-entry-heading">
+                <p class="eyebrow">Start here</p>
+                <h3>Pick one first.</h3>
+                <p class="microcopy">Choose the closest fit, not the perfect one. Northstar can tune the route after you land.</p>
+              </div>
+
+              <p class="microcopy quick-route-note">Start with the gentlest useful move. The goal here is orientation, not getting it exactly right.</p>
+              <div class="today-inline-feedback" id="todayInlineFeedback" hidden></div>
+
+              <div class="button-row quickstart-actions">
+                <button class="button subtle" id="lowEnergyAssistBtn">Use a gentle reset</button>
+                <button class="button subtle today-desktop-resume" id="todayDesktopResumeBtn" type="button">Resume thread</button>
+              </div>
+
+              <div class="today-mobile-secondary">
+                <button class="button subtle" id="showMoreTodayBtn" type="button">More tools</button>
+                <button class="button subtle" id="quickResumeBtn" type="button">Resume thread</button>
+              </div>
+            </div>
+
+            <div class="today-entry-routes">
+              <div class="quick-route-grid" id="quickRouteButtons" role="group" aria-label="Quick start choices">
+                <button class="quick-route-button" type="button" data-route-target="dashboard" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Calm pressure</span>
+                  <strong>Everything feels too big</strong>
+                  <span>Lower the demand first, then take one small useful step.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="unpack" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Make sense</span>
+                  <strong>I do not know what this wants</strong>
+                  <span>Translate the brief before asking more of your brain.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="planner" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Begin</span>
+                  <strong>I need the first step</strong>
+                  <span>Turn the task into one visible action and begin there.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="notes" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Notes</span>
+                  <strong>I need to catch the thread</strong>
+                  <span>Capture one idea, question, cue, or task before it disappears.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="profile" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Profile</span>
+                  <strong>I need to understand my pattern</strong>
+                  <span>Answer one prompt about what makes studying more doable.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="finish" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Finish</span>
+                  <strong>I need to stop without losing it</strong>
+                  <span>Leave a clean return point before you step away.</span>
+                </button>
+              </div>
+
+              <p class="today-desktop-note">Need reflection or a clean stop? Open <strong>Profile</strong> or <strong>Finish</strong> from the sidebar when you are ready.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" id="panel-dashboard-options" role="tabpanel" aria-labelledby="nav-dashboard">
+        <div class="panel-head panel-head-back">
+          <button class="button subtle back-button" id="backToTodayBtn" type="button">Back to Today</button>
+          <div>
+            <p class="eyebrow">Tune Today</p>
+            <h2>Match the app to the way your brain is landing</h2>
+            <p class="panel-copy">
+              Use this only when the quick start choices feel too broad, too vague, or not quite right.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up today-grid today-options-grid">
+          <details class="card today-deep-dive disclosure" id="todayDeepDive" open>
+            <summary class="disclosure-summary">
+              <p class="eyebrow">Study state</p>
+              <h3>Pick the version of stuck that is closest</h3>
+              <p class="microcopy">Northstar uses this to lower friction, not to put you in a box.</p>
+            </summary>
+            <div class="disclosure-body">
+              <div class="section-heading">
+                <p class="eyebrow">Study state</p>
+                <h3>How is the work landing right now?</h3>
+                <p class="microcopy">Tap the closest fit. Northstar will tune the route, pacing, and support around it.</p>
+              </div>
+
+              <div class="brain-state-grid" id="studyStateButtons" role="group" aria-label="Current study state">
+                <button class="state-card" type="button" data-study-state="overwhelmed" aria-pressed="false">
+                  <span class="state-kicker">Overloaded</span>
+                  <strong>Everything feels too big</strong>
+                  <span>Use this when the work hits as one heavy block or the environment feels too intense.</span>
+                </button>
+                <button class="state-card" type="button" data-study-state="confused" aria-pressed="false">
+                  <span class="state-kicker">Confused</span>
+                  <strong>I cannot tell what counts</strong>
+                  <span>Use this when the brief, reading, or instructions feel muddy and inaccessible.</span>
+                </button>
+                <button class="state-card" type="button" data-study-state="avoiding" aria-pressed="false">
+                  <span class="state-kicker">Avoiding</span>
+                  <strong>I keep skirting around it</strong>
+                  <span>Use this when shame, dread, or perfectionism make beginning feel dangerous.</span>
+                </button>
+                <button class="state-card" type="button" data-study-state="drifting" aria-pressed="false">
+                  <span class="state-kicker">Losing the thread</span>
+                  <strong>My brain is dropping pieces</strong>
+                  <span>Use this when notes, reading details, or next steps keep slipping away.</span>
+                </button>
+                <button class="state-card state-card-wide" type="button" data-study-state="hyperfocused" aria-pressed="false">
+                  <span class="state-kicker">Running too hot</span>
+                  <strong>I may not stop well if I keep going</strong>
+                  <span>Use this when momentum is real but you need a cleaner stopping point before burnout or drift.</span>
+                </button>
+              </div>
+
+              <div class="today-state-brief is-empty" id="todayStateBrief">
+                <strong>Pick the closest state, not the perfect label.</strong>
+                <p>Northstar uses this to lower friction, not to put you in a box.</p>
+              </div>
+            </div>
+          </details>
+
+          <div class="card today-options-card">
+            <div class="section-heading today-direct-heading">
+              <p class="eyebrow">Other spaces</p>
+              <h3>Or choose the study space you already want</h3>
+              <p class="microcopy">Use a space directly if you already know where your brain needs to go.</p>
+            </div>
+
+            <div class="triage-grid" id="triageButtons">
+              <button class="path-card" type="button" data-route-target="planner">
+                <span class="path-kicker">Start a task</span>
+                <strong>Make the first step visible</strong>
+                <span>Best when you know the task but cannot get going.</span>
+              </button>
+              <button class="path-card" type="button" data-route-target="unpack">
+                <span class="path-kicker">Understand a task</span>
+                <strong>Translate the brief</strong>
+                <span>Best when the assignment language is muddy or stressful.</span>
+              </button>
+              <button class="path-card" type="button" data-route-target="notes">
+                <span class="path-kicker">Capture notes</span>
+                <strong>Keep the thread from disappearing</strong>
+                <span>Best when ideas, questions, or reading details keep slipping away.</span>
+              </button>
+              <button class="path-card" type="button" data-route-target="profile">
+                <span class="path-kicker">Study profile</span>
+                <strong>Name what helps your brain work</strong>
+                <span>Best when you need to understand your study pattern or prepare for advising.</span>
+              </button>
+              <button class="path-card" type="button" data-route-target="finish">
+                <span class="path-kicker">Stop well</span>
+                <strong>Leave a clean return point</strong>
+                <span>Best when you need to stop without losing the thread.</span>
+              </button>
+            </div>
+
+            <div class="button-row today-options-actions">
+              <button class="button subtle" id="resumeThreadBtn">Return to my last thread</button>
+            </div>
+
+            <details class="today-checkin disclosure" id="todayCheckin">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">Optional detail</p>
+                <h3>Fine-tune the suggestion</h3>
+                <p class="microcopy">Use this when you want the route to adapt to time, energy, and friction.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div class="field-group">
+                  <span class="field-label">Capacity today</span>
+                  <div class="choice-grid battery-grid" id="batteryButtons" role="radiogroup" aria-label="Capacity today">
+                    <button class="choice-pill" type="button" role="radio" aria-checked="false" data-battery="1">Very low</button>
+                    <button class="choice-pill" type="button" role="radio" aria-checked="false" data-battery="2">Low</button>
+                    <button class="choice-pill" type="button" role="radio" aria-checked="false" data-battery="3">Steady</button>
+                    <button class="choice-pill" type="button" role="radio" aria-checked="false" data-battery="4">Good</button>
+                    <button class="choice-pill" type="button" role="radio" aria-checked="false" data-battery="5">High</button>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <label class="field">
+                    <span>How much time do you have?</span>
+                    <select id="timeAvailableSelect">
+                      <option value="5">5 minutes</option>
+                      <option value="15">15 minutes</option>
+                      <option value="30" selected>30 minutes</option>
+                      <option value="60">1 hour</option>
+                      <option value="120">2+ hours</option>
+                    </select>
+                  </label>
+
+                  <label class="field detail-only">
+                    <span>What matters most today?</span>
+                    <input
+                      id="todayIntentInput"
+                      type="text"
+                      placeholder="e.g. start my discussion post, understand the assignment brief, review my lecture notes"
+                    >
+                  </label>
+                </div>
+
+                <fieldset class="field-group detail-only">
+                  <legend class="field-label">What is getting in the way?</legend>
+                  <div class="choice-grid" id="blockerCheckboxes"></div>
+                </fieldset>
+
+                <div class="button-row">
+                  <button class="button primary" id="generateRouteBtn">Suggest my next move</button>
+                  <button class="button subtle" id="fiveMinuteBtn">I only have 5 minutes</button>
+                </div>
+              </div>
+            </details>
+
+            <article class="card output-card today-route-card">
+              <div class="section-heading">
+                <p class="eyebrow">Right now</p>
+                <h3 id="todayRouteLabel">Choose a path that matches the friction</h3>
+              </div>
+              <div class="mode-callout" id="supportStateCallout">
+                <strong id="supportStateCalloutTitle">Standard support</strong>
+                <p id="supportStateCalloutCopy">Balanced guidance with one clear next move and optional detail when you want it.</p>
+              </div>
+              <div id="todayOutput" class="rich-output empty">
+                Choose one of the four paths on the left, or fine-tune the suggestion if you want Northstar to adapt more closely to your current capacity.
+              </div>
+              <div class="button-row today-output-actions">
+                <button class="button primary" id="openRouteBtn" disabled>Open selected space</button>
+                <button class="button subtle" id="resetTodayBtn">Start over</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-planner" role="tabpanel" aria-labelledby="nav-planner">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Plan</p>
+            <h2>Turn a vague task into a visible first step</h2>
+            <p class="panel-copy">
+              Build a realistic session plan without trying to finish everything at once.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card">
+            <label class="field">
+              <span>What is the task?</span>
+              <textarea
+                id="taskInput"
+                rows="4"
+                placeholder="e.g. write the first 400 words of my sociology essay, read chapter 3 and make notes, email my lecturer about an extension"
+              ></textarea>
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Due date</span>
+                <input id="taskDueInput" type="date">
+              </label>
+
+              <label class="field">
+                <span>Energy for this task</span>
+                <select id="taskEnergySelect">
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
+            </div>
+
+            <fieldset class="field-group">
+              <legend class="field-label">Task blockers</legend>
+              <div class="choice-grid" id="plannerBlockers"></div>
+            </fieldset>
+
+            <div class="button-row">
+              <button class="button primary" id="buildPlanBtn">Build my first-step plan</button>
+              <button class="button subtle" id="copyPlanBtn">Copy plan</button>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Micro-plan</p>
+              <h3>Start small, then keep the thread</h3>
+            </div>
+            <div id="plannerOutput" class="rich-output empty">
+              Your first step, low-friction plan, and stuck-again fallback will appear here.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-unpack" role="tabpanel" aria-labelledby="nav-unpack">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Unpack</p>
+            <h2>Translate assignment language into plain next actions</h2>
+            <p class="panel-copy">
+              Turn assessment language into clearer actions, deliverables, and questions.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card">
+            <label class="field">
+              <span>Assignment title or prompt</span>
+              <textarea
+                id="promptInput"
+                rows="5"
+                placeholder="Paste the brief, question, or assessment prompt here."
+              ></textarea>
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Command word</span>
+                <select id="verbSelect"></select>
+              </label>
+
+              <label class="field">
+                <span>Due date</span>
+                <input id="promptDueInput" type="date">
+              </label>
+            </div>
+
+            <label class="field">
+              <span>What are you least sure about?</span>
+              <input
+                id="unclearInput"
+                type="text"
+                placeholder="e.g. structure, references, the argument, what counts as evidence"
+              >
+            </label>
+
+            <label class="field">
+              <span>What kind of output do you need?</span>
+              <select id="deliverableSelect">
+                <option value="essay">Essay or report</option>
+                <option value="discussion">Discussion post</option>
+                <option value="reflection">Reflection</option>
+                <option value="presentation">Presentation</option>
+                <option value="exam">Exam preparation</option>
+              </select>
+            </label>
+
+            <div class="button-row">
+              <button class="button primary" id="unpackBtn">Unpack this task</button>
+              <button class="button subtle" id="copyUnpackBtn">Copy unpack summary</button>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Clarity map</p>
+              <h3>What this task is really asking</h3>
+            </div>
+            <div id="unpackOutput" class="rich-output empty">
+              Northstar will turn the prompt into a plain-language brief, concrete actions, and advisor-ready questions.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-notes" role="tabpanel" aria-labelledby="nav-notes">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Notes</p>
+            <h2>Capture the thread in blocks you can actually return to later</h2>
+            <p class="panel-copy">
+              Use short capture blocks for ideas, questions, evidence, quotes, tasks, and re-entry cues.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card">
+            <div class="section-heading">
+              <p class="eyebrow">Capture board</p>
+              <h3>Build a study trail instead of one large text dump</h3>
+              <p class="microcopy">Start with the three default blocks, or add the block type that matches what is in your head right now.</p>
+            </div>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Session or source title</span>
+                <input id="notesTitleInput" type="text" placeholder="e.g. Week 4 lecture, article on inclusive pedagogy">
+              </label>
+
+              <label class="field">
+                <span>Where is this from?</span>
+                <input id="notesContextInput" type="text" placeholder="e.g. Sociology tutorial, EDU300 reading, meeting with advisor">
+              </label>
+            </div>
+
+            <label class="field">
+              <span>What do you need these notes to help with later?</span>
+              <input id="notesGoalInput" type="text" placeholder="e.g. draft my discussion post, revise for class, bring one question to advising">
+            </label>
+
+            <div class="note-palette" id="notesPalette" aria-label="Add note blocks">
+              <button class="note-chip" type="button" data-note-add="idea">Add idea</button>
+              <button class="note-chip" type="button" data-note-add="question">Add question</button>
+              <button class="note-chip" type="button" data-note-add="evidence">Add evidence</button>
+              <button class="note-chip" type="button" data-note-add="quote">Add quote</button>
+              <button class="note-chip" type="button" data-note-add="task">Add task</button>
+              <button class="note-chip" type="button" data-note-add="cue">Add memory cue</button>
+            </div>
+
+            <div id="notesBlocks" class="notes-block-list"></div>
+
+            <div class="button-row notes-actions">
+              <button class="button primary" id="buildNotesBtn">Build my review pack</button>
+              <button class="button subtle" id="saveNotesBtn">Save this notes session</button>
+              <button class="button subtle" id="copyNotesBtn">Copy review pack</button>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Review pack</p>
+              <h3>Study from this later without starting from zero</h3>
+            </div>
+            <div id="notesOutput" class="rich-output empty">
+              Your study deck, open loops, and re-entry cues will appear here once you build the review pack.
+            </div>
+
+            <div class="subpanel">
+              <div class="section-heading">
+                <p class="eyebrow">Saved sessions</p>
+                <h3>What you have already captured</h3>
+              </div>
+              <div id="notesHistory" class="stack-sm empty">No saved sessions yet.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-profile" role="tabpanel" aria-labelledby="nav-profile">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Profile</p>
+            <h2>Describe the study conditions that make work more doable</h2>
+            <p class="panel-copy">
+              Answer one prompt at a time. This is about patterns and supports, not labels or diagnosis language.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card">
+            <div class="section-heading">
+              <p class="eyebrow">Pattern stepper</p>
+              <h3>Move one question at a time</h3>
+              <p class="microcopy">Choose what feels most familiar in real study life, not the answer that sounds best.</p>
+            </div>
+
+            <div class="profile-progress-card">
+              <div class="profile-progress-head">
+                <div>
+                  <p class="eyebrow">Progress</p>
+                  <h3 id="profileProgressLabel">Question 1 of 6</h3>
+                </div>
+                <strong id="profileProgressCount">0 / 6</strong>
+              </div>
+              <div class="profile-progress-track" aria-hidden="true">
+                <span id="profileProgressFill"></span>
+              </div>
+              <p class="microcopy" id="profileProgressCopy">Northstar remembers where you paused, so you can answer this gradually.</p>
+            </div>
+
+            <div id="profileQuestionCard"></div>
+
+            <div class="button-row profile-controls">
+              <button class="button subtle" id="profileBackBtn" type="button">Previous</button>
+              <button class="button subtle" id="profileSkipBtn" type="button">Skip for now</button>
+              <button class="button primary" id="profileNextBtn" type="button">Next prompt</button>
+            </div>
+
+            <div class="subpanel">
+              <div class="section-heading">
+                <p class="eyebrow">Pattern trail</p>
+                <h3>What you have answered so far</h3>
+              </div>
+              <div id="profileAnswerTrail" class="stack-sm empty">No pattern answers saved yet.</div>
+            </div>
+
+            <div class="button-row">
+              <button class="button primary" id="buildProfileBtn">Generate my study profile</button>
+              <button class="button subtle" id="copyProfileBtn">Copy profile</button>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Support profile</p>
+              <h3>What tends to help you work</h3>
+            </div>
+            <div id="profileOutput" class="rich-output empty">
+              Your support profile will appear here with patterns, strategies, and language you can use in advising.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-finish" role="tabpanel" aria-labelledby="nav-finish">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Finish</p>
+            <h2>Close the loop without panic</h2>
+            <p class="panel-copy">
+              End the session cleanly so resuming later costs less energy.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up">
+          <article class="card">
+            <div class="section-heading">
+              <p class="eyebrow">Checklist</p>
+              <h3>Done enough for today, or ready to submit?</h3>
+            </div>
+            <div id="finishChecklist" class="stack-sm"></div>
+
+            <label class="field">
+              <span>What do you want to remember next time?</span>
+              <textarea
+                id="nextTimeInput"
+                rows="4"
+                placeholder="e.g. The task felt easier once I unpacked the command word, or I need to email for clarification before I keep drafting."
+              ></textarea>
+            </label>
+
+            <div class="button-row">
+              <button class="button primary" id="saveFinishBtn">Save finish reflection</button>
+              <button class="button subtle" id="copyFinishBtn">Copy finish summary</button>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Completion summary</p>
+              <h3>End the session with a clear memory cue</h3>
+            </div>
+            <div id="finishOutput" class="rich-output empty">
+              Tick off what matters, then Northstar will build a short finish summary here.
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./js/app.js?v=20260511d"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Northstar logo">
+  <path
+    d="M24 70V27L68 70V27"
+    fill="none"
+    stroke="#20303B"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="10"
+  />
+  <circle cx="68" cy="27" r="4.5" fill="#B9865B" />
+</svg>
