@@ -184,6 +184,10 @@ html[data-motion="minimal"] * {
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -1010,6 +1014,88 @@ select:focus-visible {
 .today-entry-copy .quick-route-note,
 .today-entry-copy .microcopy {
   color: rgba(243, 235, 223, 0.72);
+}
+
+.first-minute-guide {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid rgba(243, 235, 223, 0.14);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(82, 107, 100, 0.24), transparent 62%),
+    rgba(255, 255, 255, 0.055);
+}
+
+.first-minute-guide[hidden] {
+  display: none !important;
+}
+
+.first-minute-copy {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.first-minute-copy h3 {
+  color: var(--sidebar-text);
+  font-family: var(--font-brand);
+  font-size: 1.55rem;
+  font-weight: 400;
+  line-height: 1.04;
+}
+
+.first-minute-steps {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.first-minute-steps span {
+  position: relative;
+  padding-left: 1.15rem;
+  color: rgba(243, 235, 223, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.first-minute-steps span::before {
+  content: "";
+  position: absolute;
+  top: 0.52em;
+  left: 0;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--gold);
+}
+
+.first-minute-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 0.55rem;
+}
+
+.first-minute-dismiss {
+  justify-self: start;
+  min-height: auto;
+  border: 0;
+  background: transparent;
+  color: rgba(243, 235, 223, 0.66);
+  padding: 0;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.first-minute-dismiss:hover,
+.first-minute-dismiss:focus-visible {
+  color: var(--sidebar-text);
+}
+
+html[data-first-minute-guide="on"] .today-entry-heading,
+html[data-first-minute-guide="on"] .quick-route-note,
+html[data-first-minute-guide="on"] .quickstart-actions {
+  display: none;
 }
 
 .today-entry-copy .button {
@@ -2753,6 +2839,8 @@ html[data-runtime="native"] .support-state-button {
     min-height: 0;
     height: 100%;
     align-content: start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 1.05rem;
     border-radius: 24px;
   }
@@ -2775,6 +2863,29 @@ html[data-runtime="native"] .support-state-button {
   html[data-active-panel="dashboard"] .section-heading h3 {
     font-size: 1.85rem;
     line-height: 1.05;
+  }
+
+  html[data-active-panel="dashboard"] .first-minute-guide {
+    gap: 0.7rem;
+    padding: 0.92rem;
+    border-radius: 18px;
+  }
+
+  html[data-active-panel="dashboard"] .first-minute-copy h3 {
+    font-size: 1.45rem;
+  }
+
+  html[data-active-panel="dashboard"] .first-minute-actions {
+    grid-template-columns: 1fr;
+    gap: 0.42rem;
+  }
+
+  html[data-active-panel="dashboard"] .first-minute-steps {
+    gap: 0.36rem;
+  }
+
+  html[data-active-panel="dashboard"] .first-minute-steps span {
+    font-size: 0.86rem;
   }
 
   html[data-active-panel="dashboard"] .quick-route-grid {

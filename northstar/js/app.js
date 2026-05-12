@@ -73,7 +73,8 @@ const defaultSettings = {
   contrast: "soft",
   motion: "normal",
   supportState: "standard",
-  focusMode: false
+  focusMode: false,
+  introDismissed: false
 };
 
 const defaultCheckin = {
@@ -877,6 +878,26 @@ function renderTodayEmpty() {
   renderTodayInlineFeedback(null);
   setTodayExpanded(false);
   renderStudyStateSelection();
+}
+
+function renderFirstMinuteGuide() {
+  const guide = $("#firstMinuteGuide");
+  if (!guide) return;
+
+  const shouldShow = !state.settings.introDismissed && !hasMeaningfulThread();
+  guide.hidden = !shouldShow;
+  document.documentElement.dataset.firstMinuteGuide = shouldShow ? "on" : "off";
+}
+
+function focusQuickStartChoices() {
+  const firstChoice = $("#quickRouteButtons .quick-route-button");
+  if (!firstChoice) return;
+
+  firstChoice.scrollIntoView({
+    block: "center",
+    behavior: state.settings.motion === "normal" ? "smooth" : "auto"
+  });
+  requestAnimationFrame(() => firstChoice.focus({ preventScroll: true }));
 }
 
 function renderTodayRoute(result) {
@@ -2097,6 +2118,7 @@ function renderStatus() {
     resumeSummary.textContent = `If you stop now, Northstar will reopen on ${$("#statusResume").textContent} and keep your current notes, task, and reflection drafts.`;
   }
   renderResumeBanner();
+  renderFirstMinuteGuide();
 }
 
 function bindEvents() {
@@ -2138,6 +2160,18 @@ function bindEvents() {
   if (todayDesktopResumeBtn) {
     todayDesktopResumeBtn.addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
   }
+  $("#firstMinuteStartBtn").addEventListener("click", () => {
+    state.settings.introDismissed = true;
+    saveState("settings", state.settings);
+    applyStudyStatePreset("overwhelmed", { autoOpen: true, revealInline: true });
+  });
+  $("#firstMinuteChooseBtn").addEventListener("click", focusQuickStartChoices);
+  $("#firstMinuteDismissBtn").addEventListener("click", () => {
+    state.settings.introDismissed = true;
+    saveState("settings", state.settings);
+    renderFirstMinuteGuide();
+    focusQuickStartChoices();
+  });
   $("#showMoreTodayBtn").addEventListener("click", () => showPanel("dashboard-options"));
   $("#backToTodayBtn").addEventListener("click", () => showPanel("dashboard"));
   $("#mobileHomeBtn").addEventListener("click", () => showPanel("dashboard"));

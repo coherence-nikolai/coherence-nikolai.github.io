@@ -23,7 +23,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=20260511e">
+  <link rel="stylesheet" href="./styles.css?v=20260512b">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -262,6 +262,32 @@
                   <strong>Built for neurodivergent ways of studying</strong>
                 </div>
               </div>
+
+              <section class="first-minute-guide" id="firstMinuteGuide" aria-labelledby="firstMinuteTitle">
+                <div class="first-minute-copy">
+                  <p class="eyebrow">First minute</p>
+                  <h3 id="firstMinuteTitle">Start where your brain is.</h3>
+                  <p class="microcopy">
+                    If you are frozen, overloaded, or unsure, Northstar can start with one next move.
+                    Close enough is enough.
+                  </p>
+                </div>
+
+                <div class="first-minute-steps" aria-label="What to do first">
+                  <span>Pick the closest state.</span>
+                  <span>Take one small move.</span>
+                  <span>Save your place before stopping.</span>
+                </div>
+
+                <div class="first-minute-actions">
+                  <button class="button primary" id="firstMinuteStartBtn" type="button">Give me one next move</button>
+                  <button class="button subtle" id="firstMinuteChooseBtn" type="button">Choose myself</button>
+                </div>
+
+                <button class="first-minute-dismiss" id="firstMinuteDismissBtn" type="button">
+                  Hide this next time
+                </button>
+              </section>
 
               <div class="section-heading today-entry-heading">
                 <p class="eyebrow">Start here</p>
@@ -824,6 +850,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260511d"></script>
+  <script type="module" src="./js/app.js?v=20260512b"></script>
 </body>
 </html>
