@@ -50,6 +50,12 @@ a {
   color: inherit;
 }
 
+a:focus-visible,
+.button:focus-visible {
+  outline: 2px solid rgba(232, 215, 178, 0.82);
+  outline-offset: 4px;
+}
+
 .tone-field {
   position: fixed;
   inset: 0;
@@ -192,6 +198,11 @@ h1 {
   display: block;
 }
 
+.home-heading {
+  font-size: clamp(3rem, 8vw, 6.6rem);
+  letter-spacing: 0.045em;
+}
+
 .page-hero h1 {
   font-size: clamp(3.4rem, 10vw, 8rem);
 }
@@ -281,6 +292,49 @@ h3 {
 .button:hover {
   transform: translateY(-1px);
   border-color: rgba(232, 215, 178, 0.28);
+}
+
+.screen-showcase {
+  overflow: hidden;
+}
+
+.screen-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(12px, 2vw, 18px);
+  align-items: end;
+}
+
+.phone-shot {
+  position: relative;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(232, 215, 178, 0.13), transparent 12rem),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.phone-shot.tall {
+  transform: translateY(-18px);
+}
+
+.phone-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+}
+
+.phone-shot figcaption {
+  min-height: 3.1em;
+  padding: 12px 4px 2px;
+  color: rgba(242, 234, 223, 0.66);
+  font-size: 0.86rem;
+  line-height: 1.35;
+  text-align: center;
 }
 
 .tone-card,
@@ -633,6 +687,10 @@ dd {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.app-grid.four-up {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .app-card {
   position: relative;
   z-index: 2;
@@ -690,6 +748,19 @@ dd {
   width: 100%;
   height: auto;
   filter: drop-shadow(0 0 30px rgba(232, 215, 178, 0.30));
+}
+
+.northstar-card-mark {
+  width: min(180px, 78%);
+  padding: 18px;
+  border: 1px solid rgba(232, 215, 178, 0.14);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(134, 189, 180, 0.12), transparent 68%),
+    rgba(255, 255, 255, 0.025);
+}
+
+.northstar-card-mark img {
+  border-radius: 28%;
 }
 
 .app-card strong {
@@ -795,6 +866,10 @@ dd {
 .steps article,
 .split > div {
   padding: 24px;
+}
+
+.compact-steps article {
+  min-height: 210px;
 }
 
 .steps span {
@@ -918,12 +993,23 @@ dd {
   .tone-card,
   .app-grid,
   .app-grid.two-up,
+  .app-grid.four-up,
   .lab-grid,
   .support-grid,
   .steps,
+  .screen-row,
   .split,
   .feature-list {
     grid-template-columns: 1fr;
+  }
+
+  .screen-row {
+    max-width: 390px;
+    margin-inline: auto;
+  }
+
+  .phone-shot.tall {
+    transform: none;
   }
 
   .tone-orb {
@@ -961,6 +1047,11 @@ dd {
   .brand-heading {
     gap: 0.08em;
     font-size: clamp(4.2rem, 17vw, 6.5rem);
+    letter-spacing: 0.035em;
+  }
+
+  .home-heading {
+    font-size: clamp(2.75rem, 11vw, 4.2rem);
     letter-spacing: 0.035em;
   }
 
