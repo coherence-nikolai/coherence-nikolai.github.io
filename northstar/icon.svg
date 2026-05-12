@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Northstar icon">
-  <rect width="512" height="512" rx="124" fill="#20303B" />
+  <rect width="512" height="512" rx="124" fill="#17201E" />
   <path
     d="M148 372V146L364 372V146"
     fill="none"
@@ -8,5 +8,5 @@
     stroke-linejoin="round"
     stroke-width="54"
   />
-  <circle cx="364" cy="146" r="24" fill="#B9865B" />
+  <circle cx="364" cy="146" r="24" fill="#D4A65A" />
 </svg>
