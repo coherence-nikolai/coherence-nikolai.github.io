@@ -26,6 +26,7 @@ const PANEL_LABELS = {
   dashboard: "Today",
   "dashboard-options": "Tune Today",
   planner: "Plan",
+  focus: "Focus",
   unpack: "Unpack",
   notes: "Notes",
   profile: "Profile",
@@ -37,6 +38,7 @@ const PANEL_THEME_COLORS = {
   dashboard: "#efe9df",
   "dashboard-options": "#efe9df",
   planner: "#f1e7e0",
+  focus: "#f1ecdf",
   unpack: "#e8eee4",
   notes: "#e6edf3",
   profile: "#f1e7e2",
@@ -44,7 +46,7 @@ const PANEL_THEME_COLORS = {
   "mobile-result": "#efe9df"
 };
 
-const PRIMARY_PANELS = new Set(["dashboard", "planner", "unpack", "notes", "profile", "finish"]);
+const PRIMARY_PANELS = new Set(["dashboard", "planner", "focus", "unpack", "notes", "profile", "finish"]);
 
 const SUPPORT_STATES = {
   low: {
@@ -95,6 +97,36 @@ const defaultNotesState = {
 
 const defaultProfileUi = {
   activeIndex: 0
+};
+
+const FOCUS_PRESETS = {
+  gentle: {
+    label: "Gentle start",
+    focusMinutes: 10,
+    breakMinutes: 3,
+    hint: "One small block. Enough contact with the task counts."
+  },
+  classic: {
+    label: "Classic",
+    focusMinutes: 25,
+    breakMinutes: 5,
+    hint: "A steady Pomodoro container without turning the session into a sprint."
+  },
+  deep: {
+    label: "Deep but safe",
+    focusMinutes: 40,
+    breakMinutes: 10,
+    hint: "Use this only when you already have momentum and a clear stopping cue."
+  }
+};
+
+const defaultFocusState = {
+  preset: "gentle",
+  phase: "focus",
+  intention: "",
+  returnCue: "",
+  completedRounds: 0,
+  lastCompletedAt: null
 };
 
 const DEFAULT_NOTE_BLOCK_SEQUENCE = ["idea", "question", "task"];
@@ -162,6 +194,24 @@ function normalizeProfileUi(rawState) {
   };
 }
 
+function normalizeFocusState(rawState) {
+  const raw = rawState && typeof rawState === "object" ? rawState : {};
+  const preset = FOCUS_PRESETS[raw.preset] ? raw.preset : defaultFocusState.preset;
+  const phase = raw.phase === "break" ? "break" : "focus";
+  const completedRounds = Number.isInteger(raw.completedRounds)
+    ? Math.max(raw.completedRounds, 0)
+    : 0;
+
+  return {
+    preset,
+    phase,
+    intention: String(raw.intention || ""),
+    returnCue: String(raw.returnCue || ""),
+    completedRounds,
+    lastCompletedAt: raw.lastCompletedAt || null
+  };
+}
+
 const state = {
   settings: loadState("settings", defaultSettings),
   checkin: {
@@ -185,6 +235,7 @@ const state = {
   notesHistory: loadState("notesHistory", []),
   profileAnswers: loadState("profileAnswers", {}),
   profileUi: normalizeProfileUi(loadState("profileUi", defaultProfileUi)),
+  focus: normalizeFocusState(loadState("focus", defaultFocusState)),
   finish: loadState("finish", {
     items: FINISH_ITEMS.map(() => false),
     nextTime: ""
@@ -200,6 +251,9 @@ let todayInlineFeedbackVisible = false;
 let mobileResultSourcePanel = "dashboard";
 let mobileResultPrimaryTarget = "dashboard";
 let mobileResultCopyText = "";
+let focusTimerRemaining = null;
+let focusTimerRunning = false;
+let focusTimerIntervalId = null;
 
 function isNativeShell() {
   const hasCapacitorPlatform = typeof window.Capacitor?.isNativePlatform === "function"
@@ -276,6 +330,12 @@ function hasMeaningfulThread() {
     state.notes.reviewGoal ||
     state.notes.blocks.some((block) => block.text.trim())
   );
+  const hasFocusThread = Boolean(
+    state.focus.intention ||
+    state.focus.returnCue ||
+    state.focus.completedRounds ||
+    state.outputs.focus
+  );
 
   return Boolean(
     state.notesHistory.length ||
@@ -284,9 +344,11 @@ function hasMeaningfulThread() {
     state.outputs.unpack ||
     state.outputs.notes ||
     state.outputs.profile ||
+    state.outputs.focus ||
     state.outputs.finish ||
     state.planner.task ||
     state.unpack.prompt ||
+    hasFocusThread ||
     hasNotesDraft ||
     Object.keys(state.profileAnswers).length ||
     state.finish.items.some(Boolean) ||
@@ -691,11 +753,248 @@ function setInitialFormValues() {
   $("#unclearInput").value = state.unpack.unclear;
   $("#deliverableSelect").value = state.unpack.deliverable;
 
+  $("#focusIntentionInput").value = state.focus.intention;
+  $("#focusReturnCueInput").value = state.focus.returnCue;
+
   $("#notesTitleInput").value = state.notes.title;
   $("#notesContextInput").value = state.notes.context;
   $("#notesGoalInput").value = state.notes.reviewGoal;
 
   $("#nextTimeInput").value = state.finish.nextTime;
+}
+
+function currentFocusPreset() {
+  return FOCUS_PRESETS[state.focus.preset] || FOCUS_PRESETS.gentle;
+}
+
+function focusDurationSeconds(phase = state.focus.phase) {
+  const preset = currentFocusPreset();
+  const minutes = phase === "break" ? preset.breakMinutes : preset.focusMinutes;
+  return minutes * 60;
+}
+
+function ensureFocusRemaining() {
+  if (!Number.isFinite(focusTimerRemaining)) {
+    focusTimerRemaining = focusDurationSeconds();
+  }
+
+  return focusTimerRemaining;
+}
+
+function formatFocusTime(totalSeconds) {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function stopFocusInterval() {
+  if (focusTimerIntervalId) {
+    clearInterval(focusTimerIntervalId);
+    focusTimerIntervalId = null;
+  }
+  focusTimerRunning = false;
+}
+
+function focusPhaseCopy() {
+  return state.focus.phase === "break"
+    ? {
+      label: "Recovery break",
+      action: "Step away, unclench, drink water, or look somewhere further than the screen.",
+      next: "When the break ends, choose whether one more block would actually help."
+    }
+    : {
+      label: "Focus block",
+      action: state.focus.intention || "Do one visible part of the task, not the whole task.",
+      next: state.focus.returnCue || "When the timer ends, write one line about where to restart."
+    };
+}
+
+function buildFocusOutput(status = "ready") {
+  const preset = currentFocusPreset();
+  const phaseCopy = focusPhaseCopy();
+
+  return {
+    status,
+    preset: state.focus.preset,
+    presetLabel: preset.label,
+    phase: state.focus.phase,
+    phaseLabel: phaseCopy.label,
+    intention: state.focus.intention,
+    returnCue: state.focus.returnCue,
+    completedRounds: state.focus.completedRounds,
+    lastCompletedAt: state.focus.lastCompletedAt,
+    action: phaseCopy.action,
+    next: phaseCopy.next
+  };
+}
+
+function saveFocusOutput(status = "ready") {
+  state.outputs.focus = buildFocusOutput(status);
+  saveState("outputs", state.outputs);
+  saveState("focus", state.focus);
+}
+
+function renderFocusOutput() {
+  const output = $("#focusOutput");
+  if (!output) return;
+
+  const focus = state.outputs.focus;
+  const preset = currentFocusPreset();
+  const phaseCopy = focusPhaseCopy();
+  const phaseHint = state.focus.phase === "break"
+    ? "Breaks are part of the work here. They protect re-entry instead of rewarding overextension."
+    : preset.hint;
+  const hasFocusContent = Boolean(
+    focus ||
+    state.focus.intention ||
+    state.focus.returnCue ||
+    state.focus.completedRounds
+  );
+
+  if (!hasFocusContent) {
+    output.classList.add("empty");
+    output.textContent = "Pick a focus container, name what this block is for, then start. Northstar will keep the instruction narrow and help you stop cleanly.";
+    return;
+  }
+
+  output.classList.remove("empty");
+  output.innerHTML = `
+    <div class="summary-grid">
+      <div class="summary-cell">
+        <span>Container</span>
+        <strong>${escapeHtml(preset.label)}</strong>
+        <p>${escapeHtml(preset.focusMinutes)} min focus · ${escapeHtml(preset.breakMinutes)} min break</p>
+      </div>
+      <div class="summary-cell">
+        <span>Rounds complete</span>
+        <strong>${escapeHtml(String(state.focus.completedRounds))}</strong>
+        <p>${state.focus.lastCompletedAt ? `Last saved ${escapeHtml(new Date(state.focus.lastCompletedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }))}` : "No completed block yet."}</p>
+      </div>
+    </div>
+
+    <div class="output-block">
+      <h4>${escapeHtml(phaseCopy.label)}</h4>
+      <p>${escapeHtml(phaseCopy.action)}</p>
+      <p class="output-subtle">${escapeHtml(phaseHint)}</p>
+    </div>
+
+    <div class="output-block">
+      <h4>When this block ends</h4>
+      <ul class="summary-list">
+        ${toListItems([
+          phaseCopy.next,
+          "Stop first, then decide. Do not let the timer secretly become an obligation to continue.",
+          "If you are still stuck, move to Plan or Unpack instead of forcing attention."
+        ])}
+      </ul>
+    </div>
+  `;
+}
+
+function renderFocusTimer() {
+  const preset = currentFocusPreset();
+  const remaining = ensureFocusRemaining();
+  const phaseCopy = focusPhaseCopy();
+  const display = $("#focusTimerDisplay");
+  const label = $("#focusPhaseLabel");
+  const hint = $("#focusTimerHint");
+  const timerShell = $(".focus-timer-display");
+  const startBtn = $("#focusStartBtn");
+  const pauseBtn = $("#focusPauseBtn");
+
+  if (!display || !label || !hint || !timerShell) return;
+
+  display.textContent = formatFocusTime(remaining);
+  label.textContent = phaseCopy.label;
+  hint.textContent = state.focus.phase === "break" ? phaseCopy.action : preset.hint;
+  timerShell.classList.toggle("is-break", state.focus.phase === "break");
+
+  if (startBtn) startBtn.textContent = focusTimerRunning ? "Focus block running" : state.focus.phase === "break" ? "Start break" : "Start focus block";
+  if (pauseBtn) pauseBtn.disabled = !focusTimerRunning;
+
+  $$("#focusPresetButtons .focus-preset").forEach((button) => {
+    const isSelected = button.dataset.focusPreset === state.focus.preset;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-checked", String(isSelected));
+  });
+
+  renderFocusOutput();
+}
+
+function setFocusPreset(presetKey) {
+  if (!FOCUS_PRESETS[presetKey]) return;
+
+  stopFocusInterval();
+  state.focus.preset = presetKey;
+  state.focus.phase = "focus";
+  focusTimerRemaining = null;
+  saveFocusOutput("preset-changed");
+  renderFocusTimer();
+  renderSnapshotPreview();
+  renderStatus();
+}
+
+function startFocusTimer() {
+  captureForms();
+  ensureFocusRemaining();
+  if (focusTimerRunning) return;
+
+  focusTimerRunning = true;
+  saveFocusOutput("running");
+  renderFocusTimer();
+
+  focusTimerIntervalId = window.setInterval(() => {
+    focusTimerRemaining = Math.max(0, ensureFocusRemaining() - 1);
+
+    if (focusTimerRemaining <= 0) {
+      completeFocusPhase("timer-ended");
+      return;
+    }
+
+    renderFocusTimer();
+  }, 1000);
+}
+
+function pauseFocusTimer() {
+  captureForms();
+  stopFocusInterval();
+  saveFocusOutput("paused");
+  renderFocusTimer();
+  renderSnapshotPreview();
+  renderStatus();
+}
+
+function resetFocusTimer() {
+  captureForms();
+  stopFocusInterval();
+  state.focus.phase = "focus";
+  focusTimerRemaining = null;
+  saveFocusOutput("reset");
+  renderFocusTimer();
+  renderSnapshotPreview();
+  renderStatus();
+}
+
+function completeFocusPhase(status = "marked-done") {
+  captureForms();
+  const completedFocusBlock = state.focus.phase === "focus";
+  stopFocusInterval();
+
+  if (completedFocusBlock) {
+    state.focus.completedRounds += 1;
+    state.focus.lastCompletedAt = stampNow();
+    state.focus.phase = "break";
+  } else {
+    state.focus.phase = "focus";
+  }
+
+  focusTimerRemaining = focusDurationSeconds(state.focus.phase);
+  saveFocusOutput(status);
+  renderFocusTimer();
+  renderSnapshotPreview();
+  renderStatus();
+  nudgeHaptic([8, 24, 8]);
 }
 
 function collectNoteBlocks() {
@@ -744,6 +1043,12 @@ function captureForms() {
     blocks: collectNoteBlocks()
   };
 
+  state.focus = {
+    ...state.focus,
+    intention: $("#focusIntentionInput").value.trim(),
+    returnCue: $("#focusReturnCueInput").value.trim()
+  };
+
   state.finish.nextTime = $("#nextTimeInput").value.trim();
   state.finish.items = $$("[data-finish-index]").map((box) => box.checked);
 
@@ -751,6 +1056,7 @@ function captureForms() {
   saveState("planner", state.planner);
   saveState("unpack", state.unpack);
   saveState("notes", state.notes);
+  saveState("focus", state.focus);
   saveState("finish", state.finish);
   saveState("profileAnswers", state.profileAnswers);
   saveState("profileUi", state.profileUi);
@@ -1089,6 +1395,8 @@ function recommendRoute(options = {}) {
   } else if (supportState === "low") {
     if (blockerSet.has("unclear")) {
       section = "unpack";
+    } else if (blockerSet.has("time") || /timer|pomodoro|focus|time.?box|timebox/i.test(intent)) {
+      section = "focus";
     } else if (blockerSet.has("memory") || /read|lecture|notes|article|chapter/i.test(intent)) {
       section = "notes";
     } else {
@@ -1100,6 +1408,8 @@ function recommendRoute(options = {}) {
     section = "unpack";
   } else if (blockerSet.has("memory")) {
     section = "notes";
+  } else if (blockerSet.has("time") || /timer|pomodoro|focus|time.?box|timebox/i.test(intent)) {
+    section = "focus";
   } else if (blockerSet.has("starting") || blockerSet.has("perfectionism") || blockerSet.has("overwhelmed")) {
     section = "planner";
   } else if (/read|lecture|notes|article|chapter/i.test(intent)) {
@@ -1988,6 +2298,7 @@ function renderFinishSummary({ openResult = false } = {}) {
 function snapshotText() {
   const route = state.outputs.route;
   const planner = state.outputs.planner;
+  const focus = state.outputs.focus;
   const unpack = state.outputs.unpack;
   const notes = state.outputs.notes;
   const profile = state.outputs.profile;
@@ -2008,6 +2319,9 @@ function snapshotText() {
     "",
     planner ? `Task: ${planner.task}` : "",
     planner ? `First step: ${planner.firstStep}` : "",
+    focus ? `Focus container: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
+    state.focus.intention ? `Focus intention: ${state.focus.intention}` : "",
+    state.focus.returnCue ? `Focus return cue: ${state.focus.returnCue}` : "",
     unpack ? `Assignment focus: ${TASK_VERBS[unpack.verb].label} · ${unpack.dueLabel}` : "",
     notes ? `Notes summary: ${notes.summary}` : "",
     profile ? `Support needs: ${profile.content.map((item) => item.label).join(", ")}` : "",
@@ -2021,9 +2335,9 @@ function snapshotText() {
 function renderSnapshotPreview() {
   const preview = $("#snapshotPreview");
 
-  if (!state.outputs.route && !state.outputs.planner && !state.outputs.unpack && !state.outputs.notes && !state.outputs.profile) {
+  if (!state.outputs.route && !state.outputs.planner && !state.outputs.focus && !state.outputs.unpack && !state.outputs.notes && !state.outputs.profile) {
     preview.classList.add("empty");
-    preview.textContent = "Your snapshot will appear here after you use the planner, unpacker, notes, or profile tools.";
+    preview.textContent = "Your snapshot will appear here after you use Plan, Focus, Unpack, Notes, or Profile.";
     return;
   }
 
@@ -2040,6 +2354,10 @@ function currentResumeHint() {
 
   if (panelName === "unpack" && state.outputs.unpack?.nextMoves?.[0]) {
     return state.outputs.unpack.nextMoves[0];
+  }
+
+  if (panelName === "focus" && (state.focus.returnCue || state.focus.intention || state.outputs.focus?.next)) {
+    return state.focus.returnCue || state.focus.intention || state.outputs.focus.next;
   }
 
   if (panelName === "notes" && (state.outputs.notes?.reentryNote || state.outputs.notes?.nextReview)) {
@@ -2293,6 +2611,14 @@ function bindEvents() {
     );
   });
 
+  $$("#focusPresetButtons .focus-preset").forEach((button) => {
+    button.addEventListener("click", () => setFocusPreset(button.dataset.focusPreset));
+  });
+  $("#focusStartBtn").addEventListener("click", startFocusTimer);
+  $("#focusPauseBtn").addEventListener("click", pauseFocusTimer);
+  $("#focusResetBtn").addEventListener("click", resetFocusTimer);
+  $("#focusCompleteBtn").addEventListener("click", () => completeFocusPhase("marked-done"));
+
   $("#unpackBtn").addEventListener("click", renderUnpack);
   $("#copyUnpackBtn").addEventListener("click", async () => {
     const unpack = state.outputs.unpack;
@@ -2383,8 +2709,13 @@ function bindEvents() {
     window.location.reload();
   });
 
-  document.addEventListener("input", () => {
+  document.addEventListener("input", (event) => {
     captureForms();
+    if (event.target.matches("#focusIntentionInput, #focusReturnCueInput")) {
+      saveFocusOutput("edited");
+      renderFocusTimer();
+      renderSnapshotPreview();
+    }
     renderStatus();
   });
 
@@ -2441,6 +2772,7 @@ function renderStoredOutputs() {
   }
 
   if (state.outputs.planner && state.planner.task) renderPlanner({ openResult: false });
+  renderFocusTimer();
   if (state.outputs.unpack && state.unpack.prompt) renderUnpack({ openResult: false });
   if (state.outputs.notes && (state.notes.title || state.notes.context || state.notes.blocks.some((block) => block.text.trim()))) renderNotes({ openResult: false });
   if (state.outputs.profile && Object.keys(state.profileAnswers).length) renderProfile({ openResult: false });

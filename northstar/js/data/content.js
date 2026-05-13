@@ -22,6 +22,12 @@ export const ROUTE_LIBRARY = {
     action: "Go to Plan and turn the task into one visible first step plus a low-pressure micro-plan.",
     followUp: "If the wording of the assignment is part of the problem, switch to Unpack."
   },
+  focus: {
+    title: "Hold the task inside a calmer time-box",
+    reason: "When time feels slippery, an external container can make the work feel safer to enter and easier to stop.",
+    action: "Go to Focus, choose the smallest timer that still helps, and name exactly what this block is for.",
+    followUp: "When the timer ends, write one return cue before deciding whether to continue."
+  },
   unpack: {
     title: "Translate the task before you attempt it",
     reason: "Task confusion is real friction. Clarity has to come before confidence.",

@@ -20,10 +20,10 @@
     name="description"
     content="A calmer, smarter academic skills companion for neurodivergent adult students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260513c">
-  <link rel="icon" href="./icon.svg?v=20260513c" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260513c">
-  <link rel="stylesheet" href="./styles.css?v=20260513c">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260513e">
+  <link rel="icon" href="./icon.svg?v=20260513e" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260513e">
+  <link rel="stylesheet" href="./styles.css?v=20260513e">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260513c" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260513e" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -41,6 +41,7 @@
         </div>
         <button class="nav-link is-active" id="nav-dashboard" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
         <button class="nav-link" id="nav-planner" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
+        <button class="nav-link" id="nav-focus" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
         <button class="nav-link" id="nav-unpack" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
         <button class="nav-link" id="nav-notes" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
         <button class="nav-link" id="nav-profile" role="tab" aria-selected="false" aria-controls="panel-profile" data-panel-target="profile">Profile</button>
@@ -61,7 +62,7 @@
             <button class="button subtle" id="jumpToProfileBtn">Review profile</button>
           </div>
           <div class="mini-output" id="snapshotPreview">
-            Your snapshot will appear here after you use the planner, unpacker, notes, or profile tools.
+            Your snapshot will appear here after you use Plan, Focus, Unpack, Notes, or Profile.
           </div>
         </div>
       </details>
@@ -84,7 +85,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260513c" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260513e" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -178,6 +179,7 @@
       <nav class="mobile-nav card" aria-label="Study sections" role="tablist">
         <button class="nav-link is-active" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-profile" data-panel-target="profile">Profile</button>
@@ -258,7 +260,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260513c" alt="">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260513e" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Built for neurodivergent ways of studying</strong>
@@ -356,7 +358,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260513c" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260513e" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -438,6 +440,11 @@
                 <span class="path-kicker">Start a task</span>
                 <strong>Make the first step visible</strong>
                 <span>Best when you know the task but cannot get going.</span>
+              </button>
+              <button class="path-card" type="button" data-route-target="focus">
+                <span class="path-kicker">Time-box gently</span>
+                <strong>Hold the task inside a safer container</strong>
+                <span>Best when time feels slippery or starting needs a calm boundary.</span>
               </button>
               <button class="path-card" type="button" data-route-target="unpack">
                 <span class="path-kicker">Understand a task</span>
@@ -594,6 +601,84 @@
             </div>
             <div id="plannerOutput" class="rich-output empty">
               Your first step, low-friction plan, and stuck-again fallback will appear here.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-focus" role="tabpanel" aria-labelledby="nav-focus">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Focus</p>
+            <h2>Put the next step inside a kind time-box</h2>
+            <p class="panel-copy">
+              Use a gentle Pomodoro-style container when time feels slippery, pressure is rising, or beginning needs a boundary.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up focus-grid">
+          <article class="card focus-timer-card">
+            <div class="section-heading">
+              <p class="eyebrow">Study container</p>
+              <h3>Choose the lightest timer that still helps</h3>
+              <p class="microcopy">The point is not discipline. It is making time visible and ending before the thread disappears.</p>
+            </div>
+
+            <div class="focus-timer-display" aria-live="polite">
+              <p id="focusPhaseLabel">Focus block</p>
+              <strong id="focusTimerDisplay">10:00</strong>
+              <span id="focusTimerHint">One gentle block. Stop when the timer says stop.</span>
+            </div>
+
+            <div class="focus-preset-grid" id="focusPresetButtons" role="radiogroup" aria-label="Focus timer presets">
+              <button class="focus-preset is-selected" type="button" role="radio" aria-checked="true" data-focus-preset="gentle">
+                <strong>Gentle start</strong>
+                <span>10 focus · 3 break</span>
+              </button>
+              <button class="focus-preset" type="button" role="radio" aria-checked="false" data-focus-preset="classic">
+                <strong>Classic</strong>
+                <span>25 focus · 5 break</span>
+              </button>
+              <button class="focus-preset" type="button" role="radio" aria-checked="false" data-focus-preset="deep">
+                <strong>Deep but safe</strong>
+                <span>40 focus · 10 break</span>
+              </button>
+            </div>
+
+            <label class="field">
+              <span>What is this block for?</span>
+              <input
+                id="focusIntentionInput"
+                type="text"
+                placeholder="e.g. read two pages, write one messy paragraph, sort my notes"
+              >
+            </label>
+
+            <label class="field">
+              <span>When the timer ends, remind me to...</span>
+              <input
+                id="focusReturnCueInput"
+                type="text"
+                placeholder="e.g. write where I stopped before opening another tab"
+              >
+            </label>
+
+            <div class="button-row focus-actions">
+              <button class="button primary" id="focusStartBtn" type="button">Start focus block</button>
+              <button class="button subtle" id="focusPauseBtn" type="button">Pause</button>
+              <button class="button subtle" id="focusResetBtn" type="button">Reset</button>
+              <button class="button subtle" id="focusCompleteBtn" type="button">Mark done</button>
+            </div>
+          </article>
+
+          <article class="card output-card focus-support-card">
+            <div class="section-heading">
+              <p class="eyebrow">Session cue</p>
+              <h3>Keep the task contained</h3>
+            </div>
+            <div id="focusOutput" class="rich-output empty">
+              Pick a focus container, name what this block is for, then start. Northstar will keep the instruction narrow and help you stop cleanly.
             </div>
           </article>
         </div>
@@ -860,6 +945,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260513c"></script>
+  <script type="module" src="./js/app.js?v=20260513e"></script>
 </body>
 </html>
