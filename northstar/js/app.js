@@ -36,16 +36,16 @@ const PANEL_LABELS = {
 };
 
 const PANEL_THEME_COLORS = {
-  dashboard: "#efe9df",
-  "dashboard-options": "#efe9df",
-  regulate: "#e8eee4",
-  planner: "#f1e7e0",
-  focus: "#f1ecdf",
-  unpack: "#e3efeb",
-  notes: "#e6edf3",
-  profile: "#f1e7e2",
-  finish: "#f1ecdf",
-  "mobile-result": "#efe9df"
+  dashboard: "#dfece8",
+  "dashboard-options": "#dfece8",
+  regulate: "#e8edd9",
+  planner: "#f2e1d8",
+  focus: "#f3ead5",
+  unpack: "#deedf0",
+  notes: "#e3ebf4",
+  profile: "#f1dfe3",
+  finish: "#e9e2ef",
+  "mobile-result": "#dfece8"
 };
 
 const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "focus", "unpack", "notes", "profile", "finish"]);
