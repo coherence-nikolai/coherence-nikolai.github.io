@@ -53,9 +53,9 @@ const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "focus", "un
 const SUPPORT_STATES = {
   low: {
     label: "Low energy",
-    hint: "Show the lightest possible structure first, keep the path narrow, and avoid unnecessary decisions.",
+    hint: "Keep the path narrow and hide extra detail until you ask for it.",
     calloutTitle: "Low-energy support",
-    calloutCopy: "Northstar will bias toward the smallest useful move, shorter copy, and simpler choices."
+    calloutCopy: "One small move first. More detail can wait."
   },
   standard: {
     label: "Standard",
@@ -76,7 +76,7 @@ const defaultSettings = {
   fontFamily: "standard",
   contrast: "soft",
   motion: "normal",
-  supportState: "standard",
+  supportState: "low",
   focusMode: false,
   introDismissed: false
 };
@@ -1128,7 +1128,8 @@ function renderSessionMemory() {
 
   const { worked, avoid, nextCue, updatedAt, focusRounds, lastPanel } = state.sessionMemory;
   const hasMemory = Boolean(worked || avoid || nextCue || focusRounds);
-  card.hidden = !hasMemory;
+  const activePanel = document.documentElement.dataset.activePanel || "dashboard";
+  card.hidden = !hasMemory || (state.settings.supportState === "low" && activePanel !== "dashboard");
   if (!hasMemory) return;
 
   const title = nextCue || worked || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
@@ -1148,7 +1149,8 @@ function renderSessionMemory() {
 function renderCalibration() {
   const card = $("#calibrationCard");
   if (!card) return;
-  card.hidden = Boolean(state.calibration.completed);
+  const activePanel = document.documentElement.dataset.activePanel || "dashboard";
+  card.hidden = Boolean(state.calibration.completed) || activePanel !== "dashboard";
 
   $$("#calibrationCard [data-calibration-support]").forEach((button) => {
     const isSelected = button.dataset.calibrationSupport === state.calibration.supportState;
@@ -1695,7 +1697,7 @@ function renderTodayEmpty() {
   const routeCard = $(".today-route-card");
   $("#todayRouteLabel").textContent = "Pick one start above";
   $("#todayOutput").classList.add("empty");
-  $("#todayOutput").innerHTML = "Choose one quick start above. If none of them fit, open More ways to tune this for study states, other spaces, or a more tailored suggestion.";
+  $("#todayOutput").innerHTML = "Choose one quick start above. That is enough to begin.";
   $("#openRouteBtn").disabled = true;
   $("#openRouteBtn").textContent = "Open this space";
   if (routeCard) routeCard.hidden = isPhoneLayout();
@@ -3017,11 +3019,17 @@ function renderResumeBanner() {
   const resumeThreadBtn = $("#resumeThreadBtn");
   const quickResumeBtn = $("#quickResumeBtn");
   const todayDesktopResumeBtn = $("#todayDesktopResumeBtn");
+  const activePanel = document.documentElement.dataset.activePanel || "dashboard";
 
   resumeBanner.hidden = !hasSavedThread;
   resumeThreadBtn.hidden = !hasSavedThread;
   if (quickResumeBtn) quickResumeBtn.hidden = !hasSavedThread;
   if (todayDesktopResumeBtn) todayDesktopResumeBtn.hidden = !hasSavedThread;
+
+  if (state.settings.supportState === "low" && activePanel !== "dashboard") {
+    resumeBanner.hidden = true;
+    return;
+  }
 
   if (!hasSavedThread) {
     resumeBanner.classList.add("is-slim");
@@ -3030,8 +3038,13 @@ function renderResumeBanner() {
     return;
   }
 
-  $("#resumePanelLabel").textContent = `Return to ${nextPanelLabel}`;
-  $("#resumePanelCopy").textContent = `Next useful step: ${currentResumeHint()}`;
+  const lowSupport = state.settings.supportState === "low";
+  $("#resumePanelLabel").textContent = lowSupport
+    ? `Start here: ${nextPanelLabel}`
+    : `Return to ${nextPanelLabel}`;
+  $("#resumePanelCopy").textContent = lowSupport
+    ? currentResumeHint()
+    : `Next useful step: ${currentResumeHint()}`;
   $("#resumePanelMeta").textContent = updatedAt
     ? `Last saved ${updatedAt}`
     : "Progress saved on this device.";

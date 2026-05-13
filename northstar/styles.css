@@ -2695,6 +2695,107 @@ html[data-support-state="low"] .detail-only {
   display: none !important;
 }
 
+html[data-support-state="low"] .main {
+  gap: 0.9rem;
+}
+
+html[data-support-state="low"] .support-state-copy .microcopy,
+html[data-support-state="low"] .panel-copy,
+html[data-support-state="low"] .section-heading .microcopy,
+html[data-support-state="low"] .first-minute-copy .microcopy,
+html[data-support-state="low"] .quick-route-note,
+html[data-support-state="low"] .today-desktop-note,
+html[data-support-state="low"] .resume-meta,
+html[data-support-state="low"] .resume-summary,
+html[data-support-state="low"] .resume-stats,
+html[data-support-state="low"] .calibration-copy .microcopy,
+html[data-support-state="low"] .calibration-choice span,
+html[data-support-state="low"] .regulation-option span,
+html[data-support-state="low"] .focus-preset span,
+html[data-support-state="low"] .timer-alert-panel .microcopy,
+html[data-support-state="low"] .profile-progress-card .microcopy,
+html[data-support-state="low"] .path-card > span:last-child,
+html[data-support-state="low"] .state-card > span:last-child,
+html[data-support-state="low"] .quick-route-button > span:last-child {
+  display: none !important;
+}
+
+html[data-support-state="low"] .resume-banner {
+  align-items: center;
+  padding: 0.95rem 1rem;
+}
+
+html[data-support-state="low"] .resume-copy {
+  gap: 0.1rem;
+}
+
+html[data-support-state="low"] .calibration-card {
+  gap: 0.85rem;
+}
+
+html[data-support-state="low"] .calibration-copy h2 {
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+}
+
+html[data-support-state="low"] .calibration-choice,
+html[data-support-state="low"] .regulation-option {
+  min-height: 0;
+  padding: 0.8rem 0.9rem;
+}
+
+html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-dashboard-options) .grid.two-up,
+html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-dashboard-options) .regulate-grid,
+html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-dashboard-options) .focus-grid {
+  grid-template-columns: minmax(0, min(100%, 50rem));
+}
+
+html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-dashboard-options) .grid > .card:first-child {
+  position: relative;
+  border-color: var(--section-rim);
+  box-shadow:
+    inset 7px 0 0 var(--accent),
+    0 12px 26px var(--section-shadow);
+}
+
+html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-dashboard-options) .grid > .card:first-child::before {
+  content: "Start here";
+  display: inline-flex;
+  width: fit-content;
+  margin: 0 0 0.65rem;
+  padding: 0.36rem 0.58rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--sidebar-text);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-support-state="low"] .panel:not(#panel-dashboard) .output-card:has(.rich-output.empty),
+html[data-support-state="low"] .subpanel:has(.empty) {
+  display: none !important;
+}
+
+html[data-support-state="low"] .panel-head,
+html[data-support-state="low"] .section-heading {
+  gap: 0.25rem;
+}
+
+html[data-support-state="low"] .panel-head h2,
+html[data-support-state="low"] .section-heading h3 {
+  max-width: 22ch;
+}
+
+html:not([data-active-panel="dashboard"]) .calibration-card {
+  display: none !important;
+}
+
+html[data-support-state="low"]:not([data-active-panel="dashboard"]) .resume-banner,
+html[data-support-state="low"]:not([data-active-panel="dashboard"]) .memory-banner {
+  display: none !important;
+}
+
 html[data-focus-mode="on"] .snapshot-card,
 html[data-focus-mode="on"] .resource-card,
 html[data-focus-mode="on"] .status-strip,
