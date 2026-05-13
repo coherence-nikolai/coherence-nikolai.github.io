@@ -703,36 +703,147 @@ p {
 }
 
 .nav-link {
+  --tab-accent: #426d68;
+  --tab-accent-deep: #274d48;
+  --tab-surface: rgba(66, 109, 104, 0.26);
+  --tab-surface-strong: rgba(66, 109, 104, 0.46);
+  --tab-border: rgba(66, 109, 104, 0.48);
+  position: relative;
+  overflow: hidden;
   width: 100%;
   padding: 0.8rem 0.92rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--tab-border);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--sidebar-muted);
+  background:
+    radial-gradient(circle at 100% 0%, var(--tab-surface-strong), transparent 48%),
+    linear-gradient(90deg, var(--tab-surface), rgba(255, 255, 255, 0.035) 62%),
+    rgba(255, 255, 255, 0.025);
+  color: rgba(255, 243, 223, 0.9);
   font-size: 0.95rem;
   font-weight: 650;
   text-align: left;
   transition:
     background var(--motion-fast),
     border-color var(--motion-fast),
+    color var(--motion-fast),
     transform var(--motion-fast);
+}
+
+.nav-link::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.42rem;
+  background: linear-gradient(180deg, var(--tab-accent), rgba(255, 243, 223, 0.34));
+  opacity: 0.95;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 0%, rgba(255, 243, 223, 0.1) 48%, transparent 72%);
+  opacity: 0;
+  transform: translateX(-35%);
+  transition:
+    opacity var(--motion-fast),
+    transform var(--motion-mid);
+}
+
+.nav-link[data-panel-target="dashboard"] {
+  --tab-accent: #426d68;
+  --tab-accent-deep: #193f3a;
+  --tab-surface: rgba(66, 109, 104, 0.34);
+  --tab-surface-strong: rgba(66, 109, 104, 0.58);
+  --tab-border: rgba(66, 109, 104, 0.68);
+}
+
+.nav-link[data-panel-target="regulate"] {
+  --tab-accent: #748760;
+  --tab-accent-deep: #40533f;
+  --tab-surface: rgba(116, 135, 96, 0.34);
+  --tab-surface-strong: rgba(116, 135, 96, 0.58);
+  --tab-border: rgba(116, 135, 96, 0.68);
+}
+
+.nav-link[data-panel-target="planner"] {
+  --tab-accent: #a97862;
+  --tab-accent-deep: #5d372c;
+  --tab-surface: rgba(169, 120, 98, 0.36);
+  --tab-surface-strong: rgba(169, 120, 98, 0.6);
+  --tab-border: rgba(169, 120, 98, 0.7);
+}
+
+.nav-link[data-panel-target="focus"] {
+  --tab-accent: #c1a35d;
+  --tab-accent-deep: #6c5529;
+  --tab-surface: rgba(193, 163, 93, 0.36);
+  --tab-surface-strong: rgba(193, 163, 93, 0.62);
+  --tab-border: rgba(193, 163, 93, 0.72);
+}
+
+.nav-link[data-panel-target="unpack"] {
+  --tab-accent: #5d817b;
+  --tab-accent-deep: #33544f;
+  --tab-surface: rgba(93, 129, 123, 0.34);
+  --tab-surface-strong: rgba(93, 129, 123, 0.58);
+  --tab-border: rgba(93, 129, 123, 0.68);
+}
+
+.nav-link[data-panel-target="notes"] {
+  --tab-accent: #60798b;
+  --tab-accent-deep: #344c5f;
+  --tab-surface: rgba(96, 121, 139, 0.34);
+  --tab-surface-strong: rgba(96, 121, 139, 0.58);
+  --tab-border: rgba(96, 121, 139, 0.68);
+}
+
+.nav-link[data-panel-target="profile"] {
+  --tab-accent: #9a6e62;
+  --tab-accent-deep: #5c3d36;
+  --tab-surface: rgba(154, 110, 98, 0.35);
+  --tab-surface-strong: rgba(154, 110, 98, 0.59);
+  --tab-border: rgba(154, 110, 98, 0.7);
+}
+
+.nav-link[data-panel-target="finish"] {
+  --tab-accent: #b9964f;
+  --tab-accent-deep: #6d5629;
+  --tab-surface: rgba(185, 150, 79, 0.35);
+  --tab-surface-strong: rgba(185, 150, 79, 0.6);
+  --tab-border: rgba(185, 150, 79, 0.7);
 }
 
 .nav-link:hover,
 .nav-link:focus-visible {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.065);
+  border-color: rgba(255, 243, 223, 0.28);
+  background:
+    radial-gradient(circle at 100% 0%, var(--tab-surface-strong), transparent 54%),
+    linear-gradient(90deg, var(--tab-surface-strong), rgba(255, 255, 255, 0.075) 68%);
+  color: var(--sidebar-text);
   transform: translateY(-1px);
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  opacity: 1;
+  transform: translateX(18%);
 }
 
 .nav-link.is-active {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), var(--accent-wash));
-  border-color: var(--section-rim);
+    radial-gradient(circle at 92% 8%, rgba(255, 243, 223, 0.24), transparent 36%),
+    linear-gradient(135deg, var(--tab-accent), var(--tab-accent-deep));
+  border-color: rgba(255, 243, 223, 0.42);
   color: var(--sidebar-text);
   box-shadow:
-    inset 4px 0 0 var(--accent),
+    inset 0 0 0 1px rgba(255, 243, 223, 0.12),
     0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.nav-link.is-active::before {
+  width: 0.55rem;
+  background: linear-gradient(180deg, #ffe8a9, rgba(255, 243, 223, 0.74));
 }
 
 .button-row {

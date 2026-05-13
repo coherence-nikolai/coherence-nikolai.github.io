@@ -1,13 +1,13 @@
-const CACHE_NAME = "northstar-shell-v24";
+const CACHE_NAME = "northstar-shell-v26";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=20260513f",
-  "./manifest.webmanifest?v=20260513f",
-  "./icon.svg?v=20260513f",
-  "./brand-mark.svg?v=20260513f",
-  "./brand-mark-light.svg?v=20260513f",
-  "./js/app.js?v=20260513f",
+  "./styles.css?v=20260513h",
+  "./manifest.webmanifest?v=20260513h",
+  "./icon.svg?v=20260513h",
+  "./brand-mark.svg?v=20260513h",
+  "./brand-mark-light.svg?v=20260513h",
+  "./js/app.js?v=20260513h",
   "./js/state.js",
   "./js/data/content.js"
 ];

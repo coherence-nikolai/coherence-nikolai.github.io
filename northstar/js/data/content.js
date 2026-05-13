@@ -49,13 +49,13 @@ export const ROUTE_LIBRARY = {
   profile: {
     title: "Name the pattern",
     reason: "Sometimes the useful next move is understanding the conditions that make studying more possible.",
-    action: "Use Profile to answer one prompt about what helps, blocks, or steadies your study brain.",
+    action: "Use Profile to answer one prompt about what helps, blocks, or steadies your study routine.",
     followUp: "After one answer, return to Plan or Notes with a clearer support cue."
   },
   finish: {
     title: "Stop well while the thread is still alive",
     reason: "When momentum is high, a clean stopping point protects recovery and makes re-entry much easier.",
-    action: "Use Finish to close the session, leave a breadcrumb, and avoid burning past the point where your brain can recover well.",
+    action: "Use Finish to close the session, leave a breadcrumb, and avoid pushing past your recovery point.",
     followUp: "If you still have active thoughts, leave one memory cue in Notes before you step away."
   }
 };
@@ -251,7 +251,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: "environment",
     prompt: "My study environment works best when...",
-    supportText: "This is about conditions, not discipline. Pick the setup that usually gives your brain the best chance.",
+    supportText: "This is about conditions, not discipline. Pick the setup that usually gives you the best chance.",
     options: [
       { label: "There is low noise and low sensory clutter", tags: ["sensory"] },
       { label: "I can move, fidget, or shift around", tags: ["regulation"] },
@@ -336,7 +336,7 @@ export const PROFILE_TAG_CONTENT = {
   },
   overwhelm: {
     label: "Overwhelm reduction",
-    summary: "When the task arrives as one giant whole, your brain may need it reduced before it feels reachable.",
+    summary: "When the task arrives as one giant whole, it may need to be reduced before it feels reachable.",
     strategies: [
       "Shrink the task until the first action feels almost too small.",
       "Choose one pressure-reducing move before asking for output.",
@@ -416,7 +416,7 @@ export const PROFILE_TAG_CONTENT = {
   },
   avoidance: {
     label: "Avoidance awareness",
-    summary: "If the task feels threatening, the brain may protect itself by moving elsewhere.",
+    summary: "If the task feels threatening, avoidance may be a protective signal.",
     strategies: [
       "Name what feels threatening about the task before forcing action.",
       "Choose one safe contact point with the task.",

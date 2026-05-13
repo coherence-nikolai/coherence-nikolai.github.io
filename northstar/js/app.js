@@ -868,8 +868,8 @@ const REGULATION_STRATEGIES = {
   },
   label: {
     label: "Name the feeling",
-    step: "Say: \"I am noticing worry, shame, avoidance, or overload.\"",
-    bridge: "Then ask what barrier is present, not why you are like this."
+    step: "Notice one feeling without solving it yet.",
+    bridge: "Then name one barrier and choose the smallest next move."
   },
   needs: {
     label: "Basic care",
@@ -905,7 +905,7 @@ function buildRegulationResult() {
     regulationStep: strategy.step,
     loadStep,
     bridge: strategy.bridge,
-    experiment: "Afterward, notice what helped, what did not, and what needs adjusting."
+    experiment: "Afterward, notice whether this made study feel even a little more reachable."
   };
 }
 
@@ -917,12 +917,12 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
   $("#regulateOutput").classList.remove("empty");
   $("#regulateOutput").innerHTML = `
     <div class="output-block">
-      <h4>What is happening</h4>
+      <h4>What is loudest</h4>
       <p>${escapeHtml(result.signal)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Do this before study</h4>
+      <h4>Try this first</h4>
       <ul class="summary-list">
         ${toListItems([
           result.regulationStep,
@@ -933,7 +933,7 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
     </div>
 
     <div class="output-block">
-      <h4>Bridge back gently</h4>
+      <h4>Bridge back</h4>
       <p>${escapeHtml(result.bridge)}</p>
       <p class="output-subtle">${escapeHtml(result.experiment)}</p>
     </div>
@@ -1131,17 +1131,17 @@ function renderSessionMemory() {
   card.hidden = !hasMemory;
   if (!hasMemory) return;
 
-  const title = worked || nextCue || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
+  const title = nextCue || worked || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
+  const helper = avoid ? `Make lighter: ${avoid}` : worked && nextCue ? `Helpful: ${worked}` : "";
   const copyParts = [
-    nextCue ? `Return cue: ${nextCue}` : "",
-    avoid ? `Avoid next time: ${avoid}` : "",
-    focusRounds ? `Focus evidence: ${focusRounds} timer block${focusRounds === 1 ? "" : "s"} completed.` : ""
+    helper,
+    focusRounds ? `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed.` : ""
   ].filter(Boolean);
 
   $("#sessionMemoryTitle").textContent = title;
-  $("#sessionMemoryCopy").textContent = copyParts.join(" ");
+  $("#sessionMemoryCopy").textContent = copyParts.join(" · ") || "Use this as the next starting point.";
   $("#sessionMemoryMeta").textContent = updatedAt
-    ? `${panelLabel(lastPanel || "dashboard")} · saved ${new Date(updatedAt).toLocaleString()}`
+    ? `Saved from ${panelLabel(lastPanel || "dashboard")}`
     : "";
 }
 
@@ -2771,9 +2771,9 @@ function renderFinishSummary({ openResult = false } = {}) {
     total,
     summary:
       completed >= 4
-        ? "You have closed this session in a way that should make re-entry easier."
-        : "You do not need a perfect finish. Aim for a clear stopping point and one memory cue.",
-    nextTime: state.finish.nextTime || "No re-entry note saved yet.",
+        ? "You left a clear return point."
+        : "Good enough is enough. Leave one clear next step if you can.",
+    nextTime: state.finish.nextTime || "No return cue saved yet.",
     worked: state.sessionMemory.worked,
     avoid: state.sessionMemory.avoid
   };
@@ -2792,32 +2792,32 @@ function renderFinishSummary({ openResult = false } = {}) {
   $("#finishOutput").innerHTML = `
     <div class="summary-grid">
       <div class="summary-cell">
-        <span>Checklist progress</span>
+        <span>Progress</span>
         <strong>${completed} of ${total}</strong>
       </div>
       <div class="summary-cell">
-        <span>Session close</span>
-        <strong>${completed >= 4 ? "Strong" : "Good enough is valid"}</strong>
+        <span>Close</span>
+        <strong>${completed >= 4 ? "Clear" : "Good enough"}</strong>
       </div>
     </div>
 
     <div class="output-block">
-      <h4>Finish reflection</h4>
+      <h4>Close point</h4>
       <p>${escapeHtml(result.summary)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Remember next time</h4>
+      <h4>Start here next time</h4>
       <p>${escapeHtml(result.nextTime)}</p>
     </div>
 
     ${result.worked || result.avoid ? `
       <div class="output-block">
-        <h4>What Northstar will remember</h4>
+        <h4>Keep visible</h4>
         <ul class="summary-list">
           ${toListItems([
-            result.worked ? `Worked: ${result.worked}` : "",
-            result.avoid ? `Avoid: ${result.avoid}` : ""
+            result.worked ? `Helpful: ${result.worked}` : "",
+            result.avoid ? `Make lighter: ${result.avoid}` : ""
           ])}
         </ul>
       </div>
@@ -2832,11 +2832,11 @@ function renderFinishSummary({ openResult = false } = {}) {
       sourcePanel: "finish",
       resultType: "finish",
       kicker: "Session closed",
-      title: completed >= 4 ? "You left a clean return point" : "Good enough is enough",
+      title: completed >= 4 ? "You left a clear return point" : "Good enough is enough",
       summary: result.summary,
       items: [
         `${completed} of ${total} finish checks are complete.`,
-        result.nextTime ? `Remember next time: ${result.nextTime}` : "Add one memory cue if you want an easier restart.",
+        result.nextTime ? `Start here next time: ${result.nextTime}` : "Add one return cue if you want an easier restart.",
         "You can stop here without carrying the whole task in your head."
       ],
       primaryLabel: "Back to Home",
@@ -2844,9 +2844,9 @@ function renderFinishSummary({ openResult = false } = {}) {
       copyText: [
         `Finish progress: ${result.completed} of ${result.total}`,
         result.summary,
-        `Next time: ${result.nextTime}`,
-        result.worked ? `Worked: ${result.worked}` : "",
-        result.avoid ? `Avoid: ${result.avoid}` : ""
+        `Start here next time: ${result.nextTime}`,
+        result.worked ? `Helpful: ${result.worked}` : "",
+        result.avoid ? `Make lighter: ${result.avoid}` : ""
       ].join("\n")
     });
   }
