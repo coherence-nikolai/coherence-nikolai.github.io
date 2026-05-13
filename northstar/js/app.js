@@ -262,7 +262,7 @@ function normalizeSessionMemory(rawState) {
   return {
     worked: String(raw.worked || ""),
     avoid: String(raw.avoid || ""),
-    nextCue: String(raw.nextCue || ""),
+    nextCue: normalizeReturnCue(raw.nextCue),
     updatedAt: raw.updatedAt || null,
     focusRounds: Number.isInteger(raw.focusRounds) ? Math.max(raw.focusRounds, 0) : 0,
     lastPanel: PANEL_LABELS[raw.lastPanel] ? raw.lastPanel : "dashboard"
@@ -340,6 +340,23 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function normalizeReturnCue(value) {
+  const cue = String(value || "").trim();
+  if (!cue) return "";
+
+  const lowerCue = cue.toLowerCase();
+  if (lowerCue.includes("why you are like this") || lowerCue.includes("what barrier is present")) {
+    return "Name the barrier. Choose the smallest next move.";
+  }
+
+  const standaloneCue = cue
+    .replace(/^then\s+/i, "")
+    .replace(/^ask\s+what\s+barrier\s+is\s+present[,.]?\s*/i, "Name the barrier. ")
+    .trim();
+
+  return standaloneCue.charAt(0).toUpperCase() + standaloneCue.slice(1);
 }
 
 function toListItems(items) {
@@ -842,7 +859,7 @@ const REGULATION_SIGNALS = {
   body: "Your body is carrying the stress first.",
   thoughts: "The thought loop is loud right now.",
   sensory: "The environment is adding load before the task even starts.",
-  avoidance: "Avoidance is information, not a character flaw.",
+  avoidance: "Avoidance usually means a barrier is present.",
   fog: "Working memory is overloaded, so the task needs less noise around it."
 };
 
@@ -859,22 +876,22 @@ const REGULATION_STRATEGIES = {
   sensory: {
     label: "Sensory anchor",
     step: "Choose one sensory anchor and stay with it for 30-60 seconds.",
-    bridge: "Then make the task visible without starting it yet."
+    bridge: "Make the task visible without starting it yet."
   },
   movement: {
     label: "Small movement",
     step: "Move pressure through your body with one tiny movement set.",
-    bridge: "Then return and do only the first setup action."
+    bridge: "Return and do only the first setup action."
   },
   label: {
     label: "Name the feeling",
     step: "Notice one feeling without solving it yet.",
-    bridge: "Then name one barrier and choose the smallest next move."
+    bridge: "Name the barrier. Choose the smallest next move."
   },
   needs: {
     label: "Basic care",
     step: "Check water, food, temperature, device pull, and noise before effort.",
-    bridge: "Then use a 10-minute Focus block or a one-step Plan."
+    bridge: "Use a 10-minute Focus block or a one-step Plan."
   }
 };
 
@@ -904,7 +921,7 @@ function buildRegulationResult() {
     strategyLabel: strategy.label,
     regulationStep: strategy.step,
     loadStep,
-    bridge: strategy.bridge,
+    bridge: normalizeReturnCue(strategy.bridge),
     experiment: "Afterward, notice whether this made study feel even a little more reachable."
   };
 }
@@ -1116,6 +1133,7 @@ function updateSessionMemory(patch = {}) {
   state.sessionMemory = {
     ...state.sessionMemory,
     ...patch,
+    nextCue: normalizeReturnCue(patch.nextCue ?? state.sessionMemory.nextCue),
     updatedAt: stampNow()
   };
   saveState("sessionMemory", state.sessionMemory);
@@ -1132,8 +1150,9 @@ function renderSessionMemory() {
   card.hidden = !hasMemory || (state.settings.supportState === "low" && activePanel !== "dashboard");
   if (!hasMemory) return;
 
-  const title = nextCue || worked || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
-  const helper = avoid ? `Make lighter: ${avoid}` : worked && nextCue ? `Helpful: ${worked}` : "";
+  const safeNextCue = normalizeReturnCue(nextCue);
+  const title = safeNextCue || worked || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
+  const helper = avoid ? `Make lighter: ${avoid}` : worked && safeNextCue ? `Helpful: ${worked}` : "";
   const copyParts = [
     helper,
     focusRounds ? `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed.` : ""
@@ -1570,7 +1589,7 @@ function captureForms() {
     ...state.sessionMemory,
     worked: $("#workedInput").value.trim(),
     avoid: $("#avoidInput").value.trim(),
-    nextCue: $("#nextTimeInput").value.trim() || state.sessionMemory.nextCue
+    nextCue: normalizeReturnCue($("#nextTimeInput").value.trim() || state.sessionMemory.nextCue)
   };
 
   saveState("checkin", state.checkin);
@@ -2931,7 +2950,7 @@ function snapshotText() {
     route ? `Why: ${route.reason}` : "",
     "",
     regulate ? `Regulation step: ${regulate.regulationStep}` : "",
-    regulate ? `Regulation bridge: ${regulate.bridge}` : "",
+    regulate ? `Regulation bridge: ${normalizeReturnCue(regulate.bridge)}` : "",
     planner ? `Task: ${planner.task}` : "",
     planner ? `First step: ${planner.firstStep}` : "",
     focus ? `Focus container: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
@@ -2970,7 +2989,7 @@ function currentResumeHint() {
   }
 
   if (panelName === "regulate" && state.outputs.regulate?.bridge) {
-    return state.outputs.regulate.bridge;
+    return normalizeReturnCue(state.outputs.regulate.bridge);
   }
 
   if (panelName === "unpack" && state.outputs.unpack?.nextMoves?.[0]) {
@@ -2978,11 +2997,11 @@ function currentResumeHint() {
   }
 
   if (panelName === "focus" && (state.focus.returnCue || state.focus.intention || state.outputs.focus?.next)) {
-    return state.focus.returnCue || state.focus.intention || state.outputs.focus.next;
+    return normalizeReturnCue(state.focus.returnCue || state.focus.intention || state.outputs.focus.next);
   }
 
   if (panelName === "notes" && (state.outputs.notes?.reentryNote || state.outputs.notes?.nextReview)) {
-    return state.outputs.notes.reentryNote || state.outputs.notes.nextReview;
+    return normalizeReturnCue(state.outputs.notes.reentryNote || state.outputs.notes.nextReview);
   }
 
   if (panelName === "profile" && state.outputs.profile?.advisorAsks?.[0]) {
@@ -2990,11 +3009,11 @@ function currentResumeHint() {
   }
 
   if (panelName === "finish" && state.outputs.finish?.nextTime) {
-    return state.outputs.finish.nextTime;
+    return normalizeReturnCue(state.outputs.finish.nextTime);
   }
 
   if (state.outputs.route?.action) {
-    return state.outputs.route.action;
+    return normalizeReturnCue(state.outputs.route.action);
   }
 
   return "Open the task, make the next step visible, and keep the thread alive.";
@@ -3111,7 +3130,7 @@ function bindEvents() {
   $("#applyCalibrationBtn").addEventListener("click", applyCalibration);
   $("#skipCalibrationBtn").addEventListener("click", skipCalibration);
   $("#useMemoryCueBtn").addEventListener("click", () => {
-    const cue = state.sessionMemory.nextCue || state.sessionMemory.worked;
+    const cue = normalizeReturnCue(state.sessionMemory.nextCue || state.sessionMemory.worked);
     if (!cue) return;
     $("#todayIntentInput").value = cue;
     captureForms();
