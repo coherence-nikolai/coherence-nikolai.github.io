@@ -41,7 +41,7 @@ const PANEL_THEME_COLORS = {
   regulate: "#e8eee4",
   planner: "#f1e7e0",
   focus: "#f1ecdf",
-  unpack: "#e8eee4",
+  unpack: "#e3efeb",
   notes: "#e6edf3",
   profile: "#f1e7e2",
   finish: "#f1ecdf",
