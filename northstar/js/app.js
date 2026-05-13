@@ -25,6 +25,7 @@ const $$ = (selector, context = document) => [...context.querySelectorAll(select
 const PANEL_LABELS = {
   dashboard: "Today",
   "dashboard-options": "Tune Today",
+  regulate: "Regulate",
   planner: "Plan",
   focus: "Focus",
   unpack: "Unpack",
@@ -37,6 +38,7 @@ const PANEL_LABELS = {
 const PANEL_THEME_COLORS = {
   dashboard: "#efe9df",
   "dashboard-options": "#efe9df",
+  regulate: "#e8eee4",
   planner: "#f1e7e0",
   focus: "#f1ecdf",
   unpack: "#e8eee4",
@@ -46,7 +48,7 @@ const PANEL_THEME_COLORS = {
   "mobile-result": "#efe9df"
 };
 
-const PRIMARY_PANELS = new Set(["dashboard", "planner", "focus", "unpack", "notes", "profile", "finish"]);
+const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "focus", "unpack", "notes", "profile", "finish"]);
 
 const SUPPORT_STATES = {
   low: {
@@ -88,6 +90,13 @@ const defaultCheckin = {
   studyState: ""
 };
 
+const defaultRegulateState = {
+  signal: "body",
+  anchor: "touch",
+  load: "",
+  strategy: "sensory"
+};
+
 const defaultNotesState = {
   title: "",
   context: "",
@@ -97,6 +106,23 @@ const defaultNotesState = {
 
 const defaultProfileUi = {
   activeIndex: 0
+};
+
+const defaultCalibration = {
+  completed: false,
+  supportState: "low",
+  startPoint: "overwhelmed",
+  timerPreset: "gentle",
+  updatedAt: null
+};
+
+const defaultSessionMemory = {
+  worked: "",
+  avoid: "",
+  nextCue: "",
+  updatedAt: null,
+  focusRounds: 0,
+  lastPanel: "dashboard"
 };
 
 const FOCUS_PRESETS = {
@@ -126,8 +152,13 @@ const defaultFocusState = {
   intention: "",
   returnCue: "",
   completedRounds: 0,
-  lastCompletedAt: null
+  lastCompletedAt: null,
+  timerEndsAt: null,
+  alertPermission: "unknown",
+  alertPreference: false
 };
+
+const FOCUS_NOTIFICATION_ID = 401;
 
 const DEFAULT_NOTE_BLOCK_SEQUENCE = ["idea", "question", "task"];
 
@@ -208,7 +239,33 @@ function normalizeFocusState(rawState) {
     intention: String(raw.intention || ""),
     returnCue: String(raw.returnCue || ""),
     completedRounds,
-    lastCompletedAt: raw.lastCompletedAt || null
+    lastCompletedAt: raw.lastCompletedAt || null,
+    timerEndsAt: Number.isFinite(raw.timerEndsAt) ? raw.timerEndsAt : null,
+    alertPermission: String(raw.alertPermission || "unknown"),
+    alertPreference: Boolean(raw.alertPreference)
+  };
+}
+
+function normalizeCalibrationState(rawState) {
+  const raw = rawState && typeof rawState === "object" ? rawState : {};
+  return {
+    completed: Boolean(raw.completed),
+    supportState: SUPPORT_STATES[raw.supportState] ? raw.supportState : defaultCalibration.supportState,
+    startPoint: raw.startPoint || defaultCalibration.startPoint,
+    timerPreset: FOCUS_PRESETS[raw.timerPreset] ? raw.timerPreset : defaultCalibration.timerPreset,
+    updatedAt: raw.updatedAt || null
+  };
+}
+
+function normalizeSessionMemory(rawState) {
+  const raw = rawState && typeof rawState === "object" ? rawState : {};
+  return {
+    worked: String(raw.worked || ""),
+    avoid: String(raw.avoid || ""),
+    nextCue: String(raw.nextCue || ""),
+    updatedAt: raw.updatedAt || null,
+    focusRounds: Number.isInteger(raw.focusRounds) ? Math.max(raw.focusRounds, 0) : 0,
+    lastPanel: PANEL_LABELS[raw.lastPanel] ? raw.lastPanel : "dashboard"
   };
 }
 
@@ -224,6 +281,10 @@ const state = {
     energy: "medium",
     blockers: []
   }),
+  regulate: {
+    ...defaultRegulateState,
+    ...loadState("regulate", defaultRegulateState)
+  },
   unpack: loadState("unpack", {
     prompt: "",
     verb: "auto",
@@ -236,6 +297,8 @@ const state = {
   profileAnswers: loadState("profileAnswers", {}),
   profileUi: normalizeProfileUi(loadState("profileUi", defaultProfileUi)),
   focus: normalizeFocusState(loadState("focus", defaultFocusState)),
+  calibration: normalizeCalibrationState(loadState("calibration", defaultCalibration)),
+  sessionMemory: normalizeSessionMemory(loadState("sessionMemory", defaultSessionMemory)),
   finish: loadState("finish", {
     items: FINISH_ITEMS.map(() => false),
     nextTime: ""
@@ -264,6 +327,10 @@ function isNativeShell() {
     : false;
 
   return hasCapacitorPlatform || hasCapacitorIOS;
+}
+
+function nativePlugin(name) {
+  return window.Capacitor?.Plugins?.[name] || null;
 }
 
 function escapeHtml(value) {
@@ -340,6 +407,7 @@ function hasMeaningfulThread() {
   return Boolean(
     state.notesHistory.length ||
     state.outputs.route ||
+    state.outputs.regulate ||
     state.outputs.planner ||
     state.outputs.unpack ||
     state.outputs.notes ||
@@ -347,6 +415,7 @@ function hasMeaningfulThread() {
     state.outputs.focus ||
     state.outputs.finish ||
     state.planner.task ||
+    state.regulate.load ||
     state.unpack.prompt ||
     hasFocusThread ||
     hasNotesDraft ||
@@ -748,6 +817,10 @@ function setInitialFormValues() {
   $("#taskDueInput").value = state.planner.dueDate;
   $("#taskEnergySelect").value = state.planner.energy;
 
+  $("#regulateSignalSelect").value = state.regulate.signal;
+  $("#regulateAnchorSelect").value = state.regulate.anchor;
+  $("#regulateLoadInput").value = state.regulate.load;
+
   $("#promptInput").value = state.unpack.prompt;
   $("#promptDueInput").value = state.unpack.dueDate;
   $("#unclearInput").value = state.unpack.unclear;
@@ -761,6 +834,257 @@ function setInitialFormValues() {
   $("#notesGoalInput").value = state.notes.reviewGoal;
 
   $("#nextTimeInput").value = state.finish.nextTime;
+  $("#workedInput").value = state.sessionMemory.worked;
+  $("#avoidInput").value = state.sessionMemory.avoid;
+}
+
+const REGULATION_SIGNALS = {
+  body: "Your body is carrying the stress first.",
+  thoughts: "The thought loop is loud right now.",
+  sensory: "The environment is adding load before the task even starts.",
+  avoidance: "Avoidance is information, not a character flaw.",
+  fog: "Working memory is overloaded, so the task needs less noise around it."
+};
+
+const REGULATION_ANCHORS = {
+  touch: "Hold one texture or press your feet into the floor for 30 seconds.",
+  movement: "Do one small movement: stretch, pace, wall push-up, or posture shift.",
+  sound: "Choose one steady sound and let attention return there when it wanders.",
+  sight: "Pick one colour or visual point and let your eyes rest there.",
+  breath: "Use breath only if it feels safe: one slower exhale is enough.",
+  object: "Hold or look at one familiar object that helps your body orient."
+};
+
+const REGULATION_STRATEGIES = {
+  sensory: {
+    label: "Sensory anchor",
+    step: "Choose one sensory anchor and stay with it for 30-60 seconds.",
+    bridge: "Then make the task visible without starting it yet."
+  },
+  movement: {
+    label: "Small movement",
+    step: "Move pressure through your body with one tiny movement set.",
+    bridge: "Then return and do only the first setup action."
+  },
+  label: {
+    label: "Name the feeling",
+    step: "Say: \"I am noticing worry, shame, avoidance, or overload.\"",
+    bridge: "Then ask what barrier is present, not why you are like this."
+  },
+  needs: {
+    label: "Basic care",
+    step: "Check water, food, temperature, device pull, and noise before effort.",
+    bridge: "Then use a 10-minute Focus block or a one-step Plan."
+  }
+};
+
+function setRegulationStrategy(strategy) {
+  if (!REGULATION_STRATEGIES[strategy]) return;
+  state.regulate.strategy = strategy;
+  saveState("regulate", state.regulate);
+
+  $$("#regulationMenu .regulation-option").forEach((button) => {
+    const isSelected = button.dataset.regulationStrategy === strategy;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+}
+
+function buildRegulationResult() {
+  captureForms();
+
+  const strategy = REGULATION_STRATEGIES[state.regulate.strategy] || REGULATION_STRATEGIES.sensory;
+  const signal = REGULATION_SIGNALS[state.regulate.signal] || REGULATION_SIGNALS.body;
+  const anchor = REGULATION_ANCHORS[state.regulate.anchor] || REGULATION_ANCHORS.touch;
+  const loadStep = state.regulate.load || "Reduce one demand: close a tab, dim light, use headphones, move rooms, or get water.";
+
+  return {
+    signal,
+    anchor,
+    strategyLabel: strategy.label,
+    regulationStep: strategy.step,
+    loadStep,
+    bridge: strategy.bridge,
+    experiment: "Afterward, notice what helped, what did not, and what needs adjusting."
+  };
+}
+
+function renderRegulation({ openResult = false, remember = true } = {}) {
+  const result = buildRegulationResult();
+  state.outputs.regulate = result;
+  saveState("outputs", state.outputs);
+
+  $("#regulateOutput").classList.remove("empty");
+  $("#regulateOutput").innerHTML = `
+    <div class="output-block">
+      <h4>What is happening</h4>
+      <p>${escapeHtml(result.signal)}</p>
+    </div>
+
+    <div class="output-block">
+      <h4>Do this before study</h4>
+      <ul class="summary-list">
+        ${toListItems([
+          result.regulationStep,
+          result.anchor,
+          result.loadStep
+        ])}
+      </ul>
+    </div>
+
+    <div class="output-block">
+      <h4>Bridge back gently</h4>
+      <p>${escapeHtml(result.bridge)}</p>
+      <p class="output-subtle">${escapeHtml(result.experiment)}</p>
+    </div>
+  `;
+
+  if (remember) {
+    updateSessionMemory({
+      worked: state.sessionMemory.worked,
+      nextCue: result.bridge,
+      lastPanel: "regulate"
+    });
+  }
+  renderSnapshotPreview();
+  renderStatus();
+
+  if (openResult) {
+    openMobileResult({
+      sourcePanel: "regulate",
+      resultType: "regulate",
+      kicker: "Regulation first",
+      title: "Do this before the task",
+      summary: result.regulationStep,
+      items: [result.anchor, result.loadStep, result.bridge],
+      primaryLabel: "Open Focus",
+      primaryTarget: "focus",
+      copyText: [
+        "NORTHSTAR REGULATION STEP",
+        "",
+        result.signal,
+        result.regulationStep,
+        result.anchor,
+        result.loadStep,
+        result.bridge
+      ].join("\n")
+    });
+  }
+}
+
+function syncRegulationSelection() {
+  setRegulationStrategy(state.regulate.strategy || "sensory");
+}
+
+function focusNotificationCopy(phase = state.focus.phase) {
+  return phase === "break"
+    ? {
+      title: "Northstar break complete",
+      body: "Choose whether another focus block would actually help."
+    }
+    : {
+      title: "Northstar focus block complete",
+      body: "Stop first. Add a return cue before deciding what comes next."
+    };
+}
+
+async function cancelFocusNotification() {
+  const localNotifications = nativePlugin("LocalNotifications");
+  if (!localNotifications?.cancel) return;
+
+  try {
+    await localNotifications.cancel({
+      notifications: [{ id: FOCUS_NOTIFICATION_ID }]
+    });
+  } catch {
+    // Notification cancellation is best-effort; the timer itself remains reliable.
+  }
+}
+
+async function requestTimerAlerts() {
+  const localNotifications = nativePlugin("LocalNotifications");
+
+  if (localNotifications?.checkPermissions && localNotifications?.requestPermissions) {
+    try {
+      const current = await localNotifications.checkPermissions();
+      const permission = current.display === "granted"
+        ? current
+        : await localNotifications.requestPermissions();
+      state.focus.alertPermission = permission.display || "unknown";
+      state.focus.alertPreference = permission.display === "granted";
+      saveState("focus", state.focus);
+      renderFocusTimer();
+      return state.focus.alertPreference;
+    } catch {
+      state.focus.alertPermission = "unavailable";
+      state.focus.alertPreference = false;
+      saveState("focus", state.focus);
+      renderFocusTimer();
+      return false;
+    }
+  }
+
+  if ("Notification" in window) {
+    try {
+      const permission = Notification.permission === "default"
+        ? await Notification.requestPermission()
+        : Notification.permission;
+      state.focus.alertPermission = permission;
+      state.focus.alertPreference = permission === "granted";
+      saveState("focus", state.focus);
+      renderFocusTimer();
+      return state.focus.alertPreference;
+    } catch {
+      state.focus.alertPermission = "unavailable";
+      state.focus.alertPreference = false;
+      saveState("focus", state.focus);
+      renderFocusTimer();
+      return false;
+    }
+  }
+
+  state.focus.alertPermission = "unavailable";
+  state.focus.alertPreference = false;
+  saveState("focus", state.focus);
+  renderFocusTimer();
+  return false;
+}
+
+async function scheduleFocusNotification(delaySeconds) {
+  await cancelFocusNotification();
+  if (!state.focus.alertPreference || delaySeconds <= 0) return;
+
+  const copy = focusNotificationCopy();
+  const localNotifications = nativePlugin("LocalNotifications");
+
+  if (localNotifications?.schedule) {
+    try {
+      await localNotifications.schedule({
+        notifications: [
+          {
+            id: FOCUS_NOTIFICATION_ID,
+            title: copy.title,
+            body: copy.body,
+            schedule: { at: new Date(Date.now() + delaySeconds * 1000) }
+          }
+        ]
+      });
+      return;
+    } catch {
+      // Fall through to foreground/browser notification if native scheduling fails.
+    }
+  }
+}
+
+function notifyFocusTimerComplete(phase = state.focus.phase) {
+  const copy = focusNotificationCopy(phase);
+  if (!state.focus.alertPreference || !("Notification" in window) || Notification.permission !== "granted") return;
+
+  try {
+    new Notification(copy.title, { body: copy.body });
+  } catch {
+    // Browsers may reject notifications in embedded shells; ignore gracefully.
+  }
 }
 
 function currentFocusPreset() {
@@ -786,6 +1110,143 @@ function formatFocusTime(totalSeconds) {
   const minutes = Math.floor(safeSeconds / 60);
   const seconds = safeSeconds % 60;
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function updateSessionMemory(patch = {}) {
+  state.sessionMemory = {
+    ...state.sessionMemory,
+    ...patch,
+    updatedAt: stampNow()
+  };
+  saveState("sessionMemory", state.sessionMemory);
+  renderSessionMemory();
+}
+
+function renderSessionMemory() {
+  const card = $("#sessionMemoryCard");
+  if (!card) return;
+
+  const { worked, avoid, nextCue, updatedAt, focusRounds, lastPanel } = state.sessionMemory;
+  const hasMemory = Boolean(worked || avoid || nextCue || focusRounds);
+  card.hidden = !hasMemory;
+  if (!hasMemory) return;
+
+  const title = worked || nextCue || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
+  const copyParts = [
+    nextCue ? `Return cue: ${nextCue}` : "",
+    avoid ? `Avoid next time: ${avoid}` : "",
+    focusRounds ? `Focus evidence: ${focusRounds} timer block${focusRounds === 1 ? "" : "s"} completed.` : ""
+  ].filter(Boolean);
+
+  $("#sessionMemoryTitle").textContent = title;
+  $("#sessionMemoryCopy").textContent = copyParts.join(" ");
+  $("#sessionMemoryMeta").textContent = updatedAt
+    ? `${panelLabel(lastPanel || "dashboard")} · saved ${new Date(updatedAt).toLocaleString()}`
+    : "";
+}
+
+function renderCalibration() {
+  const card = $("#calibrationCard");
+  if (!card) return;
+  card.hidden = Boolean(state.calibration.completed);
+
+  $$("#calibrationCard [data-calibration-support]").forEach((button) => {
+    const isSelected = button.dataset.calibrationSupport === state.calibration.supportState;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-checked", String(isSelected));
+  });
+
+  $$("#calibrationCard [data-calibration-start]").forEach((button) => {
+    const isSelected = button.dataset.calibrationStart === state.calibration.startPoint;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-checked", String(isSelected));
+  });
+
+  $$("#calibrationCard [data-calibration-timer]").forEach((button) => {
+    const isSelected = button.dataset.calibrationTimer === state.calibration.timerPreset;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-checked", String(isSelected));
+  });
+}
+
+function setCalibrationValue(key, value) {
+  state.calibration[key] = value;
+  state.calibration.updatedAt = stampNow();
+  saveState("calibration", state.calibration);
+  renderCalibration();
+}
+
+function applyCalibration() {
+  const startPoint = state.calibration.startPoint;
+  const studyState = STUDY_STATES[startPoint] ? startPoint : "overwhelmed";
+  const studyStateMeta = STUDY_STATES[studyState];
+  let targetSection = studyStateMeta.route;
+  let routeOverrides = {
+    studyState,
+    battery: studyStateMeta.battery,
+    timeAvailable: studyStateMeta.timeAvailable,
+    blockers: [...studyStateMeta.blockers],
+    intent: state.checkin.intent || studyStateMeta.intent
+  };
+
+  state.settings.supportState = state.calibration.supportState;
+  state.focus.preset = state.calibration.timerPreset;
+  focusTimerRemaining = null;
+
+  if (startPoint === "focus") {
+    targetSection = "focus";
+    state.checkin = {
+      ...state.checkin,
+      timeAvailable: 10,
+      blockers: ["time", "starting"],
+      intent: state.checkin.intent || "use a timer container before starting"
+    };
+    routeOverrides = {
+      timeAvailable: 10,
+      blockers: ["time", "starting"],
+      intent: state.checkin.intent
+    };
+  } else {
+    state.checkin = {
+      ...state.checkin,
+      studyState,
+      battery: studyStateMeta.battery,
+      timeAvailable: studyStateMeta.timeAvailable,
+      blockers: [...studyStateMeta.blockers],
+      intent: state.checkin.intent || studyStateMeta.intent
+    };
+  }
+
+  state.calibration.completed = true;
+  state.calibration.updatedAt = stampNow();
+  saveState("settings", state.settings);
+  saveState("focus", state.focus);
+  saveState("checkin", state.checkin);
+  saveState("calibration", state.calibration);
+
+  syncTodayInputs();
+  applySettings();
+  renderFocusTimer();
+  chooseTriageRoute(targetSection, routeOverrides);
+  renderCalibration();
+  renderSnapshotPreview();
+  renderStatus();
+  showPanel(targetSection || "dashboard");
+}
+
+function skipCalibration() {
+  state.calibration.completed = true;
+  state.calibration.updatedAt = stampNow();
+  saveState("calibration", state.calibration);
+  renderCalibration();
+}
+
+function showCalibration() {
+  state.calibration.completed = false;
+  state.calibration.updatedAt = stampNow();
+  saveState("calibration", state.calibration);
+  renderCalibration();
+  showPanel("dashboard");
 }
 
 function stopFocusInterval() {
@@ -902,6 +1363,8 @@ function renderFocusTimer() {
   const timerShell = $(".focus-timer-display");
   const startBtn = $("#focusStartBtn");
   const pauseBtn = $("#focusPauseBtn");
+  const alertStatus = $("#focusNotificationStatus");
+  const alertBtn = $("#enableTimerAlertsBtn");
 
   if (!display || !label || !hint || !timerShell) return;
 
@@ -912,6 +1375,17 @@ function renderFocusTimer() {
 
   if (startBtn) startBtn.textContent = focusTimerRunning ? "Focus block running" : state.focus.phase === "break" ? "Start break" : "Start focus block";
   if (pauseBtn) pauseBtn.disabled = !focusTimerRunning;
+  if (alertStatus) {
+    alertStatus.textContent = state.focus.alertPreference
+      ? "Alerts are on. Northstar will schedule a phone reminder for the end of the active block."
+      : state.focus.alertPermission === "denied"
+        ? "Alerts are blocked in system settings. The timer will still recover when you reopen Northstar."
+        : "Alerts are off. You can still use the timer without them.";
+  }
+  if (alertBtn) {
+    alertBtn.textContent = state.focus.alertPreference ? "Alerts enabled" : "Enable alerts";
+    alertBtn.disabled = state.focus.alertPreference;
+  }
 
   $$("#focusPresetButtons .focus-preset").forEach((button) => {
     const isSelected = button.dataset.focusPreset === state.focus.preset;
@@ -926,8 +1400,10 @@ function setFocusPreset(presetKey) {
   if (!FOCUS_PRESETS[presetKey]) return;
 
   stopFocusInterval();
+  cancelFocusNotification();
   state.focus.preset = presetKey;
   state.focus.phase = "focus";
+  state.focus.timerEndsAt = null;
   focusTimerRemaining = null;
   saveFocusOutput("preset-changed");
   renderFocusTimer();
@@ -941,7 +1417,9 @@ function startFocusTimer() {
   if (focusTimerRunning) return;
 
   focusTimerRunning = true;
+  state.focus.timerEndsAt = Date.now() + ensureFocusRemaining() * 1000;
   saveFocusOutput("running");
+  scheduleFocusNotification(ensureFocusRemaining());
   renderFocusTimer();
 
   focusTimerIntervalId = window.setInterval(() => {
@@ -956,9 +1434,25 @@ function startFocusTimer() {
   }, 1000);
 }
 
+function syncFocusTimerFromClock() {
+  if (!focusTimerRunning || !state.focus.timerEndsAt) return;
+
+  const remaining = Math.ceil((state.focus.timerEndsAt - Date.now()) / 1000);
+  focusTimerRemaining = Math.max(0, remaining);
+
+  if (focusTimerRemaining <= 0) {
+    completeFocusPhase("timer-ended");
+    return;
+  }
+
+  renderFocusTimer();
+}
+
 function pauseFocusTimer() {
   captureForms();
   stopFocusInterval();
+  cancelFocusNotification();
+  state.focus.timerEndsAt = null;
   saveFocusOutput("paused");
   renderFocusTimer();
   renderSnapshotPreview();
@@ -968,7 +1462,9 @@ function pauseFocusTimer() {
 function resetFocusTimer() {
   captureForms();
   stopFocusInterval();
+  cancelFocusNotification();
   state.focus.phase = "focus";
+  state.focus.timerEndsAt = null;
   focusTimerRemaining = null;
   saveFocusOutput("reset");
   renderFocusTimer();
@@ -979,16 +1475,26 @@ function resetFocusTimer() {
 function completeFocusPhase(status = "marked-done") {
   captureForms();
   const completedFocusBlock = state.focus.phase === "focus";
+  const completedPhase = state.focus.phase;
   stopFocusInterval();
+  cancelFocusNotification();
 
   if (completedFocusBlock) {
     state.focus.completedRounds += 1;
     state.focus.lastCompletedAt = stampNow();
     state.focus.phase = "break";
+    updateSessionMemory({
+      worked: state.sessionMemory.worked || `${currentFocusPreset().label} focus block`,
+      nextCue: state.focus.returnCue || state.sessionMemory.nextCue,
+      focusRounds: state.focus.completedRounds,
+      lastPanel: "focus"
+    });
   } else {
     state.focus.phase = "focus";
   }
 
+  notifyFocusTimerComplete(completedPhase);
+  state.focus.timerEndsAt = null;
   focusTimerRemaining = focusDurationSeconds(state.focus.phase);
   saveFocusOutput(status);
   renderFocusTimer();
@@ -1028,6 +1534,13 @@ function captureForms() {
     blockers: readCheckboxValues("plannerBlockers")
   };
 
+  state.regulate = {
+    signal: $("#regulateSignalSelect").value,
+    anchor: $("#regulateAnchorSelect").value,
+    load: $("#regulateLoadInput").value.trim(),
+    strategy: state.regulate.strategy || "sensory"
+  };
+
   state.unpack = {
     prompt: $("#promptInput").value.trim(),
     verb: $("#verbSelect").value,
@@ -1051,13 +1564,21 @@ function captureForms() {
 
   state.finish.nextTime = $("#nextTimeInput").value.trim();
   state.finish.items = $$("[data-finish-index]").map((box) => box.checked);
+  state.sessionMemory = {
+    ...state.sessionMemory,
+    worked: $("#workedInput").value.trim(),
+    avoid: $("#avoidInput").value.trim(),
+    nextCue: $("#nextTimeInput").value.trim() || state.sessionMemory.nextCue
+  };
 
   saveState("checkin", state.checkin);
   saveState("planner", state.planner);
+  saveState("regulate", state.regulate);
   saveState("unpack", state.unpack);
   saveState("notes", state.notes);
   saveState("focus", state.focus);
   saveState("finish", state.finish);
+  saveState("sessionMemory", state.sessionMemory);
   saveState("profileAnswers", state.profileAnswers);
   saveState("profileUi", state.profileUi);
 }
@@ -1281,7 +1802,7 @@ function renderTodayRoute(result) {
 
   $("#openRouteBtn").disabled = false;
   $("#openRouteBtn").textContent = routeButtonLabel(result.section);
-  setQuickRouteSelection(["dashboard", "planner", "unpack"].includes(result.section) ? result.section : null);
+  setQuickRouteSelection(["dashboard", "regulate", "planner", "focus", "unpack"].includes(result.section) ? result.section : null);
   setTriageSelection(result.section);
   renderStudyStateSelection();
 }
@@ -1322,20 +1843,29 @@ function routeResultForSection(section, overrides = {}) {
 
 function openRouteMobileResult(result) {
   const isPressureRoute = result.section === "dashboard";
+  const isRegulationRoute = result.section === "regulate";
 
   openMobileResult({
     sourcePanel: "dashboard",
     resultType: result.section,
-    kicker: isPressureRoute ? "Pressure lowered" : "Route ready",
-    title: isPressureRoute ? "Do this first" : result.title,
+    kicker: isPressureRoute ? "Pressure lowered" : isRegulationRoute ? "Regulation first" : "Route ready",
+    title: isPressureRoute ? "Do this first" : isRegulationRoute ? "Ready-enough comes first" : result.title,
     summary: isPressureRoute
       ? "One setup action, one sentence, or one question is enough."
+      : isRegulationRoute
+        ? "Lower the nervous-system load before asking for output."
       : result.lowEnergyMove || result.action,
     items: isPressureRoute
       ? [
         "Choose one tiny action that lowers pressure.",
         "If it is still foggy, move to Unpack."
       ]
+      : isRegulationRoute
+        ? [
+          "Name what is loudest: body, thoughts, sensory load, avoidance, or fog.",
+          "Use one concrete anchor or movement.",
+          "Bridge into Focus only when you are ready enough."
+        ]
       : [
         result.action,
         result.followUp,
@@ -1395,6 +1925,8 @@ function recommendRoute(options = {}) {
   } else if (supportState === "low") {
     if (blockerSet.has("unclear")) {
       section = "unpack";
+    } else if (blockerSet.has("overwhelmed") || blockerSet.has("sensory") || blockerSet.has("energy")) {
+      section = "regulate";
     } else if (blockerSet.has("time") || /timer|pomodoro|focus|time.?box|timebox/i.test(intent)) {
       section = "focus";
     } else if (blockerSet.has("memory") || /read|lecture|notes|article|chapter/i.test(intent)) {
@@ -1403,9 +1935,11 @@ function recommendRoute(options = {}) {
       section = "dashboard";
     }
   } else if (timeAvailable <= 5 || battery <= 2 || blockerSet.has("energy") || blockerSet.has("sensory")) {
-    section = "dashboard";
+    section = "regulate";
   } else if (blockerSet.has("unclear")) {
     section = "unpack";
+  } else if (blockerSet.has("overwhelmed")) {
+    section = "regulate";
   } else if (blockerSet.has("memory")) {
     section = "notes";
   } else if (blockerSet.has("time") || /timer|pomodoro|focus|time.?box|timebox/i.test(intent)) {
@@ -2239,11 +2773,20 @@ function renderFinishSummary({ openResult = false } = {}) {
       completed >= 4
         ? "You have closed this session in a way that should make re-entry easier."
         : "You do not need a perfect finish. Aim for a clear stopping point and one memory cue.",
-    nextTime: state.finish.nextTime || "No re-entry note saved yet."
+    nextTime: state.finish.nextTime || "No re-entry note saved yet.",
+    worked: state.sessionMemory.worked,
+    avoid: state.sessionMemory.avoid
   };
 
   state.outputs.finish = result;
   saveState("outputs", state.outputs);
+  updateSessionMemory({
+    worked: state.sessionMemory.worked,
+    avoid: state.sessionMemory.avoid,
+    nextCue: state.finish.nextTime || state.sessionMemory.nextCue,
+    focusRounds: state.focus.completedRounds,
+    lastPanel: "finish"
+  });
 
   $("#finishOutput").classList.remove("empty");
   $("#finishOutput").innerHTML = `
@@ -2267,6 +2810,18 @@ function renderFinishSummary({ openResult = false } = {}) {
       <h4>Remember next time</h4>
       <p>${escapeHtml(result.nextTime)}</p>
     </div>
+
+    ${result.worked || result.avoid ? `
+      <div class="output-block">
+        <h4>What Northstar will remember</h4>
+        <ul class="summary-list">
+          ${toListItems([
+            result.worked ? `Worked: ${result.worked}` : "",
+            result.avoid ? `Avoid: ${result.avoid}` : ""
+          ])}
+        </ul>
+      </div>
+    ` : ""}
   `;
 
   renderSnapshotPreview();
@@ -2289,14 +2844,70 @@ function renderFinishSummary({ openResult = false } = {}) {
       copyText: [
         `Finish progress: ${result.completed} of ${result.total}`,
         result.summary,
-        `Next time: ${result.nextTime}`
+        `Next time: ${result.nextTime}`,
+        result.worked ? `Worked: ${result.worked}` : "",
+        result.avoid ? `Avoid: ${result.avoid}` : ""
       ].join("\n")
     });
   }
 }
 
+function setSnapshotExportStatus(message) {
+  const status = $("#snapshotExportStatus");
+  if (!status) return;
+  status.textContent = message;
+}
+
+function snapshotFilename() {
+  const date = new Date().toISOString().slice(0, 10);
+  return `northstar-snapshot-${date}.txt`;
+}
+
+async function shareSnapshot() {
+  const text = snapshotText();
+  const title = "Northstar advisor snapshot";
+  const share = nativePlugin("Share");
+
+  try {
+    if (share?.share) {
+      await share.share({
+        title,
+        text,
+        dialogTitle: "Share Northstar snapshot"
+      });
+      setSnapshotExportStatus("Share sheet opened.");
+      return;
+    }
+
+    if (navigator.share) {
+      await navigator.share({ title, text });
+      setSnapshotExportStatus("Share sheet opened.");
+      return;
+    }
+  } catch {
+    // Fall back to copy if a share sheet is cancelled or unavailable.
+  }
+
+  await copyText(text);
+  setSnapshotExportStatus("Sharing was unavailable, so the snapshot was copied.");
+}
+
+function downloadSnapshot() {
+  const blob = new Blob([snapshotText()], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = snapshotFilename();
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  setSnapshotExportStatus("Snapshot downloaded as a text file.");
+}
+
 function snapshotText() {
   const route = state.outputs.route;
+  const regulate = state.outputs.regulate;
   const planner = state.outputs.planner;
   const focus = state.outputs.focus;
   const unpack = state.outputs.unpack;
@@ -2317,6 +2928,8 @@ function snapshotText() {
     `Suggested route: ${route ? panelLabel(route.section) : "Not generated yet"}`,
     route ? `Why: ${route.reason}` : "",
     "",
+    regulate ? `Regulation step: ${regulate.regulationStep}` : "",
+    regulate ? `Regulation bridge: ${regulate.bridge}` : "",
     planner ? `Task: ${planner.task}` : "",
     planner ? `First step: ${planner.firstStep}` : "",
     focus ? `Focus container: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
@@ -2326,6 +2939,8 @@ function snapshotText() {
     notes ? `Notes summary: ${notes.summary}` : "",
     profile ? `Support needs: ${profile.content.map((item) => item.label).join(", ")}` : "",
     finish ? `Finish status: ${finish.completed} of ${finish.total}` : "",
+    state.sessionMemory.worked ? `What helped last time: ${state.sessionMemory.worked}` : "",
+    state.sessionMemory.avoid ? `Avoid next time: ${state.sessionMemory.avoid}` : "",
     state.finish.nextTime ? `Next time note: ${state.finish.nextTime}` : ""
   ]
     .filter(Boolean)
@@ -2335,9 +2950,9 @@ function snapshotText() {
 function renderSnapshotPreview() {
   const preview = $("#snapshotPreview");
 
-  if (!state.outputs.route && !state.outputs.planner && !state.outputs.focus && !state.outputs.unpack && !state.outputs.notes && !state.outputs.profile) {
+  if (!state.outputs.route && !state.outputs.regulate && !state.outputs.planner && !state.outputs.focus && !state.outputs.unpack && !state.outputs.notes && !state.outputs.profile) {
     preview.classList.add("empty");
-    preview.textContent = "Your snapshot will appear here after you use Plan, Focus, Unpack, Notes, or Profile.";
+    preview.textContent = "Your snapshot will appear here after you use Regulate, Plan, Focus, Unpack, Notes, or Profile.";
     return;
   }
 
@@ -2350,6 +2965,10 @@ function currentResumeHint() {
 
   if (panelName === "planner" && state.outputs.planner?.firstStep) {
     return state.outputs.planner.firstStep;
+  }
+
+  if (panelName === "regulate" && state.outputs.regulate?.bridge) {
+    return state.outputs.regulate.bridge;
   }
 
   if (panelName === "unpack" && state.outputs.unpack?.nextMoves?.[0]) {
@@ -2437,6 +3056,8 @@ function renderStatus() {
   }
   renderResumeBanner();
   renderFirstMinuteGuide();
+  renderSessionMemory();
+  renderCalibration();
 }
 
 function bindEvents() {
@@ -2464,6 +3085,26 @@ function bindEvents() {
   });
 
   $("#jumpToProfileBtn").addEventListener("click", () => showPanel("profile"));
+  $("#recalibrateBtn").addEventListener("click", showCalibration);
+  $$("#calibrationCard [data-calibration-support]").forEach((button) => {
+    button.addEventListener("click", () => setCalibrationValue("supportState", button.dataset.calibrationSupport));
+  });
+  $$("#calibrationCard [data-calibration-start]").forEach((button) => {
+    button.addEventListener("click", () => setCalibrationValue("startPoint", button.dataset.calibrationStart));
+  });
+  $$("#calibrationCard [data-calibration-timer]").forEach((button) => {
+    button.addEventListener("click", () => setCalibrationValue("timerPreset", button.dataset.calibrationTimer));
+  });
+  $("#applyCalibrationBtn").addEventListener("click", applyCalibration);
+  $("#skipCalibrationBtn").addEventListener("click", skipCalibration);
+  $("#useMemoryCueBtn").addEventListener("click", () => {
+    const cue = state.sessionMemory.nextCue || state.sessionMemory.worked;
+    if (!cue) return;
+    $("#todayIntentInput").value = cue;
+    captureForms();
+    renderStatus();
+    showPanel("dashboard-options");
+  });
   $("#resumeNowBtn").addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
   $("#saveThreadBtn").addEventListener("click", () => {
     captureForms();
@@ -2611,6 +3252,26 @@ function bindEvents() {
     );
   });
 
+  $$("#regulationMenu .regulation-option").forEach((button) => {
+    button.addEventListener("click", () => setRegulationStrategy(button.dataset.regulationStrategy));
+  });
+  $("#buildRegulationBtn").addEventListener("click", () => renderRegulation({ openResult: true }));
+  $("#copyRegulationBtn").addEventListener("click", async () => {
+    const regulation = state.outputs.regulate;
+    if (!regulation) return;
+    await copyText(
+      [
+        "NORTHSTAR REGULATION STEP",
+        "",
+        regulation.signal,
+        regulation.regulationStep,
+        regulation.anchor,
+        regulation.loadStep,
+        regulation.bridge
+      ].join("\n")
+    );
+  });
+
   $$("#focusPresetButtons .focus-preset").forEach((button) => {
     button.addEventListener("click", () => setFocusPreset(button.dataset.focusPreset));
   });
@@ -2618,6 +3279,7 @@ function bindEvents() {
   $("#focusPauseBtn").addEventListener("click", pauseFocusTimer);
   $("#focusResetBtn").addEventListener("click", resetFocusTimer);
   $("#focusCompleteBtn").addEventListener("click", () => completeFocusPhase("marked-done"));
+  $("#enableTimerAlertsBtn").addEventListener("click", requestTimerAlerts);
 
   $("#unpackBtn").addEventListener("click", renderUnpack);
   $("#copyUnpackBtn").addEventListener("click", async () => {
@@ -2693,14 +3355,19 @@ function bindEvents() {
       [
         `Finish progress: ${finish.completed} of ${finish.total}`,
         finish.summary,
-        `Next time: ${finish.nextTime}`
+        `Next time: ${finish.nextTime}`,
+        finish.worked ? `Worked: ${finish.worked}` : "",
+        finish.avoid ? `Avoid next time: ${finish.avoid}` : ""
       ].join("\n")
     );
   });
 
   $("#copySnapshotBtn").addEventListener("click", async () => {
     await copyText(snapshotText());
+    setSnapshotExportStatus("Snapshot copied.");
   });
+  $("#shareSnapshotBtn").addEventListener("click", shareSnapshot);
+  $("#downloadSnapshotBtn").addEventListener("click", downloadSnapshot);
 
   $("#resetDataBtn").addEventListener("click", () => {
     const confirmed = window.confirm("Reset only Northstar data stored in this browser?");
@@ -2758,6 +3425,12 @@ function bindEvents() {
     captureForms();
     renderStatus();
   });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) syncFocusTimerFromClock();
+  });
+  window.addEventListener("focus", syncFocusTimerFromClock);
+  window.addEventListener("pageshow", syncFocusTimerFromClock);
 }
 
 function renderStoredOutputs() {
@@ -2771,6 +3444,7 @@ function renderStoredOutputs() {
     });
   }
 
+  if (state.outputs.regulate) renderRegulation({ openResult: false, remember: false });
   if (state.outputs.planner && state.planner.task) renderPlanner({ openResult: false });
   renderFocusTimer();
   if (state.outputs.unpack && state.unpack.prompt) renderUnpack({ openResult: false });
@@ -2795,6 +3469,7 @@ function init() {
   renderProfileQuestions();
   renderFinishChecklist();
   setInitialFormValues();
+  syncRegulationSelection();
   applySettings();
   bindEvents();
   renderNotesHistory();

@@ -16,6 +16,12 @@ export const ROUTE_LIBRARY = {
     action: "Use the Today panel to choose one small action that lowers pressure.",
     followUp: "If the task is still foggy after that, move to Unpack."
   },
+  regulate: {
+    title: "Regulate before you study",
+    reason: "When the nervous system is overloaded, the useful first move is reducing sensory, emotional, or cognitive load.",
+    action: "Go to Regulate and choose one concrete anchor, movement, or load-lowering adjustment before asking for output.",
+    followUp: "After your body has one steadier cue, bridge into Focus or Plan with a tiny next step."
+  },
   planner: {
     title: "Build a first-step plan",
     reason: "The task exists, but the entry point is not visible yet.",
@@ -59,7 +65,7 @@ export const STUDY_STATES = {
     label: "Overloaded",
     prompt: "Everything feels too big, too loud, or too sharp to tackle cleanly.",
     brief: "Northstar will lower the pressure first, reduce decision count, and bias toward a gentler re-entry.",
-    route: "dashboard",
+    route: "regulate",
     supportState: "low",
     battery: 2,
     timeAvailable: 5,

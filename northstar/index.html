@@ -20,10 +20,10 @@
     name="description"
     content="A calmer, smarter academic skills companion for neurodivergent adult students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260513e">
-  <link rel="icon" href="./icon.svg?v=20260513e" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260513e">
-  <link rel="stylesheet" href="./styles.css?v=20260513e">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260513f">
+  <link rel="icon" href="./icon.svg?v=20260513f" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260513f">
+  <link rel="stylesheet" href="./styles.css?v=20260513f">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,13 +33,14 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260513e" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260513f" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
           </div>
         </div>
         <button class="nav-link is-active" id="nav-dashboard" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
+        <button class="nav-link" id="nav-regulate" role="tab" aria-selected="false" aria-controls="panel-regulate" data-panel-target="regulate">Regulate</button>
         <button class="nav-link" id="nav-planner" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
         <button class="nav-link" id="nav-focus" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
         <button class="nav-link" id="nav-unpack" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
@@ -58,11 +59,14 @@
             Northstar can turn your task, blockers, questions, and study profile into one shareable summary.
           </p>
           <div class="button-row">
-            <button class="button primary" id="copySnapshotBtn">Copy snapshot</button>
+            <button class="button primary" id="shareSnapshotBtn">Share snapshot</button>
+            <button class="button subtle" id="downloadSnapshotBtn">Download .txt</button>
+            <button class="button subtle" id="copySnapshotBtn">Copy</button>
             <button class="button subtle" id="jumpToProfileBtn">Review profile</button>
           </div>
+          <p class="microcopy export-status" id="snapshotExportStatus" aria-live="polite"></p>
           <div class="mini-output" id="snapshotPreview">
-            Your snapshot will appear here after you use Plan, Focus, Unpack, Notes, or Profile.
+            Your snapshot will appear here after you use Regulate, Plan, Focus, Unpack, Notes, or Profile.
           </div>
         </div>
       </details>
@@ -85,7 +89,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260513e" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260513f" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -143,6 +147,7 @@
                 </div>
 
                 <div class="button-row">
+                  <button class="button subtle" id="recalibrateBtn" type="button">Recalibrate Northstar</button>
                   <button class="button subtle" id="resetDataBtn">Reset Northstar data</button>
                 </div>
               </div>
@@ -178,6 +183,7 @@
 
       <nav class="mobile-nav card" aria-label="Study sections" role="tablist">
         <button class="nav-link is-active" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-regulate" data-panel-target="regulate">Regulate</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
@@ -226,6 +232,89 @@
         Back to Northstar home
       </button>
 
+      <section class="calibration-card card" id="calibrationCard" aria-labelledby="calibrationTitle">
+        <div class="calibration-copy">
+          <p class="eyebrow">First-run calibration</p>
+          <h2 id="calibrationTitle">Fit Northstar to how your brain is arriving today</h2>
+          <p class="microcopy">
+            Three choices, no diagnosis required. This tunes pressure, routing, and timer defaults before you start.
+          </p>
+        </div>
+
+        <div class="calibration-grid">
+          <fieldset class="field-group calibration-group">
+            <legend class="field-label">Support level</legend>
+            <div class="calibration-choice-grid" role="radiogroup" aria-label="Calibration support level">
+              <button class="calibration-choice is-selected" type="button" role="radio" aria-checked="true" data-calibration-support="low">
+                <strong>Low pressure</strong>
+                <span>Fewer decisions, smaller asks.</span>
+              </button>
+              <button class="calibration-choice" type="button" role="radio" aria-checked="false" data-calibration-support="standard">
+                <strong>Steady</strong>
+                <span>Balanced guidance.</span>
+              </button>
+              <button class="calibration-choice" type="button" role="radio" aria-checked="false" data-calibration-support="detailed">
+                <strong>More structure</strong>
+                <span>Extra context when useful.</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="field-group calibration-group">
+            <legend class="field-label">Start point</legend>
+            <div class="calibration-choice-grid" role="radiogroup" aria-label="Calibration start point">
+              <button class="calibration-choice is-selected" type="button" role="radio" aria-checked="true" data-calibration-start="overwhelmed">
+                <strong>Too much</strong>
+                <span>Lower pressure first.</span>
+              </button>
+              <button class="calibration-choice" type="button" role="radio" aria-checked="false" data-calibration-start="avoiding">
+                <strong>Hard to begin</strong>
+                <span>Find a safer entry point.</span>
+              </button>
+              <button class="calibration-choice" type="button" role="radio" aria-checked="false" data-calibration-start="focus">
+                <strong>Time is slippery</strong>
+                <span>Use a timer container.</span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="field-group calibration-group">
+            <legend class="field-label">Timer default</legend>
+            <div class="calibration-choice-grid" role="radiogroup" aria-label="Calibration timer preset">
+              <button class="calibration-choice is-selected" type="button" role="radio" aria-checked="true" data-calibration-timer="gentle">
+                <strong>10 / 3</strong>
+                <span>Gentle start.</span>
+              </button>
+              <button class="calibration-choice" type="button" role="radio" aria-checked="false" data-calibration-timer="classic">
+                <strong>25 / 5</strong>
+                <span>Classic container.</span>
+              </button>
+              <button class="calibration-choice" type="button" role="radio" aria-checked="false" data-calibration-timer="deep">
+                <strong>40 / 10</strong>
+                <span>Only with momentum.</span>
+              </button>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="button-row calibration-actions">
+          <button class="button primary" id="applyCalibrationBtn" type="button">Use these settings</button>
+          <button class="button subtle" id="skipCalibrationBtn" type="button">Skip for now</button>
+        </div>
+      </section>
+
+      <section class="memory-banner card" id="sessionMemoryCard" aria-labelledby="sessionMemoryTitle" hidden>
+        <div>
+          <p class="eyebrow">What worked last time</p>
+          <h3 id="sessionMemoryTitle">A useful pattern will appear here</h3>
+          <p class="microcopy" id="sessionMemoryCopy">Finish a session once and Northstar will keep the helpful bit visible for re-entry.</p>
+          <p class="memory-meta" id="sessionMemoryMeta"></p>
+        </div>
+        <div class="button-row">
+          <button class="button subtle" id="useMemoryCueBtn" type="button">Use this cue today</button>
+        </div>
+      </section>
+
       <section class="panel mobile-result-panel" id="panel-mobile-result" role="tabpanel" aria-labelledby="mobileResultTitle">
         <div class="mobile-result-shell">
           <div class="mobile-result-top">
@@ -260,7 +349,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260513e" alt="">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260513f" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Built for neurodivergent ways of studying</strong>
@@ -315,6 +404,12 @@
 
             <div class="today-entry-routes">
               <div class="quick-route-grid" id="quickRouteButtons" role="group" aria-label="Quick start choices">
+                <button class="quick-route-button" type="button" data-route-target="regulate" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Regulate first</span>
+                  <strong>I am not ready to work yet</strong>
+                  <span>Use sensory, movement, or load-lowering support before asking for output.</span>
+                </button>
                 <button class="quick-route-button" type="button" data-route-target="dashboard" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
                   <span class="quick-route-kicker">Calm pressure</span>
@@ -358,7 +453,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260513e" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260513f" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -436,6 +531,11 @@
             </div>
 
             <div class="triage-grid" id="triageButtons">
+              <button class="path-card" type="button" data-route-target="regulate">
+                <span class="path-kicker">Regulate first</span>
+                <strong>Lower the nervous-system load</strong>
+                <span>Best when you are emotionally not ready to sit down and work.</span>
+              </button>
               <button class="path-card" type="button" data-route-target="planner">
                 <span class="path-kicker">Start a task</span>
                 <strong>Make the first step visible</strong>
@@ -542,6 +642,96 @@
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-regulate" role="tabpanel" aria-labelledby="nav-regulate">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Regulate</p>
+            <h2>Get ready to work before asking yourself to work</h2>
+            <p class="panel-copy">
+              Use this when stress, shutdown, sensory load, shame, or avoidance is louder than the task.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up regulate-grid">
+          <article class="card">
+            <div class="section-heading">
+              <p class="eyebrow">Nervous-system check</p>
+              <h3>Find the smallest stabilising move</h3>
+              <p class="microcopy">These strategies are educational support, not medical treatment. If distress is ongoing or unsafe, use professional support.</p>
+            </div>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Where is stress showing up first?</span>
+                <select id="regulateSignalSelect">
+                  <option value="body">Body tension or restlessness</option>
+                  <option value="thoughts">Worry, shame, or racing thoughts</option>
+                  <option value="sensory">Noise, light, clutter, or interruptions</option>
+                  <option value="avoidance">Avoidance or shutdown</option>
+                  <option value="fog">Mental fog or working-memory overload</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Which anchor feels safest?</span>
+                <select id="regulateAnchorSelect">
+                  <option value="touch">Touch or texture</option>
+                  <option value="movement">Movement</option>
+                  <option value="sound">One steady sound</option>
+                  <option value="sight">One colour or visual point</option>
+                  <option value="breath">Breath, only if it feels safe</option>
+                  <option value="object">A familiar object</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>What can you reduce before you try harder?</span>
+              <input
+                id="regulateLoadInput"
+                type="text"
+                placeholder="e.g. close tabs, dim light, use headphones, move rooms, get water"
+              >
+            </label>
+
+            <div class="regulation-menu" id="regulationMenu" role="group" aria-label="Regulation strategy menu">
+              <button class="regulation-option is-selected" type="button" data-regulation-strategy="sensory">
+                <strong>Sensory anchor</strong>
+                <span>Feet, texture, one sound, one colour.</span>
+              </button>
+              <button class="regulation-option" type="button" data-regulation-strategy="movement">
+                <strong>Small movement</strong>
+                <span>Pace, stretch, wall push-up, posture shift.</span>
+              </button>
+              <button class="regulation-option" type="button" data-regulation-strategy="label">
+                <strong>Name the feeling</strong>
+                <span>"I am noticing worry/shame/avoidance."</span>
+              </button>
+              <button class="regulation-option" type="button" data-regulation-strategy="needs">
+                <strong>Basic care</strong>
+                <span>Water, food, device break, quieter space.</span>
+              </button>
+            </div>
+
+            <div class="button-row">
+              <button class="button primary" id="buildRegulationBtn" type="button">Build my regulation step</button>
+              <button class="button subtle" id="copyRegulationBtn" type="button">Copy step</button>
+            </div>
+          </article>
+
+          <article class="card output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Ready-enough plan</p>
+              <h3>Regulation before productivity</h3>
+            </div>
+            <div id="regulateOutput" class="rich-output empty">
+              Choose what is loudest and Northstar will give you a concrete self-regulation step, then a gentle bridge back to study.
+            </div>
+          </article>
         </div>
       </section>
 
@@ -669,6 +859,14 @@
               <button class="button subtle" id="focusPauseBtn" type="button">Pause</button>
               <button class="button subtle" id="focusResetBtn" type="button">Reset</button>
               <button class="button subtle" id="focusCompleteBtn" type="button">Mark done</button>
+            </div>
+
+            <div class="timer-alert-panel">
+              <div>
+                <p class="eyebrow">Timer alerts</p>
+                <p class="microcopy" id="focusNotificationStatus">Alerts are off. You can still use the timer without them.</p>
+              </div>
+              <button class="button subtle" id="enableTimerAlertsBtn" type="button">Enable alerts</button>
             </div>
           </article>
 
@@ -925,6 +1123,24 @@
               ></textarea>
             </label>
 
+            <label class="field">
+              <span>What helped this time?</span>
+              <input
+                id="workedInput"
+                type="text"
+                placeholder="e.g. 10-minute timer, low pressure plan, writing the first ugly sentence"
+              >
+            </label>
+
+            <label class="field">
+              <span>What should Northstar avoid next time?</span>
+              <input
+                id="avoidInput"
+                type="text"
+                placeholder="e.g. too many options, long reading blocks, starting with the whole brief"
+              >
+            </label>
+
             <div class="button-row">
               <button class="button primary" id="saveFinishBtn">Save finish reflection</button>
               <button class="button subtle" id="copyFinishBtn">Copy finish summary</button>
@@ -945,6 +1161,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260513e"></script>
+  <script type="module" src="./js/app.js?v=20260513f"></script>
 </body>
 </html>
