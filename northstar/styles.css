@@ -4196,6 +4196,49 @@ html[data-runtime="native"] .support-state-button {
     line-height: 1.05;
   }
 
+  html[data-active-panel="dashboard"],
+  html[data-active-panel="dashboard"] body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html[data-active-panel="dashboard"] .shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  html[data-active-panel="dashboard"] .main {
+    height: auto;
+    min-height: calc(100dvh - 1.24rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+
+  html[data-active-panel="dashboard"] .panel.is-active {
+    overflow: visible;
+    padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+  }
+
+  html[data-active-panel="dashboard"] #panel-dashboard {
+    min-height: auto;
+    justify-content: flex-start;
+    overflow: visible;
+  }
+
+  html[data-active-panel="dashboard"] .today-quickstart-card {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  html[data-active-panel="dashboard"] .dashboard-brand-mark {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+
   html[data-active-panel="dashboard-options"] .panel-head-back {
     padding: 0.82rem 0.9rem;
     border-radius: 20px;
