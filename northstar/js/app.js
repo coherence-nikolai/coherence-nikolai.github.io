@@ -6,7 +6,6 @@ import {
   PROFILE_TAG_CONTENT,
   ROUTE_LIBRARY,
   STUDY_STATES,
-  SUPPORT_RESOURCES,
   TASK_VERBS
 } from "./data/content.js";
 import {
@@ -125,6 +124,18 @@ const defaultSessionMemory = {
   lastPanel: "dashboard"
 };
 
+const defaultSupportContacts = [
+  {
+    id: "support_contact_1",
+    supportName: "",
+    contactName: "",
+    email: "",
+    phone: "",
+    link: "",
+    notes: ""
+  }
+];
+
 const FOCUS_PRESETS = {
   gentle: {
     label: "Gentle start",
@@ -164,6 +175,47 @@ const DEFAULT_NOTE_BLOCK_SEQUENCE = ["idea", "question", "task"];
 
 function noteBlockId() {
   return `note_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function supportContactId() {
+  return `support_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createSupportContact(overrides = {}) {
+  return {
+    id: supportContactId(),
+    supportName: "",
+    contactName: "",
+    email: "",
+    phone: "",
+    link: "",
+    notes: "",
+    ...overrides
+  };
+}
+
+function normalizeSupportContact(rawContact, index = 0) {
+  const raw = rawContact && typeof rawContact === "object" ? rawContact : {};
+
+  return {
+    id: String(raw.id || `support_contact_${index + 1}`),
+    supportName: String(raw.supportName || ""),
+    contactName: String(raw.contactName || ""),
+    email: String(raw.email || ""),
+    phone: String(raw.phone || ""),
+    link: String(raw.link || ""),
+    notes: String(raw.notes || "")
+  };
+}
+
+function normalizeSupportContacts(rawState) {
+  const contacts = Array.isArray(rawState)
+    ? rawState.map((contact, index) => normalizeSupportContact(contact, index))
+    : [];
+
+  return contacts.length
+    ? contacts
+    : defaultSupportContacts.map((contact, index) => normalizeSupportContact(contact, index));
 }
 
 function normalizeNoteBlockType(type) {
@@ -299,6 +351,7 @@ const state = {
   focus: normalizeFocusState(loadState("focus", defaultFocusState)),
   calibration: normalizeCalibrationState(loadState("calibration", defaultCalibration)),
   sessionMemory: normalizeSessionMemory(loadState("sessionMemory", defaultSessionMemory)),
+  supportContacts: normalizeSupportContacts(loadState("supportContacts", defaultSupportContacts)),
   finish: loadState("finish", {
     items: FINISH_ITEMS.map(() => false),
     nextTime: ""
@@ -581,15 +634,158 @@ function openMobileResult({
   showPanel("mobile-result");
 }
 
+function saveSupportContacts() {
+  state.supportContacts = normalizeSupportContacts(state.supportContacts);
+  saveState("supportContacts", state.supportContacts);
+
+  const status = $("#supportContactsStatus");
+  if (status) {
+    status.textContent = "Saved privately on this device.";
+  }
+}
+
+function supportContactTitle(contact, index) {
+  return contact.supportName.trim() || contact.contactName.trim() || `Support contact ${index + 1}`;
+}
+
+function updateSupportContact(contactId, field, value) {
+  const contact = state.supportContacts.find((item) => item.id === contactId);
+  if (!contact || !(field in contact)) return;
+
+  contact[field] = value;
+  saveSupportContacts();
+}
+
+function addSupportContact() {
+  const contact = createSupportContact();
+  state.supportContacts.push(contact);
+  saveSupportContacts();
+  renderResources();
+
+  requestAnimationFrame(() => {
+    $(`[data-support-contact="${contact.id}"] input`)?.focus();
+  });
+}
+
+function removeSupportContact(contactId) {
+  if (state.supportContacts.length <= 1) {
+    state.supportContacts = defaultSupportContacts.map((contact, index) => normalizeSupportContact(contact, index));
+  } else {
+    state.supportContacts = state.supportContacts.filter((contact) => contact.id !== contactId);
+  }
+
+  saveSupportContacts();
+  renderResources();
+}
+
 function renderResources() {
-  $("#resourceList").innerHTML = SUPPORT_RESOURCES.map(
-    (item) => `
-      <div class="resource-item">
-        <strong>${escapeHtml(item.title)}</strong>
-        <p>${escapeHtml(item.text)}</p>
-      </div>
-    `
-  ).join("");
+  const contacts = normalizeSupportContacts(state.supportContacts);
+  state.supportContacts = contacts;
+
+  $("#resourceList").innerHTML = `
+    <div class="support-directory">
+      ${contacts.map((contact, index) => `
+        <article class="support-contact-card" data-support-contact="${escapeHtml(contact.id)}">
+          <div class="support-contact-head">
+            <strong data-support-contact-title>${escapeHtml(supportContactTitle(contact, index))}</strong>
+            <button
+              type="button"
+              class="button subtle support-contact-remove"
+              data-support-contact-remove="${escapeHtml(contact.id)}"
+            >
+              ${contacts.length > 1 ? "Remove" : "Clear"}
+            </button>
+          </div>
+          <div class="support-contact-grid">
+            <label class="field compact-field">
+              <span>Support or service</span>
+              <input
+                type="text"
+                value="${escapeHtml(contact.supportName)}"
+                placeholder="Academic skills, mentor, course office"
+                autocomplete="organization"
+                data-support-contact-field="supportName"
+              >
+            </label>
+            <label class="field compact-field">
+              <span>Person or desk</span>
+              <input
+                type="text"
+                value="${escapeHtml(contact.contactName)}"
+                placeholder="Name or team"
+                autocomplete="name"
+                data-support-contact-field="contactName"
+              >
+            </label>
+            <label class="field compact-field">
+              <span>Email</span>
+              <input
+                type="email"
+                value="${escapeHtml(contact.email)}"
+                placeholder="name@example.edu"
+                autocomplete="email"
+                data-support-contact-field="email"
+              >
+            </label>
+            <label class="field compact-field">
+              <span>Phone</span>
+              <input
+                type="tel"
+                value="${escapeHtml(contact.phone)}"
+                placeholder="Phone number"
+                autocomplete="tel"
+                data-support-contact-field="phone"
+              >
+            </label>
+            <label class="field compact-field">
+              <span>Link</span>
+              <input
+                type="url"
+                value="${escapeHtml(contact.link)}"
+                placeholder="Booking link or website"
+                autocomplete="url"
+                data-support-contact-field="link"
+              >
+            </label>
+            <label class="field compact-field">
+              <span>Notes</span>
+              <textarea
+                rows="3"
+                placeholder="What they help with, when to contact, next booking step"
+                data-support-contact-field="notes"
+              >${escapeHtml(contact.notes)}</textarea>
+            </label>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+    <button type="button" class="button subtle support-add-button" id="addSupportContactBtn">
+      Add another support
+    </button>
+    <p class="support-save-status" id="supportContactsStatus" aria-live="polite">Saved privately on this device.</p>
+  `;
+
+  $$("#resourceList [data-support-contact-field]").forEach((field) => {
+    field.addEventListener("input", () => {
+      const card = field.closest("[data-support-contact]");
+      if (!card) return;
+
+      updateSupportContact(card.dataset.supportContact, field.dataset.supportContactField, field.value);
+
+      if (["supportName", "contactName"].includes(field.dataset.supportContactField)) {
+        const index = state.supportContacts.findIndex((contact) => contact.id === card.dataset.supportContact);
+        const contact = state.supportContacts[index];
+        const title = $("[data-support-contact-title]", card);
+        if (contact && title) title.textContent = supportContactTitle(contact, index);
+      }
+    });
+  });
+
+  $$("#resourceList [data-support-contact-remove]").forEach((button) => {
+    button.addEventListener("click", () => removeSupportContact(button.dataset.supportContactRemove));
+  });
+
+  $("#addSupportContactBtn")?.addEventListener("click", addSupportContact);
 }
 
 function renderBlockers(containerId, selected = [], name = "blocker") {
@@ -1600,6 +1796,7 @@ function captureForms() {
   saveState("focus", state.focus);
   saveState("finish", state.finish);
   saveState("sessionMemory", state.sessionMemory);
+  saveState("supportContacts", normalizeSupportContacts(state.supportContacts));
   saveState("profileAnswers", state.profileAnswers);
   saveState("profileUi", state.profileUi);
 }

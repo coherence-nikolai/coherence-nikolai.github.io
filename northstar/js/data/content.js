@@ -199,21 +199,6 @@ export const FINISH_ITEMS = [
   "I know the next step for the next session."
 ];
 
-export const SUPPORT_RESOURCES = [
-  {
-    title: "Academic skills advisor",
-    text: "Replace this with your booking link, campus contact, or support email."
-  },
-  {
-    title: "Disability or accessibility support",
-    text: "Add institution-specific accommodations, learning access, or inclusion services here."
-  },
-  {
-    title: "After-hours support",
-    text: "Add local wellbeing, crisis, or urgent support guidance appropriate to your region."
-  }
-];
-
 export const PROFILE_QUESTIONS = [
   {
     id: "starting",
