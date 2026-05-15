@@ -731,7 +731,7 @@ dd {
   width: min(230px, 82%);
   aspect-ratio: 1;
   margin: 0 auto 28px;
-  border-radius: 999px;
+  border-radius: 30%;
 }
 
 .app-card-mark::before {
@@ -746,7 +746,9 @@ dd {
 .app-card-mark img {
   position: relative;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 28%;
   filter: drop-shadow(0 0 30px rgba(232, 215, 178, 0.30));
 }
 
