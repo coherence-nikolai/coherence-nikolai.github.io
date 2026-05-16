@@ -1,3 +1,3 @@
-Drop the founder voice file here as `founder-note.m4a` when the ElevenLabs recording is ready.
+Drop the founder voice file here as `founder-note.m4a`.
 
-The About panel is wired to use `/tone-mirror/audio/founder-note.m4a` and will surface the player automatically when the file is present.
+Only the final published founder note should live in this folder. Intermediate WAV or raw MP3 renders should stay outside the public web path.
