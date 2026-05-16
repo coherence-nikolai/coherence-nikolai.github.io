@@ -716,6 +716,13 @@ dd {
     linear-gradient(145deg, rgba(232, 215, 178, 0.08), rgba(255, 255, 255, 0.025));
 }
 
+.app-card.tone-mirror-card {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(232, 215, 178, 0.18), transparent 14rem),
+    radial-gradient(circle at 50% 52%, rgba(134, 189, 180, 0.06), transparent 16rem),
+    rgba(255, 255, 255, 0.032);
+}
+
 .app-card:hover {
   transform: translateY(-2px);
   border-color: rgba(232, 215, 178, 0.36);
@@ -779,6 +786,21 @@ dd {
 .app-card > span:last-child {
   color: var(--muted);
   line-height: 1.62;
+}
+
+.app-card .app-card-note {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 18px;
+  border: 1px solid rgba(232, 215, 178, 0.18);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: rgba(232, 215, 178, 0.78);
+  background: rgba(232, 215, 178, 0.055);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
 }
 
 .lab-link {
@@ -976,6 +998,19 @@ dd {
   color: var(--faint) !important;
 }
 
+.app-grid.tone-family-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.northstar-feature {
+  max-width: 320px;
+  margin-top: 28px;
+}
+
+.northstar-feature .app-card {
+  min-height: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .northstar-frame::before {
     animation: none;
@@ -996,6 +1031,7 @@ dd {
   .app-grid,
   .app-grid.two-up,
   .app-grid.four-up,
+  .app-grid.tone-family-grid,
   .lab-grid,
   .support-grid,
   .steps,

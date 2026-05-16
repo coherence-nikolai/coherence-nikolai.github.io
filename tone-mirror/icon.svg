@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Tone Mirror icon">
+  <defs>
+    <radialGradient id="orb" cx="50%" cy="48%" r="54%">
+      <stop offset="0%" stop-color="#fff8ea"/>
+      <stop offset="22%" stop-color="#d7b886"/>
+      <stop offset="62%" stop-color="#38291e"/>
+      <stop offset="100%" stop-color="#080504"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="#060302"/>
+  <circle cx="512" cy="512" r="350" fill="url(#orb)" opacity="0.9"/>
+  <circle cx="512" cy="512" r="338" fill="none" stroke="#f8ead7" stroke-width="12" opacity="0.72"/>
+  <path d="M160 512 C245 392 325 392 410 512 S575 632 660 512 S822 392 864 512"
+        fill="none" stroke="#fff7e8" stroke-width="28" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M160 512 C245 632 325 632 410 512 S575 392 660 512 S822 632 864 512"
+        fill="none" stroke="#e7bd72" stroke-width="18" stroke-linecap="round" opacity="0.82" filter="url(#glow)"/>
+</svg>
