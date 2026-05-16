@@ -1,4 +1,3 @@
-Drop the founder voice file here as `founder-note.mp3` when the ElevenLabs recording is ready.
+Drop the founder voice file here as `founder-note.m4a` when the ElevenLabs recording is ready.
 
-The About panel is already wired to use `/tone-mirror/audio/founder-note.mp3`; keep the current
-disabled state in `src/App.tsx` until the final audio is approved.
+The About panel is wired to use `/tone-mirror/audio/founder-note.m4a` and will surface the player automatically when the file is present.
