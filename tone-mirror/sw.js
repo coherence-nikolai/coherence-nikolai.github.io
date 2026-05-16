@@ -1,4 +1,4 @@
-const CACHE_NAME = "tone-mirror-v1";
+const CACHE_NAME = "tone-mirror-v2";
 const APP_SHELL = [
   "/tone-mirror/",
   "/tone-mirror/manifest.webmanifest",
@@ -26,6 +26,19 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || !url.pathname.startsWith("/tone-mirror/")) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached ?? caches.match("/tone-mirror/")))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {
