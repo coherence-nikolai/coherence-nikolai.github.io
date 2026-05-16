@@ -496,6 +496,90 @@ h3 {
     linear-gradient(145deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.018));
 }
 
+.support-hero {
+  position: relative;
+  display: grid;
+  gap: clamp(28px, 5vw, 70px);
+  align-items: center;
+  width: 100%;
+  margin: 0 0 clamp(34px, 6vw, 58px);
+  padding: clamp(28px, 5vw, 62px);
+  border: 1px solid var(--hairline);
+  border-radius: 36px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+  overflow: hidden;
+}
+
+.support-hero::before {
+  content: "";
+  position: absolute;
+  inset: -20% auto auto -10%;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(134, 189, 180, 0.13), rgba(134, 189, 180, 0) 68%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.support-hero > * {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.support-hero .northstar-copy h2 {
+  font-size: clamp(2.35rem, 4.6vw, 4.2rem);
+}
+
+.support-hero .northstar-copy .lede {
+  max-width: 48ch;
+}
+
+.northstar-home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  margin-bottom: 2px;
+  padding: 8px 14px 8px 8px;
+  border: 1px solid rgba(232, 215, 178, 0.18);
+  border-radius: 999px;
+  color: rgba(242, 234, 223, 0.86);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: inset 0 1px 0 rgba(242, 234, 223, 0.08);
+}
+
+.northstar-home-mark {
+  display: grid;
+  place-items: center;
+  width: 3.15rem;
+  height: 3.15rem;
+  border: 1px solid rgba(232, 215, 178, 0.24);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 78% 14%, rgba(232, 215, 178, 0.36), transparent 42%),
+    radial-gradient(circle at 16% 100%, rgba(134, 189, 180, 0.22), transparent 60%),
+    linear-gradient(145deg, #0f1d1b 0%, #17201e 58%, #2a231c 100%);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.24),
+    0 0 26px rgba(232, 215, 178, 0.12),
+    inset 0 1px 0 rgba(255, 243, 223, 0.16);
+}
+
+.northstar-home-mark img {
+  display: block;
+  width: 2.65rem;
+  height: 2.65rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.18rem 0.42rem rgba(232, 215, 178, 0.22));
+}
+
 .northstar-copy {
   display: flex;
   flex-direction: column;
@@ -887,6 +971,10 @@ dd {
   max-width: 760px;
 }
 
+.support-archive-head {
+  margin-top: 0;
+}
+
 .steps article,
 .split > div {
   padding: 24px;
@@ -1028,6 +1116,7 @@ dd {
   }
 
   .tone-card,
+  .support-hero,
   .app-grid,
   .app-grid.two-up,
   .app-grid.four-up,
@@ -1106,8 +1195,26 @@ dd {
     letter-spacing: 0.035em;
   }
 
-  .tone-card {
+  .tone-card,
+  .support-hero {
     border-radius: 26px;
+  }
+
+  .northstar-home-brand {
+    gap: 10px;
+    padding: 7px 12px 7px 7px;
+    font-size: 0.68rem;
+  }
+
+  .northstar-home-mark {
+    width: 2.85rem;
+    height: 2.85rem;
+    border-radius: 14px;
+  }
+
+  .northstar-home-mark img {
+    width: 2.38rem;
+    height: 2.38rem;
   }
 
   .northstar-frame {
