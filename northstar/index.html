@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260519b">
-  <link rel="icon" href="./icon.svg?v=20260519b" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260519b">
-  <link rel="stylesheet" href="./styles.css?v=20260519b">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260519d">
+  <link rel="icon" href="./icon.svg?v=20260519d" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260519d">
+  <link rel="stylesheet" href="./styles.css?v=20260519d">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260519b" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260519d" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -92,7 +92,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260519b" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260519d" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -352,7 +352,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260519b" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260519d" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -455,7 +455,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260519b" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260519d" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -928,14 +928,26 @@
             </label>
 
             <label class="field">
-              <span>What are you making?</span>
-              <select id="deliverableSelect">
-                <option value="essay">Essay or report</option>
-                <option value="discussion">Discussion post</option>
-                <option value="reflection">Reflection</option>
-                <option value="presentation">Presentation</option>
-                <option value="exam">Exam preparation</option>
-              </select>
+              <span>What kind of work is this?</span>
+              <input
+                id="deliverableSelect"
+                type="text"
+                list="deliverableOptions"
+                placeholder="Type or choose: essay, poster, portfolio, lab report, placement task..."
+              >
+              <datalist id="deliverableOptions">
+                <option value="Essay, report, or literature review"></option>
+                <option value="Discussion post, forum reply, or short response"></option>
+                <option value="Reflection, journal, or portfolio"></option>
+                <option value="Case study, scenario, or client response"></option>
+                <option value="Lab, practical, clinical, or field report"></option>
+                <option value="Annotated bibliography or source review"></option>
+                <option value="Research proposal or project plan"></option>
+                <option value="Presentation, poster, or slides"></option>
+                <option value="Creative project, design, media, or artefact"></option>
+                <option value="Group work, placement, or professional task"></option>
+                <option value="Quiz, test, or exam preparation"></option>
+              </datalist>
             </label>
 
             <div class="button-row">
@@ -1163,6 +1175,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260519b"></script>
+  <script type="module" src="./js/app.js?v=20260519d"></script>
 </body>
 </html>

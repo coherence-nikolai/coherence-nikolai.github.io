@@ -49,6 +49,122 @@ const PANEL_THEME_COLORS = {
 
 const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "focus", "unpack", "notes", "profile", "finish"]);
 
+const DELIVERABLE_GUIDANCE = {
+  essay: {
+    label: "Essay, report, or literature review",
+    pattern: /\b(essay|report|literature review|lit review|paper|written assignment|critical review|article review)\b/,
+    essentials: [
+      "A clear position or line of thinking",
+      "Evidence that supports each main point",
+      "A structure that answers the task directly"
+    ]
+  },
+  discussion: {
+    label: "Discussion post, forum reply, or short response",
+    pattern: /\b(discussion|forum|post|reply|response|short answer|short response|online contribution)\b/,
+    essentials: [
+      "A concise response to the question",
+      "At least one supported point",
+      "A clear link back to the topic or weekly material"
+    ]
+  },
+  reflection: {
+    label: "Reflection, journal, or portfolio",
+    pattern: /\b(reflection|reflective|journal|portfolio|learning log|placement journal)\b/,
+    essentials: [
+      "A real experience, example, or observation",
+      "A link between that experience and the course ideas",
+      "A clear note on what changed, what you learnt, or what comes next"
+    ]
+  },
+  caseStudy: {
+    label: "Case study, scenario, or client response",
+    pattern: /\b(case study|case|scenario|client|patient|vignette|problem case)\b/,
+    essentials: [
+      "The key facts from the case or scenario",
+      "The main issue, need, or decision point",
+      "A supported response, recommendation, or explanation"
+    ]
+  },
+  practical: {
+    label: "Lab, practical, clinical, or field report",
+    pattern: /\b(lab|laboratory|practical|clinical|field report|experiment|data|observation|placement report)\b/,
+    essentials: [
+      "The method, process, or setting",
+      "The result, finding, or observation",
+      "A short explanation of what the result means"
+    ]
+  },
+  bibliography: {
+    label: "Annotated bibliography or source review",
+    pattern: /\b(annotated bibliography|bibliography|source review|source analysis|reference list|literature table)\b/,
+    essentials: [
+      "The source details",
+      "Why the source is useful or credible",
+      "How it connects to the assignment question"
+    ]
+  },
+  proposal: {
+    label: "Research proposal or project plan",
+    pattern: /\b(proposal|project plan|research plan|ethics|methodology|research question)\b/,
+    essentials: [
+      "The topic, question, or problem",
+      "The planned method or approach",
+      "A realistic scope for the time and word limit"
+    ]
+  },
+  presentation: {
+    label: "Presentation, poster, or slides",
+    pattern: /\b(presentation|slides|powerpoint|keynote|poster|oral|seminar|talk)\b/,
+    essentials: [
+      "A clear main message",
+      "A sequence the audience can follow",
+      "Visuals or examples that support rather than replace the spoken point"
+    ]
+  },
+  creative: {
+    label: "Creative project, design, media, or artefact",
+    pattern: /\b(creative|design|media|video|podcast|artefact|artifact|prototype|campaign|website|visual)\b/,
+    essentials: [
+      "The brief requirements or criteria",
+      "The concept or choice you are making",
+      "A short rationale that explains why it fits the task"
+    ]
+  },
+  group: {
+    label: "Group work, placement, or professional task",
+    pattern: /\b(group|team|placement|professional|workplace|role play|simulation|peer)\b/,
+    essentials: [
+      "The shared goal or task",
+      "The part you are responsible for",
+      "The next handover, message, or checkpoint"
+    ]
+  },
+  exam: {
+    label: "Quiz, test, or exam preparation",
+    pattern: /\b(exam|quiz|test|revision|study guide|practice questions)\b/,
+    essentials: [
+      "A focused list of likely concepts or questions",
+      "Condensed notes or cues",
+      "Evidence that you can recall or explain the material under time pressure"
+    ]
+  }
+};
+
+const DELIVERABLE_MATCH_ORDER = [
+  "practical",
+  "caseStudy",
+  "bibliography",
+  "proposal",
+  "presentation",
+  "creative",
+  "group",
+  "exam",
+  "reflection",
+  "discussion",
+  "essay"
+];
+
 const SUPPORT_STATES = {
   low: {
     label: "Gentle",
@@ -1041,7 +1157,7 @@ function setInitialFormValues() {
   $("#promptInput").value = state.unpack.prompt;
   $("#promptDueInput").value = state.unpack.dueDate;
   $("#unclearInput").value = state.unpack.unclear;
-  $("#deliverableSelect").value = state.unpack.deliverable;
+  $("#deliverableSelect").value = getDeliverableGuidance(state.unpack.deliverable).label;
 
   $("#focusIntentionInput").value = state.focus.intention;
   $("#focusReturnCueInput").value = state.focus.returnCue;
@@ -2350,34 +2466,7 @@ function buildUnpackResult() {
   const resolvedVerb = verb === "auto" ? detectVerb(prompt) : verb;
   const verbData = TASK_VERBS[resolvedVerb] || TASK_VERBS.discuss;
   const dueLabel = formatRelativeDue(dueDate);
-
-  const deliverables = {
-    essay: [
-      "A clear position or line of thinking",
-      "Evidence that supports each main point",
-      "A structure that answers the task directly"
-    ],
-    discussion: [
-      "A concise response to the question",
-      "At least one supported point",
-      "A contribution that clearly connects to the topic"
-    ],
-    reflection: [
-      "A real experience or observation",
-      "A link between that experience and the course ideas",
-      "A clear explanation of what changed in your thinking"
-    ],
-    presentation: [
-      "A clear narrative arc",
-      "Slides that support rather than replace the spoken point",
-      "Examples or evidence that keep the audience oriented"
-    ],
-    exam: [
-      "A focused list of likely concepts or questions",
-      "Condensed notes or cues",
-      "Evidence that you can recall or explain the material under time pressure"
-    ]
-  };
+  const deliverableGuidance = getDeliverableGuidance(deliverable);
 
   const openQuestions = unclear
     ? [
@@ -2397,7 +2486,8 @@ function buildUnpackResult() {
     dueLabel,
     meaning: verbData.meaning,
     deliverable,
-    essentials: deliverables[deliverable],
+    deliverableLabel: deliverableGuidance.label,
+    essentials: deliverableGuidance.essentials,
     openQuestions,
     nextMoves: [
       "Highlight the command word and write its plain-language meaning in your own words.",
@@ -2426,6 +2516,10 @@ function renderUnpack({ openResult = true } = {}) {
         <span>Timeline</span>
         <strong>${escapeHtml(result.dueLabel)}</strong>
       </div>
+      <div class="summary-cell">
+        <span>Task kind</span>
+        <strong>${escapeHtml(result.deliverableLabel)}</strong>
+      </div>
     </div>
 
     <div class="output-block">
@@ -2434,7 +2528,7 @@ function renderUnpack({ openResult = true } = {}) {
     </div>
 
     <div class="output-block">
-      <h4>It probably needs</h4>
+      <h4>This task may need</h4>
       <ul class="summary-list">${toListItems(result.essentials.slice(0, 3))}</ul>
     </div>
 
@@ -2459,7 +2553,8 @@ function renderUnpack({ openResult = true } = {}) {
       title: "This is what the task wants",
       summary: result.meaning,
       items: [
-        `It probably needs: ${result.essentials[0]}`,
+        `Task kind: ${result.deliverableLabel}`,
+        `May need: ${result.essentials[0]}`,
         `Ask: ${result.openQuestions[0]}`,
         result.nextMoves[2]
       ],
@@ -2467,14 +2562,40 @@ function renderUnpack({ openResult = true } = {}) {
       primaryTarget: "planner",
       copyText: [
         `Command word: ${TASK_VERBS[result.verb].label}`,
+        `Task kind: ${result.deliverableLabel}`,
         `Meaning: ${result.meaning}`,
-        "What the task needs:",
+        "What the task may need:",
         ...result.essentials.map((item) => `- ${item}`),
         "Questions:",
         ...result.openQuestions.map((item) => `- ${item}`)
       ].join("\n")
     });
   }
+}
+
+function getDeliverableGuidance(value) {
+  const raw = String(value || "").trim();
+  const lower = raw.toLowerCase();
+  const direct = DELIVERABLE_GUIDANCE[raw] || DELIVERABLE_GUIDANCE[lower];
+  if (direct) return direct;
+
+  const matchedKey = DELIVERABLE_MATCH_ORDER.find((key) => DELIVERABLE_GUIDANCE[key].pattern.test(lower));
+  if (matchedKey) {
+    const matched = DELIVERABLE_GUIDANCE[matchedKey];
+    return {
+      ...matched,
+      label: raw || matched.label
+    };
+  }
+
+  return {
+    label: raw || "Something else",
+    essentials: [
+      "The final thing you need to hand in or prepare",
+      "The marking criteria, instructions, or example you can compare it with",
+      "The smallest useful version you can make first"
+    ]
+  };
 }
 
 function splitLines(text) {
@@ -3451,8 +3572,9 @@ function bindEvents() {
     await copyText(
       [
         `Command word: ${TASK_VERBS[unpack.verb].label}`,
+        `Task kind: ${unpack.deliverableLabel || getDeliverableGuidance(unpack.deliverable).label}`,
         `Meaning: ${unpack.meaning}`,
-        "What the task needs:",
+        "What the task may need:",
         ...unpack.essentials.map((item) => `- ${item}`),
         "Questions:",
         ...unpack.openQuestions.map((item) => `- ${item}`)
