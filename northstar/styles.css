@@ -4801,3 +4801,150 @@ html[data-runtime="native"] .support-state-button {
     font-size: clamp(18px, 4.6vw, 21px);
   }
 }
+
+.panel:not(#panel-dashboard):not(#panel-dashboard-options):not(.mobile-result-panel) .grid > .card:first-child {
+  position: relative;
+  border-color: var(--section-rim);
+  background:
+    radial-gradient(circle at 96% 4%, var(--accent-soft), transparent 12rem),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.86), rgba(249, 243, 234, 0.96));
+  box-shadow:
+    inset 7px 0 0 var(--accent),
+    0 18px 38px var(--section-shadow);
+}
+
+.panel:not(#panel-dashboard):not(#panel-dashboard-options):not(.mobile-result-panel) .grid > .card:first-child::before {
+  content: "Start here";
+  display: inline-flex;
+  width: fit-content;
+  margin: 0 0 0.65rem;
+  padding: 0.36rem 0.58rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panel:not(#panel-dashboard):not(#panel-dashboard-options):not(.mobile-result-panel) .output-card {
+  border-color: var(--accent-border);
+  background:
+    radial-gradient(circle at 100% 0%, var(--accent-soft), transparent 11rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(250, 245, 238, 0.9));
+  box-shadow: var(--shadow-soft);
+}
+
+.panel:not(#panel-dashboard):not(#panel-dashboard-options):not(.mobile-result-panel) .output-card::before {
+  content: "After you act";
+  display: inline-flex;
+  width: fit-content;
+  margin: 0 0 0.65rem;
+  padding: 0.34rem 0.56rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  color: var(--accent-deep);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.rich-output .output-block {
+  padding: 0.92rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.rich-output .output-block:first-child {
+  border-color: var(--accent-border);
+  box-shadow: inset 5px 0 0 var(--accent);
+}
+
+@media (max-width: 640px) {
+  html,
+  body {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: auto;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  .ambient {
+    display: none;
+  }
+
+  .shell,
+  .main {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .panel,
+  .panel.is-active,
+  .grid.two-up,
+  .grid.three-up,
+  .regulate-grid,
+  .focus-grid {
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    overflow: visible !important;
+  }
+
+  .grid.two-up > .card,
+  .grid.three-up > .card {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .panel.is-active {
+    animation: none;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  html[data-active-panel="mobile-result"],
+  html[data-active-panel="mobile-result"] body {
+    height: 100dvh !important;
+    min-height: 100dvh;
+    overflow: hidden !important;
+  }
+
+  html[data-active-panel="mobile-result"] .shell,
+  html[data-active-panel="mobile-result"] .main,
+  html[data-active-panel="mobile-result"] .panel.is-active {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .quick-route-button,
+  .quick-route-button.is-selected,
+  .quick-route-button:hover,
+  .quick-route-button:focus-visible,
+  .path-card,
+  .path-card:hover,
+  .path-card:focus-visible {
+    transform: none;
+  }
+
+  html[data-active-panel="dashboard"] .dashboard-brand-mark {
+    animation: none !important;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .panel:not(#panel-dashboard):not(#panel-dashboard-options):not(.mobile-result-panel) .grid > .card:first-child::before,
+  .panel:not(#panel-dashboard):not(#panel-dashboard-options):not(.mobile-result-panel) .output-card::before {
+    margin-bottom: 0.46rem;
+    font-size: 0.66rem;
+  }
+}

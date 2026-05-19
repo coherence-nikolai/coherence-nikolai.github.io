@@ -1,14 +1,14 @@
 {
   "name": "Northstar Academic Skills Companion",
   "short_name": "Northstar",
-  "description": "A calmer, smarter academic skills companion for neurodivergent adult students.",
+  "description": "A calmer study companion for neurodivergent students.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f5efe6",
   "theme_color": "#f5efe6",
   "icons": [
     {
-      "src": "./icon.svg?v=20260516a",
+      "src": "./icon.svg?v=20260519b",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"

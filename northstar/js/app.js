@@ -51,22 +51,22 @@ const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "focus", "un
 
 const SUPPORT_STATES = {
   low: {
-    label: "Low energy",
-    hint: "Keep the path narrow and hide extra detail until you ask for it.",
-    calloutTitle: "Low-energy support",
-    calloutCopy: "One small move first. More detail can wait."
+    label: "Gentle",
+    hint: "One clear next move first. Extra detail can wait.",
+    calloutTitle: "Gentle support",
+    calloutCopy: "Start with one small move. That is enough for now."
   },
   standard: {
-    label: "Standard",
-    hint: "Balanced guidance with one clear next move and optional detail when you want it.",
-    calloutTitle: "Standard support",
-    calloutCopy: "Northstar will keep the path clear while leaving room for context and planning."
+    label: "Balanced",
+    hint: "One clear next move, with optional detail when you want it.",
+    calloutTitle: "Balanced support",
+    calloutCopy: "Northstar will keep the path clear and leave room for a little planning."
   },
   detailed: {
-    label: "Detailed",
-    hint: "Show more structure, more context, and a fuller planning view while you have the capacity for it.",
-    calloutTitle: "Detailed support",
-    calloutCopy: "Northstar will surface more planning detail, more context, and a fuller check-in."
+    label: "More detail",
+    hint: "Show more structure only when you have room for it.",
+    calloutTitle: "More detailed support",
+    calloutCopy: "Northstar will show more planning detail and a fuller check-in."
   }
 };
 
@@ -147,10 +147,10 @@ const FOCUS_PRESETS = {
     label: "Classic",
     focusMinutes: 25,
     breakMinutes: 5,
-    hint: "A steady Pomodoro container without turning the session into a sprint."
+    hint: "A steady timer block without turning the session into a sprint."
   },
   deep: {
-    label: "Deep but safe",
+    label: "Longer block",
     focusMinutes: 40,
     breakMinutes: 10,
     hint: "Use this only when you already have momentum and a clear stopping cue."
@@ -406,7 +406,11 @@ function normalizeReturnCue(value) {
 
   const standaloneCue = cue
     .replace(/^then\s+/i, "")
+    .replace(/^go to\s+(today|regulate|plan|focus|unpack|notes|profile|finish)\s+and\s+/i, "")
+    .replace(/^use\s+the\s+today\s+panel\s+to\s+/i, "")
+    .replace(/^use\s+(today|regulate|plan|focus|unpack|notes|profile|finish)\s+to\s+/i, "")
     .replace(/^ask\s+what\s+barrier\s+is\s+present[,.]?\s*/i, "Name the barrier. ")
+    .replace(/\bbefore asking for output\b/gi, "before starting")
     .trim();
 
   return standaloneCue.charAt(0).toUpperCase() + standaloneCue.slice(1);
@@ -999,8 +1003,8 @@ function renderStudyStateSelection() {
   if (!stateMeta) {
     brief.classList.add("is-empty");
     brief.innerHTML = `
-      <strong>Pick the closest state, not the perfect label.</strong>
-      <p>Northstar uses this to lower friction, not to put you in a box.</p>
+      <strong>Pick the closest fit, not the perfect label.</strong>
+      <p>Northstar uses this to choose a gentler first step.</p>
     `;
     return;
   }
@@ -1053,10 +1057,10 @@ function setInitialFormValues() {
 
 const REGULATION_SIGNALS = {
   body: "Your body is carrying the stress first.",
-  thoughts: "The thought loop is loud right now.",
+  thoughts: "Worry is loud right now.",
   sensory: "The environment is adding load before the task even starts.",
-  avoidance: "Avoidance usually means a barrier is present.",
-  fog: "Working memory is overloaded, so the task needs less noise around it."
+  avoidance: "Something is making the task hard to touch right now.",
+  fog: "Your brain is holding too many pieces, so the task needs less noise around it."
 };
 
 const REGULATION_ANCHORS = {
@@ -1082,11 +1086,11 @@ const REGULATION_STRATEGIES = {
   label: {
     label: "Name the feeling",
     step: "Notice one feeling without solving it yet.",
-    bridge: "Name the barrier. Choose the smallest next move."
+    bridge: "Name what is in the way. Choose the smallest next move."
   },
   needs: {
     label: "Basic care",
-    step: "Check water, food, temperature, device pull, and noise before effort.",
+    step: "Check water, food, temperature, device pull, and noise before study effort.",
     bridge: "Use a 10-minute Focus block or a one-step Plan."
   }
 };
@@ -1416,7 +1420,7 @@ function applyCalibration() {
       ...state.checkin,
       timeAvailable: 10,
       blockers: ["time", "starting"],
-      intent: state.checkin.intent || "use a timer container before starting"
+      intent: state.checkin.intent || "use a timer block before starting"
     };
     routeOverrides = {
       timeAvailable: 10,
@@ -1532,7 +1536,7 @@ function renderFocusOutput() {
 
   if (!hasFocusContent) {
     output.classList.add("empty");
-    output.textContent = "Pick a focus container, name what this block is for, then start. Northstar will keep the instruction narrow and help you stop cleanly.";
+    output.textContent = "Pick a timer, name what this block is for, then start. Northstar will keep the instruction narrow and help you stop cleanly.";
     return;
   }
 
@@ -1590,7 +1594,7 @@ function renderFocusTimer() {
   hint.textContent = state.focus.phase === "break" ? phaseCopy.action : preset.hint;
   timerShell.classList.toggle("is-break", state.focus.phase === "break");
 
-  if (startBtn) startBtn.textContent = focusTimerRunning ? "Focus block running" : state.focus.phase === "break" ? "Start break" : "Start focus block";
+  if (startBtn) startBtn.textContent = focusTimerRunning ? "Block running" : state.focus.phase === "break" ? "Start break" : "Start the block";
   if (pauseBtn) pauseBtn.disabled = !focusTimerRunning;
   if (alertStatus) {
     alertStatus.textContent = state.focus.alertPreference
@@ -1969,49 +1973,26 @@ function renderTodayRoute(result) {
   ` : `
     <div class="summary-grid">
       <div class="summary-cell">
-        <span>Best next space</span>
+        <span>Open next</span>
         <strong>${escapeHtml(routeName)}</strong>
       </div>
       <div class="summary-cell">
         <span>Capacity</span>
         <strong>Battery ${escapeHtml(result.battery)} · ${escapeHtml(friendlyTime(result.timeAvailable))}</strong>
       </div>
-      ${studyStateMeta ? `
-        <div class="summary-cell">
-          <span>Study state</span>
-          <strong>${escapeHtml(studyStateMeta.label)}</strong>
-          <p>${escapeHtml(studyStateMeta.routeNote)}</p>
-        </div>
-      ` : ""}
     </div>
 
     <div class="output-block">
-      <h4>${escapeHtml(result.title)}</h4>
-      <p>${escapeHtml(result.reason)}</p>
-    </div>
-
-    ${studyStateMeta ? `
-      <div class="output-block">
-        <h4>State-aware adjustment</h4>
-        <p>${escapeHtml(studyStateMeta.brief)}</p>
-        <p class="output-subtle">${escapeHtml(studyStateMeta.prompt)}</p>
-      </div>
-    ` : ""}
-
-    <div class="output-block">
-      <h4>What to do now</h4>
+      <h4>Start here</h4>
       <p>${escapeHtml(result.action)}</p>
       <p class="output-subtle">${escapeHtml(result.lowEnergyMove)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Why this fits this moment</h4>
+      <h4>If it still feels too much</h4>
       <ul class="summary-list">
         ${toListItems([
-          result.blockers.length
-            ? `Current friction: ${result.blockers.join(", ")}`
-            : "No blockers selected, so Northstar is using the path choice, time, and capacity to keep the next move simple.",
-          SUPPORT_STATES[result.supportState || "standard"].hint,
+          studyStateMeta ? studyStateMeta.routeNote : result.reason,
           result.followUp
         ])}
       </ul>
@@ -2048,7 +2029,7 @@ function routeResultForSection(section, overrides = {}) {
         ? "Keep the thread alive only. A setup action, one sentence, or one question is enough for now."
         : timeAvailable <= 5 || battery <= 2
           ? "If this still feels heavy, shrink it again. Opening the file or naming the next step still counts."
-          : "If the task swells again, shrink it back to one visible action before asking more of yourself.",
+          : "If the task swells again, shrink it back to one visible action before doing more.",
     supportMode,
     supportState,
     timeAvailable,
@@ -2066,12 +2047,12 @@ function openRouteMobileResult(result) {
   openMobileResult({
     sourcePanel: "dashboard",
     resultType: result.section,
-    kicker: isPressureRoute ? "Pressure lowered" : isRegulationRoute ? "Regulation first" : "Route ready",
-    title: isPressureRoute ? "Do this first" : isRegulationRoute ? "Ready-enough comes first" : result.title,
-    summary: isPressureRoute
-      ? "One setup action, one sentence, or one question is enough."
-      : isRegulationRoute
-        ? "Lower the nervous-system load before asking for output."
+    kicker: isPressureRoute ? "Pressure lowered" : isRegulationRoute ? "Get steady first" : "Route ready",
+    title: isPressureRoute ? "Do this first" : isRegulationRoute ? "Start when it feels possible" : result.title,
+      summary: isPressureRoute
+        ? "One setup action, one sentence, or one question is enough."
+        : isRegulationRoute
+        ? "Lower the pressure before starting."
       : result.lowEnergyMove || result.action,
     items: isPressureRoute
       ? [
@@ -2080,9 +2061,9 @@ function openRouteMobileResult(result) {
       ]
       : isRegulationRoute
         ? [
-          "Name what is loudest: body, thoughts, sensory load, avoidance, or fog.",
+          "Name what is loudest: body, thoughts, sensory load, hard-to-start feeling, or fog.",
           "Use one concrete anchor or movement.",
-          "Bridge into Focus only when you are ready enough."
+          "Move into Focus only when it feels possible."
         ]
       : [
         result.action,
@@ -2316,35 +2297,20 @@ function renderPlanner({ openResult = true } = {}) {
 
   $("#plannerOutput").classList.remove("empty");
   $("#plannerOutput").innerHTML = `
-    <div class="summary-grid">
-      <div class="summary-cell">
-        <span>Task type</span>
-        <strong>${escapeHtml(result.type)}</strong>
-      </div>
-      <div class="summary-cell">
-        <span>Deadline</span>
-        <strong>${escapeHtml(result.dueLabel)}</strong>
-      </div>
-    </div>
-
     <div class="output-block">
-      <h4>Visible first step</h4>
+      <h4>Start here</h4>
       <p>${escapeHtml(result.firstStep)}</p>
+      <p class="output-subtle">${escapeHtml(result.successDefinition)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Micro-plan</h4>
-      <ul class="summary-list">${toListItems(result.steps)}</ul>
+      <h4>Then do these</h4>
+      <ul class="summary-list">${toListItems(result.steps.slice(0, 3))}</ul>
     </div>
 
     <div class="output-block">
-      <h4>What counts as enough</h4>
-      <p>${escapeHtml(result.successDefinition)}</p>
-    </div>
-
-    <div class="output-block">
-      <h4>If you get stuck again</h4>
-      <ul class="summary-list">${toListItems(result.stuckAgain)}</ul>
+      <h4>If you get stuck</h4>
+      <p>${escapeHtml(result.stuckAgain[0])}</p>
     </div>
   `;
 
@@ -2463,23 +2429,23 @@ function renderUnpack({ openResult = true } = {}) {
     </div>
 
     <div class="output-block">
-      <h4>Plain-language brief</h4>
+      <h4>In plain language</h4>
       <p>${escapeHtml(result.meaning)}</p>
     </div>
 
     <div class="output-block">
-      <h4>What this deliverable probably needs</h4>
-      <ul class="summary-list">${toListItems(result.essentials)}</ul>
+      <h4>It probably needs</h4>
+      <ul class="summary-list">${toListItems(result.essentials.slice(0, 3))}</ul>
     </div>
 
     <div class="output-block">
-      <h4>Questions to bring to an advisor or tutor</h4>
-      <ul class="summary-list">${toListItems(result.openQuestions)}</ul>
+      <h4>Ask if unclear</h4>
+      <p>${escapeHtml(result.openQuestions[0])}</p>
     </div>
 
     <div class="output-block">
-      <h4>Next moves</h4>
-      <ul class="summary-list">${toListItems(result.nextMoves)}</ul>
+      <h4>Next</h4>
+      <p>${escapeHtml(result.nextMoves[2])}</p>
     </div>
   `;
 
@@ -2685,40 +2651,18 @@ function renderNotes({ openResult = true } = {}) {
     </div>
 
     <div class="output-block">
-      <h4>Session readout</h4>
+      <h4>What you caught</h4>
       <p>${escapeHtml(result.summary)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Review deck</h4>
-      <div class="review-card-list">
-        ${(result.reviewCards.length
-          ? result.reviewCards
-          : [{ prompt: "Add an idea or quote block", answer: "Northstar will turn it into a review card here." }])
-          .map((card) => `
-            <div class="review-card">
-              <span>${escapeHtml(card.prompt)}</span>
-              <strong>${escapeHtml(card.answer)}</strong>
-            </div>
-          `)
-          .join("")}
-      </div>
+      <h4>Use this next</h4>
+      <p>${escapeHtml(result.nextReview)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Open loops and next tasks</h4>
-      <ul class="summary-list">${toListItems(result.openLoops.length ? result.openLoops : [result.nextReview])}</ul>
-    </div>
-
-    <div class="output-block">
-      <h4>Sources and re-entry cues</h4>
-      <ul class="summary-list">${toListItems([
-        result.sourceHighlights.length
-          ? `Keep nearby: ${result.sourceHighlights.join(" | ")}`
-          : "No evidence or quote blocks captured yet.",
-        `Next review move: ${result.nextReview}`,
-        `Re-entry cue: ${result.reentryNote}`
-      ])}</ul>
+      <h4>Return point</h4>
+      <p>${escapeHtml(result.reentryNote)}</p>
     </div>
   `;
 
@@ -2875,8 +2819,8 @@ function buildProfileResult() {
     summary: topContent.length
       ? answeredCount < 3
         ? `Early pattern: ${topContent.map((item) => item.label.toLowerCase()).join(", ")} are already showing up in how you study.`
-        : `Your study pattern currently suggests that ${topContent.map((item) => item.label.toLowerCase()).join(", ")} would make academic work more accessible and sustainable right now.`
-      : "Your profile is still emerging. Answer a few more prompts to sharpen the output.",
+        : `Your answers suggest that ${topContent.map((item) => item.label.toLowerCase()).join(", ")} may help study feel more doable right now.`
+      : "Answer a few more prompts to make this clearer.",
     content: topContent,
     strategies: strategyPool,
     advisorAsks,
@@ -2892,7 +2836,7 @@ function renderProfile({ openResult = false } = {}) {
   const result = buildProfileResult();
   if (!result) {
     $("#profileOutput").classList.add("empty");
-    $("#profileOutput").textContent = "Your support profile will appear here with patterns, strategies, and advising language as you answer the prompts.";
+    $("#profileOutput").textContent = "What helps you study will appear here as you answer the prompts.";
     return;
   }
 
@@ -2904,18 +2848,18 @@ function renderProfile({ openResult = false } = {}) {
         <strong>${result.answeredCount} of ${result.totalQuestions}</strong>
       </div>
       <div class="summary-cell">
-        <span>Profile state</span>
-        <strong>${result.answeredCount === result.totalQuestions ? "Ready to share" : "Still emerging"}</strong>
+        <span>Status</span>
+        <strong>${result.answeredCount === result.totalQuestions ? "Ready to share" : "Still building"}</strong>
       </div>
     </div>
 
     <div class="output-block">
-      <h4>Study pattern summary</h4>
+      <h4>Useful pattern</h4>
       <p>${escapeHtml(result.summary)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Support needs showing up most strongly</h4>
+      <h4>Showing up</h4>
       <div class="tag-list">
         ${result.content
           .map((item, index) => `<span class="tag ${index === 1 ? "warm" : index === 2 ? "sage" : ""}">${escapeHtml(item.label)}</span>`)
@@ -2924,23 +2868,13 @@ function renderProfile({ openResult = false } = {}) {
     </div>
 
     <div class="output-block">
-      <h4>What to build into study</h4>
-      <ul class="summary-list">${toListItems(result.content.map((item) => item.summary))}</ul>
-    </div>
-
-    <div class="output-block">
       <h4>Try first</h4>
-      <ul class="summary-list">${toListItems(result.strategies)}</ul>
+      <ul class="summary-list">${toListItems(result.strategies.slice(0, 3))}</ul>
     </div>
 
     <div class="output-block">
-      <h4>Language to use in advising</h4>
-      <ul class="summary-list">${toListItems(result.advisorAsks)}</ul>
-    </div>
-
-    <div class="output-block">
-      <h4>Patterns you have already named</h4>
-      <ul class="summary-list">${toListItems(result.answeredPrompts)}</ul>
+      <h4>Words for support</h4>
+      <p>${escapeHtml(result.advisorAsks[0] || "I study better when the first step is concrete and visible.")}</p>
     </div>
   `;
 
@@ -2951,13 +2885,13 @@ function renderProfile({ openResult = false } = {}) {
       sourcePanel: "profile",
       resultType: "profile",
       kicker: "Pattern saved",
-      title: "Your study pattern is visible",
+      title: "What helps is visible",
       summary: result.summary,
       items: [
         `${result.answeredCount} of ${result.totalQuestions} prompts answered.`,
         result.strategies[0] ? `Try first: ${result.strategies[0]}` : "",
         result.strategies[1] ? `Also useful: ${result.strategies[1]}` : "",
-        result.advisorAsks[0] ? `Advisor language: ${result.advisorAsks[0]}` : ""
+        result.advisorAsks[0] ? `Words for support: ${result.advisorAsks[0]}` : ""
       ],
       primaryLabel: "Back to Home",
       primaryTarget: "dashboard",
@@ -2972,7 +2906,7 @@ function renderProfile({ openResult = false } = {}) {
         "Try first:",
         ...result.strategies.map((item) => `- ${item}`),
         "",
-        "Advising language:",
+        "Words for support:",
         ...result.advisorAsks.map((item) => `- ${item}`)
       ].join("\n")
     });
@@ -3150,7 +3084,7 @@ function snapshotText() {
     regulate ? `Regulation bridge: ${normalizeReturnCue(regulate.bridge)}` : "",
     planner ? `Task: ${planner.task}` : "",
     planner ? `First step: ${planner.firstStep}` : "",
-    focus ? `Focus container: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
+    focus ? `Focus timer: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
     state.focus.intention ? `Focus intention: ${state.focus.intention}` : "",
     state.focus.returnCue ? `Focus return cue: ${state.focus.returnCue}` : "",
     unpack ? `Assignment focus: ${TASK_VERBS[unpack.verb].label} · ${unpack.dueLabel}` : "",
@@ -3281,7 +3215,7 @@ function renderStatus() {
   $("#statusResume").textContent = panelLabel(panelName);
   const resumeSummary = $("#resumeSummary");
   if (resumeSummary) {
-    resumeSummary.textContent = `If you stop now, Northstar will reopen on ${$("#statusResume").textContent} and keep your current notes, task, and reflection drafts.`;
+    resumeSummary.textContent = `If you stop now, Northstar will reopen on ${$("#statusResume").textContent} and keep your current notes, task, and drafts.`;
   }
   renderResumeBanner();
   renderFirstMinuteGuide();

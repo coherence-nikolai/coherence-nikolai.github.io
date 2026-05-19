@@ -1,7 +1,7 @@
 export const BLOCKERS = [
   { id: "overwhelmed", label: "Everything feels too big" },
   { id: "unclear", label: "I do not understand the task" },
-  { id: "starting", label: "I cannot get myself to begin" },
+  { id: "starting", label: "Beginning feels hard" },
   { id: "perfectionism", label: "I am scared to do it badly" },
   { id: "time", label: "Time feels slippery" },
   { id: "energy", label: "My energy is low" },
@@ -11,51 +11,51 @@ export const BLOCKERS = [
 
 export const ROUTE_LIBRARY = {
   dashboard: {
-    title: "Pause and shrink the task",
-    reason: "When capacity is low, the right first move is reducing friction, not demanding more output.",
-    action: "Use the Today panel to choose one small action that lowers pressure.",
+    title: "Make the task smaller first",
+    reason: "When energy is low, the useful move is lowering pressure before starting.",
+    action: "Choose one tiny action that makes the task easier to touch.",
     followUp: "If the task is still foggy after that, move to Unpack."
   },
   regulate: {
-    title: "Regulate before you study",
-    reason: "When the nervous system is overloaded, the useful first move is reducing sensory, emotional, or cognitive load.",
-    action: "Go to Regulate and choose one concrete anchor, movement, or load-lowering adjustment before asking for output.",
-    followUp: "After your body has one steadier cue, bridge into Focus or Plan with a tiny next step."
+    title: "Get steady first",
+    reason: "If your body or environment is too loud, studying may need a softer entry point.",
+    action: "Choose one anchor, one small movement, or one load-lowering change.",
+    followUp: "When things feel a little more reachable, bridge into Plan or Focus."
   },
   planner: {
-    title: "Build a first-step plan",
+    title: "Find the first visible step",
     reason: "The task exists, but the entry point is not visible yet.",
-    action: "Go to Plan and turn the task into one visible first step plus a low-pressure micro-plan.",
+    action: "Turn the task into one visible first step and a short micro-plan.",
     followUp: "If the wording of the assignment is part of the problem, switch to Unpack."
   },
   focus: {
-    title: "Hold the task inside a calmer time-box",
-    reason: "When time feels slippery, an external container can make the work feel safer to enter and easier to stop.",
-    action: "Go to Focus, choose the smallest timer that still helps, and name exactly what this block is for.",
-    followUp: "When the timer ends, write one return cue before deciding whether to continue."
+    title: "Use a calm timer",
+    reason: "When time feels slippery, a visible timer can make starting and stopping easier.",
+    action: "Choose the smallest timer that helps, then name what this block is for.",
+    followUp: "When the timer ends, stop first. Then decide what comes next."
   },
   unpack: {
-    title: "Translate the task before you attempt it",
-    reason: "Task confusion is real friction. Clarity has to come before confidence.",
-    action: "Paste the prompt into Unpack and turn it into plain-language instructions and advisor questions.",
-    followUp: "After that, move into Plan for a practical first-step plan."
+    title: "Translate the task",
+    reason: "Task confusion is real. Clarity has to come before confidence.",
+    action: "Paste the brief and turn it into plain-language instructions.",
+    followUp: "After that, move into Plan for one practical first step."
   },
   notes: {
-    title: "Capture what you know before it evaporates",
-    reason: "When memory or processing is overloaded, preserving the thread matters more than polishing it.",
-    action: "Use Notes to capture ideas, confusions, and sources, then convert them into a review pack.",
+    title: "Catch the thread",
+    reason: "When your brain is holding a lot, keeping the thread matters more than polishing it.",
+    action: "Capture one idea, question, source, or memory cue before it disappears.",
     followUp: "If a task emerges from the notes, move into Plan."
   },
   profile: {
-    title: "Name the pattern",
+    title: "Name one useful pattern",
     reason: "Sometimes the useful next move is understanding the conditions that make studying more possible.",
-    action: "Use Profile to answer one prompt about what helps, blocks, or steadies your study routine.",
+    action: "Answer one prompt about what helps, blocks, or steadies your study routine.",
     followUp: "After one answer, return to Plan or Notes with a clearer support cue."
   },
   finish: {
-    title: "Stop well while the thread is still alive",
+    title: "Stop without losing the thread",
     reason: "When momentum is high, a clean stopping point protects recovery and makes re-entry much easier.",
-    action: "Use Finish to close the session, leave a breadcrumb, and avoid pushing past your recovery point.",
+    action: "Leave one short return note for the next time you open Northstar.",
     followUp: "If you still have active thoughts, leave one memory cue in Notes before you step away."
   }
 };
@@ -64,14 +64,14 @@ export const STUDY_STATES = {
   overwhelmed: {
     label: "Overloaded",
     prompt: "Everything feels too big, too loud, or too sharp to tackle cleanly.",
-    brief: "Northstar will lower the pressure first, reduce decision count, and bias toward a gentler re-entry.",
+    brief: "Northstar will lower the pressure first and keep the next move very small.",
     route: "regulate",
     supportState: "low",
     battery: 2,
     timeAvailable: 5,
     blockers: ["overwhelmed", "energy", "sensory"],
     intent: "reduce pressure and restart gently",
-    routeNote: "Regulation and reduction come before output."
+    routeNote: "Ready enough comes before starting."
   },
   confused: {
     label: "Confused",
@@ -86,15 +86,15 @@ export const STUDY_STATES = {
     routeNote: "Clarity comes before confidence."
   },
   avoiding: {
-    label: "Avoiding",
-    prompt: "I keep skirting around it, even though I know it matters.",
+    label: "Hard to begin",
+    prompt: "I keep circling the task, but touching it feels hard.",
     brief: "Northstar will find a safer contact point with the task and keep the first move very small.",
     route: "planner",
     supportState: "low",
     battery: 2,
     timeAvailable: 5,
     blockers: ["starting", "perfectionism", "overwhelmed"],
-    intent: "touch the task without triggering shutdown",
+    intent: "touch the task gently",
     routeNote: "Re-entry matters more than intensity."
   },
   drifting: {
@@ -107,7 +107,7 @@ export const STUDY_STATES = {
     timeAvailable: 15,
     blockers: ["memory", "time"],
     intent: "capture what I know before it disappears",
-    routeNote: "Preserve the thread before asking for polish."
+    routeNote: "Keep the thread before polishing."
   },
   hyperfocused: {
     label: "Running too hot",
@@ -187,12 +187,12 @@ export const NOTE_BLOCK_TYPES = {
   cue: {
     label: "Memory cue",
     shortLabel: "Cue",
-    placeholder: "Leave yourself a breadcrumb so re-entry is easier next time."
+    placeholder: "Leave yourself a short return note for next time."
   }
 };
 
 export const FINISH_ITEMS = [
-  "I met the minimum outcome for this session.",
+  "I did the smallest useful goal for this session.",
   "My file is named clearly and saved in the right place.",
   "I checked the task instructions or rubric again.",
   "I noted what still needs doing.",
@@ -203,7 +203,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: "starting",
     prompt: "When I sit down to study, the hardest part is usually...",
-    supportText: "Pick the snag that tends to appear first, even if more than one is true.",
+    supportText: "Pick the thing that tends to appear first, even if more than one is true.",
     options: [
       { label: "Actually beginning the task", tags: ["initiation", "overwhelm"] },
       { label: "Knowing what the task is asking", tags: ["clarity", "processing"] },
@@ -214,7 +214,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: "reading",
     prompt: "When I am reading academic material, I usually need...",
-    supportText: "Think about what helps the text land, not what sounds most scholarly.",
+    supportText: "Think about what helps the text make sense.",
     options: [
       { label: "Plainer language or examples", tags: ["processing", "clarity"] },
       { label: "More visual structure or chunking", tags: ["processing", "visual"] },
@@ -247,7 +247,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: "feedback",
     prompt: "The kind of support that helps me most is...",
-    supportText: "Choose the kind of help that lowers friction fastest, not the help you think you should need.",
+    supportText: "Choose the kind of help that makes starting easier.",
     options: [
       { label: "A plain-language explanation of what to do first", tags: ["clarity", "initiation"] },
       { label: "Concrete examples or models", tags: ["processing", "visual"] },
@@ -260,7 +260,7 @@ export const PROFILE_QUESTIONS = [
     prompt: "When I am stressed about study, I tend to...",
     supportText: "Answer from the pattern you recognise most often when pressure rises.",
     options: [
-      { label: "Freeze and avoid it", tags: ["overwhelm", "initiation"] },
+      { label: "Freeze or move away from it", tags: ["overwhelm", "initiation"] },
       { label: "Do other tasks that feel safer or easier", tags: ["avoidance", "initiation"] },
       { label: "Hyperfocus unevenly and burn out", tags: ["attention", "recovery"] },
       { label: "Keep going but become exhausted and foggy", tags: ["recovery", "energy"] }
@@ -270,8 +270,8 @@ export const PROFILE_QUESTIONS = [
 
 export const PROFILE_TAG_CONTENT = {
   initiation: {
-    label: "Task initiation support",
-    summary: "You benefit from visible entry points and tiny, low-friction first actions.",
+    label: "Starting support",
+    summary: "You benefit from visible entry points and tiny first actions.",
     strategies: [
       "Start with a setup action you can see, such as opening the document or pasting the prompt.",
       "Use a short body-double session or text a check-in person before you begin.",
@@ -280,8 +280,8 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I start more easily when the first action is very concrete. Can we break this task into a visible opening move?"
   },
   clarity: {
-    label: "Task clarity support",
-    summary: "Ambiguous instructions create real friction. Plain language and examples unlock progress.",
+    label: "Task clarity",
+    summary: "Ambiguous instructions can make starting harder. Plain language and examples unlock progress.",
     strategies: [
       "Translate command words before drafting.",
       "Write down what the marker probably wants to see.",
@@ -300,8 +300,8 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I understand better when information is chunked and modelled. Can we work from one example?"
   },
   time: {
-    label: "Time scaffolding",
-    summary: "Time needs to be externalised to stay usable, especially when tasks feel abstract.",
+    label: "Time support",
+    summary: "Time needs to be visible to stay usable, especially when tasks feel abstract.",
     strategies: [
       "Break the task into now, next, and later instead of one huge deadline.",
       "Estimate the next step, not the whole project.",
@@ -310,7 +310,7 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "Deadlines feel more manageable when I can see short checkpoints. Can we create those together?"
   },
   perfectionism: {
-    label: "Good-enough drafting support",
+    label: "Good-enough draft support",
     summary: "Fear of getting it wrong may be blocking completion more than the task itself.",
     strategies: [
       "Write the rough version before the good version.",
@@ -320,27 +320,27 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I can get stuck trying to make work perfect too early. Can we define what a good-enough first pass looks like?"
   },
   overwhelm: {
-    label: "Overwhelm reduction",
+    label: "Lower overwhelm",
     summary: "When the task arrives as one giant whole, it may need to be reduced before it feels reachable.",
     strategies: [
       "Shrink the task until the first action feels almost too small.",
-      "Choose one pressure-reducing move before asking for output.",
+      "Choose one pressure-reducing move before starting.",
       "Define what the next safe contact point with the task is."
     ],
     advisorAsk: "Large tasks can hit me as one overwhelming block. Can we reduce this into smaller visible pieces?"
   },
   sensory: {
-    label: "Sensory safety",
-    summary: "Noise, clutter, brightness, or unpredictability may be using capacity you need for learning.",
+    label: "Sensory support",
+    summary: "Noise, clutter, brightness, or unpredictability may be using energy you need for learning.",
     strategies: [
-      "Lower visual and sensory clutter before asking for cognitive effort.",
+      "Lower visual and sensory clutter before asking for study effort.",
       "Use headphones, quiet zones, or a calmer digital layout when possible.",
       "Build in small regulation resets instead of waiting for overload."
     ],
     advisorAsk: "My environment affects how much information I can process. Can we talk about study setups that reduce overload?"
   },
   accountability: {
-    label: "External structure",
+    label: "Outside structure",
     summary: "You may work best when the task is shared, witnessed, or time-boxed with another person or structure.",
     strategies: [
       "Set a brief check-in with someone you trust.",
@@ -350,14 +350,14 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I follow through better with some external structure. Can we build a realistic accountability step?"
   },
   recovery: {
-    label: "Recovery-aware pacing",
-    summary: "Productivity without recovery can backfire. Sustainable study includes stopping well.",
+    label: "Rest-aware pacing",
+    summary: "Study without recovery can backfire. Sustainable study includes stopping well.",
     strategies: [
       "Plan the stopping point before fatigue chooses it for you.",
       "Capture the next step before leaving so re-entry is easier.",
       "Measure success by continuity, not intensity."
     ],
-    advisorAsk: "I need study plans that include recovery and re-entry, not just output. Can we build that in?"
+    advisorAsk: "I need study plans that include recovery and re-entry, not just finishing. Can we build that in?"
   },
   visual: {
     label: "Visual structure",
@@ -380,28 +380,28 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I do better when the session has a narrow target and a clear stopping point. Can we define that together?"
   },
   energy: {
-    label: "Low-energy adaptation",
+    label: "Low-energy study",
     summary: "Some days the best plan is the smallest plan that still keeps the thread alive.",
     strategies: [
       "Use 5-minute modes instead of all-or-nothing thinking.",
       "Choose preservation tasks such as opening, naming, or outlining.",
-      "Treat continuity as success on low-capacity days."
+      "Treat continuity as success on low-energy days."
     ],
     advisorAsk: "I need ways to keep the thread alive on low-energy days without feeling like I failed."
   },
   urgency: {
-    label: "Urgency regulation",
+    label: "Deadline pressure",
     summary: "You may activate best under pressure, but relying on panic is exhausting.",
     strategies: [
       "Simulate urgency with short checkpoints rather than last-minute stress.",
       "Make the first action public or visible.",
-      "Externalise deadlines into smaller time markers."
+      "Make deadlines visible as smaller time markers."
     ],
     advisorAsk: "I often only switch on near deadlines. Can we build earlier activation points that do not rely on panic?"
   },
   avoidance: {
-    label: "Avoidance awareness",
-    summary: "If the task feels threatening, avoidance may be a protective signal.",
+    label: "Hard-to-start support",
+    summary: "If the task feels threatening, moving away from it may be a protective signal.",
     strategies: [
       "Name what feels threatening about the task before forcing action.",
       "Choose one safe contact point with the task.",
@@ -411,7 +411,7 @@ export const PROFILE_TAG_CONTENT = {
   },
   structure: {
     label: "Visible structure",
-    summary: "You may perform best when expectations, sequence, and progress are externalised.",
+    summary: "You may work best when expectations, sequence, and progress are visible.",
     strategies: [
       "Keep the plan visible while you work.",
       "Use headings, numbered steps, and checklists.",
@@ -420,8 +420,8 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I do best when the structure is explicit. Can we write out the sequence together?"
   },
   regulation: {
-    label: "Regulation support",
-    summary: "Movement, grounding, and nervous-system support may be necessary before cognitive work becomes possible.",
+    label: "Settling support",
+    summary: "Movement, grounding, and body-based support may be necessary before study feels possible.",
     strategies: [
       "Build in a short regulation step before the hardest task.",
       "Use movement or sensory tools intentionally, not as an afterthought.",
@@ -440,8 +440,8 @@ export const PROFILE_TAG_CONTENT = {
     advisorAsk: "I often understand more through discussion or audio. Can we talk the task through first?"
   },
   memory: {
-    label: "Memory offload",
-    summary: "Holding many loose pieces in mind can drain capacity fast. Visible capture helps.",
+    label: "Memory support",
+    summary: "Holding many loose pieces in mind can drain energy fast. Visible capture helps.",
     strategies: [
       "Write every open loop down as soon as it appears.",
       "Use notes that convert directly into next actions.",
