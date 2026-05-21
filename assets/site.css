@@ -1094,7 +1094,21 @@ dd {
 }
 
 .app-grid.tone-family-grid {
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.app-grid.tone-family-grid .app-card {
+  min-height: 420px;
+  padding: clamp(24px, 2.5vw, 30px);
+}
+
+.app-grid.tone-family-grid .app-card-mark {
+  width: min(168px, 78%);
+  margin-bottom: 28px;
+}
+
+.app-grid.tone-family-grid .app-card strong {
+  font-size: clamp(2rem, 3vw, 2.55rem);
 }
 
 .northstar-feature {
