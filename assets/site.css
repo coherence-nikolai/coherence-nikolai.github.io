@@ -807,6 +807,13 @@ dd {
     rgba(255, 255, 255, 0.032);
 }
 
+.app-card.tone-threshold-card {
+  background:
+    radial-gradient(circle at 50% 17%, rgba(232, 215, 178, 0.22), transparent 14rem),
+    radial-gradient(circle at 50% 48%, rgba(189, 141, 100, 0.10), transparent 16rem),
+    rgba(255, 255, 255, 0.032);
+}
+
 .app-card:hover {
   transform: translateY(-2px);
   border-color: rgba(232, 215, 178, 0.36);
