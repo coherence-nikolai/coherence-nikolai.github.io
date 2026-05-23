@@ -487,6 +487,37 @@ let focusTimerRemaining = null;
 let focusTimerRunning = false;
 let focusTimerIntervalId = null;
 
+const MOBILE_DOCK_ACTIONS = {
+  regulate: {
+    label: "Show one settling step",
+    target: "#buildRegulationBtn"
+  },
+  planner: {
+    label: "Make first step",
+    target: "#buildPlanBtn"
+  },
+  focus: {
+    label: "Start the block",
+    target: "#focusStartBtn"
+  },
+  unpack: {
+    label: "Make it clearer",
+    target: "#unpackBtn"
+  },
+  notes: {
+    label: "Catch the thread",
+    target: "#buildNotesBtn"
+  },
+  profile: {
+    label: "Next prompt",
+    target: "#profileNextBtn"
+  },
+  finish: {
+    label: "Save return point",
+    target: "#saveFinishBtn"
+  }
+};
+
 function isNativeShell() {
   const hasCapacitorPlatform = typeof window.Capacitor?.isNativePlatform === "function"
     ? window.Capacitor.isNativePlatform()
@@ -564,6 +595,31 @@ function shouldUseMobileResult() {
 function nudgeHaptic(pattern = 8) {
   if (!shouldUseMobileResult() || typeof navigator.vibrate !== "function") return;
   navigator.vibrate(pattern);
+}
+
+function updateMobileActionDock(panelName = document.documentElement.dataset.activePanel || "dashboard") {
+  const dock = $("#mobileActionDock");
+  const primary = $("#mobileDockPrimaryBtn");
+  if (!dock || !primary) return;
+
+  const action = MOBILE_DOCK_ACTIONS[panelName];
+  const shouldShow = Boolean(action && shouldUseMobileResult());
+  dock.hidden = !shouldShow;
+  document.documentElement.dataset.mobileDock = shouldShow ? "on" : "off";
+  if (!shouldShow) return;
+
+  primary.textContent = action.label;
+  primary.dataset.actionTarget = action.target;
+}
+
+function triggerMobileDockAction() {
+  const primary = $("#mobileDockPrimaryBtn");
+  const targetSelector = primary?.dataset.actionTarget;
+  const target = targetSelector ? $(targetSelector) : null;
+  if (!target) return;
+
+  nudgeHaptic();
+  target.click();
 }
 
 function setTodayExpanded(expanded) {
@@ -669,6 +725,7 @@ function applySettings() {
 function showPanel(panelName) {
   document.documentElement.dataset.activePanel = panelName;
   renderCurrentPanelLabel(panelName);
+  updateMobileActionDock(panelName);
   if (panelName !== "dashboard") {
     setTodayExpanded(false);
     setTodayInlineFeedbackVisible(false);
@@ -2049,7 +2106,7 @@ function renderFirstMinuteGuide() {
   const guide = $("#firstMinuteGuide");
   if (!guide) return;
 
-  const shouldShow = !state.settings.introDismissed && !hasMeaningfulThread();
+  const shouldShow = !isPhoneLayout() && !state.settings.introDismissed && !hasMeaningfulThread();
   guide.hidden = !shouldShow;
   document.documentElement.dataset.firstMinuteGuide = shouldShow ? "on" : "off";
 }
@@ -3418,6 +3475,8 @@ function bindEvents() {
   $("#showMoreTodayBtn").addEventListener("click", () => showPanel("dashboard-options"));
   $("#backToTodayBtn").addEventListener("click", () => showPanel("dashboard"));
   $("#mobileHomeBtn").addEventListener("click", () => showPanel("dashboard"));
+  $("#mobileDockHomeBtn").addEventListener("click", () => showPanel("dashboard"));
+  $("#mobileDockPrimaryBtn").addEventListener("click", triggerMobileDockAction);
   $("#mobileResultBackBtn").addEventListener("click", () => showPanel(mobileResultSourcePanel || "dashboard"));
   $("#mobileResultPrimaryBtn").addEventListener("click", () => showPanel(mobileResultPrimaryTarget || "dashboard"));
   $("#mobileResultCopyBtn").addEventListener("click", async () => {
@@ -3716,6 +3775,10 @@ function bindEvents() {
   });
   window.addEventListener("focus", syncFocusTimerFromClock);
   window.addEventListener("pageshow", syncFocusTimerFromClock);
+  window.addEventListener("resize", () => {
+    renderFirstMinuteGuide();
+    updateMobileActionDock(document.documentElement.dataset.activePanel || "dashboard");
+  });
 }
 
 function renderStoredOutputs() {

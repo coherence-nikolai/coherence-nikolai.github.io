@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260519d">
-  <link rel="icon" href="./icon.svg?v=20260519d" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260519d">
-  <link rel="stylesheet" href="./styles.css?v=20260519d">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260523c">
+  <link rel="icon" href="./icon.svg?v=20260523c" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260523c">
+  <link rel="stylesheet" href="./styles.css?v=20260523c">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260519d" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260523c" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -92,7 +92,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260519d" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260523c" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -235,6 +235,11 @@
         Back to Northstar home
       </button>
 
+      <div class="mobile-action-dock" id="mobileActionDock" hidden>
+        <button class="button subtle" id="mobileDockHomeBtn" type="button">Home</button>
+        <button class="button primary" id="mobileDockPrimaryBtn" type="button">Do this now</button>
+      </div>
+
       <section class="calibration-card card" id="calibrationCard" aria-labelledby="calibrationTitle">
         <div class="calibration-copy">
           <p class="eyebrow">Quick setup</p>
@@ -352,7 +357,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260519d" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260523c" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -398,10 +403,6 @@
                 <button class="button subtle today-desktop-resume" id="todayDesktopResumeBtn" type="button">Resume</button>
               </div>
 
-              <div class="today-mobile-secondary">
-                <button class="button subtle" id="showMoreTodayBtn" type="button">More tools</button>
-                <button class="button subtle" id="quickResumeBtn" type="button">Resume</button>
-              </div>
             </div>
 
             <div class="today-entry-routes">
@@ -409,7 +410,7 @@
                 <button class="quick-route-button" type="button" data-route-target="regulate" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
                   <span class="quick-route-kicker">Regulate</span>
-                  <strong>I am not ready to work yet</strong>
+                  <strong>I am not ready yet</strong>
                   <span>Lower pressure before starting.</span>
                 </button>
                 <button class="quick-route-button" type="button" data-route-target="dashboard" aria-pressed="false">
@@ -418,17 +419,17 @@
                   <strong>Everything feels too big</strong>
                   <span>Make the task smaller first.</span>
                 </button>
-                <button class="quick-route-button" type="button" data-route-target="unpack" aria-pressed="false">
-                  <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Unpack</span>
-                  <strong>I do not know what this wants</strong>
-                  <span>Translate the brief before starting.</span>
-                </button>
                 <button class="quick-route-button" type="button" data-route-target="planner" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
                   <span class="quick-route-kicker">Begin</span>
                   <strong>I need the first step</strong>
                   <span>Turn the task into one visible action.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="unpack" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Unpack</span>
+                  <strong>I do not know what this wants</strong>
+                  <span>Translate the brief before starting.</span>
                 </button>
                 <button class="quick-route-button" type="button" data-route-target="notes" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
@@ -450,12 +451,17 @@
                 </button>
               </div>
 
+              <div class="today-mobile-secondary">
+                <button class="button subtle" id="showMoreTodayBtn" type="button">More tools</button>
+                <button class="button subtle" id="quickResumeBtn" type="button">Resume</button>
+              </div>
+
               <p class="today-desktop-note">Need reflection or a clean stop? Open <strong>Profile</strong> or <strong>Finish</strong> from the sidebar when you are ready.</p>
             </div>
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260519d" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260523c" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -1175,6 +1181,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260519d"></script>
+  <script type="module" src="./js/app.js?v=20260523c"></script>
 </body>
 </html>
