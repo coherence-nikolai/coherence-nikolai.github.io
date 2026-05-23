@@ -956,6 +956,88 @@ dd {
   letter-spacing: 0.04em;
 }
 
+.sota-stream-section {
+  margin-top: clamp(-80px, -6vw, -36px);
+}
+
+.sota-stream-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1fr);
+  gap: clamp(28px, 6vw, 72px);
+  align-items: center;
+  padding: clamp(28px, 5vw, 58px);
+  border: 1px solid rgba(232, 215, 178, 0.18);
+  border-radius: 32px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 22% 34%, rgba(212, 162, 48, 0.16), transparent 18rem),
+    radial-gradient(circle at 74% 54%, rgba(134, 189, 180, 0.08), transparent 20rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.40);
+}
+
+.sota-stream-panel::before,
+.sota-stream-panel::after {
+  content: "";
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232, 215, 178, 0.24), transparent);
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.sota-stream-panel::before {
+  top: 32%;
+  transform: rotate(-2deg);
+}
+
+.sota-stream-panel::after {
+  top: 42%;
+  transform: rotate(1.5deg);
+}
+
+.sota-stream-mark {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: min(300px, 100%);
+  margin-inline: auto;
+  aspect-ratio: 1;
+  border-radius: 32%;
+  background: radial-gradient(circle, rgba(212, 162, 48, 0.12), transparent 67%);
+}
+
+.sota-stream-mark img {
+  width: min(270px, 92%);
+  height: auto;
+  filter: drop-shadow(0 0 34px rgba(212, 162, 48, 0.34));
+}
+
+.sota-stream-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+}
+
+.sota-stream-copy h2 {
+  max-width: 650px;
+  margin-bottom: 16px;
+}
+
+.sota-stream-copy p:not(.label) {
+  max-width: 590px;
+  color: rgba(242, 234, 223, 0.68);
+}
+
+.sota-actions {
+  justify-content: flex-start;
+  margin-top: 26px;
+}
+
 .lab-link {
   position: relative;
   z-index: 2;
@@ -1205,6 +1287,7 @@ dd {
   .app-grid.two-up,
   .app-grid.four-up,
   .app-grid.tone-family-grid,
+  .sota-stream-panel,
   .lab-grid,
   .support-grid,
   .steps,
@@ -1225,6 +1308,19 @@ dd {
 
   .tone-orb {
     min-height: 260px;
+  }
+
+  .sota-stream-copy,
+  .sota-stream-copy p:not(.label) {
+    max-width: none;
+  }
+
+  .sota-stream-copy {
+    text-align: center;
+  }
+
+  .sota-actions {
+    justify-content: center;
   }
 
   .northstar-marks {
@@ -1281,8 +1377,17 @@ dd {
 
   .tone-card,
   .founder-card,
+  .sota-stream-panel,
   .support-hero {
     border-radius: 26px;
+  }
+
+  .sota-stream-panel {
+    padding: 24px;
+  }
+
+  .sota-stream-mark {
+    width: min(230px, 80vw);
   }
 
   .northstar-home-brand {
