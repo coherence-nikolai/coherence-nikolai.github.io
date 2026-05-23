@@ -5193,3 +5193,155 @@ html[data-runtime="native"] .support-state-button {
     min-height: clamp(10.5rem, 31dvh, 14rem);
   }
 }
+
+@media (max-width: 640px) {
+  html[data-active-panel="dashboard"] .shell {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  html[data-runtime="native"][data-active-panel="dashboard"] .shell {
+    padding-top: max(3.85rem, calc(env(safe-area-inset-top) + 1rem));
+  }
+
+  html[data-active-panel="dashboard"] .today-quickstart-card {
+    gap: clamp(0.7rem, 1.45dvh, 0.95rem);
+    max-width: 31rem;
+    margin-inline: auto;
+    padding: clamp(0.62rem, 2.2vw, 0.88rem);
+    border-color: rgba(47, 119, 123, 0.18);
+    border-radius: 30px;
+    background:
+      radial-gradient(circle at 88% 2%, rgba(47, 119, 123, 0.13), transparent 10rem),
+      radial-gradient(circle at 8% 100%, rgba(216, 180, 99, 0.12), transparent 11rem),
+      linear-gradient(145deg, rgba(255, 251, 243, 0.98), rgba(244, 235, 222, 0.94));
+    box-shadow:
+      0 18px 38px rgba(20, 28, 34, 0.09),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  }
+
+  html[data-active-panel="dashboard"] .today-quickstart-shell {
+    gap: 0.72rem;
+  }
+
+  html[data-active-panel="dashboard"] .today-entry-copy {
+    min-height: clamp(10.4rem, 24dvh, 12.4rem);
+    padding: clamp(1rem, 4vw, 1.28rem);
+    border-radius: 27px;
+    background:
+      radial-gradient(circle at 88% 5%, rgba(216, 180, 99, 0.25), transparent 7.8rem),
+      radial-gradient(circle at 8% 92%, rgba(47, 119, 123, 0.31), transparent 9.5rem),
+      linear-gradient(145deg, #0f1b19 0%, #17241f 56%, #2a211b 100%);
+    box-shadow:
+      0 16px 32px rgba(7, 12, 11, 0.2),
+      inset 0 1px 0 rgba(255, 250, 236, 0.1);
+  }
+
+  html[data-active-panel="dashboard"] .today-mobile-brand {
+    gap: 0.6rem;
+    padding-bottom: 0.2rem;
+  }
+
+  html[data-active-panel="dashboard"] .today-mobile-brand .brand-mark {
+    width: clamp(2.45rem, 9vw, 3rem);
+    height: clamp(2.45rem, 9vw, 3rem);
+    border-radius: 16px;
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.24),
+      0 0 22px rgba(216, 180, 99, 0.18);
+  }
+
+  html[data-active-panel="dashboard"] .today-mobile-brand-copy strong {
+    font-size: clamp(1.18rem, 5vw, 1.48rem);
+    letter-spacing: -0.055em;
+  }
+
+  html[data-active-panel="dashboard"] .section-heading .eyebrow {
+    font-size: clamp(0.95rem, 3.6vw, 1.08rem);
+    letter-spacing: 0.12em;
+  }
+
+  html[data-active-panel="dashboard"] .section-heading h3 {
+    font-size: clamp(2.55rem, 10vw, 3.25rem);
+    line-height: 0.92;
+  }
+
+  html[data-active-panel="dashboard"] .quick-route-grid {
+    gap: clamp(0.62rem, 1.5dvh, 0.8rem);
+  }
+
+  html[data-active-panel="dashboard"] .quick-route-button {
+    min-height: unset;
+    padding: 0.92rem 3.25rem 0.92rem 1rem;
+    border-width: 1px;
+    border-radius: 23px;
+    background:
+      radial-gradient(circle at 96% 10%, var(--card-soft, rgba(47, 119, 123, 0.13)), transparent 6.6rem),
+      linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(248, 239, 226, 0.95));
+    box-shadow:
+      0 10px 22px rgba(20, 28, 34, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  html[data-active-panel="dashboard"] .quick-route-button::before {
+    width: 0.32rem;
+    opacity: 0.82;
+  }
+
+  html[data-active-panel="dashboard"] .quick-route-kicker {
+    font-size: clamp(0.78rem, 3.35vw, 0.92rem);
+    letter-spacing: 0.14em;
+  }
+
+  html[data-active-panel="dashboard"] .quick-route-button strong {
+    max-width: 13.6ch;
+    font-size: clamp(2rem, 8.2vw, 2.48rem);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
+  }
+
+  html[data-active-panel="dashboard"] .route-symbol {
+    top: 0.9rem;
+    right: 0.9rem;
+    width: clamp(2rem, 7.4vw, 2.28rem);
+    height: clamp(2rem, 7.4vw, 2.28rem);
+    background:
+      radial-gradient(circle at 32% 24%, rgba(255, 252, 244, 0.9), transparent 46%),
+      color-mix(in srgb, var(--card-soft, var(--accent-soft)) 78%, white);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      0 8px 18px rgba(20, 28, 34, 0.06);
+  }
+
+  html[data-active-panel="dashboard"] .route-symbol::before {
+    width: 0.82rem;
+    height: 0.82rem;
+  }
+
+  html[data-active-panel="dashboard"] .today-mobile-secondary {
+    gap: 0.58rem;
+    margin-top: 0.08rem;
+  }
+
+  html[data-active-panel="dashboard"] .today-mobile-secondary .button {
+    min-height: 3.15rem;
+    border-radius: 22px;
+    background: rgba(255, 252, 246, 0.78);
+    border-color: rgba(24, 34, 31, 0.12);
+    box-shadow:
+      0 8px 18px rgba(20, 28, 34, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  }
+
+  html[data-active-panel="dashboard"] .today-mobile-secondary #quickResumeBtn {
+    background: linear-gradient(135deg, #1a2926 0%, #23342f 100%);
+    border-color: rgba(255, 250, 240, 0.14);
+    color: #fff3df;
+    box-shadow:
+      0 12px 24px rgba(20, 28, 34, 0.16),
+      inset 0 1px 0 rgba(255, 250, 236, 0.1);
+  }
+
+  html[data-active-panel="dashboard"] .dashboard-brand-echo {
+    display: none !important;
+  }
+}
