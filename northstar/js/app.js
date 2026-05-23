@@ -1229,47 +1229,48 @@ function setInitialFormValues() {
 }
 
 const REGULATION_SIGNALS = {
-  body: "Your body is carrying the stress first.",
-  thoughts: "Worry is loud right now.",
-  sensory: "The environment is adding load before the task even starts.",
-  avoidance: "Something is making the task hard to touch right now.",
-  fog: "Your brain is holding too many pieces, so the task needs less noise around it."
+  body: "Your body feels tense, restless, or buzzy.",
+  thoughts: "Worry or fast thoughts are taking up space.",
+  sensory: "The room, screen, sound, or light feels like too much input.",
+  avoidance: "Starting feels too exposed, unclear, or demanding.",
+  fog: "Your brain feels foggy or overloaded."
 };
 
 const REGULATION_ANCHORS = {
-  touch: "Hold one texture or press your feet into the floor for 30 seconds.",
-  movement: "Do one small movement: stretch, pace, wall push-up, or posture shift.",
-  sound: "Choose one steady sound and let attention return there when it wanders.",
-  sight: "Pick one colour or visual point and let your eyes rest there.",
+  touch: "Press your feet into the floor or hold one texture for 30 seconds.",
+  movement: "Do one tiny movement: stretch, pace, wall push-up, or posture shift.",
+  sound: "Choose one steady sound and let attention come back to it.",
+  sight: "Rest your eyes on one colour, edge, or object.",
   breath: "Use breath only if it feels safe: one slower exhale is enough.",
-  object: "Hold or look at one familiar object that helps your body orient."
+  object: "Hold or look at one familiar object that helps you feel here."
 };
 
 const REGULATION_STRATEGIES = {
   sensory: {
-    label: "Sensory anchor",
-    step: "Choose one sensory anchor and stay with it for 30-60 seconds.",
-    bridge: "Make the task visible without starting it yet."
+    label: "Feel one thing",
+    step: "Choose one safe sensory anchor and stay with it for 30 seconds.",
+    bridge: "When you are ready, make the task visible without starting it yet."
   },
   movement: {
-    label: "Small movement",
+    label: "Move pressure out",
     step: "Move pressure through your body with one tiny movement set.",
-    bridge: "Return and do only the first setup action."
+    bridge: "Come back and do only the first setup action."
   },
   label: {
-    label: "Name the feeling",
-    step: "Notice one feeling without solving it yet.",
-    bridge: "Name what is in the way. Choose the smallest next move."
+    label: "Name one thing",
+    step: "Name one thing that is here without trying to fix it.",
+    bridge: "Then choose the smallest next move, even if it is only opening the task."
   },
   needs: {
-    label: "Basic care",
+    label: "Meet a body need",
     step: "Check water, food, temperature, device pull, and noise before study effort.",
-    bridge: "Use a 10-minute Focus block or a one-step Plan."
+    bridge: "After that, use a 10-minute Focus block or make a one-step Plan."
   }
 };
 
-function setRegulationStrategy(strategy) {
+function setRegulationStrategy(strategy, { feedback = true } = {}) {
   if (!REGULATION_STRATEGIES[strategy]) return;
+  if (feedback) nudgeHaptic(5);
   state.regulate.strategy = strategy;
   saveState("regulate", state.regulate);
 
@@ -1286,7 +1287,7 @@ function buildRegulationResult() {
   const strategy = REGULATION_STRATEGIES[state.regulate.strategy] || REGULATION_STRATEGIES.sensory;
   const signal = REGULATION_SIGNALS[state.regulate.signal] || REGULATION_SIGNALS.body;
   const anchor = REGULATION_ANCHORS[state.regulate.anchor] || REGULATION_ANCHORS.touch;
-  const loadStep = state.regulate.load || "Reduce one demand: close a tab, dim light, use headphones, move rooms, or get water.";
+  const loadStep = state.regulate.load || "Lower one demand: close a tab, dim the light, use headphones, move rooms, or get water.";
 
   return {
     signal,
@@ -1295,7 +1296,7 @@ function buildRegulationResult() {
     regulationStep: strategy.step,
     loadStep,
     bridge: normalizeReturnCue(strategy.bridge),
-    experiment: "Afterward, notice whether this made study feel even a little more reachable."
+    experiment: "Afterward, check if study feels even a little more reachable. If not, stay with regulation."
   };
 }
 
@@ -1343,12 +1344,12 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
     openMobileResult({
       sourcePanel: "regulate",
       resultType: "regulate",
-      kicker: "Regulation first",
-      title: "Do this before the task",
+      kicker: "No rush",
+      title: "Help your body arrive first",
       summary: result.regulationStep,
       items: [result.anchor, result.loadStep, result.bridge],
-      primaryLabel: "Open Focus",
-      primaryTarget: "focus",
+      primaryLabel: "Make first step",
+      primaryTarget: "planner",
       copyText: [
         "NORTHSTAR REGULATION STEP",
         "",
@@ -1363,7 +1364,7 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
 }
 
 function syncRegulationSelection() {
-  setRegulationStrategy(state.regulate.strategy || "sensory");
+  setRegulationStrategy(state.regulate.strategy || "sensory", { feedback: false });
 }
 
 function focusNotificationCopy(phase = state.focus.phase) {
@@ -1792,6 +1793,7 @@ function renderFocusTimer() {
 
 function setFocusPreset(presetKey) {
   if (!FOCUS_PRESETS[presetKey]) return;
+  nudgeHaptic(5);
 
   stopFocusInterval();
   cancelFocusNotification();
@@ -2717,6 +2719,7 @@ function renderNoteBlocks() {
 
 function addNoteBlock(type = "idea", text = "") {
   captureForms();
+  nudgeHaptic(5);
   const nextBlock = createNoteBlock(type, text);
   state.notes.blocks = [...state.notes.blocks, nextBlock];
   saveState("notes", state.notes);

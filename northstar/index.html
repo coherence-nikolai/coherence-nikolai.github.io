@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260523d">
-  <link rel="icon" href="./icon.svg?v=20260523d" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260523d">
-  <link rel="stylesheet" href="./styles.css?v=20260523d">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260523e">
+  <link rel="icon" href="./icon.svg?v=20260523e" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260523e">
+  <link rel="stylesheet" href="./styles.css?v=20260523e">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260523d" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260523e" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -92,7 +92,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260523d" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260523e" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -357,7 +357,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260523d" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260523e" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -461,7 +461,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260523d" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260523e" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -474,10 +474,10 @@
         <div class="panel-head panel-head-back">
           <button class="button subtle back-button" id="backToTodayBtn" type="button">Back to Today</button>
           <div>
-            <p class="eyebrow">More choices</p>
-            <h2>Choose today’s starting point</h2>
+            <p class="eyebrow">More tools</p>
+            <h2>Choose one support</h2>
             <p class="panel-copy">
-              Use this when the quick choices do not quite fit.
+              A small toolbox for when the first three choices do not quite fit.
             </p>
           </div>
         </div>
@@ -533,9 +533,9 @@
 
           <div class="card today-options-card">
             <div class="section-heading today-direct-heading">
-              <p class="eyebrow">Other spaces</p>
-              <h3>Or choose a space</h3>
-              <p class="microcopy">Use a space directly if you already know what would help.</p>
+              <p class="eyebrow">Tool drawer</p>
+              <h3>Pick the closest tool</h3>
+              <p class="microcopy">Nothing here is required. Choose one thing that would lower the pressure.</p>
             </div>
 
             <div class="triage-grid" id="triageButtons">
@@ -656,10 +656,10 @@
       <section class="panel" id="panel-regulate" role="tabpanel" aria-labelledby="nav-regulate">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">Regulate</p>
+            <p class="eyebrow">I am not ready yet</p>
             <h2>Get steady first</h2>
             <p class="panel-copy">
-              Use this when your body, feelings, or environment are louder than the task.
+              No need to work yet. Help your body arrive first.
             </p>
           </div>
         </div>
@@ -667,25 +667,25 @@
         <div class="grid two-up regulate-grid">
           <article class="card">
             <div class="section-heading">
-              <p class="eyebrow">Get steady first</p>
-              <h3>Pick one settling move</h3>
-              <p class="microcopy">Small study supports first. If you feel unsafe, contact a trusted person or local support.</p>
+              <p class="eyebrow">Start here</p>
+              <h3>What would help your body feel safer?</h3>
+              <p class="microcopy">Choose the closest fit. If you feel unsafe, contact a trusted person or local support.</p>
             </div>
 
             <div class="field-row">
               <label class="field">
-                <span>What is loudest right now?</span>
+                <span>What is your body saying?</span>
                 <select id="regulateSignalSelect">
-                  <option value="body">Body tension or restlessness</option>
-                  <option value="thoughts">Worry, shame, or racing thoughts</option>
+                  <option value="body">Tense, restless, or buzzy</option>
+                  <option value="thoughts">Worry or racing thoughts</option>
                   <option value="sensory">Noise, light, clutter, or interruptions</option>
-                  <option value="avoidance">Hard to begin or frozen</option>
-                  <option value="fog">Mental fog or working-memory overload</option>
+                  <option value="avoidance">Frozen or hard to begin</option>
+                  <option value="fog">Foggy or overloaded</option>
                 </select>
               </label>
 
               <label class="field">
-                <span>Which anchor feels safest?</span>
+                <span>What anchor feels okay?</span>
                 <select id="regulateAnchorSelect">
                   <option value="touch">Touch or texture</option>
                   <option value="movement">Movement</option>
@@ -698,30 +698,30 @@
             </div>
 
             <label class="field">
-              <span>What can you make easier first?</span>
-              <input
-                id="regulateLoadInput"
-                type="text"
-                placeholder="e.g. close tabs, dim light, use headphones, move rooms, get water"
-              >
-            </label>
+                <span>Add more detail if useful</span>
+                <input
+                  id="regulateLoadInput"
+                  type="text"
+                  placeholder="e.g. close tabs, dim light, use headphones, move rooms, get water"
+                >
+              </label>
 
             <div class="regulation-menu" id="regulationMenu" role="group" aria-label="Regulation strategy menu">
               <button class="regulation-option is-selected" type="button" data-regulation-strategy="sensory">
-                <strong>Sensory anchor</strong>
-                <span>Feet, texture, one sound, one colour.</span>
+                <strong>Feel one thing</strong>
+                <span>Feet, texture, sound, or colour.</span>
               </button>
               <button class="regulation-option" type="button" data-regulation-strategy="movement">
-                <strong>Small movement</strong>
-                <span>Pace, stretch, wall push-up, posture shift.</span>
+                <strong>Move pressure out</strong>
+                <span>Pace, stretch, wall push-up, or posture shift.</span>
               </button>
               <button class="regulation-option" type="button" data-regulation-strategy="label">
-                <strong>Name the feeling</strong>
-                <span>Notice one feeling without solving it.</span>
+                <strong>Name one thing</strong>
+                <span>Notice what is here without solving it.</span>
               </button>
               <button class="regulation-option" type="button" data-regulation-strategy="needs">
-                <strong>Basic care</strong>
-                <span>Water, food, device break, quieter space.</span>
+                <strong>Meet a body need</strong>
+                <span>Water, food, quiet, temperature, or less input.</span>
               </button>
             </div>
 
@@ -1181,6 +1181,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260523d"></script>
+  <script type="module" src="./js/app.js?v=20260523e"></script>
 </body>
 </html>

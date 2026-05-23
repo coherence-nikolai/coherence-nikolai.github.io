@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Northstar icon">
   <defs>
     <linearGradient id="icon-bg" x1="64" y1="42" x2="448" y2="470" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#12211F" />
-      <stop offset="0.62" stop-color="#1D211D" />
+      <stop offset="0" stop-color="#101816" />
+      <stop offset="0.62" stop-color="#1C1D19" />
       <stop offset="1" stop-color="#2B211A" />
     </linearGradient>
     <linearGradient id="icon-stroke" x1="126" y1="378" x2="378" y2="118" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFE7A7" />
-      <stop offset="0.52" stop-color="#D6B160" />
-      <stop offset="1" stop-color="#8DB6AD" />
+      <stop offset="0" stop-color="#FFF0B9" />
+      <stop offset="0.52" stop-color="#D9B45F" />
+      <stop offset="1" stop-color="#B4863D" />
     </linearGradient>
     <radialGradient id="icon-star" cx="42%" cy="30%" r="72%">
       <stop offset="0" stop-color="#FFF3C4" />
@@ -19,7 +19,7 @@
       <feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#06110F" flood-opacity="0.32" />
     </filter>
   </defs>
-  <rect width="512" height="512" rx="124" fill="url(#icon-bg)" />
+  <rect width="512" height="512" fill="url(#icon-bg)" />
   <path
     d="M146 374V150L366 374V132"
     fill="none"
@@ -32,11 +32,11 @@
   <path
     d="M146 374V150L366 374V132"
     fill="none"
-    stroke="#4F6D63"
+    stroke="#6E5731"
     stroke-linecap="round"
     stroke-linejoin="round"
     stroke-width="62"
-    opacity="0.72"
+    opacity="0.22"
   />
   <path
     d="M146 374V150L366 374V132"

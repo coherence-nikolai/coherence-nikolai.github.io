@@ -5345,3 +5345,262 @@ html[data-runtime="native"] .support-state-button {
     display: none !important;
   }
 }
+
+@media (max-width: 640px) {
+  button,
+  .choice-pill,
+  .state-card,
+  .path-card,
+  .quick-route-button,
+  .regulation-option,
+  .focus-preset,
+  .profile-option-button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  button:active,
+  .choice-pill:active,
+  .state-card:active,
+  .path-card:active,
+  .quick-route-button:active,
+  .regulation-option:active,
+  .focus-preset:active,
+  .profile-option-button:active {
+    transform: scale(0.985);
+    transition-duration: 80ms;
+  }
+
+  html[data-motion="minimal"] button:active,
+  html[data-motion="minimal"] .choice-pill:active,
+  html[data-motion="minimal"] .state-card:active,
+  html[data-motion="minimal"] .path-card:active,
+  html[data-motion="minimal"] .quick-route-button:active,
+  html[data-motion="minimal"] .regulation-option:active,
+  html[data-motion="minimal"] .focus-preset:active,
+  html[data-motion="minimal"] .profile-option-button:active,
+  html[data-motion="reduced"] button:active,
+  html[data-motion="reduced"] .choice-pill:active,
+  html[data-motion="reduced"] .state-card:active,
+  html[data-motion="reduced"] .path-card:active,
+  html[data-motion="reduced"] .quick-route-button:active,
+  html[data-motion="reduced"] .regulation-option:active,
+  html[data-motion="reduced"] .focus-preset:active,
+  html[data-motion="reduced"] .profile-option-button:active {
+    transform: none;
+  }
+
+  html[data-runtime="native"] .shell {
+    background:
+      radial-gradient(circle at 92% 0%, var(--section-surface), transparent 16rem),
+      linear-gradient(180deg, rgba(250, 246, 238, 0.92), rgba(238, 226, 209, 0.96));
+  }
+
+  html[data-active-panel="dashboard-options"] body {
+    background:
+      radial-gradient(circle at 92% 6%, rgba(216, 180, 99, 0.16), transparent 14rem),
+      radial-gradient(circle at 8% 94%, rgba(47, 119, 123, 0.11), transparent 14rem),
+      linear-gradient(180deg, #f5ebdc 0%, #eadfce 100%);
+  }
+
+  html[data-active-panel="dashboard-options"] .shell {
+    display: flex;
+    align-items: flex-end;
+    padding:
+      max(0.92rem, env(safe-area-inset-top))
+      max(0.72rem, env(safe-area-inset-right))
+      max(0.82rem, calc(0.7rem + env(safe-area-inset-bottom)))
+      max(0.72rem, env(safe-area-inset-left));
+  }
+
+  html[data-active-panel="dashboard-options"] .main,
+  html[data-active-panel="dashboard-options"] #panel-dashboard-options {
+    width: 100%;
+    min-height: auto;
+  }
+
+  html[data-active-panel="dashboard-options"] #panel-dashboard-options {
+    gap: 0.62rem;
+  }
+
+  html[data-active-panel="dashboard-options"] .panel-head-back {
+    padding: 0.62rem 0.68rem 0.78rem;
+    border: 1px solid rgba(47, 119, 123, 0.16);
+    border-radius: 26px 26px 20px 20px;
+    background:
+      radial-gradient(circle at 94% 0%, rgba(216, 180, 99, 0.18), transparent 8rem),
+      rgba(255, 252, 246, 0.86);
+    box-shadow:
+      0 14px 28px rgba(20, 28, 34, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px);
+  }
+
+  html[data-active-panel="dashboard-options"] .panel-head-back .back-button {
+    min-height: 2.42rem;
+    padding-inline: 0.88rem;
+    border-radius: 999px;
+  }
+
+  html[data-active-panel="dashboard-options"] .panel-head-back .eyebrow {
+    color: #8b6a35;
+  }
+
+  html[data-active-panel="dashboard-options"] .panel-head-back h2 {
+    font-size: clamp(1.45rem, 6vw, 1.95rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+  }
+
+  html[data-active-panel="dashboard-options"] .panel-head-back .panel-copy {
+    max-width: 25ch;
+    font-size: 0.92rem;
+    line-height: 1.25;
+  }
+
+  html[data-active-panel="dashboard-options"] .today-options-grid {
+    display: block;
+  }
+
+  html[data-active-panel="dashboard-options"] .today-options-card {
+    padding: 0.72rem;
+    border: 1px solid rgba(47, 119, 123, 0.15);
+    border-radius: 26px;
+    background:
+      linear-gradient(180deg, rgba(255, 252, 246, 0.9), rgba(245, 236, 224, 0.86));
+    box-shadow:
+      0 18px 34px rgba(20, 28, 34, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  html[data-active-panel="dashboard-options"] .today-options-card > .section-heading {
+    padding: 0.18rem 0.2rem 0.1rem;
+  }
+
+  html[data-active-panel="dashboard-options"] .today-options-card .section-heading h3 {
+    font-size: 1.1rem;
+    font-family: var(--font-ui);
+    letter-spacing: -0.03em;
+  }
+
+  html[data-active-panel="dashboard-options"] .today-options-card .microcopy {
+    max-width: 28ch;
+    font-size: 0.88rem;
+  }
+
+  html[data-active-panel="dashboard-options"] .triage-grid {
+    gap: 0.5rem;
+  }
+
+  html[data-active-panel="dashboard-options"] .path-card {
+    min-height: 3.85rem;
+    padding: 0.74rem 0.82rem 0.74rem 0.92rem;
+    border-width: 1px;
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 94% 12%, var(--card-soft, rgba(47, 119, 123, 0.12)), transparent 7rem),
+      rgba(255, 252, 246, 0.72);
+    box-shadow:
+      0 8px 16px rgba(20, 28, 34, 0.05),
+      inset 4px 0 0 var(--card-accent, var(--accent));
+  }
+
+  html[data-active-panel="dashboard-options"] .path-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  html[data-active-panel="dashboard-options"] .path-card strong {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .panel-head {
+    padding: 0.92rem 1rem;
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 98% 0%, var(--section-surface-strong), transparent 10rem),
+      linear-gradient(135deg, rgba(255, 252, 246, 0.92), rgba(243, 233, 218, 0.88));
+    box-shadow:
+      inset 5px 0 0 var(--accent),
+      0 12px 24px rgba(20, 28, 34, 0.06);
+  }
+
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .panel-head h2 {
+    max-width: 10ch;
+    font-size: clamp(1.7rem, 7vw, 2.25rem);
+    letter-spacing: -0.055em;
+    line-height: 0.96;
+  }
+
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .panel-head .panel-copy {
+    max-width: 25ch;
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .grid.two-up > .card:not(.output-card),
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .grid.three-up > .card:not(.output-card) {
+    gap: 0.74rem;
+    padding: 0.92rem;
+    border-radius: 26px;
+    border-color: var(--accent-border);
+    background:
+      radial-gradient(circle at 98% 3%, var(--accent-soft), transparent 10rem),
+      linear-gradient(160deg, rgba(255, 253, 248, 0.94), rgba(247, 239, 227, 0.92));
+    box-shadow:
+      0 16px 30px rgba(20, 28, 34, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  }
+
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .grid.two-up > .card:not(.output-card) > .section-heading:first-child h3,
+  html:not([data-active-panel="dashboard"]):not([data-active-panel="dashboard-options"]):not([data-active-panel="mobile-result"]) .grid.three-up > .card:not(.output-card) > .section-heading:first-child h3 {
+    font-size: clamp(1.42rem, 5.8vw, 1.9rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  #panel-regulate .regulate-grid > .card:first-child {
+    border-color: rgba(115, 137, 77, 0.35);
+    background:
+      radial-gradient(circle at 94% 4%, rgba(115, 137, 77, 0.25), transparent 10rem),
+      radial-gradient(circle at 5% 96%, rgba(216, 180, 99, 0.16), transparent 9rem),
+      linear-gradient(160deg, rgba(255, 253, 248, 0.95), rgba(242, 235, 221, 0.92));
+  }
+
+  #panel-regulate .section-heading h3 {
+    max-width: 13ch;
+  }
+
+  #panel-regulate .regulation-menu {
+    grid-template-columns: 1fr;
+    gap: 0.54rem;
+  }
+
+  #panel-regulate .regulation-option {
+    min-height: 4.05rem;
+    padding: 0.82rem 0.9rem;
+    border-radius: 19px;
+  }
+
+  #panel-regulate .regulation-option strong {
+    font-size: 1.02rem;
+  }
+
+  #panel-regulate .regulation-option span {
+    font-size: 0.88rem;
+    line-height: 1.22;
+  }
+
+  #panel-regulate .output-card {
+    border-color: rgba(115, 137, 77, 0.22);
+  }
+
+  .mobile-action-dock {
+    transform: translateZ(0);
+  }
+}
