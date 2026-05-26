@@ -1,0 +1,1241 @@
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  Archive,
+  Check,
+  Download,
+  FileJson,
+  LifeBuoy,
+  Map,
+  Mic,
+  Play,
+  Plus,
+  RotateCcw,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Upload
+} from "lucide-react";
+import { PacketCard } from "./components/PacketCard";
+import { SprintMode } from "./components/SprintMode";
+import { generatePatternMap } from "./engine/patternMap";
+import {
+  detectReentryState,
+  generateReentryActions,
+  generateSmartReentryList
+} from "./engine/reentryEngine";
+import {
+  generateExitResponsiblyScript,
+  increaseSupportLevel
+} from "./engine/rescueEngine";
+import { useScaffoldData } from "./hooks/useScaffoldData";
+import {
+  blockLabels,
+  exitStatusLabels,
+  missingItemLabels,
+  reentryStateLabels,
+  rescueModeLabels,
+  statusLabels,
+  supportLabels,
+  taskTypeLabels,
+  type ExitResponsibilityStatus,
+  type MissingItemType,
+  type PatternActionSuggestion,
+  type ReentryActionType,
+  type RescueMode,
+  type RescuePacket,
+  type SprintOutcome,
+  type Status
+} from "./types";
+
+type Screen = "home" | "packet" | "sprint" | "reentry" | "patterns" | "settings";
+
+const statusOrder: Status[] = [
+  "rescue_now",
+  "in_progress",
+  "waiting",
+  "repaired",
+  "done_enough",
+  "exited_responsibly",
+  "archived"
+];
+
+const rescueModeOrder: RescueMode[] = [
+  "start_tiny",
+  "make_it_ugly",
+  "repair",
+  "body_double",
+  "unblock",
+  "exit_responsibly"
+];
+
+const missingItemOrder: MissingItemType[] = [
+  "information",
+  "material",
+  "decision",
+  "energy",
+  "courage",
+  "time",
+  "permission"
+];
+
+const exitStatusOrder: Exclude<ExitResponsibilityStatus, "not_chosen">[] = [
+  "renegotiate",
+  "defer",
+  "delegate",
+  "abandon"
+];
+
+const navButtonBase =
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold transition";
+
+export default function App() {
+  const {
+    packets,
+    meta,
+    isReady,
+    error,
+    packetCountByStatus,
+    createPacket,
+    updatePacket,
+    changeStatus,
+    recordSprint,
+    increaseSupport,
+    recordReentryAction,
+    incrementReentries,
+    updateExternalLlmConsent,
+    exportLocalData,
+    importLocalData
+  } = useScaffoldData();
+  const [screen, setScreen] = useState<Screen>("home");
+  const [selectedPacketId, setSelectedPacketId] = useState<string | null>(null);
+  const [stuckText, setStuckText] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [patternStarterMessage, setPatternStarterMessage] = useState<string | null>(
+    null
+  );
+  const selectedPacket = packets.find((packet) => packet.id === selectedPacketId) ?? null;
+  const activeCount =
+    packetCountByStatus.rescue_now +
+    packetCountByStatus.in_progress +
+    packetCountByStatus.waiting;
+
+  useEffect(() => {
+    if (selectedPacketId && !selectedPacket) {
+      setSelectedPacketId(null);
+      setScreen("home");
+    }
+  }, [selectedPacket, selectedPacketId]);
+
+  async function handleCreatePacket() {
+    const trimmed = stuckText.trim();
+    if (!trimmed) return;
+
+    const packet = await createPacket(trimmed);
+    setSelectedPacketId(packet.id);
+    setStuckText("");
+    setPatternStarterMessage(null);
+    setScreen("packet");
+  }
+
+  function usePatternSuggestion(suggestion: PatternActionSuggestion) {
+    setStuckText(suggestion.draftText);
+    setPatternStarterMessage(suggestion.title);
+    setScreen("home");
+  }
+
+  function openPacket(packet: RescuePacket) {
+    setSelectedPacketId(packet.id);
+    setScreen("packet");
+  }
+
+  function startSpeechInput() {
+    const Recognition = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    if (!Recognition) return;
+
+    const recognition = new Recognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    recognition.onresult = (event) => {
+      const result = event.results[event.results.length - 1];
+      const transcript = result?.[0]?.transcript ?? "";
+      setStuckText((current) => `${current} ${transcript}`.trim());
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    setIsListening(true);
+    recognition.start();
+  }
+
+  async function openReentry() {
+    await incrementReentries();
+    setScreen("reentry");
+  }
+
+  async function handleReentryAction(
+    packet: RescuePacket,
+    actionType: ReentryActionType
+  ) {
+    const nextPacket = await recordReentryAction(packet.id, actionType);
+    if (nextPacket) {
+      setSelectedPacketId(nextPacket.id);
+      setScreen("packet");
+    }
+  }
+
+  async function handleSprintOutcome(
+    outcome: SprintOutcome,
+    durationMinutes: number,
+    notes?: string
+  ) {
+    if (!selectedPacket) return;
+
+    const nextPacket = await recordSprint(
+      selectedPacket.id,
+      outcome,
+      durationMinutes,
+      notes
+    );
+    if (nextPacket) setSelectedPacketId(nextPacket.id);
+    setScreen("packet");
+  }
+
+  if (!isReady) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-paper px-4 text-ink">
+        <div className="rounded-lg border border-line bg-surface p-6 shadow-sm">
+          Loading Scaffold
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-paper text-ink">
+      <header className="border-b border-line bg-surface/95">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          <button
+            type="button"
+            onClick={() => setScreen("home")}
+            className="flex min-h-11 items-center gap-3 text-left"
+          >
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-moss text-white">
+              <LifeBuoy className="h-6 w-6" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block text-xl font-semibold">Scaffold</span>
+              <span className="block text-sm text-muted">Not reminders. Rescue.</span>
+            </span>
+          </button>
+
+          <nav className="flex flex-wrap gap-2" aria-label="Primary">
+            <NavButton
+              active={screen === "home" || screen === "packet" || screen === "sprint"}
+              icon={<Plus className="h-4 w-4" aria-hidden="true" />}
+              label="Rescue"
+              onClick={() => setScreen("home")}
+            />
+            <NavButton
+              active={screen === "reentry"}
+              icon={<RotateCcw className="h-4 w-4" aria-hidden="true" />}
+              label="Re-entry"
+              onClick={() => void openReentry()}
+            />
+            <NavButton
+              active={screen === "patterns"}
+              icon={<Map className="h-4 w-4" aria-hidden="true" />}
+              label="Pattern Map"
+              onClick={() => setScreen("patterns")}
+            />
+            <NavButton
+              active={screen === "settings"}
+              icon={<Settings className="h-4 w-4" aria-hidden="true" />}
+              label="Settings"
+              onClick={() => setScreen("settings")}
+            />
+          </nav>
+        </div>
+      </header>
+
+      {error && (
+        <div className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-lg border border-clay bg-surface p-4 text-sm font-semibold text-clay">
+            {error}
+          </div>
+        </div>
+      )}
+
+      {screen === "home" && (
+        <HomeScreen
+          activeCount={activeCount}
+          packets={packets}
+          stuckText={stuckText}
+          isListening={isListening}
+          starterMessage={patternStarterMessage}
+          onTextChange={(value) => {
+            setStuckText(value);
+            if (patternStarterMessage) setPatternStarterMessage(null);
+          }}
+          onCreatePacket={() => void handleCreatePacket()}
+          onListen={startSpeechInput}
+          onOpenPacket={openPacket}
+        />
+      )}
+
+      {screen === "packet" && selectedPacket && (
+        <PacketDetail
+          packet={selectedPacket}
+          onBack={() => setScreen("home")}
+          onStartSprint={() => setScreen("sprint")}
+          onUpdatePacket={updatePacket}
+          onChangeStatus={changeStatus}
+          onIncreaseSupport={increaseSupport}
+        />
+      )}
+
+      {screen === "sprint" && selectedPacket && (
+        <SprintMode
+          packet={selectedPacket}
+          onBack={() => setScreen("packet")}
+          onRecordOutcome={handleSprintOutcome}
+          onStuckAgain={() => undefined}
+        />
+      )}
+
+      {screen === "reentry" && (
+        <ReentryScreen
+          packets={packets}
+          onOpenPacket={openPacket}
+          onReentryAction={handleReentryAction}
+        />
+      )}
+
+      {screen === "patterns" && (
+        <PatternScreen
+          packets={packets}
+          meta={meta}
+          onUseSuggestion={usePatternSuggestion}
+        />
+      )}
+
+      {screen === "settings" && (
+        <SettingsScreen
+          meta={meta}
+          onExport={exportLocalData}
+          onImport={importLocalData}
+          onSetExternalLlmConsent={updateExternalLlmConsent}
+          packetCount={packets.length}
+        />
+      )}
+    </div>
+  );
+}
+
+function NavButton({
+  active,
+  icon,
+  label,
+  onClick
+}: {
+  active: boolean;
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${navButtonBase} ${
+        active
+          ? "bg-ink text-white"
+          : "border border-line bg-surface text-ink hover:border-moss"
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function HomeScreen({
+  activeCount,
+  packets,
+  stuckText,
+  isListening,
+  starterMessage,
+  onTextChange,
+  onCreatePacket,
+  onListen,
+  onOpenPacket
+}: {
+  activeCount: number;
+  packets: RescuePacket[];
+  stuckText: string;
+  isListening: boolean;
+  starterMessage: string | null;
+  onTextChange: (value: string) => void;
+  onCreatePacket: () => void;
+  onListen: () => void;
+  onOpenPacket: (packet: RescuePacket) => void;
+}) {
+  const groupedPackets = useMemo(
+    () =>
+      statusOrder.map((status) => ({
+        status,
+        packets: packets.filter((packet) => packet.status === status)
+      })),
+    [packets]
+  );
+  const speechSupported =
+    typeof window !== "undefined" &&
+    Boolean(window.SpeechRecognition ?? window.webkitSpeechRecognition);
+
+  return (
+    <main>
+      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
+        <div className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
+          <p className="text-sm font-semibold uppercase text-moss">
+            No explanation needed.
+          </p>
+          <h1 className="safe-text mt-3 text-4xl font-semibold leading-tight text-ink sm:text-5xl">
+            What is worth rescuing?
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
+            Press "I'm stuck", drop the messy version here, and Scaffold will turn it
+            into a next physical action.
+          </p>
+
+          <label className="mt-7 block text-sm font-semibold text-ink" htmlFor="stuck">
+            Messy task
+          </label>
+          {starterMessage && (
+            <p className="mt-3 rounded-lg border border-line bg-paper p-3 text-sm font-semibold leading-6 text-ink">
+              Starter loaded: {starterMessage}
+            </p>
+          )}
+          <textarea
+            id="stuck"
+            value={stuckText}
+            onChange={(event) => onTextChange(event.target.value)}
+            className="mt-2 min-h-40 w-full resize-y rounded-lg border border-line bg-paper p-4 text-lg leading-8 text-ink"
+            placeholder="I need to reply to this email but I feel ashamed it is late."
+          />
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={onCreatePacket}
+              disabled={!stuckText.trim()}
+              className="inline-flex min-h-14 items-center gap-2 rounded-lg bg-moss px-6 text-lg font-semibold text-white shadow-sm hover:bg-mossDark disabled:cursor-not-allowed disabled:bg-muted"
+            >
+              <LifeBuoy className="h-5 w-5" aria-hidden="true" />
+              I'm stuck
+            </button>
+            <button
+              type="button"
+              onClick={onListen}
+              disabled={!speechSupported || isListening}
+              className="inline-flex min-h-14 items-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink disabled:cursor-not-allowed disabled:text-muted"
+            >
+              <Mic className="h-5 w-5" aria-hidden="true" />
+              {isListening ? "Listening" : "Speak"}
+            </button>
+          </div>
+        </div>
+
+        <aside className="rounded-lg border border-line bg-ink p-5 text-white shadow-sm sm:p-6">
+          <p className="text-sm font-semibold text-white/70">Rescue engine</p>
+          <p className="mt-4 text-5xl font-semibold">{activeCount}</p>
+          <p className="mt-3 text-lg leading-7 text-white/80">
+            Choose one next action. Done enough counts.
+          </p>
+          <div className="mt-6 space-y-3 text-sm text-white/75">
+            <p>Start tiny.</p>
+            <p>Make it ugly.</p>
+            <p>Repair is progress.</p>
+            <p>Exit responsibly.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase text-moss">Task packets</p>
+            <h2 className="mt-1 text-2xl font-semibold text-ink">Choose one next action.</h2>
+          </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          {groupedPackets.map(({ status, packets: group }) => (
+            <section key={status} className="rounded-lg border border-line bg-paper p-4">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="font-semibold text-ink">{statusLabels[status]}</h3>
+                <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
+                  {group.length}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {group.length > 0 ? (
+                  group.map((packet) => (
+                    <PacketCard
+                      key={packet.id}
+                      packet={packet}
+                      onOpen={onOpenPacket}
+                    />
+                  ))
+                ) : (
+                  <p className="rounded-lg border border-dashed border-line bg-surface p-4 text-sm text-muted">
+                    Nothing here right now.
+                  </p>
+                )}
+              </div>
+            </section>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function PacketDetail({
+  packet,
+  onBack,
+  onStartSprint,
+  onUpdatePacket,
+  onChangeStatus,
+  onIncreaseSupport
+}: {
+  packet: RescuePacket;
+  onBack: () => void;
+  onStartSprint: () => void;
+  onUpdatePacket: (
+    packetId: string,
+    updater: Partial<RescuePacket> | ((packet: RescuePacket) => RescuePacket)
+  ) => Promise<RescuePacket | null>;
+  onChangeStatus: (packetId: string, status: Status) => Promise<RescuePacket | null>;
+  onIncreaseSupport: (packetId: string) => Promise<RescuePacket | null>;
+}) {
+  const [notes, setNotes] = useState(packet.notes);
+
+  useEffect(() => {
+    setNotes(packet.notes);
+  }, [packet.id, packet.notes]);
+
+  const moreSupportAvailable =
+    increaseSupportLevel(packet.supportLevel) !== packet.supportLevel;
+  const confidencePercent = Math.round(packet.blockConfidence * 100);
+
+  async function chooseMissingItem(missingItem: MissingItemType) {
+    await onUpdatePacket(packet.id, {
+      missingItem,
+      rescueMode: "unblock",
+      status: "waiting"
+    });
+  }
+
+  async function chooseExitStatus(exitStatus: ExitResponsibilityStatus) {
+    await onUpdatePacket(packet.id, {
+      exitStatus,
+      exitScript: generateExitResponsiblyScript(
+        packet.originalText,
+        packet.taskType,
+        exitStatus
+      ),
+      rescueMode: "exit_responsibly",
+      status: "exited_responsibly"
+    });
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-5 inline-flex min-h-11 items-center rounded-lg border border-line bg-surface px-4 text-sm font-semibold text-ink"
+      >
+        Back to packets
+      </button>
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase text-moss">
+                Rescue packet
+              </p>
+              <h1 className="safe-text mt-3 text-3xl font-semibold text-ink sm:text-4xl">
+                {packet.title}
+              </h1>
+              <p className="safe-text mt-3 max-w-3xl text-base leading-7 text-muted">
+                {packet.originalText}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onStartSprint}
+              className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white hover:bg-mossDark"
+            >
+              <Play className="h-5 w-5" aria-hidden="true" />
+              Start rescue sprint
+            </button>
+          </div>
+
+          <div className="mt-6 rounded-lg border border-line bg-paper p-5">
+            <p className="text-sm font-semibold text-muted">Next physical action</p>
+            <p className="safe-text mt-2 text-2xl font-semibold leading-9 text-ink">
+              {packet.firstPhysicalAction}
+            </p>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <InfoPanel title="Real task" body={packet.realTask} />
+            <InfoPanel title="Minimum viable progress" body={packet.minimumViableProgress} />
+          </div>
+
+          <section className="mt-6">
+            <h2 className="text-xl font-semibold text-ink">10-minute rescue plan</h2>
+            <ol className="mt-3 space-y-3">
+              {packet.tenMinutePlan.map((step) => (
+                <li
+                  key={step}
+                  className="safe-text rounded-lg border border-line bg-paper p-4 leading-7 text-ink"
+                >
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <section className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-line bg-paper p-4">
+              <h2 className="text-lg font-semibold text-ink">Repair script</h2>
+              <p className="safe-text mt-3 leading-7 text-muted">{packet.repairScript}</p>
+            </div>
+            <ModePanel mode={packet.rescueMode} />
+          </section>
+
+          <section className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-line bg-paper p-4">
+              <h2 className="text-lg font-semibold text-ink">Unblock</h2>
+              <p className="mt-2 text-sm leading-6 text-muted">What is missing?</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {missingItemOrder.map((missingItem) => (
+                  <button
+                    key={missingItem}
+                    type="button"
+                    onClick={() => void chooseMissingItem(missingItem)}
+                    className={`min-h-10 rounded-lg border px-3 text-sm font-semibold ${
+                      packet.missingItem === missingItem
+                        ? "border-moss bg-moss text-white"
+                        : "border-line bg-surface text-ink"
+                    }`}
+                  >
+                    {missingItemLabels[missingItem]}
+                  </button>
+                ))}
+              </div>
+              <p className="safe-text mt-4 text-sm leading-6 text-muted">
+                Current: {missingItemLabels[packet.missingItem]}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-line bg-paper p-4">
+              <h2 className="text-lg font-semibold text-ink">Exit responsibly</h2>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Renegotiate, defer, delegate, or abandon clearly.
+              </p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {exitStatusOrder.map((exitStatus) => (
+                  <button
+                    key={exitStatus}
+                    type="button"
+                    onClick={() => void chooseExitStatus(exitStatus)}
+                    className={`min-h-10 rounded-lg border px-3 text-left text-sm font-semibold ${
+                      packet.exitStatus === exitStatus
+                        ? "border-clay bg-clay text-white"
+                        : "border-line bg-surface text-ink"
+                    }`}
+                  >
+                    {exitStatusLabels[exitStatus]}
+                  </button>
+                ))}
+              </div>
+              <p className="safe-text mt-4 text-sm leading-6 text-muted">
+                {packet.exitScript}
+              </p>
+            </div>
+          </section>
+
+          <section className="mt-6">
+            <label className="text-sm font-semibold text-ink" htmlFor="packet-notes">
+              Notes
+            </label>
+            <textarea
+              id="packet-notes"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              onBlur={() => void onUpdatePacket(packet.id, { notes })}
+              className="mt-2 min-h-28 w-full resize-y rounded-lg border border-line bg-paper p-3 text-base leading-7 text-ink"
+              placeholder="What moved? What is missing?"
+            />
+          </section>
+        </section>
+
+        <aside className="space-y-4">
+          <section className="rounded-lg border border-line bg-surface p-4 shadow-sm">
+            <h2 className="text-lg font-semibold text-ink">Signal</h2>
+            <dl className="mt-4 grid grid-cols-2 gap-3">
+              <Estimate label="Urgency" value={packet.urgency} />
+              <Estimate label="Consequence" value={packet.consequence} />
+              <Estimate label="Emotion" value={packet.emotionalLoad} />
+              <Estimate label="Effort" value={packet.effort} />
+            </dl>
+            <div className="mt-4 space-y-3 text-sm">
+              <Badge label="Task type" value={taskTypeLabels[packet.taskType]} />
+              <Badge label="Likely block" value={blockLabels[packet.blockType]} />
+              <Badge label="Confidence" value={`${confidencePercent}%`} />
+              <Badge label="Mode" value={rescueModeLabels[packet.rescueMode]} />
+              <Badge label="Support" value={supportLabels[packet.supportLevel]} />
+              <Badge label="Status" value={statusLabels[packet.status]} />
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-line bg-surface p-4 shadow-sm">
+            <h2 className="text-lg font-semibold text-ink">Packet controls</h2>
+            <label className="mt-4 block text-sm font-semibold text-ink" htmlFor="status">
+              Status
+            </label>
+            <select
+              id="status"
+              value={packet.status}
+              onChange={(event) =>
+                void onChangeStatus(packet.id, event.target.value as Status)
+              }
+              className="mt-2 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+            >
+              {statusOrder.map((status) => (
+                <option key={status} value={status}>
+                  {statusLabels[status]}
+                </option>
+              ))}
+            </select>
+
+            <label className="mt-4 block text-sm font-semibold text-ink" htmlFor="mode">
+              Rescue mode
+            </label>
+            <select
+              id="mode"
+              value={packet.rescueMode}
+              onChange={(event) =>
+                void onUpdatePacket(packet.id, {
+                  rescueMode: event.target.value as RescueMode
+                })
+              }
+              className="mt-2 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+            >
+              {rescueModeOrder.map((mode) => (
+                <option key={mode} value={mode}>
+                  {rescueModeLabels[mode]}
+                </option>
+              ))}
+            </select>
+
+            {packet.supportLevel !== "full_scaffold" && (
+              <div className="mt-4 rounded-lg border border-line bg-paper p-3 text-sm leading-6 text-muted">
+                You've started this kind of task before. Choose the full breakdown or
+                just the first move.
+              </div>
+            )}
+
+            <div className="mt-4 grid gap-3">
+              <button
+                type="button"
+                onClick={() => void onIncreaseSupport(packet.id)}
+                disabled={!moreSupportAvailable}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink disabled:cursor-not-allowed disabled:text-muted"
+              >
+                <Sparkles className="h-5 w-5" aria-hidden="true" />
+                More scaffold
+              </button>
+              <button
+                type="button"
+                onClick={() => void onChangeStatus(packet.id, "done_enough")}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink"
+              >
+                <Check className="h-5 w-5" aria-hidden="true" />
+                Done enough
+              </button>
+              <button
+                type="button"
+                onClick={() => void chooseExitStatus("renegotiate")}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink"
+              >
+                <Archive className="h-5 w-5" aria-hidden="true" />
+                Exit responsibly
+              </button>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+  );
+}
+
+function InfoPanel({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-line bg-paper p-4">
+      <p className="text-sm font-semibold text-muted">{title}</p>
+      <p className="safe-text mt-2 leading-7 text-ink">{body}</p>
+    </div>
+  );
+}
+
+function Estimate({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-line bg-paper p-3">
+      <dt className="text-xs font-semibold uppercase text-muted">{label}</dt>
+      <dd className="mt-2 text-2xl font-semibold text-ink">{value}</dd>
+    </div>
+  );
+}
+
+function Badge({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-line bg-paper p-3">
+      <p className="text-xs font-semibold uppercase text-muted">{label}</p>
+      <p className="safe-text mt-1 font-semibold text-ink">{value}</p>
+    </div>
+  );
+}
+
+function ModePanel({ mode }: { mode: RescueMode }) {
+  const content: Record<RescueMode, string> = {
+    start_tiny: "Find the 30-second to 2-minute version. Stop before the task expands.",
+    make_it_ugly: "Use rough bullets, placeholders, and bad draft energy. Polish is not the entry fee.",
+    repair: "Send the brief accountable version. No extra confession. No disappearing.",
+    body_double: "Keep the timer visible. Let the panel stay with you while you do the first move.",
+    unblock:
+      "Name the missing piece: information, materials, decision, energy, courage, time, or permission.",
+    exit_responsibly:
+      "Renegotiate, defer, delegate, or abandon clearly. Name who needs to know and what you can offer."
+  };
+
+  return (
+    <div className="rounded-lg border border-line bg-paper p-4">
+      <h2 className="text-lg font-semibold text-ink">{rescueModeLabels[mode]}</h2>
+      <p className="safe-text mt-3 leading-7 text-muted">{content[mode]}</p>
+    </div>
+  );
+}
+
+function ReentryScreen({
+  packets,
+  onOpenPacket,
+  onReentryAction
+}: {
+  packets: RescuePacket[];
+  onOpenPacket: (packet: RescuePacket) => void;
+  onReentryAction: (
+    packet: RescuePacket,
+    actionType: ReentryActionType
+  ) => Promise<void>;
+}) {
+  const reentryList = generateSmartReentryList(packets);
+
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
+        <p className="text-sm font-semibold uppercase text-moss">Re-entry</p>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">
+          No explanation needed. Let's rescue what matters.
+        </h1>
+        <p className="mt-3 text-lg leading-8 text-muted">
+          No explanation needed. Choose what is still possible.
+        </p>
+      </section>
+
+      <section className="mt-6">
+        <h2 className="text-2xl font-semibold text-ink">Most worth rescuing</h2>
+        <div className="mt-4 grid gap-5 lg:grid-cols-3">
+          {reentryList.length > 0 ? (
+            reentryList.map((packet) => {
+              const reentryState = detectReentryState(packet);
+              const actions = generateReentryActions(packet, packets);
+
+              return (
+                <article key={packet.id} className="space-y-3">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="font-semibold text-moss">
+                      {reentryStateLabels[reentryState]}
+                    </span>
+                    <span className="text-muted">
+                      {packet.reentryHistory.length} re-entry action
+                      {packet.reentryHistory.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <PacketCard packet={packet} onOpen={onOpenPacket} />
+                  <div className="grid gap-2">
+                    {actions.map((action) => (
+                      <button
+                        key={action.actionType}
+                        type="button"
+                        onClick={() =>
+                          void onReentryAction(packet, action.actionType)
+                        }
+                        className="rounded-lg border border-line bg-surface p-3 text-left hover:border-moss"
+                      >
+                        <span className="block font-semibold text-ink">
+                          {action.label}
+                        </span>
+                        <span className="safe-text mt-1 block text-sm leading-6 text-muted">
+                          {action.body}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </article>
+              );
+            })
+          ) : (
+            <p className="rounded-lg border border-line bg-surface p-5 text-muted">
+              Nothing needs re-entry right now.
+            </p>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function PatternScreen({
+  packets,
+  meta,
+  onUseSuggestion
+}: {
+  packets: RescuePacket[];
+  meta: Parameters<typeof generatePatternMap>[1];
+  onUseSuggestion: (suggestion: PatternActionSuggestion) => void;
+}) {
+  const patternMap = generatePatternMap(packets, meta);
+
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
+        <p className="text-sm font-semibold uppercase text-moss">Pattern map</p>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">
+          What helps you restart?
+        </h1>
+        <p className="mt-3 text-lg leading-8 text-muted">
+          Patterns only. No score. No streaks.
+        </p>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Metric label="Successful starts" value={patternMap.successfulStarts} />
+        <Metric label="Repairs" value={patternMap.repairs} />
+        <Metric label="Re-entries" value={patternMap.reentries} />
+        <Metric label="Responsible exits" value={patternMap.responsibleExits} />
+        <Metric label="Support faded" value={patternMap.supportFadingEvents} />
+      </section>
+
+      <section className="mt-6 rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase text-moss">
+              Suggested next moves
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold text-ink">
+              Use a pattern without handing over the wheel.
+            </h2>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {patternMap.actionSuggestions.length > 0 ? (
+            patternMap.actionSuggestions.map((suggestion) => (
+              <button
+                key={suggestion.id}
+                type="button"
+                onClick={() => onUseSuggestion(suggestion)}
+                className="rounded-lg border border-line bg-paper p-4 text-left hover:border-moss"
+              >
+                <span className="safe-text block text-lg font-semibold text-ink">
+                  {suggestion.title}
+                </span>
+                <span className="safe-text mt-2 block text-sm leading-6 text-muted">
+                  {suggestion.body}
+                </span>
+                <span className="mt-4 inline-flex min-h-10 items-center rounded-lg bg-moss px-4 text-sm font-semibold text-white">
+                  {suggestion.ctaLabel}
+                </span>
+              </button>
+            ))
+          ) : (
+            <p className="rounded-lg border border-dashed border-line bg-paper p-4 text-muted">
+              A few rescues will turn this into starter suggestions.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-6 grid gap-5 lg:grid-cols-2">
+        <PatternList
+          title="Task types"
+          items={patternMap.commonTaskTypes.map((item) => ({
+            label: item.label,
+            count: item.count
+          }))}
+        />
+        <PatternList
+          title="Common blocks"
+          items={patternMap.commonBlocks.map((item) => ({
+            label: item.label,
+            count: item.count
+          }))}
+        />
+        <PatternList
+          title="Best rescue modes"
+          items={patternMap.commonRescueModes.map((item) => ({
+            label: item.label,
+            count: item.count
+          }))}
+        />
+        <PatternList
+          title="Usually missing"
+          items={patternMap.commonMissingItems.map((item) => ({
+            label: item.label,
+            count: item.count
+          }))}
+        />
+        <PatternList
+          title="Exit choices"
+          items={patternMap.exitChoices.map((item) => ({
+            label: item.label,
+            count: item.count
+          }))}
+        />
+        <PatternList
+          title="Rescue patterns that started"
+          items={patternMap.successfulRescuePatterns.map((item) => ({
+            label: item.label,
+            count: item.count,
+            detail: `${item.count} of ${item.total} sprint${
+              item.total === 1 ? "" : "s"
+            } started`
+          }))}
+        />
+        <PatternList
+          title="Tasks often avoided"
+          items={patternMap.tasksMostOftenAvoided.map((item) => ({
+            label: item.task,
+            count: item.count
+          }))}
+        />
+        <PatternList
+          title="Start times"
+          items={patternMap.timesOfDayStarts.map((item) => ({
+            label: item.label,
+            count: item.count
+          }))}
+        />
+      </section>
+    </main>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-line bg-surface p-4 shadow-sm">
+      <p className="text-sm font-semibold text-muted">{label}</p>
+      <p className="mt-2 text-3xl font-semibold text-ink">{value}</p>
+    </div>
+  );
+}
+
+function PatternList({
+  title,
+  items
+}: {
+  title: string;
+  items: Array<{ label: string; count: number; detail?: string }>;
+}) {
+  return (
+    <section className="rounded-lg border border-line bg-surface p-5 shadow-sm">
+      <h2 className="text-xl font-semibold text-ink">{title}</h2>
+      <div className="mt-4 space-y-3">
+        {items.length > 0 ? (
+          items.map((item) => (
+            <div
+              key={`${item.label}-${item.count}`}
+              className="flex items-center justify-between gap-4 rounded-lg border border-line bg-paper p-3"
+            >
+              <span className="safe-text font-medium text-ink">{item.label}</span>
+              <span className="text-right">
+                <span className="block rounded-full bg-surface px-3 py-1 text-sm font-semibold text-muted">
+                  {item.count}
+                </span>
+                {item.detail && (
+                  <span className="mt-1 block text-xs leading-5 text-muted">
+                    {item.detail}
+                  </span>
+                )}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="rounded-lg border border-dashed border-line bg-paper p-4 text-muted">
+            More rescues will fill this in.
+          </p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function SettingsScreen({
+  meta,
+  onExport,
+  onImport,
+  onSetExternalLlmConsent,
+  packetCount
+}: {
+  meta: Parameters<typeof generatePatternMap>[1];
+  onExport: () => Promise<unknown>;
+  onImport: (raw: unknown) => Promise<unknown>;
+  onSetExternalLlmConsent: (enabled: boolean) => Promise<unknown>;
+  packetCount: number;
+}) {
+  const [message, setMessage] = useState<string | null>(null);
+  const [isSavingConsent, setIsSavingConsent] = useState(false);
+
+  async function handleExport() {
+    const payload = await onExport();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json"
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `scaffold-export-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    setMessage("Export created.");
+  }
+
+  async function handleImport(file: File | undefined) {
+    if (!file) return;
+
+    const confirmed = window.confirm(
+      "Import will replace the current local Scaffold data in this browser. Continue?"
+    );
+    if (!confirmed) return;
+
+    try {
+      const text = await file.text();
+      await onImport(JSON.parse(text));
+      setMessage("Import complete.");
+    } catch (caught) {
+      setMessage(caught instanceof Error ? caught.message : "Import did not complete.");
+    }
+  }
+
+  async function handleExternalLlmConsent(enabled: boolean) {
+    setIsSavingConsent(true);
+    try {
+      await onSetExternalLlmConsent(enabled);
+      setMessage(
+        enabled
+          ? "External LLM consent recorded locally. No external provider is connected in this MVP."
+          : "External LLM consent revoked locally."
+      );
+    } finally {
+      setIsSavingConsent(false);
+    }
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
+        <p className="text-sm font-semibold uppercase text-moss">Settings</p>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">
+          Local data
+        </h1>
+        <p className="mt-3 text-lg leading-8 text-muted">
+          Stored in this browser using IndexedDB. No cloud account is required.
+        </p>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => void handleExport()}
+            className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg bg-moss px-5 text-lg font-semibold text-white hover:bg-mossDark"
+          >
+            <Download className="h-5 w-5" aria-hidden="true" />
+            Export JSON
+          </button>
+
+          <label className="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line bg-paper px-5 text-lg font-semibold text-ink">
+            <Upload className="h-5 w-5" aria-hidden="true" />
+            Import JSON
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="sr-only"
+              onChange={(event) => void handleImport(event.target.files?.[0])}
+            />
+          </label>
+        </div>
+
+        <div className="mt-6 rounded-lg border border-line bg-paper p-4">
+          <div className="flex items-center gap-3">
+            <FileJson className="h-5 w-5 text-moss" aria-hidden="true" />
+            <p className="font-semibold text-ink">{packetCount} local packets</p>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-muted">
+            Scaffold does not diagnose, treat, or make clinical claims.
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-lg border border-line bg-paper p-4">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-1 h-5 w-5 flex-none text-moss" aria-hidden="true" />
+            <div>
+              <h2 className="text-lg font-semibold text-ink">LLM adapter</h2>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Scaffold uses local rules in this MVP. Task text can only leave this
+                browser through an external LLM adapter after explicit consent.
+              </p>
+            </div>
+          </div>
+
+          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-line bg-surface p-3">
+            <input
+              type="checkbox"
+              checked={meta.llmConsent.externalLlmEnabled}
+              disabled={isSavingConsent}
+              onChange={(event) =>
+                void handleExternalLlmConsent(event.currentTarget.checked)
+              }
+              className="mt-1 h-5 w-5 accent-moss"
+            />
+            <span>
+              <span className="block font-semibold text-ink">
+                Allow task text to be sent to an external LLM adapter if one is connected.
+              </span>
+              <span className="mt-1 block text-sm leading-6 text-muted">
+                Current mode: {meta.llmConsent.providerLabel}
+              </span>
+            </span>
+          </label>
+        </div>
+
+        {message && (
+          <p className="mt-4 rounded-lg border border-line bg-paper p-3 text-sm font-semibold text-ink">
+            {message}
+          </p>
+        )}
+      </section>
+    </main>
+  );
+}
