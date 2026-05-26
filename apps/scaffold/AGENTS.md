@@ -20,11 +20,15 @@ This project is a local-first ADHD executive-function scaffold. It is a rescue e
 - Keep deterministic rules modular so an LLM classifier can replace them later.
 - Put any future LLM integration behind `src/llm/rescueAdapter.ts`.
 - Never send task text to an external LLM without explicit consent recorded in local metadata.
+- Future external LLM support should be BYOK unless the user explicitly changes strategy: user supplies their own key, keys stay local, and exports never include keys.
 - Keep persistence behind `src/data/` and app state operations behind hooks.
 - Prefer accessible, low-cognitive-load UI.
 - Avoid dense dashboards and excessive notifications.
 - Use plain English.
 - Preserve keyboard access and mobile responsiveness.
+- Preserve the Rescue Frame identity: a minimal scaffold/S mark made from support beams with one moss first-step block.
+- Avoid brain, checkmark, clock, bell, lightning, lifebuoy, medical, construction helmet, streak, or gamified brand imagery.
+- Keep the visual language warm paper, deep ink, muted moss/teal, restrained accents, 8px radius or less, and calm premium surfaces.
 
 ## Wording To Use
 

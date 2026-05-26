@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Check,
   CirclePause,
   CirclePlay,
+  Flag,
   RotateCcw,
-  ShieldCheck,
-  TimerReset
+  ShieldCheck
 } from "lucide-react";
+import { BrandMark } from "./BrandMark";
+import { Panel, PrimaryAction, SignalPill } from "./design";
 import type { RescuePacket, SprintOutcome } from "../types";
 
 type SprintState = "idle" | "running" | "paused" | "completed";
@@ -67,31 +68,42 @@ export function SprintMode({
   }
 
   return (
-    <section className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
       <button
         type="button"
         onClick={onBack}
-        className="mb-5 inline-flex min-h-11 items-center rounded-lg border border-line bg-surface px-4 text-sm font-semibold text-ink"
+        className="mb-5 inline-flex min-h-11 items-center rounded-lg border border-line bg-surface/90 px-4 text-sm font-semibold text-ink shadow-sm transition hover:border-moss"
       >
         Back to packet
       </button>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
-        <div className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
-          <p className="text-sm font-semibold uppercase text-moss">Rescue sprint</p>
-          <h1 className="safe-text mt-3 text-3xl font-semibold text-ink sm:text-4xl">
-            {packet.title}
-          </h1>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <Panel className="p-5 sm:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-5">
+            <div>
+              <p className="text-xs font-semibold uppercase text-moss">
+                Rescue sprint
+              </p>
+              <h1 className="safe-text mt-3 text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+                {packet.title}
+              </h1>
+            </div>
+            <SignalPill value="Body double active" tone="moss" />
+          </div>
 
-          <div className="mt-6 rounded-lg border border-line bg-paper p-4">
-            <p className="text-sm font-semibold text-muted">First physical action</p>
-            <p className="safe-text mt-2 text-xl font-semibold leading-8 text-ink">
+          <div className="mt-7 rounded-lg border border-moss/25 bg-moss/10 p-5">
+            <p className="text-xs font-semibold uppercase text-mossDark">
+              First physical action
+            </p>
+            <p className="safe-text mt-2 text-2xl font-semibold leading-9 text-ink">
               {packet.firstPhysicalAction}
             </p>
           </div>
 
-          <div className="mt-4 rounded-lg border border-line bg-paper p-4">
-            <p className="text-sm font-semibold text-muted">Minimum viable progress</p>
+          <div className="mt-4 rounded-lg border border-line bg-paper/80 p-4">
+            <p className="text-sm font-semibold text-muted">
+              Minimum viable progress
+            </p>
             <p className="safe-text mt-2 text-lg leading-7 text-ink">
               {packet.minimumViableProgress}
             </p>
@@ -99,41 +111,33 @@ export function SprintMode({
 
           <div className="mt-6 flex flex-wrap gap-3">
             {state === "idle" && (
-              <button
-                type="button"
-                onClick={() => setState("running")}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-sm hover:bg-mossDark"
-              >
+              <PrimaryAction onClick={() => setState("running")}>
                 <CirclePlay className="h-5 w-5" aria-hidden="true" />
                 Start 10 minutes
-              </button>
+              </PrimaryAction>
             )}
             {state === "running" && (
               <button
                 type="button"
                 onClick={() => setState("paused")}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-ink px-5 font-semibold text-white"
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-ink px-5 font-semibold text-white transition hover:bg-ink/90"
               >
                 <CirclePause className="h-5 w-5" aria-hidden="true" />
                 Pause
               </button>
             )}
             {state === "paused" && (
-              <button
-                type="button"
-                onClick={() => setState("running")}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white hover:bg-mossDark"
-              >
+              <PrimaryAction onClick={() => setState("running")}>
                 <CirclePlay className="h-5 w-5" aria-hidden="true" />
                 Resume
-              </button>
+              </PrimaryAction>
             )}
             <button
               type="button"
               onClick={() => void complete("done_enough")}
-              className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink"
+              className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
             >
-              <Check className="h-5 w-5" aria-hidden="true" />
+              <Flag className="h-5 w-5 text-moss" aria-hidden="true" />
               Done enough
             </button>
             <button
@@ -142,15 +146,15 @@ export function SprintMode({
                 setState("completed");
                 onStuckAgain();
               }}
-              className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink"
+              className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
             >
-              <RotateCcw className="h-5 w-5" aria-hidden="true" />
+              <RotateCcw className="h-5 w-5 text-moss" aria-hidden="true" />
               Stuck again
             </button>
           </div>
 
           {(state === "completed" || remaining === 0) && (
-            <div className="mt-7 border-t border-line pt-6">
+            <div className="mt-8 border-t border-line pt-6">
               <h2 className="text-xl font-semibold text-ink">What happened?</h2>
               <textarea
                 value={notes}
@@ -179,22 +183,23 @@ export function SprintMode({
               </div>
             </div>
           )}
-        </div>
+        </Panel>
 
-        <aside className="rounded-lg border border-line bg-ink p-5 text-white shadow-sm">
+        <Panel tone="ink" className="p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-white/70">Still here</p>
-              <p className="mt-1 text-lg font-semibold">I am here with you.</p>
+              <p className="text-sm font-semibold text-paper/70">Still here</p>
+              <p className="mt-1 text-lg font-semibold text-paper">
+                I am here with you.
+              </p>
             </div>
-            <ShieldCheck className="h-8 w-8 text-amberSoft" aria-hidden="true" />
+            <BrandMark className="h-11 w-11 text-ink" title="Scaffold sprint" />
           </div>
-          <div className="mt-8 flex aspect-square items-center justify-center rounded-full border-8 border-white/20 text-6xl font-semibold">
+          <div className="mt-8 flex aspect-square items-center justify-center rounded-full border border-white/20 bg-white/10 text-6xl font-semibold text-paper shadow-inner">
             {formatTime(remaining)}
           </div>
-          <p className="mt-6 text-base leading-7 text-white/80">
-            Choose one next action. Keep the task small enough to stay physical.
-            Repair is progress.
+          <p className="mt-6 text-base leading-7 text-paper/80">
+            Choose one next action. Keep it physical. Done enough counts.
           </p>
           <button
             type="button"
@@ -202,12 +207,16 @@ export function SprintMode({
               setRemaining(sprintSeconds);
               setState("idle");
             }}
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/25 px-4 font-semibold text-white"
+            className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/25 px-4 font-semibold text-white transition hover:border-white/45"
           >
-            <TimerReset className="h-5 w-5" aria-hidden="true" />
+            <RotateCcw className="h-5 w-5" aria-hidden="true" />
             Reset timer
           </button>
-        </aside>
+          <div className="mt-5 flex items-start gap-3 rounded-lg border border-white/10 bg-white/10 p-3 text-sm leading-6 text-paper/80">
+            <ShieldCheck className="mt-0.5 h-5 w-5 flex-none text-amberSoft" aria-hidden="true" />
+            <span>No explanation needed if you drift. Re-entry is part of the tool.</span>
+          </div>
+        </Panel>
       </div>
     </section>
   );
@@ -224,7 +233,7 @@ function OutcomeButton({
     <button
       type="button"
       onClick={onClick}
-      className="min-h-12 rounded-lg border border-line bg-paper px-4 text-left font-semibold text-ink hover:border-moss"
+      className="min-h-12 rounded-lg border border-line bg-paper px-4 text-left font-semibold text-ink transition hover:border-moss hover:bg-surface"
     >
       {label}
     </button>

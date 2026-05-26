@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   Archive,
   Check,
+  Clipboard,
   Download,
   FileJson,
-  LifeBuoy,
   Map,
   Mic,
   Play,
@@ -15,8 +15,18 @@ import {
   Sparkles,
   Upload
 } from "lucide-react";
+import { BrandMark } from "./components/BrandMark";
 import { PacketCard } from "./components/PacketCard";
 import { SprintMode } from "./components/SprintMode";
+import {
+  EmptyState,
+  Panel,
+  PrimaryAction,
+  RescueBrief,
+  ScriptCard,
+  Shell,
+  SignalPill
+} from "./components/design";
 import { generatePatternMap } from "./engine/patternMap";
 import {
   detectReentryState,
@@ -87,6 +97,14 @@ const exitStatusOrder: Exclude<ExitResponsibilityStatus, "not_chosen">[] = [
 
 const navButtonBase =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold transition";
+
+const starterPrompts = [
+  "I need to start my assignment and I don't know where to start.",
+  "I need to reply to this email but I feel ashamed it is late.",
+  "I have too many things and I am frozen.",
+  "I need to clean but the room feels too big.",
+  "I am bored and I keep scrolling."
+];
 
 export default function App() {
   const {
@@ -202,8 +220,9 @@ export default function App() {
 
   if (!isReady) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-paper px-4 text-ink">
-        <div className="rounded-lg border border-line bg-surface p-6 shadow-sm">
+      <main className="paper-field flex min-h-screen items-center justify-center bg-paper px-4 text-ink">
+        <div className="flex items-center gap-3 rounded-lg border border-line bg-surface p-6 shadow-premium">
+          <BrandMark className="h-10 w-10 text-ink" />
           Loading Scaffold
         </div>
       </main>
@@ -211,20 +230,20 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-paper text-ink">
-      <header className="border-b border-line bg-surface/95">
+    <div className="paper-field min-h-screen bg-paper text-ink">
+      <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <button
             type="button"
             onClick={() => setScreen("home")}
             className="flex min-h-11 items-center gap-3 text-left"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-moss text-white">
-              <LifeBuoy className="h-6 w-6" aria-hidden="true" />
-            </span>
+            <BrandMark className="h-12 w-12 text-ink shadow-sm" />
             <span>
-              <span className="block text-xl font-semibold">Scaffold</span>
-              <span className="block text-sm text-muted">Not reminders. Rescue.</span>
+              <span className="block text-xl font-semibold leading-6">Scaffold</span>
+              <span className="block text-sm text-muted">
+                Not reminders. Rescue.
+              </span>
             </span>
           </button>
 
@@ -259,7 +278,7 @@ export default function App() {
 
       {error && (
         <div className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-lg border border-clay bg-surface p-4 text-sm font-semibold text-clay">
+          <div className="rounded-lg border border-clay/40 bg-surface p-4 text-sm font-semibold text-clay shadow-sm">
             {error}
           </div>
         </div>
@@ -348,8 +367,8 @@ function NavButton({
       onClick={onClick}
       className={`${navButtonBase} ${
         active
-          ? "bg-ink text-white"
-          : "border border-line bg-surface text-ink hover:border-moss"
+          ? "bg-ink text-white shadow-sm"
+          : "border border-line/80 bg-surface/90 text-ink hover:border-moss"
       }`}
     >
       {icon}
@@ -393,88 +412,114 @@ function HomeScreen({
 
   return (
     <main>
-      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:px-8">
-        <div className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
-          <p className="text-sm font-semibold uppercase text-moss">
-            No explanation needed.
-          </p>
-          <h1 className="safe-text mt-3 text-4xl font-semibold leading-tight text-ink sm:text-5xl">
-            What is worth rescuing?
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
-            Press "I'm stuck", drop the messy version here, and Scaffold will turn it
-            into a next physical action.
-          </p>
+      <Shell className="pb-3">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <Panel className="relative overflow-hidden p-5 sm:p-8">
+            <div className="flex flex-wrap items-start justify-between gap-5">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  No explanation needed.
+                </p>
+                <h1 className="safe-text mt-3 text-4xl font-semibold leading-tight text-ink sm:text-5xl">
+                  What is worth rescuing?
+                </h1>
+                <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
+                  Drop the messy version. Scaffold turns it into one next physical
+                  action, a short rescue plan, and a repair option only when repair
+                  is actually relevant.
+                </p>
+              </div>
+              <SignalPill value="Local-first" tone="moss" />
+            </div>
 
-          <label className="mt-7 block text-sm font-semibold text-ink" htmlFor="stuck">
-            Messy task
-          </label>
-          {starterMessage && (
-            <p className="mt-3 rounded-lg border border-line bg-paper p-3 text-sm font-semibold leading-6 text-ink">
-              Starter loaded: {starterMessage}
+            <div className="mt-7 rounded-lg border border-line/80 bg-paper/70 p-3 sm:p-4">
+              <label
+                className="block text-sm font-semibold text-ink"
+                htmlFor="stuck"
+              >
+                Messy task
+              </label>
+              {starterMessage && (
+                <p className="mt-3 rounded-lg border border-line bg-surface p-3 text-sm font-semibold leading-6 text-ink">
+                  Starter loaded: {starterMessage}
+                </p>
+              )}
+              <textarea
+                id="stuck"
+                value={stuckText}
+                onChange={(event) => onTextChange(event.target.value)}
+                className="console-textarea mt-3 min-h-44 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70"
+                placeholder="I need to reply to this email but I feel ashamed it is late."
+              />
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {starterPrompts.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => onTextChange(prompt)}
+                  className="rounded-full border border-line/80 bg-paper/80 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:text-ink"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              <PrimaryAction
+                onClick={onCreatePacket}
+                disabled={!stuckText.trim()}
+                className="text-lg"
+              >
+                <BrandMark className="h-7 w-7 text-ink" decorative />
+                I'm stuck
+              </PrimaryAction>
+              <button
+                type="button"
+                onClick={onListen}
+                disabled={!speechSupported || isListening}
+                className="inline-flex min-h-14 items-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
+              >
+                <Mic className="h-5 w-5" aria-hidden="true" />
+                {isListening ? "Listening" : "Speak"}
+              </button>
+            </div>
+          </Panel>
+
+          <Panel tone="ink" className="p-5 sm:p-6">
+            <p className="text-sm font-semibold text-paper/70">Rescue engine</p>
+            <p className="mt-4 text-5xl font-semibold text-paper">{activeCount}</p>
+            <p className="mt-3 text-lg leading-7 text-paper/80">
+              Choose one next action. Done enough counts.
             </p>
-          )}
-          <textarea
-            id="stuck"
-            value={stuckText}
-            onChange={(event) => onTextChange(event.target.value)}
-            className="mt-2 min-h-40 w-full resize-y rounded-lg border border-line bg-paper p-4 text-lg leading-8 text-ink"
-            placeholder="I need to reply to this email but I feel ashamed it is late."
-          />
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={onCreatePacket}
-              disabled={!stuckText.trim()}
-              className="inline-flex min-h-14 items-center gap-2 rounded-lg bg-moss px-6 text-lg font-semibold text-white shadow-sm hover:bg-mossDark disabled:cursor-not-allowed disabled:bg-muted"
-            >
-              <LifeBuoy className="h-5 w-5" aria-hidden="true" />
-              I'm stuck
-            </button>
-            <button
-              type="button"
-              onClick={onListen}
-              disabled={!speechSupported || isListening}
-              className="inline-flex min-h-14 items-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink disabled:cursor-not-allowed disabled:text-muted"
-            >
-              <Mic className="h-5 w-5" aria-hidden="true" />
-              {isListening ? "Listening" : "Speak"}
-            </button>
-          </div>
+            <div className="mt-7 space-y-3 text-sm font-medium text-paper/75">
+              <p>Start tiny.</p>
+              <p>Make it ugly.</p>
+              <p>Repair is progress.</p>
+              <p>Exit responsibly.</p>
+            </div>
+          </Panel>
         </div>
+      </Shell>
 
-        <aside className="rounded-lg border border-line bg-ink p-5 text-white shadow-sm sm:p-6">
-          <p className="text-sm font-semibold text-white/70">Rescue engine</p>
-          <p className="mt-4 text-5xl font-semibold">{activeCount}</p>
-          <p className="mt-3 text-lg leading-7 text-white/80">
-            Choose one next action. Done enough counts.
-          </p>
-          <div className="mt-6 space-y-3 text-sm text-white/75">
-            <p>Start tiny.</p>
-            <p>Make it ugly.</p>
-            <p>Repair is progress.</p>
-            <p>Exit responsibly.</p>
-          </div>
-        </aside>
-      </section>
-
-      <section className="mx-auto w-full max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+      <Shell className="pt-3 pb-12">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold uppercase text-moss">Task packets</p>
-            <h2 className="mt-1 text-2xl font-semibold text-ink">Choose one next action.</h2>
+            <p className="text-xs font-semibold uppercase text-moss">Task packets</p>
+            <h2 className="mt-1 text-2xl font-semibold text-ink">
+              Choose one next action.
+            </h2>
           </div>
+          <SignalPill value={`${packets.length} local packets`} />
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">
           {groupedPackets.map(({ status, packets: group }) => (
-            <section key={status} className="rounded-lg border border-line bg-paper p-4">
+            <Panel key={status} tone="paper" className="p-4">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <h3 className="font-semibold text-ink">{statusLabels[status]}</h3>
-                <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
-                  {group.length}
-                </span>
+                <SignalPill value={group.length} />
               </div>
               <div className="space-y-3">
                 {group.length > 0 ? (
@@ -486,17 +531,41 @@ function HomeScreen({
                     />
                   ))
                 ) : (
-                  <p className="rounded-lg border border-dashed border-line bg-surface p-4 text-sm text-muted">
-                    Nothing here right now.
-                  </p>
+                  <EmptyState
+                    title="Nothing here right now."
+                    body="No score. No streak. Just the next rescue."
+                  />
                 )}
               </div>
-            </section>
+            </Panel>
           ))}
         </div>
-      </section>
+      </Shell>
     </main>
   );
+}
+
+function canPersonalizeRepairScript(script: string): boolean {
+  return /\[(Name|specific thing|time\/date|date\/time)\]/.test(script);
+}
+
+function personalizeRepairScript(
+  script: string,
+  details: {
+    recipientName: string;
+    specificThing: string;
+    timeDate: string;
+  }
+): string {
+  return script
+    .split("[Name]")
+    .join(details.recipientName.trim() || "[Name]")
+    .split("[specific thing]")
+    .join(details.specificThing.trim() || "[specific thing]")
+    .split("[time/date]")
+    .join(details.timeDate.trim() || "[time/date]")
+    .split("[date/time]")
+    .join(details.timeDate.trim() || "[date/time]");
 }
 
 function PacketDetail({
@@ -518,14 +587,33 @@ function PacketDetail({
   onIncreaseSupport: (packetId: string) => Promise<RescuePacket | null>;
 }) {
   const [notes, setNotes] = useState(packet.notes);
+  const [showPersonalizer, setShowPersonalizer] = useState(false);
+  const [recipientName, setRecipientName] = useState("");
+  const [specificThing, setSpecificThing] = useState("");
+  const [timeDate, setTimeDate] = useState("");
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setNotes(packet.notes);
   }, [packet.id, packet.notes]);
 
+  useEffect(() => {
+    setShowPersonalizer(false);
+    setRecipientName("");
+    setSpecificThing("");
+    setTimeDate("");
+    setCopyMessage(null);
+  }, [packet.id]);
+
   const moreSupportAvailable =
     increaseSupportLevel(packet.supportLevel) !== packet.supportLevel;
   const confidencePercent = Math.round(packet.blockConfidence * 100);
+  const canPersonalize = canPersonalizeRepairScript(packet.repairScript);
+  const personalizedRepairScript = personalizeRepairScript(packet.repairScript, {
+    recipientName,
+    specificThing,
+    timeDate
+  });
 
   async function chooseMissingItem(missingItem: MissingItemType) {
     await onUpdatePacket(packet.id, {
@@ -548,76 +636,154 @@ function PacketDetail({
     });
   }
 
+  async function copyRepairScript() {
+    try {
+      await navigator.clipboard.writeText(personalizedRepairScript);
+      setCopyMessage("Copied.");
+    } catch {
+      setCopyMessage("Copy unavailable in this browser.");
+    }
+  }
+
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <Shell className="max-w-6xl">
       <button
         type="button"
         onClick={onBack}
-        className="mb-5 inline-flex min-h-11 items-center rounded-lg border border-line bg-surface px-4 text-sm font-semibold text-ink"
+        className="mb-5 inline-flex min-h-11 items-center rounded-lg border border-line bg-surface/90 px-4 text-sm font-semibold text-ink shadow-sm transition hover:border-moss"
       >
         Back to packets
       </button>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold uppercase text-moss">
-                Rescue packet
-              </p>
-              <h1 className="safe-text mt-3 text-3xl font-semibold text-ink sm:text-4xl">
-                {packet.title}
-              </h1>
-              <p className="safe-text mt-3 max-w-3xl text-base leading-7 text-muted">
-                {packet.originalText}
-              </p>
+      <RescueBrief
+        eyebrow="Next physical action"
+        title={packet.firstPhysicalAction}
+        body={
+          <>
+            <span className="font-semibold text-ink">{packet.title}</span>
+            <span className="block">{packet.originalText}</span>
+          </>
+        }
+        action={
+          <PrimaryAction onClick={onStartSprint} className="min-h-12">
+            <Play className="h-5 w-5" aria-hidden="true" />
+            Start rescue sprint
+          </PrimaryAction>
+        }
+      />
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="space-y-5">
+          <Panel>
+            <p className="text-xs font-semibold uppercase text-moss">Rescue packet</p>
+            <h1 className="safe-text mt-3 text-3xl font-semibold text-ink sm:text-4xl">
+              {packet.title}
+            </h1>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <SignalPill label="Task" value={taskTypeLabels[packet.taskType]} />
+              <SignalPill
+                label="Likely block"
+                value={blockLabels[packet.blockType]}
+                tone="moss"
+              />
+              <SignalPill label="Confidence" value={`${confidencePercent}%`} />
+              <SignalPill label="Support" value={supportLabels[packet.supportLevel]} />
+              <SignalPill label="Status" value={statusLabels[packet.status]} tone="clay" />
             </div>
-            <button
-              type="button"
-              onClick={onStartSprint}
-              className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white hover:bg-mossDark"
-            >
-              <Play className="h-5 w-5" aria-hidden="true" />
-              Start rescue sprint
-            </button>
-          </div>
+          </Panel>
 
-          <div className="mt-6 rounded-lg border border-line bg-paper p-5">
-            <p className="text-sm font-semibold text-muted">Next physical action</p>
-            <p className="safe-text mt-2 text-2xl font-semibold leading-9 text-ink">
-              {packet.firstPhysicalAction}
-            </p>
-          </div>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <InfoPanel title="Real task" body={packet.realTask} />
-            <InfoPanel title="Minimum viable progress" body={packet.minimumViableProgress} />
+            <InfoPanel
+              title="Minimum viable progress"
+              body={packet.minimumViableProgress}
+            />
           </div>
 
-          <section className="mt-6">
+          <Panel tone="paper">
             <h2 className="text-xl font-semibold text-ink">10-minute rescue plan</h2>
             <ol className="mt-3 space-y-3">
               {packet.tenMinutePlan.map((step) => (
                 <li
                   key={step}
-                  className="safe-text rounded-lg border border-line bg-paper p-4 leading-7 text-ink"
+                  className="safe-text rounded-lg border border-line bg-surface p-4 leading-7 text-ink"
                 >
                   {step}
                 </li>
               ))}
             </ol>
-          </section>
+          </Panel>
 
-          <section className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-line bg-paper p-4">
-              <h2 className="text-lg font-semibold text-ink">Repair option</h2>
-              <p className="safe-text mt-3 leading-7 text-muted">{packet.repairScript}</p>
-            </div>
+          <section className="grid gap-4 md:grid-cols-2">
+            <ScriptCard
+              title="Repair option"
+              actions={
+                canPersonalize ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPersonalizer((current) => !current)}
+                    className="min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-moss"
+                  >
+                    Personalize script
+                  </button>
+                ) : undefined
+              }
+            >
+              <p>{personalizedRepairScript}</p>
+              {canPersonalize && showPersonalizer && (
+                <div className="mt-4 grid gap-3 rounded-lg border border-line bg-surface p-3">
+                  <label className="text-sm font-semibold text-ink">
+                    Recipient name
+                    <input
+                      value={recipientName}
+                      onChange={(event) => setRecipientName(event.target.value)}
+                      className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                      placeholder="[Name]"
+                    />
+                  </label>
+                  <label className="text-sm font-semibold text-ink">
+                    Specific thing
+                    <input
+                      value={specificThing}
+                      onChange={(event) => setSpecificThing(event.target.value)}
+                      className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                      placeholder="[specific thing]"
+                    />
+                  </label>
+                  <label className="text-sm font-semibold text-ink">
+                    Time/date
+                    <input
+                      value={timeDate}
+                      onChange={(event) => setTimeDate(event.target.value)}
+                      className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                      placeholder="[time/date]"
+                    />
+                  </label>
+                </div>
+              )}
+              {canPersonalize && (
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void copyRepairScript()}
+                    className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-moss"
+                  >
+                    <Clipboard className="h-4 w-4" aria-hidden="true" />
+                    Copy script
+                  </button>
+                  {copyMessage && (
+                    <span className="text-sm font-semibold text-mossDark">
+                      {copyMessage}
+                    </span>
+                  )}
+                </div>
+              )}
+            </ScriptCard>
             <ModePanel mode={packet.rescueMode} />
           </section>
 
-          <section className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-line bg-paper p-4">
+          <section className="grid gap-4 md:grid-cols-2">
+            <Panel tone="paper" className="p-4 sm:p-5">
               <h2 className="text-lg font-semibold text-ink">Unblock</h2>
               <p className="mt-2 text-sm leading-6 text-muted">What is missing?</p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -629,7 +795,7 @@ function PacketDetail({
                     className={`min-h-10 rounded-lg border px-3 text-sm font-semibold ${
                       packet.missingItem === missingItem
                         ? "border-moss bg-moss text-white"
-                        : "border-line bg-surface text-ink"
+                        : "border-line bg-surface text-ink hover:border-moss"
                     }`}
                   >
                     {missingItemLabels[missingItem]}
@@ -639,9 +805,9 @@ function PacketDetail({
               <p className="safe-text mt-4 text-sm leading-6 text-muted">
                 Current: {missingItemLabels[packet.missingItem]}
               </p>
-            </div>
+            </Panel>
 
-            <div className="rounded-lg border border-line bg-paper p-4">
+            <Panel tone="paper" className="p-4 sm:p-5">
               <h2 className="text-lg font-semibold text-ink">Exit responsibly</h2>
               <p className="mt-2 text-sm leading-6 text-muted">
                 Renegotiate, defer, delegate, or abandon clearly.
@@ -655,7 +821,7 @@ function PacketDetail({
                     className={`min-h-10 rounded-lg border px-3 text-left text-sm font-semibold ${
                       packet.exitStatus === exitStatus
                         ? "border-clay bg-clay text-white"
-                        : "border-line bg-surface text-ink"
+                        : "border-line bg-surface text-ink hover:border-clay"
                     }`}
                   >
                     {exitStatusLabels[exitStatus]}
@@ -665,10 +831,10 @@ function PacketDetail({
               <p className="safe-text mt-4 text-sm leading-6 text-muted">
                 {packet.exitScript}
               </p>
-            </div>
+            </Panel>
           </section>
 
-          <section className="mt-6">
+          <Panel tone="paper">
             <label className="text-sm font-semibold text-ink" htmlFor="packet-notes">
               Notes
             </label>
@@ -677,14 +843,14 @@ function PacketDetail({
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               onBlur={() => void onUpdatePacket(packet.id, { notes })}
-              className="mt-2 min-h-28 w-full resize-y rounded-lg border border-line bg-paper p-3 text-base leading-7 text-ink"
+              className="mt-2 min-h-28 w-full resize-y rounded-lg border border-line bg-surface p-3 text-base leading-7 text-ink"
               placeholder="What moved? What is missing?"
             />
-          </section>
-        </section>
+          </Panel>
+        </div>
 
         <aside className="space-y-4">
-          <section className="rounded-lg border border-line bg-surface p-4 shadow-sm">
+          <Panel>
             <h2 className="text-lg font-semibold text-ink">Signal</h2>
             <dl className="mt-4 grid grid-cols-2 gap-3">
               <Estimate label="Urgency" value={packet.urgency} />
@@ -700,9 +866,9 @@ function PacketDetail({
               <Badge label="Support" value={supportLabels[packet.supportLevel]} />
               <Badge label="Status" value={statusLabels[packet.status]} />
             </div>
-          </section>
+          </Panel>
 
-          <section className="rounded-lg border border-line bg-surface p-4 shadow-sm">
+          <Panel>
             <h2 className="text-lg font-semibold text-ink">Packet controls</h2>
             <label className="mt-4 block text-sm font-semibold text-ink" htmlFor="status">
               Status
@@ -754,7 +920,7 @@ function PacketDetail({
                 type="button"
                 onClick={() => void onIncreaseSupport(packet.id)}
                 disabled={!moreSupportAvailable}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink disabled:cursor-not-allowed disabled:text-muted"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
               >
                 <Sparkles className="h-5 w-5" aria-hidden="true" />
                 More scaffold
@@ -762,7 +928,7 @@ function PacketDetail({
               <button
                 type="button"
                 onClick={() => void onChangeStatus(packet.id, "done_enough")}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink transition hover:border-moss"
               >
                 <Check className="h-5 w-5" aria-hidden="true" />
                 Done enough
@@ -770,16 +936,16 @@ function PacketDetail({
               <button
                 type="button"
                 onClick={() => void chooseExitStatus("renegotiate")}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 font-semibold text-ink transition hover:border-clay"
               >
                 <Archive className="h-5 w-5" aria-hidden="true" />
                 Exit responsibly
               </button>
             </div>
-          </section>
+          </Panel>
         </aside>
       </div>
-    </main>
+    </Shell>
   );
 }
 
@@ -845,16 +1011,12 @@ function ReentryScreen({
   const reentryList = generateSmartReentryList(packets);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
-        <p className="text-sm font-semibold uppercase text-moss">Re-entry</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">
-          No explanation needed. Let's rescue what matters.
-        </h1>
-        <p className="mt-3 text-lg leading-8 text-muted">
-          No explanation needed. Choose what is still possible.
-        </p>
-      </section>
+    <Shell className="max-w-6xl py-8">
+      <RescueBrief
+        eyebrow="Re-entry"
+        title="No explanation needed. Let's rescue what matters."
+        body="No explanation needed. Choose what is still possible."
+      />
 
       <section className="mt-6">
         <h2 className="text-2xl font-semibold text-ink">Most worth rescuing</h2>
@@ -866,14 +1028,16 @@ function ReentryScreen({
 
               return (
                 <article key={packet.id} className="space-y-3">
-                  <div className="flex items-center justify-between gap-3 text-sm">
-                    <span className="font-semibold text-moss">
-                      {reentryStateLabels[reentryState]}
-                    </span>
-                    <span className="text-muted">
-                      {packet.reentryHistory.length} re-entry action
-                      {packet.reentryHistory.length === 1 ? "" : "s"}
-                    </span>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <SignalPill
+                      value={reentryStateLabels[reentryState]}
+                      tone="moss"
+                    />
+                    <SignalPill
+                      value={`${packet.reentryHistory.length} re-entry action${
+                        packet.reentryHistory.length === 1 ? "" : "s"
+                      }`}
+                    />
                   </div>
                   <PacketCard packet={packet} onOpen={onOpenPacket} />
                   <div className="grid gap-2">
@@ -884,7 +1048,7 @@ function ReentryScreen({
                         onClick={() =>
                           void onReentryAction(packet, action.actionType)
                         }
-                        className="rounded-lg border border-line bg-surface p-3 text-left hover:border-moss"
+                        className="rounded-lg border border-line bg-surface/90 p-3 text-left transition hover:border-moss hover:shadow-sm"
                       >
                         <span className="block font-semibold text-ink">
                           {action.label}
@@ -899,13 +1063,14 @@ function ReentryScreen({
               );
             })
           ) : (
-            <p className="rounded-lg border border-line bg-surface p-5 text-muted">
-              Nothing needs re-entry right now.
-            </p>
+            <EmptyState
+              title="Nothing needs re-entry right now."
+              body="Still possible is the only standard here."
+            />
           )}
         </div>
       </section>
-    </main>
+    </Shell>
   );
 }
 
@@ -921,16 +1086,12 @@ function PatternScreen({
   const patternMap = generatePatternMap(packets, meta);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
-        <p className="text-sm font-semibold uppercase text-moss">Pattern map</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">
-          What helps you restart?
-        </h1>
-        <p className="mt-3 text-lg leading-8 text-muted">
-          Patterns only. No score. No streaks.
-        </p>
-      </section>
+    <Shell className="max-w-6xl py-8">
+      <RescueBrief
+        eyebrow="Pattern map"
+        title="What helps you restart?"
+        body="Patterns only. No score. No streaks. Use what is useful and ignore the rest."
+      />
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Metric label="Successful starts" value={patternMap.successfulStarts} />
@@ -940,10 +1101,10 @@ function PatternScreen({
         <Metric label="Support faded" value={patternMap.supportFadingEvents} />
       </section>
 
-      <section className="mt-6 rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-6">
+      <Panel className="mt-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold uppercase text-moss">
+            <p className="text-xs font-semibold uppercase text-moss">
               Suggested next moves
             </p>
             <h2 className="mt-1 text-2xl font-semibold text-ink">
@@ -972,12 +1133,13 @@ function PatternScreen({
               </button>
             ))
           ) : (
-            <p className="rounded-lg border border-dashed border-line bg-paper p-4 text-muted">
-              A few rescues will turn this into starter suggestions.
-            </p>
+            <EmptyState
+              title="A few rescues will turn this into starter suggestions."
+              body="Nothing here is a grade."
+            />
           )}
         </div>
-      </section>
+      </Panel>
 
       <section className="mt-6 grid gap-5 lg:grid-cols-2">
         <PatternList
@@ -1040,13 +1202,13 @@ function PatternScreen({
           }))}
         />
       </section>
-    </main>
+    </Shell>
   );
 }
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-line bg-surface p-4 shadow-sm">
+    <div className="rounded-lg border border-line/80 bg-surface/90 p-4 shadow-sm">
       <p className="text-sm font-semibold text-muted">{label}</p>
       <p className="mt-2 text-3xl font-semibold text-ink">{value}</p>
     </div>
@@ -1061,14 +1223,14 @@ function PatternList({
   items: Array<{ label: string; count: number; detail?: string }>;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-surface p-5 shadow-sm">
+    <Panel className="p-5">
       <h2 className="text-xl font-semibold text-ink">{title}</h2>
       <div className="mt-4 space-y-3">
         {items.length > 0 ? (
           items.map((item) => (
             <div
               key={`${item.label}-${item.count}`}
-              className="flex items-center justify-between gap-4 rounded-lg border border-line bg-paper p-3"
+              className="flex items-center justify-between gap-4 rounded-lg border border-line bg-paper/80 p-3"
             >
               <span className="safe-text font-medium text-ink">{item.label}</span>
               <span className="text-right">
@@ -1084,12 +1246,10 @@ function PatternList({
             </div>
           ))
         ) : (
-          <p className="rounded-lg border border-dashed border-line bg-paper p-4 text-muted">
-            More rescues will fill this in.
-          </p>
+          <EmptyState title="More rescues will fill this in." />
         )}
       </div>
-    </section>
+    </Panel>
   );
 }
 
@@ -1155,25 +1315,19 @@ function SettingsScreen({
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <section className="rounded-lg border border-line bg-surface p-5 shadow-sm sm:p-7">
-        <p className="text-sm font-semibold uppercase text-moss">Settings</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">
-          Local data
-        </h1>
-        <p className="mt-3 text-lg leading-8 text-muted">
-          Stored in this browser using IndexedDB. No cloud account is required.
-        </p>
+    <Shell className="max-w-4xl py-8">
+      <RescueBrief
+        eyebrow="Settings"
+        title="Local data"
+        body="Stored in this browser using IndexedDB. No cloud account is required."
+      />
 
+      <Panel className="mt-6">
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => void handleExport()}
-            className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg bg-moss px-5 text-lg font-semibold text-white hover:bg-mossDark"
-          >
+          <PrimaryAction onClick={() => void handleExport()} className="text-lg">
             <Download className="h-5 w-5" aria-hidden="true" />
             Export JSON
-          </button>
+          </PrimaryAction>
 
           <label className="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line bg-paper px-5 text-lg font-semibold text-ink">
             <Upload className="h-5 w-5" aria-hidden="true" />
@@ -1187,7 +1341,7 @@ function SettingsScreen({
           </label>
         </div>
 
-        <div className="mt-6 rounded-lg border border-line bg-paper p-4">
+        <div className="mt-6 rounded-lg border border-line bg-paper/80 p-4">
           <div className="flex items-center gap-3">
             <FileJson className="h-5 w-5 text-moss" aria-hidden="true" />
             <p className="font-semibold text-ink">{packetCount} local packets</p>
@@ -1197,14 +1351,16 @@ function SettingsScreen({
           </p>
         </div>
 
-        <div className="mt-6 rounded-lg border border-line bg-paper p-4">
+        <div className="mt-6 rounded-lg border border-line bg-paper/80 p-4">
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-1 h-5 w-5 flex-none text-moss" aria-hidden="true" />
             <div>
               <h2 className="text-lg font-semibold text-ink">LLM adapter</h2>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Scaffold uses local rules in this MVP. Task text can only leave this
-                browser through an external LLM adapter after explicit consent.
+                Scaffold uses local rules by default. Deep Rescue is the future
+                BYOK path: the user supplies their own API key, the key stays local,
+                task text leaves the browser only after explicit consent, and exports
+                never include API keys.
               </p>
             </div>
           </div>
@@ -1226,6 +1382,9 @@ function SettingsScreen({
               <span className="mt-1 block text-sm leading-6 text-muted">
                 Current mode: {meta.llmConsent.providerLabel}
               </span>
+              <span className="mt-1 block text-sm leading-6 text-muted">
+                No external provider is connected in this MVP.
+              </span>
             </span>
           </label>
         </div>
@@ -1235,7 +1394,7 @@ function SettingsScreen({
             {message}
           </p>
         )}
-      </section>
-    </main>
+      </Panel>
+    </Shell>
   );
 }

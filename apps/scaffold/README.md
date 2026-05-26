@@ -18,6 +18,7 @@ Core slogan: **Not reminders. Rescue.**
 - Shows a local pattern map without shame, streaks, or productivity scores.
 - Exports and imports all local data as JSON.
 - Includes an explicit-consent adapter boundary for any future external LLM use.
+- Uses a premium Rescue Frame visual system built around a minimalist scaffold/S mark.
 
 ## What It Is Not
 
@@ -76,6 +77,8 @@ src/
   hooks/
     useScaffoldData.ts   React data operations around local persistence
   components/
+    BrandMark.tsx       Rescue Frame mark
+    design.tsx          Shell, Panel, PrimaryAction, SignalPill, RescueBrief, ScriptCard
     PacketCard.tsx       Reusable task packet cards
     SprintMode.tsx       10-minute rescue sprint
   App.tsx                Screen orchestration and product UI
@@ -89,7 +92,7 @@ Scaffold stores packets in the browser using IndexedDB via Dexie. The MVP has no
 
 Do not introduce cloud storage, sync, calendar access, email access, analytics, or passive signals without explicit user consent.
 
-External LLM processing is off by default. The settings screen can record local consent for a future adapter, but this MVP does not connect to a provider or send task text outside the browser.
+External LLM processing is off by default. The settings screen can record local consent for a future BYOK adapter, but this MVP does not connect to a provider or send task text outside the browser. Any future key should stay local, task text should leave only after an explicit Deep Rescue action, and exports must never include API keys.
 
 ## Future Roadmap
 
