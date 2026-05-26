@@ -30,7 +30,7 @@ export const ROUTE_LIBRARY = {
   },
   calendar: {
     title: "Map what is coming",
-    reason: "Due dates can be hard to hold in working memory, especially across a whole trimester.",
+    reason: "Due dates can be hard to hold in working memory, especially across a whole study period.",
     action: "Save one due date, then let Northstar show the next few weeks in order.",
     followUp: "After the date is visible, move into Plan for the first task that needs attention."
   },

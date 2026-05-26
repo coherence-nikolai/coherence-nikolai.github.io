@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260526d";
+} from "./data/content.js?v=20260526e";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260526d";
+} from "./state.js?v=20260526e";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -272,7 +272,26 @@ const CALENDAR_STATUS_LABELS = {
   done: "Done"
 };
 
+const CALENDAR_PERIOD_TYPES = {
+  trimester: {
+    label: "Trimester",
+    lower: "trimester",
+    defaultName: "My trimester"
+  },
+  semester: {
+    label: "Semester",
+    lower: "semester",
+    defaultName: "My semester"
+  },
+  term: {
+    label: "Term",
+    lower: "term",
+    defaultName: "My term"
+  }
+};
+
 const defaultCalendarState = {
+  termType: "trimester",
   termName: "",
   termStart: "",
   termEnd: "",
@@ -360,6 +379,7 @@ function normalizeCalendarState(rawState) {
     : [];
 
   return {
+    termType: CALENDAR_PERIOD_TYPES[raw.termType] ? raw.termType : defaultCalendarState.termType,
     termName: String(raw.termName || ""),
     termStart: normalizeDateInput(raw.termStart),
     termEnd: normalizeDateInput(raw.termEnd),
@@ -1284,9 +1304,7 @@ function setInitialFormValues() {
   $("#taskDueInput").value = state.planner.dueDate;
   $("#taskEnergySelect").value = state.planner.energy;
 
-  $("#termNameInput").value = state.calendar.termName;
-  $("#termStartInput").value = state.calendar.termStart;
-  $("#termEndInput").value = state.calendar.termEnd;
+  updateCalendarTermInputs();
 
   $("#regulateSignalSelect").value = state.regulate.signal;
   $("#regulateAnchorSelect").value = state.regulate.anchor;
@@ -2013,6 +2031,7 @@ function captureForms() {
 
   state.calendar = {
     ...state.calendar,
+    termType: $("#termTypeSelect").value,
     termName: $("#termNameInput").value.trim(),
     termStart: normalizeDateInput($("#termStartInput").value),
     termEnd: normalizeDateInput($("#termEndInput").value)
@@ -2715,6 +2734,10 @@ function calendarRangeWeeks(range) {
   return Math.max(1, Math.ceil(inclusiveDays / 7));
 }
 
+function calendarPeriodType() {
+  return CALENDAR_PERIOD_TYPES[state.calendar.termType] || CALENDAR_PERIOD_TYPES.trimester;
+}
+
 function sortCalendarItems(items = state.calendar.items) {
   return [...items].sort((a, b) => {
     if (a.status === "done" && b.status !== "done") return 1;
@@ -2727,7 +2750,7 @@ function sortCalendarItems(items = state.calendar.items) {
 }
 
 function calendarTermLabel() {
-  const name = state.calendar.termName || "My trimester";
+  const name = state.calendar.termName || calendarPeriodType().defaultName;
   const start = state.calendar.termStart ? formatCalendarDate(state.calendar.termStart) : "";
   const end = state.calendar.termEnd ? formatCalendarDate(state.calendar.termEnd) : "";
   if (start && end) return `${name} · ${start} to ${end}`;
@@ -2749,9 +2772,11 @@ function saveCalendar() {
 }
 
 function updateCalendarTermInputs() {
+  const termTypeSelect = $("#termTypeSelect");
   const termNameInput = $("#termNameInput");
   const termStartInput = $("#termStartInput");
   const termEndInput = $("#termEndInput");
+  if (termTypeSelect) termTypeSelect.value = state.calendar.termType;
   if (termNameInput) termNameInput.value = state.calendar.termName;
   if (termStartInput) termStartInput.value = state.calendar.termStart;
   if (termEndInput) termEndInput.value = state.calendar.termEnd;
@@ -2793,6 +2818,7 @@ function buildCalendarResult() {
   const nextDue = active[0] || null;
 
   const result = {
+    termType: state.calendar.termType,
     termName: state.calendar.termName,
     termLabel: calendarTermLabel(),
     termStart: state.calendar.termStart,
@@ -2817,9 +2843,9 @@ function buildCalendarResult() {
 function calendarSummaryText() {
   const sorted = sortCalendarItems();
   const lines = [
-    "NORTHSTAR TERM PLAN",
+    "NORTHSTAR STUDY PERIOD PLAN",
     "",
-    `Term: ${calendarTermLabel()}`,
+    `${calendarPeriodType().label}: ${calendarTermLabel()}`,
     `Saved due dates: ${state.calendar.items.length}`,
     ""
   ];
@@ -3042,8 +3068,13 @@ function renderCalendarBoard() {
   }
 
   const summary = $("#calendarBoardSummary");
+  const mapEyebrow = $("#calendarMapEyebrow");
+  const periodType = calendarPeriodType();
+  if (mapEyebrow) {
+    mapEyebrow.textContent = `${periodType.label} map`;
+  }
   if (summary) {
-    const starter = range.isStarter ? "Starter map" : "Term map";
+    const starter = range.isStarter ? `Starter ${periodType.lower} map` : `${periodType.label} map`;
     summary.textContent = `${starter}: ${calendarRangeWeeks(range)} weeks, ${formatCalendarDate(calendarDateKey(range.start))} to ${formatCalendarDate(calendarDateKey(range.end))}.`;
   }
 
@@ -4420,7 +4451,7 @@ function bindEvents() {
 
   document.addEventListener("input", (event) => {
     captureForms();
-    if (event.target.matches("#termNameInput, #termStartInput, #termEndInput")) {
+    if (event.target.matches("#termTypeSelect, #termNameInput, #termStartInput, #termEndInput")) {
       renderCalendar();
     }
     if (event.target.matches("#focusIntentionInput, #focusReturnCueInput")) {
