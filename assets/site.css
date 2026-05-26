@@ -774,6 +774,98 @@ h3 {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.scaffold-story {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(232, 215, 178, 0.13), transparent 24rem),
+    radial-gradient(circle at 100% 80%, rgba(134, 189, 180, 0.12), transparent 20rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.046), rgba(255, 255, 255, 0.016));
+}
+
+.scaffold-home-mark {
+  background:
+    radial-gradient(circle at 72% 18%, rgba(242, 234, 223, 0.32), transparent 42%),
+    radial-gradient(circle at 10% 100%, rgba(134, 189, 180, 0.28), transparent 60%),
+    linear-gradient(145deg, #1d3a34 0%, #27382f 58%, #5d4c38 100%);
+}
+
+.scaffold-frame {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  min-height: 100%;
+  padding: 22px;
+  border: 1px solid rgba(232, 215, 178, 0.16);
+  border-radius: 30px;
+  background:
+    linear-gradient(160deg, rgba(10, 15, 14, 0.92), rgba(24, 21, 17, 0.86)),
+    rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 1px 0 rgba(242, 234, 223, 0.08);
+}
+
+.scaffold-frame-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 6px;
+  color: rgba(242, 234, 223, 0.56);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.scaffold-packet {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid rgba(232, 215, 178, 0.12);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.036), rgba(255, 255, 255, 0.014)),
+    rgba(255, 255, 255, 0.01);
+}
+
+.scaffold-packet.featured {
+  border-color: rgba(134, 189, 180, 0.24);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(134, 189, 180, 0.2), transparent 14rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+}
+
+.scaffold-packet strong {
+  color: var(--bone);
+  font-family: var(--display);
+  font-size: clamp(1.45rem, 2.8vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.scaffold-packet p {
+  margin: 0;
+  color: rgba(242, 234, 223, 0.64);
+  font-size: 0.96rem;
+  line-height: 1.62;
+}
+
+.scaffold-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.scaffold-chip-row span {
+  padding: 10px 14px;
+  border: 1px solid rgba(232, 215, 178, 0.12);
+  border-radius: 999px;
+  color: rgba(242, 234, 223, 0.7);
+  font-size: 0.84rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
 @keyframes glow-drift {
   0%, 100% {
     transform: translate3d(0, 0, 0) rotate(-8deg);
