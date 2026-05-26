@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260526a";
+} from "./data/content.js?v=20260526b";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260526a";
+} from "./state.js?v=20260526b";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -2616,6 +2616,29 @@ function parseCalendarDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function calendarDateKey(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function monthStart(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1, 12, 0, 0, 0);
+}
+
+function addCalendarMonths(date, count) {
+  return new Date(date.getFullYear(), date.getMonth() + count, 1, 12, 0, 0, 0);
+}
+
+function formatCalendarMonth(date) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "long",
+    year: "numeric"
+  }).format(date);
+}
+
 function formatCalendarDate(value) {
   const date = parseCalendarDate(value);
   if (!date) return "No date";
@@ -2905,9 +2928,138 @@ function renderCalendarTimeline() {
   }).join("");
 }
 
+function calendarVisualRange(items) {
+  const termStart = parseCalendarDate(state.calendar.termStart);
+  const termEnd = parseCalendarDate(state.calendar.termEnd);
+  const dueDates = items
+    .map((item) => parseCalendarDate(item.dueDate))
+    .filter(Boolean)
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  if (termStart && termEnd && termStart <= termEnd) {
+    return {
+      start: monthStart(termStart),
+      end: monthStart(termEnd)
+    };
+  }
+
+  if (dueDates.length) {
+    return {
+      start: monthStart(dueDates[0]),
+      end: monthStart(dueDates[dueDates.length - 1])
+    };
+  }
+
+  const now = new Date();
+  return {
+    start: monthStart(now),
+    end: addCalendarMonths(monthStart(now), 1)
+  };
+}
+
+function calendarItemsByDate(items) {
+  return items.reduce((map, item) => {
+    const key = item.dueDate;
+    if (!key) return map;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(item);
+    return map;
+  }, new Map());
+}
+
+function renderCalendarBoard() {
+  const board = $("#calendarBoard");
+  if (!board) return;
+
+  const items = sortCalendarItems().filter((item) => item.dueDate);
+  if (!items.length && !state.calendar.termStart && !state.calendar.termEnd) {
+    board.innerHTML = `
+      <article class="calendar-board-empty">
+        <strong>Add one due date</strong>
+        <span>The visual calendar will appear here.</span>
+      </article>
+    `;
+    return;
+  }
+
+  const range = calendarVisualRange(items);
+  const byDate = calendarItemsByDate(items);
+  const todayKey = calendarDateKey(new Date());
+  const months = [];
+  let cursor = range.start;
+  let guard = 0;
+
+  while (cursor <= range.end && guard < 8) {
+    months.push(cursor);
+    cursor = addCalendarMonths(cursor, 1);
+    guard += 1;
+  }
+
+  board.innerHTML = months.map((monthDate) => {
+    const firstDay = monthStart(monthDate);
+    const daysInMonth = new Date(firstDay.getFullYear(), firstDay.getMonth() + 1, 0, 12).getDate();
+    const leadingBlanks = (firstDay.getDay() + 6) % 7;
+    const monthItems = items.filter((item) => {
+      const due = parseCalendarDate(item.dueDate);
+      return due && due.getFullYear() === firstDay.getFullYear() && due.getMonth() === firstDay.getMonth();
+    });
+
+    const cells = [
+      ...Array.from({ length: leadingBlanks }, (_, index) => `<span class="calendar-day is-blank" aria-hidden="true" data-blank="${index}"></span>`),
+      ...Array.from({ length: daysInMonth }, (_, dayIndex) => {
+        const date = new Date(firstDay.getFullYear(), firstDay.getMonth(), dayIndex + 1, 12);
+        const key = calendarDateKey(date);
+        const dayItems = byDate.get(key) || [];
+        const visibleItems = dayItems.slice(0, 3);
+        return `
+          <article class="calendar-day${key === todayKey ? " is-today" : ""}${dayItems.length ? " has-due" : ""}">
+            <span class="calendar-day-number">${dayIndex + 1}</span>
+            <div class="calendar-day-items">
+              ${visibleItems.map((item) => `
+                <button
+                  class="calendar-due-chip${item.status === "done" ? " is-done" : ""}"
+                  type="button"
+                  data-calendar-edit="${escapeHtml(item.id)}"
+                  data-calendar-type="${escapeHtml(item.type)}"
+                  title="${escapeHtml(`${item.title} · ${CALENDAR_ITEM_TYPES[item.type]}`)}"
+                >
+                  <span>${escapeHtml(item.title)}</span>
+                </button>
+              `).join("")}
+              ${dayItems.length > visibleItems.length ? `<span class="calendar-more-chip">+${dayItems.length - visibleItems.length} more</span>` : ""}
+            </div>
+          </article>
+        `;
+      })
+    ];
+
+    return `
+      <section class="calendar-month" aria-label="${escapeHtml(formatCalendarMonth(firstDay))}">
+        <div class="calendar-month-head">
+          <h4>${escapeHtml(formatCalendarMonth(firstDay))}</h4>
+          <span>${escapeHtml(monthItems.length ? `${monthItems.length} due` : "No due dates")}</span>
+        </div>
+        <div class="calendar-weekdays" aria-hidden="true">
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+          <span>Sun</span>
+        </div>
+        <div class="calendar-month-grid">
+          ${cells.join("")}
+        </div>
+      </section>
+    `;
+  }).join("");
+}
+
 function renderCalendar() {
   saveCalendar();
   renderCalendarTimeline();
+  renderCalendarBoard();
 
   const output = $("#calendarOutput");
   if (!output) return null;
