@@ -10,6 +10,7 @@ This project is a local-first ADHD executive-function scaffold. It is a rescue e
 - Every packet must identify a next physical action.
 - Support the action, not avoidance.
 - Repair is progress. Help users repair missed obligations instead of hiding them.
+- Repair must be contextual. Do not generate an email-style repair script unless the task involves another person, lateness, appointment, clarification, help, scope, apology, or extension. If no repair is needed yet, say so and return the user to the first physical action.
 - Do not make clinical claims or imply the app diagnoses or treats ADHD.
 - Keep privacy local-first. Do not introduce cloud storage, sync, analytics, calendar access, email access, or passive signals without explicit user consent.
 

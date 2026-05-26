@@ -816,7 +816,19 @@ export function generateRepairScript(
     return "Hi [Name], I'm sorry for the delay. I'm working on this now and can send you [specific thing] by [time/date]. Thanks for your patience.";
   }
 
-  if (includesAny(normalized, ["extension", "more time", "deadline", "due"])) {
+  if (
+    includesAny(normalized, [
+      "extension",
+      "more time",
+      "need more time",
+      "late submission",
+      "missed deadline",
+      "can't finish by",
+      "cannot finish by"
+    ]) ||
+    ((taskType === "essay" || taskType === "study") &&
+      includesAny(normalized, ["late", "overdue"]))
+  ) {
     return "Hi [Name], I'm sorry for the late notice. I need a little more time to finish [specific thing]. Could I send it by [date/time]?";
   }
 
@@ -851,7 +863,11 @@ export function generateRepairScript(
     return "Hi [Name], I'm sorry for the delay. I'm working on this now and can send you [specific thing] by [time/date]. Thanks for your patience.";
   }
 
-  return "Hi [Name], thanks for your patience. I can take the next step on [specific thing] by [time/date], or I can suggest a smaller option if that works better.";
+  if (taskType === "essay" || taskType === "study") {
+    return "No repair needed yet. Start the assignment first: open the brief or document, paste the question, and write one rough bullet. If it is already late, switch to an extension request.";
+  }
+
+  return "No repair needed yet. Choose the first physical action. If another person is waiting on this, send a brief update with what you can do and when.";
 }
 
 export function inferExitStatus(input: string): ExitResponsibilityStatus {

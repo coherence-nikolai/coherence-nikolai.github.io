@@ -610,7 +610,7 @@ function PacketDetail({
 
           <section className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="rounded-lg border border-line bg-paper p-4">
-              <h2 className="text-lg font-semibold text-ink">Repair script</h2>
+              <h2 className="text-lg font-semibold text-ink">Repair option</h2>
               <p className="safe-text mt-3 leading-7 text-muted">{packet.repairScript}</p>
             </div>
             <ModePanel mode={packet.rescueMode} />

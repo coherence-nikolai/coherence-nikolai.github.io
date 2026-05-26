@@ -121,6 +121,31 @@ describe("fixture-based rescue generation", () => {
     );
   });
 
+  it("does not generate an email-style repair script when no repair is needed yet", () => {
+    const script = generateRepairScript(
+      "I need to start my assignment",
+      "ambiguous_start",
+      "study"
+    );
+    const packet = generateRescuePacket("I need to start my assignment");
+
+    expect(script).toContain("No repair needed yet");
+    expect(script).not.toContain("Hi [Name]");
+    expect(packet.repairScript).toContain("No repair needed yet");
+    expect(packet.repairScript).not.toContain("Hi [Name]");
+  });
+
+  it("does not treat a normal due date as a repair request", () => {
+    const script = generateRepairScript(
+      "I have an essay due and I don't know where to start.",
+      "ambiguous_start",
+      "essay"
+    );
+
+    expect(script).toContain("No repair needed yet");
+    expect(script).not.toContain("Could I send it by");
+  });
+
   it("infers and writes exit responsibly scripts", () => {
     expect(inferExitStatus("I need to delegate this to someone else")).toBe("delegate");
     expect(
