@@ -28,6 +28,12 @@ export const ROUTE_LIBRARY = {
     action: "Turn the task into one visible first step and a short micro-plan.",
     followUp: "If the wording of the assignment is part of the problem, switch to Unpack."
   },
+  calendar: {
+    title: "Map what is coming",
+    reason: "Due dates can be hard to hold in working memory, especially across a whole trimester.",
+    action: "Save one due date, then let Northstar show the next few weeks in order.",
+    followUp: "After the date is visible, move into Plan for the first task that needs attention."
+  },
   focus: {
     title: "Use a calm timer",
     reason: "When time feels slippery, a visible timer can make starting and stopping easier.",

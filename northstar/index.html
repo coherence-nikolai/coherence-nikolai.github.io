@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260523e">
-  <link rel="icon" href="./icon.svg?v=20260523e" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260523e">
-  <link rel="stylesheet" href="./styles.css?v=20260523e">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260526a">
+  <link rel="icon" href="./icon.svg?v=20260526a" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260526a">
+  <link rel="stylesheet" href="./styles.css?v=20260526a">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260523e" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260526a" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -42,6 +42,7 @@
         <button class="nav-link is-active" id="nav-dashboard" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
         <button class="nav-link" id="nav-regulate" role="tab" aria-selected="false" aria-controls="panel-regulate" data-panel-target="regulate">Regulate</button>
         <button class="nav-link" id="nav-planner" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
+        <button class="nav-link" id="nav-calendar" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel-target="calendar">Calendar</button>
         <button class="nav-link" id="nav-focus" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
         <button class="nav-link" id="nav-unpack" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
         <button class="nav-link" id="nav-notes" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
@@ -66,7 +67,7 @@
           </div>
           <p class="microcopy export-status" id="snapshotExportStatus" aria-live="polite"></p>
           <div class="mini-output" id="snapshotPreview">
-            Your snapshot will appear here after you use Regulate, Plan, Focus, Unpack, Notes, or Profile.
+            Your snapshot will appear here after you use Regulate, Plan, Calendar, Focus, Unpack, Notes, or Profile.
           </div>
         </div>
       </details>
@@ -92,7 +93,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260523e" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260526a" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -188,6 +189,7 @@
         <button class="nav-link is-active" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-regulate" data-panel-target="regulate">Regulate</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel-target="calendar">Calendar</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
         <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
@@ -357,7 +359,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260523e" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260526a" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -461,7 +463,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260523e" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260526a" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -548,6 +550,11 @@
                 <span class="path-kicker">Start a task</span>
                 <strong>Make the first step visible</strong>
                 <span>Best when you know the task but cannot get going.</span>
+              </button>
+              <button class="path-card" type="button" data-route-target="calendar">
+                <span class="path-kicker">Map the term</span>
+                <strong>See what is coming</strong>
+                <span>Best when due dates, weeks, or trimester shape feel hard to hold.</span>
               </button>
               <button class="path-card" type="button" data-route-target="focus">
                 <span class="path-kicker">Use a timer</span>
@@ -799,6 +806,152 @@
             </div>
             <div id="plannerOutput" class="rich-output empty">
               Your first step will appear here.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-calendar" role="tabpanel" aria-labelledby="nav-calendar">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Calendar</p>
+            <h2>Map the trimester</h2>
+            <p class="panel-copy">
+              Save due dates and see what is coming without holding it all in your head.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid two-up calendar-grid">
+          <article class="card calendar-start-card">
+            <div class="section-heading">
+              <p class="eyebrow">Start here</p>
+              <h3>Add one due date</h3>
+              <p class="microcopy">You do not need the whole term. One real date is enough to begin.</p>
+            </div>
+
+            <div class="calendar-term-card">
+              <div class="section-heading">
+                <p class="eyebrow">Term map</p>
+                <h3>Name the trimester</h3>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  <span>Trimester name</span>
+                  <input id="termNameInput" type="text" placeholder="e.g. Trimester 2, 2026">
+                </label>
+                <label class="field">
+                  <span>Start date</span>
+                  <input id="termStartInput" type="date">
+                </label>
+                <label class="field">
+                  <span>End date</span>
+                  <input id="termEndInput" type="date">
+                </label>
+              </div>
+            </div>
+
+            <input id="calendarEditId" type="hidden">
+
+            <label class="field">
+              <span>What is due?</span>
+              <input
+                id="calendarTitleInput"
+                type="text"
+                placeholder="e.g. Psychology reflection, biology quiz, placement form"
+              >
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Subject or course</span>
+                <input id="calendarCourseInput" type="text" placeholder="Optional">
+              </label>
+
+              <label class="field">
+                <span>Due date</span>
+                <input id="calendarDueInput" type="date">
+              </label>
+            </div>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Kind of task</span>
+                <select id="calendarTypeSelect">
+                  <option value="assignment">Assignment</option>
+                  <option value="quiz">Quiz or test</option>
+                  <option value="exam">Exam</option>
+                  <option value="presentation">Presentation</option>
+                  <option value="reading">Reading or weekly prep</option>
+                  <option value="placement">Placement or practical</option>
+                  <option value="admin">Admin task</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Weighting</span>
+                <input id="calendarWeightInput" type="text" placeholder="Optional, e.g. 30%">
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Small first move</span>
+              <input
+                id="calendarFirstStepInput"
+                type="text"
+                placeholder="e.g. open the brief, make a title page, email one question"
+              >
+            </label>
+
+            <details class="disclosure calendar-extra">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">Optional detail</p>
+                <h3>Add notes if useful</h3>
+                <p class="microcopy">Keep this short. It is a cue, not a second assignment.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div class="field-row">
+                  <label class="field">
+                    <span>Status</span>
+                    <select id="calendarStatusSelect">
+                      <option value="not-started">Not started</option>
+                      <option value="underway">Underway</option>
+                      <option value="waiting">Waiting on something</option>
+                      <option value="done">Done</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>Notes</span>
+                    <input id="calendarNotesInput" type="text" placeholder="Optional support notes, links, or reminders">
+                  </label>
+                </div>
+              </div>
+            </details>
+
+            <div class="button-row calendar-actions">
+              <button class="button primary" id="saveCalendarItemBtn" type="button">Save due date</button>
+              <button class="button subtle" id="clearCalendarFormBtn" type="button">Clear form</button>
+            </div>
+            <p class="microcopy save-status" id="calendarSaveStatus" aria-live="polite"></p>
+          </article>
+
+          <article class="card output-card calendar-output-card">
+            <div class="section-heading">
+              <p class="eyebrow">Term view</p>
+              <h3>What is coming up</h3>
+              <p class="microcopy">Sorted by due date. Done items stay quiet at the bottom.</p>
+            </div>
+
+            <div id="calendarTimeline" class="calendar-timeline" aria-label="Trimester weeks"></div>
+
+            <div id="calendarOutput" class="rich-output empty">
+              Add one due date. Northstar will build a calm term map here.
+            </div>
+
+            <div class="button-row calendar-copy-actions">
+              <button class="button subtle" id="copyCalendarBtn" type="button">Copy term plan</button>
             </div>
           </article>
         </div>
@@ -1181,6 +1334,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260523e"></script>
+  <script type="module" src="./js/app.js?v=20260526a"></script>
 </body>
 </html>

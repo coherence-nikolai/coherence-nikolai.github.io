@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js";
+} from "./data/content.js?v=20260526a";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js";
+} from "./state.js?v=20260526a";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -26,6 +26,7 @@ const PANEL_LABELS = {
   "dashboard-options": "Tune Today",
   regulate: "Regulate",
   planner: "Plan",
+  calendar: "Calendar",
   focus: "Focus",
   unpack: "Unpack",
   notes: "Notes",
@@ -39,6 +40,7 @@ const PANEL_THEME_COLORS = {
   "dashboard-options": "#dfece8",
   regulate: "#e8edd9",
   planner: "#f2e1d8",
+  calendar: "#e9e7f2",
   focus: "#f3ead5",
   unpack: "#deedf0",
   notes: "#e3ebf4",
@@ -47,7 +49,7 @@ const PANEL_THEME_COLORS = {
   "mobile-result": "#dfece8"
 };
 
-const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "focus", "unpack", "notes", "profile", "finish"]);
+const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "calendar", "focus", "unpack", "notes", "profile", "finish"]);
 
 const DELIVERABLE_GUIDANCE = {
   essay: {
@@ -252,6 +254,31 @@ const defaultSupportContacts = [
   }
 ];
 
+const CALENDAR_ITEM_TYPES = {
+  assignment: "Assignment",
+  quiz: "Quiz or test",
+  exam: "Exam",
+  presentation: "Presentation",
+  reading: "Reading or prep",
+  placement: "Placement",
+  admin: "Admin",
+  other: "Other"
+};
+
+const CALENDAR_STATUS_LABELS = {
+  "not-started": "Not started",
+  underway: "Underway",
+  waiting: "Waiting",
+  done: "Done"
+};
+
+const defaultCalendarState = {
+  termName: "",
+  termStart: "",
+  termEnd: "",
+  items: []
+};
+
 const FOCUS_PRESETS = {
   gentle: {
     label: "Gentle start",
@@ -295,6 +322,49 @@ function noteBlockId() {
 
 function supportContactId() {
   return `support_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function calendarItemId() {
+  return `due_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function normalizeDateInput(value) {
+  const date = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "";
+}
+
+function normalizeCalendarItem(rawItem, index = 0) {
+  const raw = rawItem && typeof rawItem === "object" ? rawItem : {};
+  const type = CALENDAR_ITEM_TYPES[raw.type] ? raw.type : "assignment";
+  const status = CALENDAR_STATUS_LABELS[raw.status] ? raw.status : "not-started";
+
+  return {
+    id: String(raw.id || `due_${index + 1}`),
+    title: String(raw.title || ""),
+    course: String(raw.course || ""),
+    dueDate: normalizeDateInput(raw.dueDate),
+    type,
+    weight: String(raw.weight || ""),
+    status,
+    firstStep: String(raw.firstStep || ""),
+    notes: String(raw.notes || ""),
+    createdAt: raw.createdAt || stampNow(),
+    updatedAt: raw.updatedAt || null
+  };
+}
+
+function normalizeCalendarState(rawState) {
+  const raw = rawState && typeof rawState === "object" ? rawState : {};
+  const items = Array.isArray(raw.items)
+    ? raw.items.map((item, index) => normalizeCalendarItem(item, index))
+    : [];
+
+  return {
+    termName: String(raw.termName || ""),
+    termStart: normalizeDateInput(raw.termStart),
+    termEnd: normalizeDateInput(raw.termEnd),
+    items
+  };
 }
 
 function createSupportContact(overrides = {}) {
@@ -465,6 +535,7 @@ const state = {
   profileAnswers: loadState("profileAnswers", {}),
   profileUi: normalizeProfileUi(loadState("profileUi", defaultProfileUi)),
   focus: normalizeFocusState(loadState("focus", defaultFocusState)),
+  calendar: normalizeCalendarState(loadState("calendar", defaultCalendarState)),
   calibration: normalizeCalibrationState(loadState("calibration", defaultCalibration)),
   sessionMemory: normalizeSessionMemory(loadState("sessionMemory", defaultSessionMemory)),
   supportContacts: normalizeSupportContacts(loadState("supportContacts", defaultSupportContacts)),
@@ -495,6 +566,10 @@ const MOBILE_DOCK_ACTIONS = {
   planner: {
     label: "Make first step",
     target: "#buildPlanBtn"
+  },
+  calendar: {
+    label: "Save due date",
+    target: "#saveCalendarItemBtn"
   },
   focus: {
     label: "Start the block",
@@ -553,9 +628,9 @@ function normalizeReturnCue(value) {
 
   const standaloneCue = cue
     .replace(/^then\s+/i, "")
-    .replace(/^go to\s+(today|regulate|plan|focus|unpack|notes|profile|finish)\s+and\s+/i, "")
+    .replace(/^go to\s+(today|regulate|plan|calendar|focus|unpack|notes|profile|finish)\s+and\s+/i, "")
     .replace(/^use\s+the\s+today\s+panel\s+to\s+/i, "")
-    .replace(/^use\s+(today|regulate|plan|focus|unpack|notes|profile|finish)\s+to\s+/i, "")
+    .replace(/^use\s+(today|regulate|plan|calendar|focus|unpack|notes|profile|finish)\s+to\s+/i, "")
     .replace(/^ask\s+what\s+barrier\s+is\s+present[,.]?\s*/i, "Name the barrier. ")
     .replace(/\bbefore asking for output\b/gi, "before starting")
     .trim();
@@ -659,8 +734,10 @@ function hasMeaningfulThread() {
     state.outputs.notes ||
     state.outputs.profile ||
     state.outputs.focus ||
+    state.outputs.calendar ||
     state.outputs.finish ||
     state.planner.task ||
+    state.calendar.items.length ||
     state.regulate.load ||
     state.unpack.prompt ||
     hasFocusThread ||
@@ -1206,6 +1283,10 @@ function setInitialFormValues() {
   $("#taskInput").value = state.planner.task;
   $("#taskDueInput").value = state.planner.dueDate;
   $("#taskEnergySelect").value = state.planner.energy;
+
+  $("#termNameInput").value = state.calendar.termName;
+  $("#termStartInput").value = state.calendar.termStart;
+  $("#termEndInput").value = state.calendar.termEnd;
 
   $("#regulateSignalSelect").value = state.regulate.signal;
   $("#regulateAnchorSelect").value = state.regulate.anchor;
@@ -1930,6 +2011,13 @@ function captureForms() {
     blockers: readCheckboxValues("plannerBlockers")
   };
 
+  state.calendar = {
+    ...state.calendar,
+    termName: $("#termNameInput").value.trim(),
+    termStart: normalizeDateInput($("#termStartInput").value),
+    termEnd: normalizeDateInput($("#termEndInput").value)
+  };
+
   state.regulate = {
     signal: $("#regulateSignalSelect").value,
     anchor: $("#regulateAnchorSelect").value,
@@ -1969,6 +2057,7 @@ function captureForms() {
 
   saveState("checkin", state.checkin);
   saveState("planner", state.planner);
+  saveState("calendar", state.calendar);
   saveState("regulate", state.regulate);
   saveState("unpack", state.unpack);
   saveState("notes", state.notes);
@@ -2301,6 +2390,8 @@ function recommendRoute(options = {}) {
       section = "unpack";
     } else if (blockerSet.has("overwhelmed") || blockerSet.has("sensory") || blockerSet.has("energy")) {
       section = "regulate";
+    } else if (/calendar|trimester|semester|term|due date|deadline|assessment schedule/i.test(intent)) {
+      section = "calendar";
     } else if (blockerSet.has("time") || /timer|pomodoro|focus|time.?box|timebox/i.test(intent)) {
       section = "focus";
     } else if (blockerSet.has("memory") || /read|lecture|notes|article|chapter/i.test(intent)) {
@@ -2314,6 +2405,8 @@ function recommendRoute(options = {}) {
     section = "unpack";
   } else if (blockerSet.has("overwhelmed")) {
     section = "regulate";
+  } else if (/calendar|trimester|semester|term|due date|deadline|assessment schedule/i.test(intent)) {
+    section = "calendar";
   } else if (blockerSet.has("memory")) {
     section = "notes";
   } else if (blockerSet.has("time") || /timer|pomodoro|focus|time.?box|timebox/i.test(intent)) {
@@ -2514,6 +2607,362 @@ function renderPlanner({ openResult = true } = {}) {
       ].join("\n")
     });
   }
+}
+
+function parseCalendarDate(value) {
+  const date = normalizeDateInput(value);
+  if (!date) return null;
+  const parsed = new Date(`${date}T12:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatCalendarDate(value) {
+  const date = parseCalendarDate(value);
+  if (!date) return "No date";
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short"
+  }).format(date);
+}
+
+function daysUntil(value) {
+  const date = parseCalendarDate(value);
+  if (!date) return null;
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  return Math.round((date.getTime() - today.getTime()) / 86400000);
+}
+
+function calendarDuePhrase(value) {
+  const distance = daysUntil(value);
+  if (distance === null) return "No due date yet";
+  if (distance === 0) return "Due today";
+  if (distance === 1) return "Due tomorrow";
+  if (distance === -1) return "Overdue by 1 day";
+  if (distance < 0) return `Overdue by ${Math.abs(distance)} days`;
+  return `Due in ${distance} days`;
+}
+
+function sortCalendarItems(items = state.calendar.items) {
+  return [...items].sort((a, b) => {
+    if (a.status === "done" && b.status !== "done") return 1;
+    if (a.status !== "done" && b.status === "done") return -1;
+    const aTime = parseCalendarDate(a.dueDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    const bTime = parseCalendarDate(b.dueDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    if (aTime !== bTime) return aTime - bTime;
+    return a.title.localeCompare(b.title);
+  });
+}
+
+function calendarTermLabel() {
+  const name = state.calendar.termName || "My trimester";
+  const start = state.calendar.termStart ? formatCalendarDate(state.calendar.termStart) : "";
+  const end = state.calendar.termEnd ? formatCalendarDate(state.calendar.termEnd) : "";
+  if (start && end) return `${name} · ${start} to ${end}`;
+  return name;
+}
+
+function hasCalendarContent() {
+  return Boolean(
+    state.calendar.termName ||
+    state.calendar.termStart ||
+    state.calendar.termEnd ||
+    state.calendar.items.length
+  );
+}
+
+function saveCalendar() {
+  state.calendar = normalizeCalendarState(state.calendar);
+  saveState("calendar", state.calendar);
+}
+
+function buildCalendarResult() {
+  const sorted = sortCalendarItems();
+  const active = sorted.filter((item) => item.status !== "done");
+  const done = sorted.filter((item) => item.status === "done");
+  const nextDue = active[0] || null;
+
+  const result = {
+    termName: state.calendar.termName,
+    termLabel: calendarTermLabel(),
+    termStart: state.calendar.termStart,
+    termEnd: state.calendar.termEnd,
+    total: state.calendar.items.length,
+    activeCount: active.length,
+    doneCount: done.length,
+    nextDue,
+    upcoming: active.slice(0, 5),
+    updatedAt: stampNow()
+  };
+
+  if (hasCalendarContent()) {
+    state.outputs.calendar = result;
+  } else {
+    delete state.outputs.calendar;
+  }
+  saveState("outputs", state.outputs);
+  return result;
+}
+
+function calendarSummaryText() {
+  const sorted = sortCalendarItems();
+  const lines = [
+    "NORTHSTAR TERM PLAN",
+    "",
+    `Term: ${calendarTermLabel()}`,
+    `Saved due dates: ${state.calendar.items.length}`,
+    ""
+  ];
+
+  if (!sorted.length) {
+    lines.push("No due dates saved yet.");
+  } else {
+    lines.push("Due dates:");
+    sorted.forEach((item) => {
+      lines.push(
+        `- ${formatCalendarDate(item.dueDate)}: ${item.title}${item.course ? ` (${item.course})` : ""} · ${CALENDAR_ITEM_TYPES[item.type]} · ${CALENDAR_STATUS_LABELS[item.status]}`
+      );
+      if (item.firstStep) lines.push(`  First move: ${item.firstStep}`);
+      if (item.notes) lines.push(`  Note: ${item.notes}`);
+    });
+  }
+
+  return lines.join("\n");
+}
+
+function clearCalendarForm({ keepStatus = false } = {}) {
+  $("#calendarEditId").value = "";
+  $("#calendarTitleInput").value = "";
+  $("#calendarCourseInput").value = "";
+  $("#calendarDueInput").value = "";
+  $("#calendarTypeSelect").value = "assignment";
+  $("#calendarWeightInput").value = "";
+  $("#calendarStatusSelect").value = "not-started";
+  $("#calendarFirstStepInput").value = "";
+  $("#calendarNotesInput").value = "";
+  $("#saveCalendarItemBtn").textContent = "Save due date";
+  if (!keepStatus) $("#calendarSaveStatus").textContent = "";
+}
+
+function readCalendarItemForm() {
+  const title = $("#calendarTitleInput").value.trim();
+  const dueDate = normalizeDateInput($("#calendarDueInput").value);
+  if (!title || !dueDate) {
+    $("#calendarSaveStatus").textContent = !title
+      ? "Add what is due first."
+      : "Add the due date, then save.";
+    return null;
+  }
+
+  return normalizeCalendarItem({
+    id: $("#calendarEditId").value || calendarItemId(),
+    title,
+    course: $("#calendarCourseInput").value.trim(),
+    dueDate,
+    type: $("#calendarTypeSelect").value,
+    weight: $("#calendarWeightInput").value.trim(),
+    status: $("#calendarStatusSelect").value,
+    firstStep: $("#calendarFirstStepInput").value.trim(),
+    notes: $("#calendarNotesInput").value.trim()
+  });
+}
+
+function saveCalendarItem({ openResult = true } = {}) {
+  captureForms();
+  const formItem = readCalendarItemForm();
+  if (!formItem) return;
+
+  const existingIndex = state.calendar.items.findIndex((item) => item.id === formItem.id);
+  const previous = existingIndex === -1 ? null : state.calendar.items[existingIndex];
+  const item = normalizeCalendarItem({
+    ...previous,
+    ...formItem,
+    createdAt: previous?.createdAt || stampNow(),
+    updatedAt: stampNow()
+  });
+
+  if (existingIndex === -1) {
+    state.calendar.items.push(item);
+  } else {
+    state.calendar.items[existingIndex] = item;
+  }
+
+  saveCalendar();
+  clearCalendarForm({ keepStatus: true });
+  $("#calendarSaveStatus").textContent = existingIndex === -1
+    ? "Saved privately on this device."
+    : "Updated privately on this device.";
+  const result = renderCalendar();
+  renderSnapshotPreview();
+  renderStatus();
+
+  if (openResult) {
+    openMobileResult({
+      sourcePanel: "calendar",
+      resultType: "calendar",
+      kicker: "Due date saved",
+      title: "You made it visible",
+      summary: `${item.title} · ${calendarDuePhrase(item.dueDate)}`,
+      items: [
+        `${formatCalendarDate(item.dueDate)}: ${item.title}`,
+        item.firstStep || "First move: open the brief and name the next tiny action.",
+        result?.nextDue ? `Next visible date: ${result.nextDue.title}` : "Add another date only if it helps."
+      ],
+      primaryLabel: "Back to Calendar",
+      primaryTarget: "calendar",
+      copyText: calendarSummaryText()
+    });
+  }
+}
+
+function editCalendarItem(itemId) {
+  const item = state.calendar.items.find((calendarItem) => calendarItem.id === itemId);
+  if (!item) return;
+
+  $("#calendarEditId").value = item.id;
+  $("#calendarTitleInput").value = item.title;
+  $("#calendarCourseInput").value = item.course;
+  $("#calendarDueInput").value = item.dueDate;
+  $("#calendarTypeSelect").value = item.type;
+  $("#calendarWeightInput").value = item.weight;
+  $("#calendarStatusSelect").value = item.status;
+  $("#calendarFirstStepInput").value = item.firstStep;
+  $("#calendarNotesInput").value = item.notes;
+  $("#saveCalendarItemBtn").textContent = "Save changes";
+  $("#calendarSaveStatus").textContent = "Editing this due date.";
+  $("#calendarTitleInput").focus({ preventScroll: true });
+  $("#panel-calendar .calendar-start-card").scrollIntoView({
+    block: "start",
+    behavior: state.settings.motion === "normal" ? "smooth" : "auto"
+  });
+}
+
+function removeCalendarItem(itemId) {
+  state.calendar.items = state.calendar.items.filter((item) => item.id !== itemId);
+  saveCalendar();
+  renderCalendar();
+  renderSnapshotPreview();
+  renderStatus();
+}
+
+function toggleCalendarDone(itemId) {
+  const item = state.calendar.items.find((calendarItem) => calendarItem.id === itemId);
+  if (!item) return;
+  item.status = item.status === "done" ? "not-started" : "done";
+  item.updatedAt = stampNow();
+  saveCalendar();
+  renderCalendar();
+  renderSnapshotPreview();
+  renderStatus();
+}
+
+function renderCalendarTimeline() {
+  const timeline = $("#calendarTimeline");
+  if (!timeline) return;
+
+  const start = parseCalendarDate(state.calendar.termStart);
+  const end = parseCalendarDate(state.calendar.termEnd);
+  if (!start || !end || start > end) {
+    timeline.innerHTML = `
+      <article class="calendar-week is-empty">
+        <strong>Add term dates</strong>
+        <span>Weeks will appear here. Due dates still save below.</span>
+      </article>
+    `;
+    return;
+  }
+
+  const weeks = [];
+  const cursor = new Date(start);
+  let guard = 0;
+  while (cursor <= end && guard < 26) {
+    const weekStart = new Date(cursor);
+    const weekEnd = new Date(cursor);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weeks.push({ weekStart, weekEnd: weekEnd > end ? new Date(end) : weekEnd });
+    cursor.setDate(cursor.getDate() + 7);
+    guard += 1;
+  }
+
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  const items = state.calendar.items.filter((item) => item.dueDate);
+
+  timeline.innerHTML = weeks.map((week, index) => {
+    const weekItems = items.filter((item) => {
+      const due = parseCalendarDate(item.dueDate);
+      return due && due >= week.weekStart && due <= week.weekEnd;
+    });
+    const isNow = today >= week.weekStart && today <= week.weekEnd;
+    return `
+      <article class="calendar-week${isNow ? " is-now" : ""}${weekItems.length ? " has-items" : ""}">
+        <span class="calendar-week-label">Week ${index + 1}</span>
+        <strong>${escapeHtml(formatCalendarDate(week.weekStart))}</strong>
+        <span>${escapeHtml(weekItems.length ? `${weekItems.length} due` : "Clear")}</span>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderCalendar() {
+  saveCalendar();
+  renderCalendarTimeline();
+
+  const output = $("#calendarOutput");
+  if (!output) return null;
+  const result = buildCalendarResult();
+  const sorted = sortCalendarItems();
+
+  if (!sorted.length) {
+    output.classList.add("empty");
+    output.innerHTML = "Add one due date. Northstar will build a calm term map here.";
+    return result;
+  }
+
+  const nextDue = result.nextDue;
+  output.classList.remove("empty");
+  output.innerHTML = `
+    ${nextDue ? `
+      <div class="output-block calendar-next-block">
+        <h4>Next visible date</h4>
+        <p><strong>${escapeHtml(nextDue.title)}</strong></p>
+        <p>${escapeHtml(formatCalendarDate(nextDue.dueDate))} · ${escapeHtml(calendarDuePhrase(nextDue.dueDate))}</p>
+        <p class="output-subtle">${escapeHtml(nextDue.firstStep || "First move: open the brief and choose one small starting action.")}</p>
+      </div>
+    ` : `
+      <div class="output-block calendar-next-block">
+        <h4>Nothing active is due</h4>
+        <p>All saved items are marked done.</p>
+      </div>
+    `}
+
+    <div class="calendar-item-list" aria-label="Saved due dates">
+      ${sorted.map((item) => `
+        <article class="calendar-item-card${item.status === "done" ? " is-done" : ""}">
+          <div class="calendar-item-main">
+            <span class="calendar-item-kicker">${escapeHtml(CALENDAR_ITEM_TYPES[item.type])}${item.weight ? ` · ${escapeHtml(item.weight)}` : ""}</span>
+            <h4>${escapeHtml(item.title)}</h4>
+            <p>${escapeHtml(formatCalendarDate(item.dueDate))} · ${escapeHtml(calendarDuePhrase(item.dueDate))}</p>
+            ${item.course || item.firstStep || item.notes ? `
+              <p class="calendar-item-detail">${escapeHtml([
+                item.course ? item.course : "",
+                item.firstStep ? `First move: ${item.firstStep}` : "",
+                item.notes
+              ].filter(Boolean).join(" · "))}</p>
+            ` : ""}
+          </div>
+          <div class="calendar-item-actions">
+            <button class="button subtle" type="button" data-calendar-toggle="${escapeHtml(item.id)}">${item.status === "done" ? "Mark active" : "Done"}</button>
+            <button class="button subtle" type="button" data-calendar-edit="${escapeHtml(item.id)}">Edit</button>
+            <button class="button subtle" type="button" data-calendar-remove="${escapeHtml(item.id)}">Remove</button>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+
+  return result;
 }
 
 function buildUnpackResult() {
@@ -3242,6 +3691,7 @@ function snapshotText() {
   const route = state.outputs.route;
   const regulate = state.outputs.regulate;
   const planner = state.outputs.planner;
+  const calendar = state.outputs.calendar;
   const focus = state.outputs.focus;
   const unpack = state.outputs.unpack;
   const notes = state.outputs.notes;
@@ -3265,6 +3715,8 @@ function snapshotText() {
     regulate ? `Regulation bridge: ${normalizeReturnCue(regulate.bridge)}` : "",
     planner ? `Task: ${planner.task}` : "",
     planner ? `First step: ${planner.firstStep}` : "",
+    calendar ? `Calendar: ${calendar.termLabel}` : "",
+    calendar?.nextDue ? `Next due date: ${calendar.nextDue.title} · ${formatCalendarDate(calendar.nextDue.dueDate)}` : "",
     focus ? `Focus timer: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
     state.focus.intention ? `Focus intention: ${state.focus.intention}` : "",
     state.focus.returnCue ? `Focus return cue: ${state.focus.returnCue}` : "",
@@ -3283,9 +3735,9 @@ function snapshotText() {
 function renderSnapshotPreview() {
   const preview = $("#snapshotPreview");
 
-  if (!state.outputs.route && !state.outputs.regulate && !state.outputs.planner && !state.outputs.focus && !state.outputs.unpack && !state.outputs.notes && !state.outputs.profile) {
+  if (!state.outputs.route && !state.outputs.regulate && !state.outputs.planner && !state.outputs.calendar && !state.outputs.focus && !state.outputs.unpack && !state.outputs.notes && !state.outputs.profile) {
     preview.classList.add("empty");
-    preview.textContent = "Your snapshot will appear here after you use Regulate, Plan, Focus, Unpack, Notes, or Profile.";
+    preview.textContent = "Your snapshot will appear here after you use Regulate, Plan, Calendar, Focus, Unpack, Notes, or Profile.";
     return;
   }
 
@@ -3298,6 +3750,11 @@ function currentResumeHint() {
 
   if (panelName === "planner" && state.outputs.planner?.firstStep) {
     return state.outputs.planner.firstStep;
+  }
+
+  if (panelName === "calendar" && state.outputs.calendar?.nextDue) {
+    const item = state.outputs.calendar.nextDue;
+    return `${item.title} is ${calendarDuePhrase(item.dueDate).toLowerCase()}. ${item.firstStep || "Open it and choose one small starting action."}`;
   }
 
   if (panelName === "regulate" && state.outputs.regulate?.bridge) {
@@ -3598,6 +4055,13 @@ function bindEvents() {
     );
   });
 
+  $("#saveCalendarItemBtn").addEventListener("click", () => saveCalendarItem({ openResult: true }));
+  $("#clearCalendarFormBtn").addEventListener("click", () => clearCalendarForm());
+  $("#copyCalendarBtn").addEventListener("click", async () => {
+    await copyText(calendarSummaryText());
+    $("#calendarSaveStatus").textContent = "Term plan copied.";
+  });
+
   $$("#regulationMenu .regulation-option").forEach((button) => {
     button.addEventListener("click", () => setRegulationStrategy(button.dataset.regulationStrategy));
   });
@@ -3725,6 +4189,9 @@ function bindEvents() {
 
   document.addEventListener("input", (event) => {
     captureForms();
+    if (event.target.matches("#termNameInput, #termStartInput, #termEndInput")) {
+      renderCalendar();
+    }
     if (event.target.matches("#focusIntentionInput, #focusReturnCueInput")) {
       saveFocusOutput("edited");
       renderFocusTimer();
@@ -3734,6 +4201,24 @@ function bindEvents() {
   });
 
   document.addEventListener("click", (event) => {
+    const calendarToggle = event.target.closest("[data-calendar-toggle]");
+    if (calendarToggle) {
+      toggleCalendarDone(calendarToggle.dataset.calendarToggle);
+      return;
+    }
+
+    const calendarEdit = event.target.closest("[data-calendar-edit]");
+    if (calendarEdit) {
+      editCalendarItem(calendarEdit.dataset.calendarEdit);
+      return;
+    }
+
+    const calendarRemove = event.target.closest("[data-calendar-remove]");
+    if (calendarRemove) {
+      removeCalendarItem(calendarRemove.dataset.calendarRemove);
+      return;
+    }
+
     const noteRemove = event.target.closest("[data-note-remove]");
     if (noteRemove) {
       removeNoteBlock(noteRemove.dataset.noteRemove);
@@ -3797,6 +4282,7 @@ function renderStoredOutputs() {
 
   if (state.outputs.regulate) renderRegulation({ openResult: false, remember: false });
   if (state.outputs.planner && state.planner.task) renderPlanner({ openResult: false });
+  renderCalendar();
   renderFocusTimer();
   if (state.outputs.unpack && state.unpack.prompt) renderUnpack({ openResult: false });
   if (state.outputs.notes && (state.notes.title || state.notes.context || state.notes.blocks.some((block) => block.text.trim()))) renderNotes({ openResult: false });
@@ -3820,6 +4306,7 @@ function init() {
   renderProfileQuestions();
   renderFinishChecklist();
   setInitialFormValues();
+  renderCalendar();
   syncRegulationSelection();
   applySettings();
   bindEvents();
