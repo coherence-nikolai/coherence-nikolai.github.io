@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260526c";
+} from "./data/content.js?v=20260526d";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260526c";
+} from "./state.js?v=20260526d";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -2748,6 +2748,44 @@ function saveCalendar() {
   saveState("calendar", state.calendar);
 }
 
+function updateCalendarTermInputs() {
+  const termNameInput = $("#termNameInput");
+  const termStartInput = $("#termStartInput");
+  const termEndInput = $("#termEndInput");
+  if (termNameInput) termNameInput.value = state.calendar.termName;
+  if (termStartInput) termStartInput.value = state.calendar.termStart;
+  if (termEndInput) termEndInput.value = state.calendar.termEnd;
+}
+
+function setCalendarTermDates(start, end) {
+  if (!(start instanceof Date) || !(end instanceof Date)) return;
+
+  state.calendar = normalizeCalendarState({
+    ...state.calendar,
+    termStart: calendarDateKey(start),
+    termEnd: calendarDateKey(end)
+  });
+  updateCalendarTermInputs();
+  saveCalendar();
+  renderCalendar();
+  renderSnapshotPreview();
+  renderStatus();
+}
+
+function setCalendarToThirteenWeeksFrom(startDate) {
+  const start = startDate instanceof Date && !Number.isNaN(startDate.getTime())
+    ? startDate
+    : calendarTermRange().start;
+  setCalendarTermDates(start, addCalendarDays(start, 90));
+}
+
+function shiftCalendarTerm(direction) {
+  const range = calendarTermRange();
+  const weekCount = Math.max(calendarRangeWeeks(range), 13);
+  const start = addCalendarDays(range.start, direction * weekCount * 7);
+  setCalendarToThirteenWeeksFrom(start);
+}
+
 function buildCalendarResult() {
   const sorted = sortCalendarItems();
   const active = sorted.filter((item) => item.status !== "done");
@@ -4244,6 +4282,12 @@ function bindEvents() {
 
   $("#saveCalendarItemBtn").addEventListener("click", () => saveCalendarItem({ openResult: true }));
   $("#clearCalendarFormBtn").addEventListener("click", () => clearCalendarForm());
+  $("#calendarPrevTermBtn").addEventListener("click", () => shiftCalendarTerm(-1));
+  $("#calendarMake13WeeksBtn").addEventListener("click", () => {
+    const chosenStart = parseCalendarDate($("#termStartInput").value) || calendarTermRange().start;
+    setCalendarToThirteenWeeksFrom(chosenStart);
+  });
+  $("#calendarNextTermBtn").addEventListener("click", () => shiftCalendarTerm(1));
   $("#copyCalendarBtn").addEventListener("click", async () => {
     await copyText(calendarSummaryText());
     $("#calendarSaveStatus").textContent = "Term plan copied.";

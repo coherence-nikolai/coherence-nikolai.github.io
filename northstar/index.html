@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260526c">
-  <link rel="icon" href="./icon.svg?v=20260526c" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260526c">
-  <link rel="stylesheet" href="./styles.css?v=20260526c">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260526d">
+  <link rel="icon" href="./icon.svg?v=20260526d" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260526d">
+  <link rel="stylesheet" href="./styles.css?v=20260526d">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260526c" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260526d" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -93,7 +93,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260526c" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260526d" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -359,7 +359,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260526c" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260526d" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -463,7 +463,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260526c" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260526d" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -830,27 +830,6 @@
               <p class="microcopy">You do not need the whole term. One real date is enough to begin.</p>
             </div>
 
-            <div class="calendar-term-card">
-              <div class="section-heading">
-                <p class="eyebrow">Term map</p>
-                <h3>Name the trimester</h3>
-              </div>
-              <div class="field-row">
-                <label class="field">
-                  <span>Trimester name</span>
-                  <input id="termNameInput" type="text" placeholder="e.g. Trimester 2, 2026">
-                </label>
-                <label class="field">
-                  <span>Start date</span>
-                  <input id="termStartInput" type="date">
-                </label>
-                <label class="field">
-                  <span>End date</span>
-                  <input id="termEndInput" type="date">
-                </label>
-              </div>
-            </div>
-
             <input id="calendarEditId" type="hidden">
 
             <label class="field">
@@ -942,6 +921,33 @@
               <p class="eyebrow">Term view</p>
               <h3>13-week visual calendar</h3>
               <p class="microcopy">Tap a day to add a due date. Tap a coloured block to edit it.</p>
+            </div>
+
+            <div class="calendar-term-card">
+              <div class="section-heading">
+                <p class="eyebrow">Term dates</p>
+                <h3>Choose the months</h3>
+                <p class="microcopy">Set this once for each trimester. The calendar will roll forward without an app update.</p>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  <span>Trimester name</span>
+                  <input id="termNameInput" type="text" placeholder="e.g. Trimester 2, 2026">
+                </label>
+                <label class="field">
+                  <span>Start date</span>
+                  <input id="termStartInput" type="date">
+                </label>
+                <label class="field">
+                  <span>End date</span>
+                  <input id="termEndInput" type="date">
+                </label>
+              </div>
+              <div class="button-row calendar-term-actions" aria-label="Quick term date actions">
+                <button class="button subtle" id="calendarPrevTermBtn" type="button">Previous 13 weeks</button>
+                <button class="button subtle" id="calendarMake13WeeksBtn" type="button">Use 13 weeks</button>
+                <button class="button subtle" id="calendarNextTermBtn" type="button">Next 13 weeks</button>
+              </div>
             </div>
 
             <div class="calendar-board-shell">
@@ -1354,6 +1360,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260526c"></script>
+  <script type="module" src="./js/app.js?v=20260526d"></script>
 </body>
 </html>
