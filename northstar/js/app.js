@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260526b";
+} from "./data/content.js?v=20260526c";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260526b";
+} from "./state.js?v=20260526c";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -2628,6 +2628,20 @@ function monthStart(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1, 12, 0, 0, 0);
 }
 
+function startOfCalendarWeek(date) {
+  const copy = new Date(date);
+  copy.setHours(12, 0, 0, 0);
+  copy.setDate(copy.getDate() - ((copy.getDay() + 6) % 7));
+  return copy;
+}
+
+function addCalendarDays(date, count) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + count);
+  copy.setHours(12, 0, 0, 0);
+  return copy;
+}
+
 function addCalendarMonths(date, count) {
   return new Date(date.getFullYear(), date.getMonth() + count, 1, 12, 0, 0, 0);
 }
@@ -2665,6 +2679,40 @@ function calendarDuePhrase(value) {
   if (distance === -1) return "Overdue by 1 day";
   if (distance < 0) return `Overdue by ${Math.abs(distance)} days`;
   return `Due in ${distance} days`;
+}
+
+function calendarTermRange(items = state.calendar.items) {
+  const termStart = parseCalendarDate(state.calendar.termStart);
+  const termEnd = parseCalendarDate(state.calendar.termEnd);
+  const dueDates = items
+    .map((item) => parseCalendarDate(item.dueDate))
+    .filter(Boolean)
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  if (termStart && termEnd && termStart <= termEnd) {
+    return { start: termStart, end: termEnd, isStarter: false };
+  }
+
+  if (termStart) {
+    return { start: termStart, end: addCalendarDays(termStart, 90), isStarter: false };
+  }
+
+  if (termEnd) {
+    return { start: addCalendarDays(termEnd, -90), end: termEnd, isStarter: false };
+  }
+
+  if (dueDates.length) {
+    const start = startOfCalendarWeek(dueDates[0]);
+    return { start, end: addCalendarDays(start, 90), isStarter: true };
+  }
+
+  const start = startOfCalendarWeek(new Date());
+  return { start, end: addCalendarDays(start, 90), isStarter: true };
+}
+
+function calendarRangeWeeks(range) {
+  const inclusiveDays = Math.max(1, Math.round((range.end.getTime() - range.start.getTime()) / 86400000) + 1);
+  return Math.max(1, Math.ceil(inclusiveDays / 7));
 }
 
 function sortCalendarItems(items = state.calendar.items) {
@@ -2884,17 +2932,7 @@ function renderCalendarTimeline() {
   const timeline = $("#calendarTimeline");
   if (!timeline) return;
 
-  const start = parseCalendarDate(state.calendar.termStart);
-  const end = parseCalendarDate(state.calendar.termEnd);
-  if (!start || !end || start > end) {
-    timeline.innerHTML = `
-      <article class="calendar-week is-empty">
-        <strong>Add term dates</strong>
-        <span>Weeks will appear here. Due dates still save below.</span>
-      </article>
-    `;
-    return;
-  }
+  const { start, end } = calendarTermRange();
 
   const weeks = [];
   const cursor = new Date(start);
@@ -2929,31 +2967,11 @@ function renderCalendarTimeline() {
 }
 
 function calendarVisualRange(items) {
-  const termStart = parseCalendarDate(state.calendar.termStart);
-  const termEnd = parseCalendarDate(state.calendar.termEnd);
-  const dueDates = items
-    .map((item) => parseCalendarDate(item.dueDate))
-    .filter(Boolean)
-    .sort((a, b) => a.getTime() - b.getTime());
-
-  if (termStart && termEnd && termStart <= termEnd) {
-    return {
-      start: monthStart(termStart),
-      end: monthStart(termEnd)
-    };
-  }
-
-  if (dueDates.length) {
-    return {
-      start: monthStart(dueDates[0]),
-      end: monthStart(dueDates[dueDates.length - 1])
-    };
-  }
-
-  const now = new Date();
+  const range = calendarTermRange(items);
   return {
-    start: monthStart(now),
-    end: addCalendarMonths(monthStart(now), 1)
+    ...range,
+    monthStart: monthStart(range.start),
+    monthEnd: monthStart(range.end)
   };
 }
 
@@ -2972,27 +2990,23 @@ function renderCalendarBoard() {
   if (!board) return;
 
   const items = sortCalendarItems().filter((item) => item.dueDate);
-  if (!items.length && !state.calendar.termStart && !state.calendar.termEnd) {
-    board.innerHTML = `
-      <article class="calendar-board-empty">
-        <strong>Add one due date</strong>
-        <span>The visual calendar will appear here.</span>
-      </article>
-    `;
-    return;
-  }
-
   const range = calendarVisualRange(items);
   const byDate = calendarItemsByDate(items);
   const todayKey = calendarDateKey(new Date());
   const months = [];
-  let cursor = range.start;
+  let cursor = range.monthStart;
   let guard = 0;
 
-  while (cursor <= range.end && guard < 8) {
+  while (cursor <= range.monthEnd && guard < 8) {
     months.push(cursor);
     cursor = addCalendarMonths(cursor, 1);
     guard += 1;
+  }
+
+  const summary = $("#calendarBoardSummary");
+  if (summary) {
+    const starter = range.isStarter ? "Starter map" : "Term map";
+    summary.textContent = `${starter}: ${calendarRangeWeeks(range)} weeks, ${formatCalendarDate(calendarDateKey(range.start))} to ${formatCalendarDate(calendarDateKey(range.end))}.`;
   }
 
   board.innerHTML = months.map((monthDate) => {
@@ -3011,9 +3025,13 @@ function renderCalendarBoard() {
         const key = calendarDateKey(date);
         const dayItems = byDate.get(key) || [];
         const visibleItems = dayItems.slice(0, 3);
+        const isOutsideTerm = date < range.start || date > range.end;
         return `
-          <article class="calendar-day${key === todayKey ? " is-today" : ""}${dayItems.length ? " has-due" : ""}">
-            <span class="calendar-day-number">${dayIndex + 1}</span>
+          <article class="calendar-day${key === todayKey ? " is-today" : ""}${dayItems.length ? " has-due" : ""}${isOutsideTerm ? " is-outside-term" : ""}" data-calendar-day="${key}">
+            <div class="calendar-day-top">
+              <span class="calendar-day-number">${dayIndex + 1}</span>
+              <button class="calendar-day-add" type="button" data-calendar-day="${key}" aria-label="Add due date on ${escapeHtml(formatCalendarDate(key))}">+</button>
+            </div>
             <div class="calendar-day-items">
               ${visibleItems.map((item) => `
                 <button
@@ -3054,6 +3072,23 @@ function renderCalendarBoard() {
       </section>
     `;
   }).join("");
+}
+
+function startCalendarItemOnDate(dateKey) {
+  const dueDate = normalizeDateInput(dateKey);
+  if (!dueDate) return;
+
+  $("#calendarDueInput").value = dueDate;
+  $("#calendarSaveStatus").textContent = `Date chosen: ${formatCalendarDate(dueDate)}. Add what is due, then save.`;
+
+  if (!$("#calendarTitleInput").value.trim()) {
+    $("#calendarTitleInput").focus({ preventScroll: true });
+  }
+
+  $("#panel-calendar .calendar-start-card").scrollIntoView({
+    block: "start",
+    behavior: state.settings.motion === "normal" ? "smooth" : "auto"
+  });
 }
 
 function renderCalendar() {
@@ -4368,6 +4403,12 @@ function bindEvents() {
     const calendarRemove = event.target.closest("[data-calendar-remove]");
     if (calendarRemove) {
       removeCalendarItem(calendarRemove.dataset.calendarRemove);
+      return;
+    }
+
+    const calendarDay = event.target.closest("[data-calendar-day]");
+    if (calendarDay) {
+      startCalendarItemOnDate(calendarDay.dataset.calendarDay);
       return;
     }
 

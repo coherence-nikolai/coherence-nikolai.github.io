@@ -354,6 +354,7 @@ html[data-runtime="native"] .shell {
   position: sticky;
   top: 1rem;
   align-self: start;
+  z-index: 3;
 }
 
 .card {
@@ -372,11 +373,18 @@ html[data-runtime="native"] .shell {
 }
 
 .nav-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #14201d;
   background:
-    radial-gradient(circle at 82% 4%, rgba(255, 232, 169, 0.12), transparent 38%),
-    linear-gradient(180deg, #1f302a 0%, #172722 100%);
+    radial-gradient(circle at 82% 4%, rgba(255, 232, 169, 0.13), transparent 34%),
+    linear-gradient(180deg, #20312c 0%, #15231f 48%, #101b18 100%);
   border-color: rgba(255, 243, 223, 0.14);
-  box-shadow: 0 20px 42px rgba(17, 14, 12, 0.17);
+  box-shadow:
+    0 20px 42px rgba(17, 14, 12, 0.18),
+    inset 0 1px 0 rgba(255, 243, 223, 0.08);
+  backdrop-filter: none;
 }
 
 .snapshot-card,
@@ -712,6 +720,13 @@ p {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+}
+
+.sidebar .nav-card.card {
+  background-color: #14201d;
+  background:
+    radial-gradient(circle at 82% 4%, rgba(255, 232, 169, 0.13), transparent 34%),
+    linear-gradient(180deg, #20312c 0%, #15231f 48%, #101b18 100%);
 }
 
 .mobile-nav {
@@ -2011,6 +2026,7 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
 
 .calendar-grid {
   align-items: start;
+  grid-template-columns: minmax(20rem, 0.78fr) minmax(34rem, 1.22fr);
 }
 
 .calendar-start-card,
@@ -2044,6 +2060,12 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(6.8rem, 1fr));
   gap: 0.55rem;
+}
+
+.calendar-week-strip {
+  border: 1px solid rgba(104, 112, 168, 0.18);
+  border-radius: 20px;
+  background: rgba(255, 252, 246, 0.48);
 }
 
 .calendar-week {
@@ -2088,12 +2110,15 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
 .calendar-board-shell {
   display: grid;
   gap: 0.75rem;
-  padding: 0.95rem;
+  padding: 1rem;
   border: 1px solid rgba(104, 112, 168, 0.18);
-  border-radius: 22px;
+  border-radius: 24px;
   background:
     radial-gradient(circle at 100% 0%, rgba(104, 112, 168, 0.1), transparent 12rem),
-    rgba(255, 252, 246, 0.5);
+    linear-gradient(180deg, rgba(255, 252, 246, 0.72), rgba(246, 238, 226, 0.78));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 14px 30px rgba(20, 28, 34, 0.06);
 }
 
 .calendar-board-head {
@@ -2105,7 +2130,7 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
 
 .calendar-board {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
   gap: 0.9rem;
 }
 
@@ -2125,12 +2150,14 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
 
 .calendar-month {
   min-width: 0;
-  padding: 0.82rem;
+  padding: 0.9rem;
   border: 1px solid rgba(104, 112, 168, 0.2);
-  border-radius: 18px;
+  border-radius: 20px;
   background:
     linear-gradient(180deg, rgba(255, 252, 246, 0.86), rgba(247, 239, 227, 0.9));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.68),
+    0 10px 22px rgba(20, 28, 34, 0.045);
 }
 
 .calendar-month-head {
@@ -2184,17 +2211,31 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
   display: grid;
   grid-template-rows: auto 1fr;
   gap: 0.22rem;
-  min-height: 5.2rem;
+  min-height: 5.55rem;
   padding: 0.34rem;
   border: 1px solid rgba(104, 112, 168, 0.14);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.46);
+  transition:
+    border-color var(--motion-fast),
+    background var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+
+.calendar-day:hover {
+  border-color: rgba(104, 112, 168, 0.32);
+  background: rgba(255, 252, 246, 0.74);
 }
 
 .calendar-day.is-blank {
-  min-height: 5.2rem;
+  min-height: 5.55rem;
   border-color: transparent;
   background: transparent;
+}
+
+.calendar-day.is-outside-term {
+  opacity: 0.52;
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .calendar-day.is-today {
@@ -2214,6 +2255,37 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
   color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 850;
+}
+
+.calendar-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.calendar-day-add {
+  display: inline-grid;
+  place-items: center;
+  width: 1.32rem;
+  height: 1.32rem;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid rgba(104, 112, 168, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 252, 246, 0.62);
+  color: #3f456d;
+  font-size: 0.92rem;
+  font-weight: 850;
+  line-height: 1;
+  opacity: 0.72;
+}
+
+.calendar-day:hover .calendar-day-add,
+.calendar-day-add:focus-visible {
+  border-color: rgba(104, 112, 168, 0.42);
+  background: rgba(255, 252, 246, 0.94);
+  opacity: 1;
 }
 
 .calendar-day-items {
@@ -3259,7 +3331,11 @@ html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-dashboard
   text-transform: uppercase;
 }
 
-html[data-support-state="low"] .panel:not(#panel-dashboard) .output-card:has(.rich-output.empty),
+html[data-support-state="low"] #panel-calendar .calendar-output-card {
+  order: -1;
+}
+
+html[data-support-state="low"] .panel:not(#panel-dashboard):not(#panel-calendar) .output-card:has(.rich-output.empty),
 html[data-support-state="low"] .subpanel:has(.empty) {
   display: none !important;
 }
@@ -3363,6 +3439,10 @@ html[data-runtime="native"] .support-state-button {
   .memory-banner,
   .timer-alert-panel {
     grid-template-columns: 1fr;
+  }
+
+  #panel-calendar .calendar-output-card {
+    order: -1;
   }
 
   .calibration-choice-grid,
@@ -5596,6 +5676,10 @@ html[data-runtime="native"] .support-state-button {
     display: grid;
   }
 
+  #panel-calendar .calendar-output-card {
+    order: -1;
+  }
+
   #panel-calendar .calendar-term-card {
     order: 20;
     padding: 0.82rem;
@@ -5645,12 +5729,18 @@ html[data-runtime="native"] .support-state-button {
   }
 
   #panel-calendar .calendar-day {
-    min-height: 4.85rem;
+    min-height: 5rem;
     padding: 0.26rem;
   }
 
   #panel-calendar .calendar-day.is-blank {
-    min-height: 4.85rem;
+    min-height: 5rem;
+  }
+
+  #panel-calendar .calendar-day-add {
+    width: 1.2rem;
+    height: 1.2rem;
+    font-size: 0.84rem;
   }
 
   #panel-calendar .calendar-due-chip,
