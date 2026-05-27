@@ -75,7 +75,7 @@ test("maps task, missing-item, exit, and successful-start patterns", async ({ pa
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Renegotiate" }).click();
 
-  await page.getByRole("button", { name: "Pattern Map" }).click();
+  await page.getByRole("button", { name: "Map" }).click();
 
   await expect(page.getByRole("heading", { name: "Task types" })).toBeVisible();
   await expect(page.getByText("Email / message", { exact: true })).toBeVisible();

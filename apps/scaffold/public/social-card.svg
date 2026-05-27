@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Scaffold social preview</title>
+  <desc id="desc">A warm premium social preview for Scaffold.</desc>
+  <rect width="1200" height="630" fill="#F6F1E7"/>
+  <path d="M0 0H1200V630H0Z" fill="#F6F1E7"/>
+  <path d="M0 78H1200" stroke="#D8CFBF" stroke-width="2" opacity="0.5"/>
+  <path d="M0 552H1200" stroke="#D8CFBF" stroke-width="2" opacity="0.5"/>
+  <g transform="translate(108 130)">
+    <rect width="170" height="170" rx="18" fill="#FFFCF6" stroke="#D8CFBF" stroke-width="2"/>
+    <rect x="39" y="32" width="16" height="106" rx="4" fill="#22251F"/>
+    <rect x="115" y="32" width="16" height="106" rx="4" fill="#22251F"/>
+    <rect x="39" y="32" width="69" height="16" rx="4" fill="#22251F"/>
+    <rect x="62" y="77" width="69" height="16" rx="4" fill="#22251F"/>
+    <rect x="39" y="122" width="69" height="16" rx="4" fill="#22251F"/>
+    <rect x="39" y="122" width="23" height="16" rx="4" fill="#3F7C6B"/>
+  </g>
+  <text x="330" y="190" fill="#22251F" font-family="Avenir Next, Inter, system-ui, sans-serif" font-size="74" font-weight="700" letter-spacing="0">Scaffold</text>
+  <text x="334" y="248" fill="#3F7C6B" font-family="Avenir Next, Inter, system-ui, sans-serif" font-size="28" font-weight="700" letter-spacing="0">Not reminders. Rescue.</text>
+  <text x="110" y="394" fill="#22251F" font-family="Avenir Next, Inter, system-ui, sans-serif" font-size="43" font-weight="700" letter-spacing="0">An external executive-function rescue frame.</text>
+  <text x="112" y="455" fill="#636B61" font-family="Avenir Next, Inter, system-ui, sans-serif" font-size="27" font-weight="600" letter-spacing="0">Local-first. Agency-first. One next physical action.</text>
+  <rect x="108" y="506" width="205" height="48" rx="8" fill="#3F7C6B"/>
+  <text x="134" y="538" fill="#FFFCF6" font-family="Avenir Next, Inter, system-ui, sans-serif" font-size="19" font-weight="700" letter-spacing="0">Choose one next action</text>
+</svg>

@@ -68,7 +68,7 @@ export function SprintMode({
   }
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <section className="rescue-enter mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
       <button
         type="button"
         onClick={onBack}
@@ -195,7 +195,11 @@ export function SprintMode({
             </div>
             <BrandMark className="h-11 w-11 text-ink" title="Scaffold sprint" />
           </div>
-          <div className="mt-8 flex aspect-square items-center justify-center rounded-full border border-white/20 bg-white/10 text-6xl font-semibold text-paper shadow-inner">
+          <div
+            className={`mt-8 flex aspect-square items-center justify-center rounded-full border border-white/20 bg-white/10 text-6xl font-semibold text-paper shadow-inner ${
+              state === "running" ? "breathe-timer" : ""
+            }`}
+          >
             {formatTime(remaining)}
           </div>
           <p className="mt-6 text-base leading-7 text-paper/80">

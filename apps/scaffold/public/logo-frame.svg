@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Scaffold Rescue Frame</title>
+  <desc id="desc">A minimalist scaffold S built from vertical posts and offset crossbars.</desc>
+  <rect width="128" height="128" rx="16" fill="#FFFCF6"/>
+  <rect x="28" y="24" width="12" height="80" rx="3" fill="#22251F"/>
+  <rect x="88" y="24" width="12" height="80" rx="3" fill="#22251F"/>
+  <rect x="28" y="24" width="54" height="12" rx="3" fill="#22251F"/>
+  <rect x="46" y="58" width="54" height="12" rx="3" fill="#22251F"/>
+  <rect x="28" y="92" width="54" height="12" rx="3" fill="#22251F"/>
+  <rect x="28" y="92" width="18" height="12" rx="3" fill="#3F7C6B"/>
+</svg>

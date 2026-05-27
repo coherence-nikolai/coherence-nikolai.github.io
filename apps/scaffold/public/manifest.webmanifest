@@ -12,7 +12,19 @@
       "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "app-icon.svg",
+      "sizes": "1024x1024",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "app-icon-maskable.svg",
+      "sizes": "1024x1024",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Scaffold app icon</title>
+  <desc id="desc">The Rescue Frame mark on a warm paper field.</desc>
+  <rect width="1024" height="1024" rx="180" fill="#F6F1E7"/>
+  <rect x="210" y="170" width="88" height="684" rx="22" fill="#22251F"/>
+  <rect x="726" y="170" width="88" height="684" rx="22" fill="#22251F"/>
+  <rect x="210" y="170" width="462" height="88" rx="22" fill="#22251F"/>
+  <rect x="356" y="468" width="458" height="88" rx="22" fill="#22251F"/>
+  <rect x="210" y="766" width="462" height="88" rx="22" fill="#22251F"/>
+  <rect x="210" y="766" width="148" height="88" rx="22" fill="#3F7C6B"/>
+</svg>

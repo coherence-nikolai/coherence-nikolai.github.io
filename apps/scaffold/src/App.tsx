@@ -23,7 +23,6 @@ import {
   Panel,
   PrimaryAction,
   RescueBrief,
-  ScriptCard,
   Shell,
   SignalPill
 } from "./components/design";
@@ -264,7 +263,7 @@ export default function App() {
   }
 
   return (
-    <div className="paper-field min-h-screen bg-paper text-ink">
+    <div className="paper-field min-h-screen bg-paper pb-28 text-ink md:pb-0">
       <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <button
@@ -281,7 +280,7 @@ export default function App() {
             </span>
           </button>
 
-          <nav className="flex flex-wrap gap-2" aria-label="Primary">
+          <nav className="hidden flex-wrap gap-2 md:flex" aria-label="Primary">
             <NavButton
               active={screen === "home" || screen === "packet" || screen === "sprint"}
               icon={<Plus className="h-4 w-4" aria-hidden="true" />}
@@ -297,7 +296,7 @@ export default function App() {
             <NavButton
               active={screen === "patterns"}
               icon={<Map className="h-4 w-4" aria-hidden="true" />}
-              label="Pattern Map"
+              label="Map"
               onClick={() => setScreen("patterns")}
             />
             <NavButton
@@ -309,6 +308,14 @@ export default function App() {
           </nav>
         </div>
       </header>
+
+      <MobileCommandRail
+        screen={screen}
+        onRescue={() => setScreen("home")}
+        onReentry={() => void openReentry()}
+        onMap={() => setScreen("patterns")}
+        onSettings={() => setScreen("settings")}
+      />
 
       {error && (
         <div className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -420,6 +427,73 @@ function NavButton({
   );
 }
 
+function MobileCommandRail({
+  screen,
+  onRescue,
+  onReentry,
+  onMap,
+  onSettings
+}: {
+  screen: Screen;
+  onRescue: () => void;
+  onReentry: () => void;
+  onMap: () => void;
+  onSettings: () => void;
+}) {
+  const items = [
+    {
+      label: "Rescue",
+      icon: <Plus className="h-5 w-5" aria-hidden="true" />,
+      active: screen === "home" || screen === "packet" || screen === "sprint",
+      onClick: onRescue
+    },
+    {
+      label: "Re-entry",
+      icon: <RotateCcw className="h-5 w-5" aria-hidden="true" />,
+      active: screen === "reentry",
+      onClick: onReentry
+    },
+    {
+      label: "Map",
+      icon: <Map className="h-5 w-5" aria-hidden="true" />,
+      active: screen === "patterns",
+      onClick: onMap
+    },
+    {
+      label: "Settings",
+      icon: <Settings className="h-5 w-5" aria-hidden="true" />,
+      active: screen === "settings",
+      onClick: onSettings
+    }
+  ];
+
+  return (
+    <nav
+      aria-label="Mobile command rail"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-line/80 bg-surface/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 shadow-premium backdrop-blur md:hidden"
+    >
+      <div className="mx-auto grid max-w-xl grid-cols-4 gap-2">
+        {items.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            onClick={item.onClick}
+            aria-current={item.active ? "page" : undefined}
+            className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-lg px-2 text-xs font-semibold transition ${
+              item.active
+                ? "bg-ink text-paper shadow-sm"
+                : "text-muted hover:bg-paper hover:text-ink"
+            }`}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 function HomeScreen({
   activeCount,
   packets,
@@ -491,22 +565,9 @@ function HomeScreen({
                 id="stuck"
                 value={stuckText}
                 onChange={(event) => onTextChange(event.target.value)}
-                className="console-textarea mt-3 min-h-44 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70"
+                className="console-textarea mt-3 min-h-32 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70 sm:min-h-44"
                 placeholder="I need to reply to this email but I feel ashamed it is late."
               />
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              {starterPrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => onTextChange(prompt)}
-                  className="rounded-full border border-line/80 bg-paper/80 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:text-ink"
-                >
-                  {prompt}
-                </button>
-              ))}
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
@@ -528,6 +589,19 @@ function HomeScreen({
                 {isListening ? "Listening" : "Speak"}
               </button>
             </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {starterPrompts.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => onTextChange(prompt)}
+                  className="rounded-full border border-line/80 bg-paper/80 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:text-ink"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
           </Panel>
 
           <Panel tone="ink" className="p-5 sm:p-6">
@@ -545,6 +619,18 @@ function HomeScreen({
           </Panel>
         </div>
       </Shell>
+
+      {packets.length === 0 && (
+        <Shell className="pt-2 pb-3">
+          <FirstRunPanel
+            onLoadDemo={() =>
+              onTextChange(
+                "I need to reply to this email but I feel ashamed it is late."
+              )
+            }
+          />
+        </Shell>
+      )}
 
       <Shell className="pt-3 pb-12">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -588,6 +674,46 @@ function HomeScreen({
   );
 }
 
+function FirstRunPanel({ onLoadDemo }: { onLoadDemo: () => void }) {
+  return (
+    <Panel className="rescue-enter overflow-hidden p-0">
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="p-5 sm:p-6">
+          <p className="text-xs font-semibold uppercase text-moss">
+            First rescue
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold leading-tight text-ink">
+            Start with one guided packet.
+          </h2>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
+            Scaffold stays local in this browser. No account, no streaks, no
+            shame loop. Local rules create the first move; Deep Rescue only runs
+            when you explicitly choose it.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <PrimaryAction onClick={onLoadDemo} className="min-h-12">
+              Load demo stuck moment
+            </PrimaryAction>
+            <SignalPill value="Local rescue first" tone="moss" />
+          </div>
+        </div>
+        <div className="border-t border-line bg-paper/80 p-5 lg:border-l lg:border-t-0">
+          <div className="rounded-lg border border-line bg-surface p-4">
+            <p className="text-sm font-semibold text-ink">Demo packet</p>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              A late reply becomes one holding message, a 10-minute plan, and a
+              copyable repair option.
+            </p>
+            <p className="mt-4 text-sm font-semibold text-mossDark">
+              Repair is progress.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
 function canPersonalizeRepairScript(script: string): boolean {
   return /\[(Name|specific thing|time\/date|date\/time)\]/.test(script);
 }
@@ -609,6 +735,49 @@ function personalizeRepairScript(
     .join(details.timeDate.trim() || "[time/date]")
     .split("[date/time]")
     .join(details.timeDate.trim() || "[date/time]");
+}
+
+function ActionDisplay({
+  packet,
+  onStartSprint
+}: {
+  packet: RescuePacket;
+  onStartSprint: () => void;
+}) {
+  return (
+    <section className="instrument-display rescue-enter relative overflow-hidden rounded-lg border border-ink bg-ink p-5 text-paper shadow-premium sm:p-7">
+      <div className="absolute right-5 top-5 hidden opacity-20 sm:block" aria-hidden="true">
+        <BrandMark className="h-16 w-16 text-paper" decorative />
+      </div>
+      <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-end">
+        <div>
+          <p className="text-xs font-semibold uppercase text-moss">
+            Next physical action
+          </p>
+          <h1 className="safe-text mt-3 max-w-4xl text-3xl font-semibold leading-tight text-paper sm:text-5xl">
+            {packet.firstPhysicalAction}
+          </h1>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <SignalPill value={taskTypeLabels[packet.taskType]} />
+            <SignalPill value={blockLabels[packet.blockType]} tone="moss" />
+            <SignalPill value={rescueModeLabels[packet.rescueMode]} />
+          </div>
+          <p className="safe-text mt-5 max-w-3xl text-sm leading-6 text-paper/70">
+            <span className="font-semibold text-paper">{packet.title}</span>
+            <span className="block">{packet.originalText}</span>
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onStartSprint}
+          className="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-paper px-5 font-semibold text-ink shadow-action transition hover:bg-white"
+        >
+          <Play className="h-5 w-5" aria-hidden="true" />
+          Start rescue sprint
+        </button>
+      </div>
+    </section>
+  );
 }
 
 function PacketDetail({
@@ -749,22 +918,7 @@ function PacketDetail({
         Back to packets
       </button>
 
-      <RescueBrief
-        eyebrow="Next physical action"
-        title={packet.firstPhysicalAction}
-        body={
-          <>
-            <span className="font-semibold text-ink">{packet.title}</span>
-            <span className="block">{packet.originalText}</span>
-          </>
-        }
-        action={
-          <PrimaryAction onClick={onStartSprint} className="min-h-12">
-            <Play className="h-5 w-5" aria-hidden="true" />
-            Start rescue sprint
-          </PrimaryAction>
-        }
-      />
+      <ActionDisplay packet={packet} onStartSprint={onStartSprint} />
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-5">
@@ -913,125 +1067,137 @@ function PacketDetail({
             </ol>
           </Panel>
 
-          <section className="grid gap-4 md:grid-cols-2">
-            <ScriptCard
-              title="Repair option"
-              actions={
-                canPersonalize ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowPersonalizer((current) => !current)}
-                    className="min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-moss"
-                  >
-                    Personalize script
-                  </button>
-                ) : undefined
-              }
-            >
-              <p>{personalizedRepairScript}</p>
-              {canPersonalize && showPersonalizer && (
-                <div className="mt-4 grid gap-3 rounded-lg border border-line bg-surface p-3">
-                  <label className="text-sm font-semibold text-ink">
-                    Recipient name
-                    <input
-                      value={recipientName}
-                      onChange={(event) => setRecipientName(event.target.value)}
-                      className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
-                      placeholder="[Name]"
-                    />
-                  </label>
-                  <label className="text-sm font-semibold text-ink">
-                    Specific thing
-                    <input
-                      value={specificThing}
-                      onChange={(event) => setSpecificThing(event.target.value)}
-                      className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
-                      placeholder="[specific thing]"
-                    />
-                  </label>
-                  <label className="text-sm font-semibold text-ink">
-                    Time/date
-                    <input
-                      value={timeDate}
-                      onChange={(event) => setTimeDate(event.target.value)}
-                      className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
-                      placeholder="[time/date]"
-                    />
-                  </label>
-                </div>
-              )}
-              {canPersonalize && (
-                <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => void copyRepairScript()}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-moss"
-                  >
-                    <Clipboard className="h-4 w-4" aria-hidden="true" />
-                    Copy script
-                  </button>
-                  {copyMessage && (
-                    <span className="text-sm font-semibold text-mossDark">
-                      {copyMessage}
-                    </span>
+          <Panel tone="paper" className="rescue-enter p-4 sm:p-5">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Rescue tools
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-ink">
+                  Repair, unblock, or exit cleanly.
+                </h2>
+              </div>
+              <SignalPill value={rescueModeLabels[packet.rescueMode]} tone="moss" />
+            </div>
+
+            <div className="mt-4 grid gap-3 lg:grid-cols-3">
+              <div className="tool-surface">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="text-lg font-semibold text-ink">Repair option</h3>
+                  {canPersonalize && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPersonalizer((current) => !current)}
+                      className="min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-moss"
+                    >
+                      Personalize script
+                    </button>
                   )}
                 </div>
-              )}
-            </ScriptCard>
-            <ModePanel mode={packet.rescueMode} />
-          </section>
-
-          <section className="grid gap-4 md:grid-cols-2">
-            <Panel tone="paper" className="p-4 sm:p-5">
-              <h2 className="text-lg font-semibold text-ink">Unblock</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">What is missing?</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {missingItemOrder.map((missingItem) => (
-                  <button
-                    key={missingItem}
-                    type="button"
-                    onClick={() => void chooseMissingItem(missingItem)}
-                    className={`min-h-10 rounded-lg border px-3 text-sm font-semibold ${
-                      packet.missingItem === missingItem
-                        ? "border-moss bg-moss text-white"
-                        : "border-line bg-surface text-ink hover:border-moss"
-                    }`}
-                  >
-                    {missingItemLabels[missingItem]}
-                  </button>
-                ))}
+                <p className="safe-text mt-3 text-sm leading-6 text-muted">
+                  {personalizedRepairScript}
+                </p>
+                {canPersonalize && showPersonalizer && (
+                  <div className="mt-4 grid gap-3 rounded-lg border border-line bg-surface p-3">
+                    <label className="text-sm font-semibold text-ink">
+                      Recipient name
+                      <input
+                        value={recipientName}
+                        onChange={(event) => setRecipientName(event.target.value)}
+                        className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                        placeholder="[Name]"
+                      />
+                    </label>
+                    <label className="text-sm font-semibold text-ink">
+                      Specific thing
+                      <input
+                        value={specificThing}
+                        onChange={(event) => setSpecificThing(event.target.value)}
+                        className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                        placeholder="[specific thing]"
+                      />
+                    </label>
+                    <label className="text-sm font-semibold text-ink">
+                      Time/date
+                      <input
+                        value={timeDate}
+                        onChange={(event) => setTimeDate(event.target.value)}
+                        className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                        placeholder="[time/date]"
+                      />
+                    </label>
+                  </div>
+                )}
+                {canPersonalize && (
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => void copyRepairScript()}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-moss"
+                    >
+                      <Clipboard className="h-4 w-4" aria-hidden="true" />
+                      Copy script
+                    </button>
+                    {copyMessage && (
+                      <span className="text-sm font-semibold text-mossDark">
+                        {copyMessage}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
-              <p className="safe-text mt-4 text-sm leading-6 text-muted">
-                Current: {missingItemLabels[packet.missingItem]}
-              </p>
-            </Panel>
 
-            <Panel tone="paper" className="p-4 sm:p-5">
-              <h2 className="text-lg font-semibold text-ink">Exit responsibly</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                Renegotiate, defer, delegate, or abandon clearly.
-              </p>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {exitStatusOrder.map((exitStatus) => (
-                  <button
-                    key={exitStatus}
-                    type="button"
-                    onClick={() => void chooseExitStatus(exitStatus)}
-                    className={`min-h-10 rounded-lg border px-3 text-left text-sm font-semibold ${
-                      packet.exitStatus === exitStatus
-                        ? "border-clay bg-clay text-white"
-                        : "border-line bg-surface text-ink hover:border-clay"
-                    }`}
-                  >
-                    {exitStatusLabels[exitStatus]}
-                  </button>
-                ))}
+              <div className="tool-surface">
+                <h3 className="text-lg font-semibold text-ink">Unblock</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">What is missing?</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {missingItemOrder.map((missingItem) => (
+                    <button
+                      key={missingItem}
+                      type="button"
+                      onClick={() => void chooseMissingItem(missingItem)}
+                      className={`min-h-10 rounded-lg border px-3 text-sm font-semibold transition ${
+                        packet.missingItem === missingItem
+                          ? "border-moss bg-moss text-white"
+                          : "border-line bg-surface text-ink hover:border-moss"
+                      }`}
+                    >
+                      {missingItemLabels[missingItem]}
+                    </button>
+                  ))}
+                </div>
+                <p className="safe-text mt-4 text-sm leading-6 text-muted">
+                  Current: {missingItemLabels[packet.missingItem]}
+                </p>
               </div>
-              <p className="safe-text mt-4 text-sm leading-6 text-muted">
-                {packet.exitScript}
-              </p>
-            </Panel>
-          </section>
+
+              <div className="tool-surface">
+                <h3 className="text-lg font-semibold text-ink">Exit responsibly</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  Renegotiate, defer, delegate, or abandon clearly.
+                </p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  {exitStatusOrder.map((exitStatus) => (
+                    <button
+                      key={exitStatus}
+                      type="button"
+                      onClick={() => void chooseExitStatus(exitStatus)}
+                      className={`min-h-10 rounded-lg border px-3 text-left text-sm font-semibold transition ${
+                        packet.exitStatus === exitStatus
+                          ? "border-clay bg-clay text-white"
+                          : "border-line bg-surface text-ink hover:border-clay"
+                      }`}
+                    >
+                      {exitStatusLabels[exitStatus]}
+                    </button>
+                  ))}
+                </div>
+                <p className="safe-text mt-4 text-sm leading-6 text-muted">
+                  {packet.exitScript}
+                </p>
+              </div>
+            </div>
+          </Panel>
 
           <Panel tone="paper">
             <label className="text-sm font-semibold text-ink" htmlFor="packet-notes">
@@ -1171,26 +1337,6 @@ function Badge({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg border border-line bg-paper p-3">
       <p className="text-xs font-semibold uppercase text-muted">{label}</p>
       <p className="safe-text mt-1 font-semibold text-ink">{value}</p>
-    </div>
-  );
-}
-
-function ModePanel({ mode }: { mode: RescueMode }) {
-  const content: Record<RescueMode, string> = {
-    start_tiny: "Find the 30-second to 2-minute version. Stop before the task expands.",
-    make_it_ugly: "Use rough bullets, placeholders, and bad draft energy. Polish is not the entry fee.",
-    repair: "Send the brief accountable version. No extra confession. No disappearing.",
-    body_double: "Keep the timer visible. Let the panel stay with you while you do the first move.",
-    unblock:
-      "Name the missing piece: information, materials, decision, energy, courage, time, or permission.",
-    exit_responsibly:
-      "Renegotiate, defer, delegate, or abandon clearly. Name who needs to know and what you can offer."
-  };
-
-  return (
-    <div className="rounded-lg border border-line bg-paper p-4">
-      <h2 className="text-lg font-semibold text-ink">{rescueModeLabels[mode]}</h2>
-      <p className="safe-text mt-3 leading-7 text-muted">{content[mode]}</p>
     </div>
   );
 }
