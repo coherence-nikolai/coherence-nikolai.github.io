@@ -22,6 +22,19 @@ test("creates a rescue packet from messy text", async ({ page }) => {
   await expect(page.getByText("I'm sorry for the delay")).toBeVisible();
 });
 
+test("autosaves and clears messy draft text locally", async ({ page }) => {
+  await page.getByLabel("Messy task").fill("I need to start the grant report.");
+  await expect(page.getByText("Draft autosaves locally in this browser.")).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByLabel("Messy task")).toHaveValue(
+    "I need to start the grant report."
+  );
+
+  await page.getByRole("button", { name: "Clear draft" }).click();
+  await expect(page.getByLabel("Messy task")).toHaveValue("");
+});
+
 test("runs a sprint and records done enough", async ({ page }) => {
   await page.getByLabel("Messy task").fill("I have an essay due and I don't know where to start.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
@@ -112,20 +125,15 @@ test("exports and imports local JSON data", async ({ page }, testInfo) => {
   const exportPath = testInfo.outputPath("scaffold-export.json");
   await download.saveAs(exportPath);
 
-  const dialogMessagePromise = new Promise<string>((resolve) => {
-    page.once("dialog", async (dialog) => {
-      const message = dialog.message();
-      resolve(message);
-      await dialog.accept();
-    });
-  });
   await page.locator('input[type="file"]').setInputFiles(exportPath);
-  await expect(dialogMessagePromise).resolves.toContain(
-    "replace the current local Scaffold data"
-  );
+  await expect(
+    page.getByRole("heading", { name: "Review import before overwrite" })
+  ).toBeVisible();
+  await expect(page.getByText("API keys are not part of Scaffold JSON exports")).toBeVisible();
+  await page.getByRole("button", { name: "Replace local data" }).click();
 
   await expect(page.getByText("Import complete.")).toBeVisible();
-  await expect(page.getByText("1 local packets")).toBeVisible();
+  await expect(page.getByText("1 local", { exact: true })).toBeVisible();
 });
 
 test("records explicit external LLM consent in settings", async ({ page }) => {

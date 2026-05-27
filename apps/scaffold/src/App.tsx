@@ -26,6 +26,7 @@ import {
   Shell,
   SignalPill
 } from "./components/design";
+import { parseImportPayload, type ScaffoldExport } from "./data/db";
 import { generatePatternMap } from "./engine/patternMap";
 import {
   detectReentryState,
@@ -115,6 +116,32 @@ const exitStatusOrder: Exclude<ExitResponsibilityStatus, "not_chosen">[] = [
 const navButtonBase =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold transition";
 
+const stuckDraftStorageKey = "scaffold.stuckDraft.v1";
+
+function loadSavedStuckDraft(): string {
+  if (typeof window === "undefined") return "";
+
+  try {
+    return window.localStorage.getItem(stuckDraftStorageKey) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function saveStuckDraft(value: string) {
+  if (typeof window === "undefined") return;
+
+  try {
+    if (value.trim()) {
+      window.localStorage.setItem(stuckDraftStorageKey, value);
+    } else {
+      window.localStorage.removeItem(stuckDraftStorageKey);
+    }
+  } catch {
+    // Local draft autosave is a convenience only; packet storage remains IndexedDB.
+  }
+}
+
 const starterPrompts = [
   "I need to start my assignment and I don't know where to start.",
   "I need to reply to this email but I feel ashamed it is late.",
@@ -144,7 +171,7 @@ export default function App() {
   } = useScaffoldData();
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedPacketId, setSelectedPacketId] = useState<string | null>(null);
-  const [stuckText, setStuckText] = useState("");
+  const [stuckText, setStuckText] = useState(loadSavedStuckDraft);
   const [isListening, setIsListening] = useState(false);
   const [byokSettings, setByokSettings] = useState<ByokSettings>(() =>
     loadByokSettings()
@@ -165,6 +192,10 @@ export default function App() {
       setScreen("home");
     }
   }, [selectedPacket, selectedPacketId]);
+
+  useEffect(() => {
+    saveStuckDraft(stuckText);
+  }, [stuckText]);
 
   async function handleCreatePacket() {
     const trimmed = stuckText.trim();
@@ -345,6 +376,10 @@ export default function App() {
             setStuckText(value);
             if (patternStarterMessage) setPatternStarterMessage(null);
           }}
+          onClearDraft={() => {
+            setStuckText("");
+            setPatternStarterMessage(null);
+          }}
           onCreatePacket={() => void handleCreatePacket()}
           onListen={startSpeechInput}
           onOpenPacket={openPacket}
@@ -510,6 +545,7 @@ function HomeScreen({
   isListening,
   starterMessage,
   onTextChange,
+  onClearDraft,
   onCreatePacket,
   onListen,
   onOpenPacket
@@ -520,6 +556,7 @@ function HomeScreen({
   isListening: boolean;
   starterMessage: string | null;
   onTextChange: (value: string) => void;
+  onClearDraft: () => void;
   onCreatePacket: () => void;
   onListen: () => void;
   onOpenPacket: (packet: RescuePacket) => void;
@@ -577,6 +614,20 @@ function HomeScreen({
                 className="console-textarea mt-3 min-h-32 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70 sm:min-h-44"
                 placeholder="I need to reply to this email but I feel ashamed it is late."
               />
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm leading-6 text-muted">
+                  Draft autosaves locally in this browser.
+                </p>
+                {stuckText.trim() && (
+                  <button
+                    type="button"
+                    onClick={onClearDraft}
+                    className="min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-clay"
+                  >
+                    Clear draft
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="mt-5 flex flex-wrap gap-3">
@@ -1790,6 +1841,10 @@ function SettingsScreen({
 }) {
   const [message, setMessage] = useState<string | null>(null);
   const [isSavingConsent, setIsSavingConsent] = useState(false);
+  const [pendingImport, setPendingImport] = useState<{
+    fileName: string;
+    payload: ScaffoldExport;
+  } | null>(null);
   const [draftByokSettings, setDraftByokSettings] =
     useState<ByokSettings>(byokSettings);
 
@@ -1798,6 +1853,30 @@ function SettingsScreen({
   }, [byokSettings]);
 
   const byokSummary = summarizeByokSettings(byokSettings);
+  const healthItems = [
+    {
+      label: "Storage",
+      value: "IndexedDB local",
+      detail: "Packet history stays in this browser."
+    },
+    {
+      label: "Packets",
+      value: `${packetCount} local`,
+      detail: packetCount === 0 ? "Nothing stored yet." : "Ready for export."
+    },
+    {
+      label: "External text",
+      value: meta.llmConsent.externalLlmEnabled ? "Consent on" : "Consent off",
+      detail: meta.llmConsent.externalLlmEnabled
+        ? "Deep Rescue still asks before sending packet text."
+        : "No packet text can leave by default."
+    },
+    {
+      label: "API keys",
+      value: byokSummary.hasApiKey ? "Stored locally" : "None stored",
+      detail: "JSON export never includes API keys."
+    }
+  ];
 
   async function handleExport() {
     const payload = await onExport();
@@ -1813,18 +1892,34 @@ function SettingsScreen({
     setMessage("Export created.");
   }
 
-  async function handleImport(file: File | undefined) {
+  async function handleImportPreview(file: File | undefined) {
     if (!file) return;
-
-    const confirmed = window.confirm(
-      "Import will replace the current local Scaffold data in this browser. Continue?"
-    );
-    if (!confirmed) return;
 
     try {
       const text = await file.text();
-      await onImport(JSON.parse(text));
-      setMessage("Import complete.");
+      const payload = parseImportPayload(JSON.parse(text));
+      setPendingImport({
+        fileName: file.name,
+        payload
+      });
+      setMessage("Import preview ready. Review before replacing local data.");
+    } catch (caught) {
+      setPendingImport(null);
+      setMessage(caught instanceof Error ? caught.message : "Import preview failed.");
+    }
+  }
+
+  async function confirmImport() {
+    if (!pendingImport) return;
+
+    try {
+      await onImport(pendingImport.payload);
+      setMessage(
+        `Import complete. ${pendingImport.payload.packets.length} packet${
+          pendingImport.payload.packets.length === 1 ? "" : "s"
+        } restored locally.`
+      );
+      setPendingImport(null);
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : "Import did not complete.");
     }
@@ -1872,11 +1967,64 @@ function SettingsScreen({
     <Shell className="max-w-4xl py-8">
       <RescueBrief
         eyebrow="Settings"
-        title="Local data"
-        body="Stored in this browser using IndexedDB. No cloud account is required."
+        title="Local rescue vault"
+        body="Stored in this browser using IndexedDB. No cloud account is required, and external processing stays off unless you choose it."
       />
 
+      <Panel tone="ink" className="mt-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-paper/65">Privacy posture</p>
+            <h2 className="mt-2 text-3xl font-semibold text-paper">
+              Local rescue first.
+            </h2>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-paper/75">
+              Scaffold keeps packet history, stuck drafts, and BYOK settings in
+              this browser. Export is explicit. Import previews before overwrite.
+            </p>
+          </div>
+          <SignalPill value="No account required" tone="moss" />
+        </div>
+      </Panel>
+
       <Panel className="mt-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase text-moss">
+              Local data health
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold text-ink">
+              What is stored here?
+            </h2>
+          </div>
+          <SignalPill value={`Updated ${formatShortDate(meta.updatedAt)}`} />
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {healthItems.map((item) => (
+            <div
+              key={item.label}
+              className="rounded-lg border border-line bg-paper/80 p-4"
+            >
+              <p className="text-xs font-semibold uppercase text-muted">
+                {item.label}
+              </p>
+              <p className="mt-2 text-lg font-semibold text-ink">{item.value}</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
+      <Panel className="mt-6">
+        <div>
+          <p className="text-xs font-semibold uppercase text-moss">
+            Portability
+          </p>
+          <h2 className="mt-1 text-2xl font-semibold text-ink">
+            Export or restore local rescue data.
+          </h2>
+        </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <PrimaryAction onClick={() => void handleExport()} className="text-lg">
             <Download className="h-5 w-5" aria-hidden="true" />
@@ -1890,22 +2038,65 @@ function SettingsScreen({
               type="file"
               accept="application/json,.json"
               className="sr-only"
-              onChange={(event) => void handleImport(event.target.files?.[0])}
+              onChange={(event) => {
+                const input = event.currentTarget;
+                void handleImportPreview(input.files?.[0]).finally(() => {
+                  input.value = "";
+                });
+              }}
             />
           </label>
         </div>
 
-        <div className="mt-6 rounded-lg border border-line bg-paper/80 p-4">
-          <div className="flex items-center gap-3">
-            <FileJson className="h-5 w-5 text-moss" aria-hidden="true" />
-            <p className="font-semibold text-ink">{packetCount} local packets</p>
+        {pendingImport && (
+          <div className="mt-5 rounded-lg border border-clay/35 bg-clay/10 p-4">
+            <div className="flex items-start gap-3">
+              <FileJson className="mt-1 h-5 w-5 flex-none text-clay" aria-hidden="true" />
+              <div>
+                <h3 className="text-lg font-semibold text-ink">
+                  Review import before overwrite
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  {pendingImport.fileName} contains {pendingImport.payload.packets.length} packet
+                  {pendingImport.payload.packets.length === 1 ? "" : "s"} exported{" "}
+                  {formatShortDate(pendingImport.payload.exportedAt)}. Import will
+                  replace the {packetCount} packet{packetCount === 1 ? "" : "s"} currently
+                  stored in this browser.
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  API keys are not part of Scaffold JSON exports, so this will not
+                  import or overwrite BYOK keys.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void confirmImport()}
+                    className="inline-flex min-h-11 items-center rounded-lg bg-clay px-4 font-semibold text-white transition hover:bg-clay/90"
+                  >
+                    Replace local data
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPendingImport(null)}
+                    className="inline-flex min-h-11 items-center rounded-lg border border-line bg-surface px-4 font-semibold text-ink transition hover:border-moss"
+                  >
+                    Cancel import
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
+        )}
+
+        <div className="mt-6 rounded-lg border border-line bg-paper/80 p-4">
           <p className="mt-3 text-sm leading-6 text-muted">
             Scaffold does not diagnose, treat, or make clinical claims.
           </p>
         </div>
+      </Panel>
 
-        <div className="mt-6 rounded-lg border border-line bg-paper/80 p-4">
+      <Panel className="mt-6">
+        <div className="rounded-lg border border-line bg-paper/80 p-4">
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-1 h-5 w-5 flex-none text-moss" aria-hidden="true" />
             <div>
