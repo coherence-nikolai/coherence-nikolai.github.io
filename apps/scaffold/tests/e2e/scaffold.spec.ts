@@ -69,7 +69,7 @@ test("uses unblock and exit responsibly controls", async ({ page }) => {
   await page.getByLabel("Messy task").fill("I need to finish the work proposal but the scope is too much.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
-  await expect(page.getByText("Next physical action")).toBeVisible();
+  await expect(page.getByText("Next physical action", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Decision" }).click();
   await expect(page.getByText("Current: Decision")).toBeVisible();
 
@@ -134,6 +134,35 @@ test("exports and imports local JSON data", async ({ page }, testInfo) => {
 
   await expect(page.getByText("Import complete.")).toBeVisible();
   await expect(page.getByText("1 local", { exact: true })).toBeVisible();
+});
+
+test("uses the Rescue Quality Lab and saves a local signal", async ({ page }) => {
+  await page.getByRole("button", { name: "Map" }).click();
+  await page.getByRole("button", { name: "Quality Lab" }).click();
+
+  await expect(
+    page.getByRole("heading", {
+      name: "Make packets sharper without vague AI fluff."
+    })
+  ).toBeVisible();
+  await expect(page.getByText("Golden fixtures")).toBeVisible();
+  await page.getByRole("button", { name: /Assignment blank start/ }).click();
+  await expect(page.getByLabel("Messy input")).toHaveValue(
+    "I need to start my assignment and I don't know where to start."
+  );
+  await expect(page.getByText("Local rules packet")).toBeVisible();
+  await expect(page.getByText("No repair needed yet")).toBeVisible();
+
+  await page.getByLabel("Which packet helped more?").selectOption("local_better");
+  await page.getByLabel("What changed the decision?").selectOption("next_action");
+  await page
+    .getByLabel("Note")
+    .fill("Local action is more physical and repair stays out of the way.");
+  await page.getByRole("button", { name: "Save local signal" }).click();
+
+  await expect(page.getByText("Quality signal saved locally.")).toBeVisible();
+  await expect(page.getByText("1 saved")).toBeVisible();
+  await expect(page.getByText("Local action is more physical")).toBeVisible();
 });
 
 test("records explicit external LLM consent in settings", async ({ page }) => {

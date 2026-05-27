@@ -84,6 +84,19 @@ export type ReentryActionType =
   | "unblock_missing_piece"
   | "exit_responsibly";
 
+export type QualitySignalChoice =
+  | "local_better"
+  | "deep_better"
+  | "both_useful"
+  | "neither_clear";
+
+export type QualitySignalDimension =
+  | "next_action"
+  | "block"
+  | "plan"
+  | "repair"
+  | "overall";
+
 export interface Sprint {
   id: string;
   packetId: string;
@@ -173,6 +186,18 @@ export interface PatternActionSuggestion {
   exitStatus?: ExitResponsibilityStatus;
 }
 
+export interface QualitySignal {
+  id: string;
+  fixtureId?: string;
+  input: string;
+  choice: QualitySignalChoice;
+  dimension: QualitySignalDimension;
+  localScore: number;
+  deepScore?: number;
+  note?: string;
+  createdAt: string;
+}
+
 export interface LlmConsentState {
   externalLlmEnabled: boolean;
   providerLabel: string;
@@ -185,6 +210,7 @@ export interface AppMeta {
   reentries: number;
   repairs: number;
   supportFadingEvents: number;
+  qualitySignals: QualitySignal[];
   llmConsent: LlmConsentState;
   updatedAt: string;
 }
@@ -274,4 +300,19 @@ export const reentryActionLabels: Record<ReentryActionType, string> = {
   repair_this: "Repair this",
   unblock_missing_piece: "Unblock missing piece",
   exit_responsibly: "Exit responsibly"
+};
+
+export const qualitySignalChoiceLabels: Record<QualitySignalChoice, string> = {
+  local_better: "Local better",
+  deep_better: "Deep better",
+  both_useful: "Both useful",
+  neither_clear: "Neither clear"
+};
+
+export const qualitySignalDimensionLabels: Record<QualitySignalDimension, string> = {
+  next_action: "Next action",
+  block: "Block",
+  plan: "Plan",
+  repair: "Repair",
+  overall: "Overall"
 };

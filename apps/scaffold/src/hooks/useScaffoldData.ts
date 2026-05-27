@@ -21,6 +21,7 @@ import {
 } from "../llm/rescueAdapter";
 import type {
   AppMeta,
+  QualitySignal,
   ReentryActionType,
   ReentryEvent,
   RescuePacket,
@@ -324,6 +325,28 @@ export function useScaffoldData() {
     return nextMeta;
   }, []);
 
+  const recordQualitySignal = useCallback(
+    async (signal: Omit<QualitySignal, "id" | "createdAt">) => {
+      const current = await ensureMeta();
+      const now = new Date().toISOString();
+      const nextSignal: QualitySignal = {
+        ...signal,
+        id: makeLocalId("quality"),
+        createdAt: now
+      };
+      const nextMeta: AppMeta = {
+        ...current,
+        qualitySignals: [...current.qualitySignals, nextSignal].slice(-200),
+        updatedAt: now
+      };
+
+      await saveMeta(nextMeta);
+      setMeta(nextMeta);
+      return nextSignal;
+    },
+    []
+  );
+
   const exportLocalData = useCallback(async (): Promise<ScaffoldExport> => {
     return buildExport();
   }, []);
@@ -371,6 +394,7 @@ export function useScaffoldData() {
     deepRescuePacket,
     previewDeepRescuePacket,
     updateExternalLlmConsent,
+    recordQualitySignal,
     exportLocalData,
     importLocalData,
     refresh

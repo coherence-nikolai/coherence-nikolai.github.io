@@ -5,6 +5,7 @@ import {
   Clipboard,
   Download,
   FileJson,
+  FlaskConical,
   Map as MapIcon,
   Mic,
   Play,
@@ -36,9 +37,19 @@ import {
 import {
   decomposeTask,
   generateExitResponsiblyScript,
+  generateRescuePacket,
   increaseSupportLevel,
   scoreRepairRelevance
 } from "./engine/rescueEngine";
+import {
+  comparePacketQuality,
+  goldenRescueFixtures,
+  scorePacketQuality,
+  summarizeQualitySignals,
+  type GoldenRescueFixture,
+  type PacketQualityComparison,
+  type PacketQualityScore
+} from "./engine/qualityLab";
 import { useScaffoldData } from "./hooks/useScaffoldData";
 import {
   clearByokSettings,
@@ -56,12 +67,15 @@ import {
   ByokConfigurationError,
   ExternalLlmConsentRequiredError,
   ExternalLlmRequestError,
-  createByokRescueAdapter
+  createByokRescueAdapter,
+  generateRescuePacketWithAdapter
 } from "./llm/rescueAdapter";
 import {
   blockLabels,
   exitStatusLabels,
   missingItemLabels,
+  qualitySignalChoiceLabels,
+  qualitySignalDimensionLabels,
   reentryStateLabels,
   rescueModeLabels,
   statusLabels,
@@ -70,6 +84,9 @@ import {
   type ExitResponsibilityStatus,
   type MissingItemType,
   type PatternActionSuggestion,
+  type QualitySignal,
+  type QualitySignalChoice,
+  type QualitySignalDimension,
   type ReentryActionType,
   type RescueMode,
   type RescuePacket,
@@ -77,7 +94,14 @@ import {
   type Status
 } from "./types";
 
-type Screen = "home" | "packet" | "sprint" | "reentry" | "patterns" | "settings";
+type Screen =
+  | "home"
+  | "packet"
+  | "sprint"
+  | "reentry"
+  | "patterns"
+  | "quality"
+  | "settings";
 
 const statusOrder: Status[] = [
   "rescue_now",
@@ -113,6 +137,21 @@ const exitStatusOrder: Exclude<ExitResponsibilityStatus, "not_chosen">[] = [
   "defer",
   "delegate",
   "abandon"
+];
+
+const qualityChoiceOrder: QualitySignalChoice[] = [
+  "local_better",
+  "deep_better",
+  "both_useful",
+  "neither_clear"
+];
+
+const qualityDimensionOrder: QualitySignalDimension[] = [
+  "next_action",
+  "block",
+  "plan",
+  "repair",
+  "overall"
 ];
 
 const navButtonBase =
@@ -168,6 +207,7 @@ export default function App() {
     incrementReentries,
     previewDeepRescuePacket,
     updateExternalLlmConsent,
+    recordQualitySignal,
     exportLocalData,
     importLocalData
   } = useScaffoldData();
@@ -334,9 +374,15 @@ export default function App() {
               />
               <NavButton
                 active={screen === "patterns"}
-              icon={<MapIcon className="h-4 w-4" aria-hidden="true" />}
+                icon={<MapIcon className="h-4 w-4" aria-hidden="true" />}
                 label="Map"
                 onClick={() => setScreen("patterns")}
+              />
+              <NavButton
+                active={screen === "quality"}
+                icon={<FlaskConical className="h-4 w-4" aria-hidden="true" />}
+                label="Lab"
+                onClick={() => setScreen("quality")}
               />
               <NavButton
                 active={screen === "settings"}
@@ -427,6 +473,16 @@ export default function App() {
           packets={packets}
           meta={meta}
           onUseSuggestion={usePatternSuggestion}
+          onOpenQualityLab={() => setScreen("quality")}
+        />
+      )}
+
+      {screen === "quality" && (
+        <QualityLabScreen
+          meta={meta}
+          byokSettings={byokSettings}
+          onRecordQualitySignal={recordQualitySignal}
+          onOpenSettings={() => setScreen("settings")}
         />
       )}
 
@@ -502,7 +558,7 @@ function MobileCommandRail({
     {
       label: "Map",
       icon: <MapIcon className="h-5 w-5" aria-hidden="true" />,
-      active: screen === "patterns",
+      active: screen === "patterns" || screen === "quality",
       onClick: onMap
     },
     {
@@ -1815,14 +1871,643 @@ function ReentryScreen({
   );
 }
 
+function QualityLabScreen({
+  meta,
+  byokSettings,
+  onRecordQualitySignal,
+  onOpenSettings
+}: {
+  meta: Parameters<typeof generatePatternMap>[1];
+  byokSettings: ByokSettings;
+  onRecordQualitySignal: (
+    signal: Omit<QualitySignal, "id" | "createdAt">
+  ) => Promise<QualitySignal>;
+  onOpenSettings: () => void;
+}) {
+  const [selectedFixtureId, setSelectedFixtureId] = useState(
+    goldenRescueFixtures[0]?.id ?? ""
+  );
+  const selectedFixture =
+    goldenRescueFixtures.find((fixture) => fixture.id === selectedFixtureId) ??
+    goldenRescueFixtures[0]!;
+  const [labInput, setLabInput] = useState(selectedFixture.messyInput);
+  const [deepPacket, setDeepPacket] = useState<RescuePacket | null>(null);
+  const [deepConsentChecked, setDeepConsentChecked] = useState(false);
+  const [isRunningDeepRescue, setIsRunningDeepRescue] = useState(false);
+  const [labMessage, setLabMessage] = useState<string | null>(null);
+  const [labError, setLabError] = useState<string | null>(null);
+  const [signalChoice, setSignalChoice] =
+    useState<QualitySignalChoice>("local_better");
+  const [signalDimension, setSignalDimension] =
+    useState<QualitySignalDimension>("next_action");
+  const [signalNote, setSignalNote] = useState("");
+  const [signalMessage, setSignalMessage] = useState<string | null>(null);
+  const byokSummary = summarizeByokSettings(byokSettings);
+  const deepRescueConfigured =
+    byokSummary.hasApiKey &&
+    Boolean(byokSettings.model.trim()) &&
+    Boolean(byokSettings.endpoint.trim());
+  const deepRescueAllowed =
+    meta.llmConsent.externalLlmEnabled && Boolean(meta.llmConsent.consentedAt);
+
+  const localPacket = useMemo(
+    () => generateRescuePacket(labInput.trim() || selectedFixture.messyInput),
+    [labInput, selectedFixture.messyInput]
+  );
+  const localScore = useMemo(
+    () => scorePacketQuality(localPacket, selectedFixture),
+    [localPacket, selectedFixture]
+  );
+  const deepScore = useMemo(
+    () => (deepPacket ? scorePacketQuality(deepPacket, selectedFixture) : null),
+    [deepPacket, selectedFixture]
+  );
+  const comparison = useMemo<PacketQualityComparison | null>(
+    () => (deepPacket ? comparePacketQuality(localPacket, deepPacket, selectedFixture) : null),
+    [deepPacket, localPacket, selectedFixture]
+  );
+  const fixtureScores = useMemo(
+    () =>
+      goldenRescueFixtures.map((fixture) => {
+        const packet = generateRescuePacket(fixture.messyInput);
+        return {
+          fixture,
+          score: scorePacketQuality(packet, fixture)
+        };
+      }),
+    []
+  );
+  const signalSummary = summarizeQualitySignals(meta.qualitySignals);
+
+  function chooseFixture(fixture: GoldenRescueFixture) {
+    setSelectedFixtureId(fixture.id);
+    setLabInput(fixture.messyInput);
+    setDeepPacket(null);
+    setDeepConsentChecked(false);
+    setLabMessage(null);
+    setLabError(null);
+    setSignalMessage(null);
+  }
+
+  async function runDeepRescueComparison() {
+    setLabError(null);
+    setLabMessage(null);
+
+    if (!deepRescueConfigured) {
+      setLabError("Add a local BYOK provider before running Deep Rescue in the Lab.");
+      return;
+    }
+
+    if (!deepRescueAllowed) {
+      setLabError("Turn on external LLM consent in Settings first.");
+      return;
+    }
+
+    if (!deepConsentChecked) {
+      setLabError("Confirm this specific Lab input can leave the browser first.");
+      return;
+    }
+
+    setIsRunningDeepRescue(true);
+
+    try {
+      const result = await generateRescuePacketWithAdapter(
+        labInput.trim() || selectedFixture.messyInput,
+        meta.llmConsent,
+        createByokRescueAdapter(byokSettings),
+        localPacket
+      );
+      setDeepPacket(result.packet);
+      setLabMessage("Deep Rescue comparison ready. Nothing was saved as a packet.");
+      setDeepConsentChecked(false);
+    } catch (caught) {
+      if (caught instanceof ExternalLlmConsentRequiredError) {
+        setLabError("External LLM consent is off. Turn it on in Settings to compare.");
+      } else if (caught instanceof ByokConfigurationError) {
+        setLabError(caught.message);
+      } else if (caught instanceof ExternalLlmRequestError) {
+        setLabError(caught.message);
+      } else {
+        setLabError("Deep Rescue comparison could not complete.");
+      }
+    } finally {
+      setIsRunningDeepRescue(false);
+    }
+  }
+
+  async function saveSignal() {
+    await onRecordQualitySignal({
+      fixtureId: selectedFixture.id,
+      input: labInput.trim() || selectedFixture.messyInput,
+      choice: signalChoice,
+      dimension: signalDimension,
+      localScore: localScore.score,
+      deepScore: deepScore?.score,
+      note: signalNote.trim() || undefined
+    });
+    setSignalMessage("Quality signal saved locally.");
+    setSignalNote("");
+  }
+
+  return (
+    <Shell className="max-w-7xl py-8">
+      <RescueBrief
+        eyebrow="Rescue Quality Lab"
+        title="Make packets sharper without vague AI fluff."
+        body="Golden messy inputs, scored packet anatomy, optional Deep Rescue comparison, and local feedback signals. No text leaves the browser unless you explicitly run Deep Rescue."
+        action={<SignalPill value={`${signalSummary.total} local signals`} tone="moss" />}
+      />
+
+      <section className="mt-6 grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
+        <Panel tone="paper" className="p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase text-moss">
+                Golden fixtures
+              </p>
+              <h2 className="mt-1 text-xl font-semibold text-ink">
+                Messy inputs worth protecting.
+              </h2>
+            </div>
+            <SignalPill value={`${goldenRescueFixtures.length} fixtures`} />
+          </div>
+          <div className="mt-4 space-y-2">
+            {fixtureScores.map(({ fixture, score }) => (
+              <button
+                key={fixture.id}
+                type="button"
+                onClick={() => chooseFixture(fixture)}
+                className={`w-full rounded-lg border p-3 text-left transition ${
+                  fixture.id === selectedFixture.id
+                    ? "border-moss bg-moss/10"
+                    : "border-line bg-surface hover:border-moss"
+                }`}
+              >
+                <span className="safe-text block font-semibold text-ink">
+                  {fixture.title}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-muted">
+                  Local rules score {score.score}/100
+                </span>
+              </button>
+            ))}
+          </div>
+        </Panel>
+
+        <div className="space-y-5">
+          <Panel>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Lab input
+                </p>
+                <h2 className="safe-text mt-1 text-2xl font-semibold text-ink">
+                  {selectedFixture.title}
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+                  {selectedFixture.whyItMatters}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <SignalPill value={taskTypeLabels[selectedFixture.expected.taskType]} />
+                <SignalPill
+                  value={blockLabels[selectedFixture.expected.blockType]}
+                  tone="moss"
+                />
+              </div>
+            </div>
+
+            <label className="mt-5 block text-sm font-semibold text-ink" htmlFor="lab-input">
+              Messy input
+            </label>
+            <textarea
+              id="lab-input"
+              value={labInput}
+              onChange={(event) => {
+                setLabInput(event.target.value);
+                setDeepPacket(null);
+                setLabMessage(null);
+                setLabError(null);
+              }}
+              className="console-textarea mt-2 min-h-28 w-full resize-y rounded-lg border border-line bg-paper p-4 text-base leading-7 text-ink"
+            />
+            <div className="mt-4 flex flex-wrap gap-2">
+              <SignalPill
+                label="Expected repair"
+                value={
+                  selectedFixture.expected.repair === "needed"
+                    ? "contextual"
+                    : "not needed"
+                }
+                tone={selectedFixture.expected.repair === "needed" ? "moss" : "quiet"}
+              />
+              {selectedFixture.expected.rescueMode && (
+                <SignalPill
+                  label="Expected mode"
+                  value={rescueModeLabels[selectedFixture.expected.rescueMode]}
+                />
+              )}
+            </div>
+          </Panel>
+
+          <section className="grid gap-5 xl:grid-cols-2">
+            <QualityPacketPanel
+              title="Local rules packet"
+              packet={localPacket}
+              score={localScore}
+              tone="local"
+            />
+            <QualityPacketPanel
+              title="Deep Rescue packet"
+              packet={deepPacket}
+              score={deepScore}
+              tone="deep"
+              empty={
+                <div>
+                  <p className="font-semibold text-ink">Optional comparison.</p>
+                  <p className="mt-2 leading-6">
+                    Local rules stay default. Use Deep Rescue only when you want to
+                    compare your BYOK adapter against the golden input.
+                  </p>
+                </div>
+              }
+            />
+          </section>
+
+          <Panel tone="paper">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Deep Rescue comparison
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-ink">
+                  Compare before trusting.
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+                  This sends only the Lab input to your selected provider when you
+                  press the button below.
+                </p>
+              </div>
+              <SignalPill value={byokSummary.providerLabel} tone="moss" />
+            </div>
+
+            {!deepRescueConfigured && (
+              <div className="mt-4 rounded-lg border border-line bg-surface p-4 text-sm leading-6 text-muted">
+                Add a provider, endpoint, model, and API key in Settings before
+                running this comparison.
+                <button
+                  type="button"
+                  onClick={onOpenSettings}
+                  className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-line bg-paper px-3 font-semibold text-ink hover:border-moss"
+                >
+                  Open Settings
+                </button>
+              </div>
+            )}
+
+            <label className="mt-4 flex gap-3 rounded-lg border border-line bg-surface p-3 text-sm leading-6 text-muted">
+              <input
+                type="checkbox"
+                checked={deepConsentChecked}
+                onChange={(event) => setDeepConsentChecked(event.target.checked)}
+                className="mt-1 h-4 w-4 accent-moss"
+              />
+              <span>
+                I understand this Lab input will be sent to my selected provider if I
+                run Deep Rescue.
+              </span>
+            </label>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void runDeepRescueComparison()}
+                disabled={isRunningDeepRescue}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-ink px-4 font-semibold text-paper transition hover:bg-mossDark disabled:cursor-not-allowed disabled:bg-muted"
+              >
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+                {isRunningDeepRescue ? "Comparing" : "Run Deep Rescue comparison"}
+              </button>
+              {comparison && (
+                <SignalPill
+                  value={
+                    comparison.recommendation === "candidate"
+                      ? "Deep scored clearer"
+                      : comparison.recommendation === "local"
+                        ? "Local scored clearer"
+                        : "Scores are close"
+                  }
+                  tone="moss"
+                />
+              )}
+            </div>
+
+            {labMessage && (
+              <p className="mt-3 rounded-lg border border-moss/30 bg-moss/10 p-3 text-sm font-semibold text-mossDark">
+                {labMessage}
+              </p>
+            )}
+            {labError && (
+              <p className="mt-3 rounded-lg border border-clay/30 bg-clay/10 p-3 text-sm font-semibold text-clay">
+                {labError}
+              </p>
+            )}
+
+            {comparison && <QualityComparisonTable comparison={comparison} />}
+          </Panel>
+
+          <Panel>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Local feedback signals
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-ink">
+                  Teach the Lab what “better” means.
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+                  Signals stay local and export with Scaffold JSON. They are not a
+                  productivity score.
+                </p>
+              </div>
+              <SignalPill value={`${signalSummary.total} saved`} />
+            </div>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              <label className="text-sm font-semibold text-ink">
+                Which packet helped more?
+                <select
+                  value={signalChoice}
+                  onChange={(event) =>
+                    setSignalChoice(event.target.value as QualitySignalChoice)
+                  }
+                  className="mt-2 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                >
+                  {qualityChoiceOrder.map((choice) => (
+                    <option key={choice} value={choice}>
+                      {qualitySignalChoiceLabels[choice]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="text-sm font-semibold text-ink">
+                What changed the decision?
+                <select
+                  value={signalDimension}
+                  onChange={(event) =>
+                    setSignalDimension(event.target.value as QualitySignalDimension)
+                  }
+                  className="mt-2 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                >
+                  {qualityDimensionOrder.map((dimension) => (
+                    <option key={dimension} value={dimension}>
+                      {qualitySignalDimensionLabels[dimension]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label className="mt-4 block text-sm font-semibold text-ink">
+              Note
+              <textarea
+                value={signalNote}
+                onChange={(event) => setSignalNote(event.target.value)}
+                className="mt-2 min-h-24 w-full resize-y rounded-lg border border-line bg-paper p-3 text-sm leading-6 text-ink"
+                placeholder="Example: local action was more physical; Deep plan had a better stop rule."
+              />
+            </label>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void saveSignal()}
+                className="inline-flex min-h-11 items-center rounded-lg bg-moss px-4 font-semibold text-white transition hover:bg-mossDark"
+              >
+                Save local signal
+              </button>
+              {signalMessage && (
+                <p className="text-sm font-semibold text-mossDark">{signalMessage}</p>
+              )}
+            </div>
+
+            <QualitySignalSummaryPanel summary={signalSummary} />
+          </Panel>
+        </div>
+      </section>
+    </Shell>
+  );
+}
+
+function QualityPacketPanel({
+  title,
+  packet,
+  score,
+  tone,
+  empty
+}: {
+  title: string;
+  packet: RescuePacket | null;
+  score: PacketQualityScore | null;
+  tone: "local" | "deep";
+  empty?: ReactNode;
+}) {
+  if (!packet || !score) {
+    return (
+      <Panel tone="paper" className="min-h-[320px]">
+        <p className="text-xs font-semibold uppercase text-moss">{title}</p>
+        <div className="mt-4 rounded-lg border border-dashed border-line bg-surface p-4 text-sm text-muted">
+          {empty ?? "No packet yet."}
+        </div>
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel className={tone === "local" ? "border-ink/20" : "border-moss/30"}>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase text-moss">{title}</p>
+          <h2 className="safe-text mt-1 text-xl font-semibold text-ink">
+            {packet.title}
+          </h2>
+        </div>
+        <ScoreBadge score={score} />
+      </div>
+      <div className="mt-4 rounded-lg border border-ink bg-ink p-4 text-paper">
+        <p className="text-xs font-semibold uppercase text-moss">
+          Next physical action
+        </p>
+        <p className="safe-text mt-2 text-lg font-semibold leading-7">
+          {packet.firstPhysicalAction}
+        </p>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <SignalPill value={taskTypeLabels[packet.taskType]} />
+        <SignalPill value={blockLabels[packet.blockType]} tone="moss" />
+        <SignalPill value={rescueModeLabels[packet.rescueMode]} />
+      </div>
+      <div className="mt-4 grid gap-3">
+        <InfoPanel title="Minimum viable progress" body={packet.minimumViableProgress} />
+        <InfoPanel title="Repair output" body={packet.repairScript} />
+      </div>
+      <div className="mt-4 grid gap-3">
+        {score.criteria.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-start justify-between gap-3 rounded-lg border border-line bg-paper/70 p-3"
+          >
+            <div>
+              <p className="font-semibold text-ink">{item.label}</p>
+              <p className="mt-1 text-xs leading-5 text-muted">{item.detail}</p>
+            </div>
+            <span
+              className={`flex-none rounded-full px-2.5 py-1 text-xs font-semibold ${
+                item.passed
+                  ? "bg-moss/10 text-mossDark"
+                  : "bg-clay/10 text-clay"
+              }`}
+            >
+              {item.passed ? "met" : "check"}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function ScoreBadge({ score }: { score: PacketQualityScore }) {
+  return (
+    <div className="rounded-lg border border-line bg-paper px-4 py-3 text-right">
+      <p className="text-xs font-semibold uppercase text-muted">Score</p>
+      <p className="mt-1 text-3xl font-semibold text-ink">{score.score}</p>
+      <p className="text-xs font-semibold capitalize text-mossDark">
+        {score.label.replace("_", " ")}
+      </p>
+    </div>
+  );
+}
+
+function QualityComparisonTable({
+  comparison
+}: {
+  comparison: PacketQualityComparison;
+}) {
+  return (
+    <div className="mt-5 overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="grid gap-0 border-b border-line bg-paper px-4 py-3 text-xs font-semibold uppercase text-muted md:grid-cols-[160px_minmax(0,1fr)_minmax(0,1fr)_96px]">
+        <span>Dimension</span>
+        <span>Local</span>
+        <span>Deep Rescue</span>
+        <span>Signal</span>
+      </div>
+      {comparison.rows.map((row) => (
+        <div
+          key={row.label}
+          className="grid gap-3 border-b border-line px-4 py-3 last:border-b-0 md:grid-cols-[160px_minmax(0,1fr)_minmax(0,1fr)_96px]"
+        >
+          <p className="text-sm font-semibold text-ink">{row.label}</p>
+          <p className="safe-text text-sm leading-6 text-muted">{row.local}</p>
+          <p className="safe-text text-sm leading-6 text-ink">{row.candidate}</p>
+          <SignalPill
+            value={
+              row.winner === "candidate"
+                ? "Deep"
+                : row.winner === "local"
+                  ? "Local"
+                  : "Close"
+            }
+            tone={row.winner === "tie" ? "quiet" : "moss"}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QualitySignalSummaryPanel({
+  summary
+}: {
+  summary: ReturnType<typeof summarizeQualitySignals>;
+}) {
+  return (
+    <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="rounded-lg border border-line bg-paper p-4">
+        <p className="text-sm font-semibold text-ink">Choices</p>
+        <div className="mt-3 space-y-2">
+          {summary.byChoice.length > 0 ? (
+            summary.byChoice.map((item) => (
+              <div
+                key={item.choice}
+                className="flex items-center justify-between gap-3 text-sm"
+              >
+                <span className="text-muted">{item.label}</span>
+                <span className="font-semibold text-ink">{item.count}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm leading-6 text-muted">No signals yet.</p>
+          )}
+        </div>
+      </div>
+      <div className="rounded-lg border border-line bg-paper p-4">
+        <p className="text-sm font-semibold text-ink">Decision points</p>
+        <div className="mt-3 space-y-2">
+          {summary.byDimension.length > 0 ? (
+            summary.byDimension.map((item) => (
+              <div
+                key={item.dimension}
+                className="flex items-center justify-between gap-3 text-sm"
+              >
+                <span className="text-muted">{item.label}</span>
+                <span className="font-semibold text-ink">{item.count}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm leading-6 text-muted">No decision pattern yet.</p>
+          )}
+        </div>
+      </div>
+      <div className="rounded-lg border border-line bg-paper p-4">
+        <p className="text-sm font-semibold text-ink">Recent signals</p>
+        <div className="mt-3 space-y-3">
+          {summary.recentSignals.length > 0 ? (
+            summary.recentSignals.map((signal) => (
+              <div key={signal.id} className="rounded-lg border border-line bg-surface p-3">
+                <p className="text-sm font-semibold text-ink">
+                  {qualitySignalChoiceLabels[signal.choice]} /{" "}
+                  {qualitySignalDimensionLabels[signal.dimension]}
+                </p>
+                {signal.note && (
+                  <p className="safe-text mt-1 text-xs leading-5 text-muted">
+                    {signal.note}
+                  </p>
+                )}
+              </div>
+            ))
+          ) : (
+            <p className="text-sm leading-6 text-muted">
+              Save a signal after comparing packets.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PatternScreen({
   packets,
   meta,
-  onUseSuggestion
+  onUseSuggestion,
+  onOpenQualityLab
 }: {
   packets: RescuePacket[];
   meta: Parameters<typeof generatePatternMap>[1];
   onUseSuggestion: (suggestion: PatternActionSuggestion) => void;
+  onOpenQualityLab: () => void;
 }) {
   const patternMap = generatePatternMap(packets, meta);
 
@@ -1832,6 +2517,16 @@ function PatternScreen({
         eyebrow="Pattern map"
         title="What helps you restart?"
         body="Patterns only. No score. No streaks. Use what is useful and ignore the rest."
+        action={
+          <button
+            type="button"
+            onClick={onOpenQualityLab}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm font-semibold text-ink transition hover:border-moss"
+          >
+            <FlaskConical className="h-4 w-4" aria-hidden="true" />
+            Quality Lab
+          </button>
+        }
       />
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

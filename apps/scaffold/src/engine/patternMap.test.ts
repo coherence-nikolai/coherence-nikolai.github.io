@@ -8,6 +8,7 @@ const meta: AppMeta = {
   reentries: 2,
   repairs: 0,
   supportFadingEvents: 1,
+  qualitySignals: [],
   llmConsent: {
     externalLlmEnabled: false,
     providerLabel: "No external LLM adapter connected"

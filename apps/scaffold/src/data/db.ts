@@ -12,6 +12,9 @@ import {
   type ExitResponsibilityStatus,
   type LlmConsentState,
   type MissingItemType,
+  type QualitySignal,
+  type QualitySignalChoice,
+  type QualitySignalDimension,
   type RescueMode,
   type ReentryEvent,
   type RescuePacket,
@@ -56,6 +59,7 @@ export function defaultMeta(): AppMeta {
     reentries: 0,
     repairs: 0,
     supportFadingEvents: 0,
+    qualitySignals: [],
     llmConsent: defaultLlmConsent(),
     updatedAt: new Date().toISOString()
   };
@@ -139,6 +143,21 @@ const reentryActions = [
   "exit_responsibly"
 ] as const;
 
+const qualitySignalChoices = [
+  "local_better",
+  "deep_better",
+  "both_useful",
+  "neither_clear"
+] as const;
+
+const qualitySignalDimensions = [
+  "next_action",
+  "block",
+  "plan",
+  "repair",
+  "overall"
+] as const;
+
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
@@ -220,6 +239,45 @@ function isLlmConsentState(value: unknown): value is LlmConsentState {
     typeof value.providerLabel === "string" &&
     (value.consentedAt === undefined || isIsoDateLike(value.consentedAt)) &&
     (value.revokedAt === undefined || isIsoDateLike(value.revokedAt))
+  );
+}
+
+function isQualitySignalChoice(value: unknown): value is QualitySignalChoice {
+  return (
+    typeof value === "string" &&
+    qualitySignalChoices.includes(value as (typeof qualitySignalChoices)[number])
+  );
+}
+
+function isQualitySignalDimension(value: unknown): value is QualitySignalDimension {
+  return (
+    typeof value === "string" &&
+    qualitySignalDimensions.includes(value as (typeof qualitySignalDimensions)[number])
+  );
+}
+
+function isQualityScore(value: unknown): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value >= 0 &&
+    value <= 100
+  );
+}
+
+function isQualitySignal(value: unknown): value is QualitySignal {
+  if (!isRecord(value)) return false;
+
+  return (
+    typeof value.id === "string" &&
+    (value.fixtureId === undefined || typeof value.fixtureId === "string") &&
+    typeof value.input === "string" &&
+    isQualitySignalChoice(value.choice) &&
+    isQualitySignalDimension(value.dimension) &&
+    isQualityScore(value.localScore) &&
+    (value.deepScore === undefined || isQualityScore(value.deepScore)) &&
+    (value.note === undefined || typeof value.note === "string") &&
+    isIsoDateLike(value.createdAt)
   );
 }
 
@@ -349,6 +407,11 @@ function normalizeMeta(value: unknown): AppMeta {
     reentries: safeCount(metaRaw.reentries),
     repairs: safeCount(metaRaw.repairs),
     supportFadingEvents: safeCount(metaRaw.supportFadingEvents),
+    qualitySignals:
+      Array.isArray(metaRaw.qualitySignals) &&
+      metaRaw.qualitySignals.every(isQualitySignal)
+        ? metaRaw.qualitySignals.slice(-200)
+        : [],
     llmConsent,
     updatedAt:
       typeof metaRaw.updatedAt === "string"
