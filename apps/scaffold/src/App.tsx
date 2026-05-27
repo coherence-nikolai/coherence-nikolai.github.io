@@ -5,7 +5,7 @@ import {
   Clipboard,
   Download,
   FileJson,
-  Map,
+  Map as MapIcon,
   Mic,
   Play,
   Plus,
@@ -157,6 +157,7 @@ export default function App() {
     packetCountByStatus.rescue_now +
     packetCountByStatus.in_progress +
     packetCountByStatus.waiting;
+  const isSprintScreen = screen === "sprint";
 
   useEffect(() => {
     if (selectedPacketId && !selectedPacket) {
@@ -263,59 +264,67 @@ export default function App() {
   }
 
   return (
-    <div className="paper-field min-h-screen bg-paper pb-28 text-ink md:pb-0">
-      <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <button
-            type="button"
-            onClick={() => setScreen("home")}
-            className="flex min-h-11 items-center gap-3 text-left"
-          >
-            <BrandMark className="h-12 w-12 text-ink shadow-sm" />
-            <span>
-              <span className="block text-xl font-semibold leading-6">Scaffold</span>
-              <span className="block text-sm text-muted">
-                Not reminders. Rescue.
-              </span>
-            </span>
-          </button>
-
-          <nav className="hidden flex-wrap gap-2 md:flex" aria-label="Primary">
-            <NavButton
-              active={screen === "home" || screen === "packet" || screen === "sprint"}
-              icon={<Plus className="h-4 w-4" aria-hidden="true" />}
-              label="Rescue"
+    <div
+      className={`min-h-screen text-ink ${
+        isSprintScreen ? "bg-ink" : "paper-field bg-paper pb-28 md:pb-0"
+      }`}
+    >
+      {!isSprintScreen && (
+        <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/90 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <button
+              type="button"
               onClick={() => setScreen("home")}
-            />
-            <NavButton
-              active={screen === "reentry"}
-              icon={<RotateCcw className="h-4 w-4" aria-hidden="true" />}
-              label="Re-entry"
-              onClick={() => void openReentry()}
-            />
-            <NavButton
-              active={screen === "patterns"}
-              icon={<Map className="h-4 w-4" aria-hidden="true" />}
-              label="Map"
-              onClick={() => setScreen("patterns")}
-            />
-            <NavButton
-              active={screen === "settings"}
-              icon={<Settings className="h-4 w-4" aria-hidden="true" />}
-              label="Settings"
-              onClick={() => setScreen("settings")}
-            />
-          </nav>
-        </div>
-      </header>
+              className="flex min-h-11 items-center gap-3 text-left"
+            >
+              <BrandMark className="h-12 w-12 text-ink shadow-sm" />
+              <span>
+                <span className="block text-xl font-semibold leading-6">Scaffold</span>
+                <span className="block text-sm text-muted">
+                  Not reminders. Rescue.
+                </span>
+              </span>
+            </button>
 
-      <MobileCommandRail
-        screen={screen}
-        onRescue={() => setScreen("home")}
-        onReentry={() => void openReentry()}
-        onMap={() => setScreen("patterns")}
-        onSettings={() => setScreen("settings")}
-      />
+            <nav className="hidden flex-wrap gap-2 md:flex" aria-label="Primary">
+              <NavButton
+                active={screen === "home" || screen === "packet"}
+                icon={<Plus className="h-4 w-4" aria-hidden="true" />}
+                label="Rescue"
+                onClick={() => setScreen("home")}
+              />
+              <NavButton
+                active={screen === "reentry"}
+                icon={<RotateCcw className="h-4 w-4" aria-hidden="true" />}
+                label="Re-entry"
+                onClick={() => void openReentry()}
+              />
+              <NavButton
+                active={screen === "patterns"}
+              icon={<MapIcon className="h-4 w-4" aria-hidden="true" />}
+                label="Map"
+                onClick={() => setScreen("patterns")}
+              />
+              <NavButton
+                active={screen === "settings"}
+                icon={<Settings className="h-4 w-4" aria-hidden="true" />}
+                label="Settings"
+                onClick={() => setScreen("settings")}
+              />
+            </nav>
+          </div>
+        </header>
+      )}
+
+      {!isSprintScreen && (
+        <MobileCommandRail
+          screen={screen}
+          onRescue={() => setScreen("home")}
+          onReentry={() => void openReentry()}
+          onMap={() => setScreen("patterns")}
+          onSettings={() => setScreen("settings")}
+        />
+      )}
 
       {error && (
         <div className="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -455,7 +464,7 @@ function MobileCommandRail({
     },
     {
       label: "Map",
-      icon: <Map className="h-5 w-5" aria-hidden="true" />,
+      icon: <MapIcon className="h-5 w-5" aria-hidden="true" />,
       active: screen === "patterns",
       onClick: onMap
     },
@@ -780,6 +789,50 @@ function ActionDisplay({
   );
 }
 
+function DisclosurePanel({
+  title,
+  eyebrow,
+  summary,
+  children,
+  defaultOpen = false
+}: {
+  title: string;
+  eyebrow?: string;
+  summary?: ReactNode;
+  children: ReactNode;
+  defaultOpen?: boolean;
+}) {
+  return (
+    <details
+      open={defaultOpen}
+      className="group rounded-lg border border-line/80 bg-surface/85 shadow-sm"
+    >
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 py-3 text-left [&::-webkit-details-marker]:hidden sm:px-5">
+        <span>
+          {eyebrow && (
+            <span className="block text-xs font-semibold uppercase text-moss">
+              {eyebrow}
+            </span>
+          )}
+          <span className="block text-lg font-semibold text-ink">{title}</span>
+          {summary && (
+            <span className="safe-text mt-1 block text-sm leading-6 text-muted">
+              {summary}
+            </span>
+          )}
+        </span>
+        <span
+          className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-line bg-paper text-lg font-semibold text-muted transition group-open:rotate-45"
+          aria-hidden="true"
+        >
+          +
+        </span>
+      </summary>
+      <div className="border-t border-line/80 p-4 sm:p-5">{children}</div>
+    </details>
+  );
+}
+
 function PacketDetail({
   packet,
   meta,
@@ -940,12 +993,13 @@ function PacketDetail({
             </div>
           </Panel>
 
-          <Panel tone="paper">
+          <DisclosurePanel
+            title="Deep Rescue adapter"
+            eyebrow="Optional BYOK"
+            summary="Local rules stay default. Send text out only when you explicitly choose Deep Rescue."
+          >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase text-moss">
-                  Deep Rescue
-                </p>
                 <h2 className="mt-2 text-xl font-semibold text-ink">
                   Optional BYOK refinement
                 </h2>
@@ -1043,7 +1097,7 @@ function PacketDetail({
                 {deepRescueError}
               </p>
             )}
-          </Panel>
+          </DisclosurePanel>
 
           <div className="grid gap-4 md:grid-cols-2">
             <InfoPanel title="Real task" body={packet.realTask} />
@@ -1199,9 +1253,12 @@ function PacketDetail({
             </div>
           </Panel>
 
-          <Panel tone="paper">
+          <DisclosurePanel
+            title="Notes"
+            summary="Capture only what moved or what is missing."
+          >
             <label className="text-sm font-semibold text-ink" htmlFor="packet-notes">
-              Notes
+              Note
             </label>
             <textarea
               id="packet-notes"
@@ -1211,12 +1268,11 @@ function PacketDetail({
               className="mt-2 min-h-28 w-full resize-y rounded-lg border border-line bg-surface p-3 text-base leading-7 text-ink"
               placeholder="What moved? What is missing?"
             />
-          </Panel>
+          </DisclosurePanel>
         </div>
 
         <aside className="space-y-4">
-          <Panel>
-            <h2 className="text-lg font-semibold text-ink">Signal</h2>
+          <DisclosurePanel title="Signal" summary="Quiet context. No score.">
             <dl className="mt-4 grid grid-cols-2 gap-3">
               <Estimate label="Urgency" value={packet.urgency} />
               <Estimate label="Consequence" value={packet.consequence} />
@@ -1231,10 +1287,32 @@ function PacketDetail({
               <Badge label="Support" value={supportLabels[packet.supportLevel]} />
               <Badge label="Status" value={statusLabels[packet.status]} />
             </div>
-          </Panel>
+          </DisclosurePanel>
 
-          <Panel>
-            <h2 className="text-lg font-semibold text-ink">Packet controls</h2>
+          <DisclosurePanel
+            title="Packet controls"
+            summary="Change status, support, or rescue mode deliberately."
+          >
+            <div className="rounded-lg border border-line bg-paper p-3">
+              <p className="text-sm font-semibold text-ink">Support dial</p>
+              <div className="mt-3 grid gap-2">
+                {(["full_scaffold", "guided_scaffold", "light_nudge", "self_led"] as const).map(
+                  (level) => (
+                    <div
+                      key={level}
+                      className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+                        packet.supportLevel === level
+                          ? "border-moss bg-moss/10 text-mossDark"
+                          : "border-line bg-surface text-muted"
+                      }`}
+                    >
+                      {supportLabels[level]}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
             <label className="mt-4 block text-sm font-semibold text-ink" htmlFor="status">
               Status
             </label>
@@ -1307,7 +1385,7 @@ function PacketDetail({
                 Exit responsibly
               </button>
             </div>
-          </Panel>
+          </DisclosurePanel>
         </aside>
       </div>
     </Shell>
@@ -1341,6 +1419,127 @@ function Badge({ label, value }: { label: string; value: string }) {
   );
 }
 
+function formatShortDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "recently";
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric"
+  }).format(date);
+}
+
+function getReentryReasons(packet: RescuePacket): string[] {
+  const reasons: string[] = [];
+
+  if (packet.consequence >= 4) reasons.push("high consequence");
+  if (packet.urgency >= 4) reasons.push("time-sensitive");
+  if (packet.effort <= 2) reasons.push("low effort entry");
+  if (packet.blockType === "shame_fear" || packet.rescueMode === "repair") {
+    reasons.push("repair available");
+  }
+  if (packet.missingItem !== "unknown") {
+    reasons.push(`${missingItemLabels[packet.missingItem].toLowerCase()} named`);
+  }
+
+  reasons.push(`touched ${formatShortDate(packet.lastTouchedAt)}`);
+  return reasons.slice(0, 4);
+}
+
+function ReentryTriageCard({
+  packet,
+  packets,
+  onOpenPacket,
+  onReentryAction
+}: {
+  packet: RescuePacket;
+  packets: RescuePacket[];
+  onOpenPacket: (packet: RescuePacket) => void;
+  onReentryAction: (
+    packet: RescuePacket,
+    actionType: ReentryActionType
+  ) => Promise<void>;
+}) {
+  const reentryState = detectReentryState(packet);
+  const actions = generateReentryActions(packet, packets);
+  const actionByType = new Map(actions.map((action) => [action.actionType, action]));
+  const primaryActions: ReentryActionType[] = [
+    "resume_first_move",
+    "repair_this",
+    "exit_responsibly"
+  ];
+  const reasons = getReentryReasons(packet);
+
+  return (
+    <article className="reentry-card flex h-full flex-col rounded-lg border border-line/80 bg-surface/95 p-4 shadow-premium">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <SignalPill value={reentryStateLabels[reentryState]} tone="moss" />
+        <SignalPill value={statusLabels[packet.status]} />
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onOpenPacket(packet)}
+        className="mt-4 text-left"
+      >
+        <h3 className="safe-text text-2xl font-semibold leading-tight text-ink">
+          {packet.title}
+        </h3>
+        <p className="safe-text mt-3 text-sm font-semibold uppercase text-moss">
+          Next action
+        </p>
+        <p className="safe-text mt-1 text-base leading-7 text-ink">
+          {packet.firstPhysicalAction}
+        </p>
+      </button>
+
+      <div className="mt-4">
+        <p className="text-sm font-semibold text-muted">Worth rescuing because</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {reasons.map((reason) => (
+            <span
+              key={reason}
+              className="rounded-full border border-line bg-paper px-3 py-1 text-xs font-semibold text-muted"
+            >
+              {reason}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-auto grid gap-2 pt-5">
+        {primaryActions.map((actionType) => {
+          const action = actionByType.get(actionType);
+          if (!action) return null;
+
+          return (
+            <button
+              key={actionType}
+              type="button"
+              onClick={() => void onReentryAction(packet, actionType)}
+              className={`rounded-lg border p-3 text-left transition hover:shadow-sm ${
+                actionType === "resume_first_move"
+                  ? "border-moss bg-moss text-white hover:bg-mossDark"
+                  : "border-line bg-paper text-ink hover:border-moss"
+              }`}
+            >
+              <span className="block font-semibold">{action.label}</span>
+              <span
+                className={`safe-text mt-1 block text-sm leading-6 ${
+                  actionType === "resume_first_move" ? "text-white/80" : "text-muted"
+                }`}
+              >
+                {action.body}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </article>
+  );
+}
+
 function ReentryScreen({
   packets,
   onOpenPacket,
@@ -1359,54 +1558,23 @@ function ReentryScreen({
     <Shell className="max-w-6xl py-8">
       <RescueBrief
         eyebrow="Re-entry"
-        title="No explanation needed. Let's rescue what matters."
-        body="No explanation needed. Choose what is still possible."
+        title="No explanation needed. Choose what is still possible."
+        body="Calm triage only. Pick one next action, repair what needs repair, or exit responsibly."
       />
 
       <section className="mt-6">
         <h2 className="text-2xl font-semibold text-ink">Most worth rescuing</h2>
         <div className="mt-4 grid gap-5 lg:grid-cols-3">
           {reentryList.length > 0 ? (
-            reentryList.map((packet) => {
-              const reentryState = detectReentryState(packet);
-              const actions = generateReentryActions(packet, packets);
-
-              return (
-                <article key={packet.id} className="space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <SignalPill
-                      value={reentryStateLabels[reentryState]}
-                      tone="moss"
-                    />
-                    <SignalPill
-                      value={`${packet.reentryHistory.length} re-entry action${
-                        packet.reentryHistory.length === 1 ? "" : "s"
-                      }`}
-                    />
-                  </div>
-                  <PacketCard packet={packet} onOpen={onOpenPacket} />
-                  <div className="grid gap-2">
-                    {actions.map((action) => (
-                      <button
-                        key={action.actionType}
-                        type="button"
-                        onClick={() =>
-                          void onReentryAction(packet, action.actionType)
-                        }
-                        className="rounded-lg border border-line bg-surface/90 p-3 text-left transition hover:border-moss hover:shadow-sm"
-                      >
-                        <span className="block font-semibold text-ink">
-                          {action.label}
-                        </span>
-                        <span className="safe-text mt-1 block text-sm leading-6 text-muted">
-                          {action.body}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </article>
-              );
-            })
+            reentryList.map((packet) => (
+              <ReentryTriageCard
+                key={packet.id}
+                packet={packet}
+                packets={packets}
+                onOpenPacket={onOpenPacket}
+                onReentryAction={onReentryAction}
+              />
+            ))
           ) : (
             <EmptyState
               title="Nothing needs re-entry right now."

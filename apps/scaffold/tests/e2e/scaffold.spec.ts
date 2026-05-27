@@ -27,8 +27,10 @@ test("runs a sprint and records done enough", async ({ page }) => {
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Start rescue sprint" }).click();
   await expect(page.getByRole("heading", { name: "Essay due" })).toBeVisible();
+  await expect(page.getByText("Ready the environment", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Done enough" }).click();
 
+  await page.getByText("Packet controls").click();
   await expect(page.getByLabel("Status")).toHaveValue("done_enough");
 });
 
@@ -39,15 +41,14 @@ test("shows unfinished packets on the re-entry screen", async ({ page }) => {
 
   await expect(
     page.getByRole("heading", {
-      name: "No explanation needed. Let's rescue what matters."
+      name: "No explanation needed. Choose what is still possible."
     })
   ).toBeVisible();
-  await expect(
-    page.getByText("No explanation needed. Choose what is still possible.")
-  ).toBeVisible();
+  await expect(page.getByText("Worth rescuing because")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Most worth rescuing" })).toBeVisible();
   await expect(page.getByText("Do my tax today")).toBeVisible();
   await page.getByRole("button", { name: /Resume first move/ }).click();
+  await page.getByText("Packet controls").click();
   await expect(page.getByLabel("Status")).toHaveValue("in_progress");
 });
 
@@ -55,12 +56,13 @@ test("uses unblock and exit responsibly controls", async ({ page }) => {
   await page.getByLabel("Messy task").fill("I need to finish the work proposal but the scope is too much.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
-  await expect(page.getByText("Task type")).toBeVisible();
+  await expect(page.getByText("Next physical action")).toBeVisible();
   await page.getByRole("button", { name: "Decision" }).click();
   await expect(page.getByText("Current: Decision")).toBeVisible();
 
   await page.getByRole("button", { name: "Renegotiate" }).click();
   await expect(page.getByText("current scope")).toBeVisible();
+  await page.getByText("Packet controls").click();
   await expect(page.getByLabel("Status")).toHaveValue("exited_responsibly");
 });
 
@@ -148,6 +150,7 @@ test("records explicit external LLM consent in settings", async ({ page }) => {
     name: "Deep Rescue",
     exact: true
   });
+  await page.getByText("Deep Rescue adapter").click();
   await expect(deepRescueButton).toBeEnabled();
   await deepRescueButton.click();
   await expect(page.getByText("Text that will leave this browser")).toBeVisible();

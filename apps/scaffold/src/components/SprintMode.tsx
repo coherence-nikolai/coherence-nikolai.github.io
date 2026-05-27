@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  ArrowLeft,
   CirclePause,
   CirclePlay,
   Flag,
@@ -7,7 +8,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { BrandMark } from "./BrandMark";
-import { Panel, PrimaryAction, SignalPill } from "./design";
+import { SignalPill } from "./design";
 import type { RescuePacket, SprintOutcome } from "../types";
 
 type SprintState = "idle" | "running" | "paused" | "completed";
@@ -31,6 +32,61 @@ function formatTime(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
+function bodyDoubleCopy(state: SprintState, remaining: number) {
+  const elapsed = sprintSeconds - remaining;
+
+  if (state === "idle") {
+    return {
+      title: "Ready the environment.",
+      body: "One surface. One tab. One next physical action."
+    };
+  }
+
+  if (state === "paused") {
+    return {
+      title: "Still here.",
+      body: "Pause is allowed. Restart with the same first move."
+    };
+  }
+
+  if (state === "completed" || remaining === 0) {
+    return {
+      title: "Done enough counts.",
+      body: "Name what happened. Then rescue, repair, or stop cleanly."
+    };
+  }
+
+  if (elapsed < 120) {
+    return {
+      title: "Start tiny.",
+      body: "Touch the task before judging it. The first move is enough."
+    };
+  }
+
+  if (elapsed < 420) {
+    return {
+      title: "Stay with the visible piece.",
+      body: "No expanding scope. Keep your hands on this one action."
+    };
+  }
+
+  return {
+    title: "Close the loop.",
+    body: "Mark what changed. Done enough is a responsible outcome."
+  };
+}
+
+function stateLabel(state: SprintState): string {
+  const labels: Record<SprintState, string> = {
+    idle: "Ready",
+    running: "Running",
+    paused: "Paused",
+    completed: "Re-entry"
+  };
+
+  return labels[state];
+}
+
 export function SprintMode({
   packet,
   onRecordOutcome,
@@ -44,6 +100,7 @@ export function SprintMode({
     () => Math.max(1, Math.ceil((sprintSeconds - remaining) / 60)),
     [remaining]
   );
+  const message = bodyDoubleCopy(state, remaining);
 
   useEffect(() => {
     if (state !== "running") return undefined;
@@ -68,159 +125,215 @@ export function SprintMode({
   }
 
   return (
-    <section className="rescue-enter mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-5 inline-flex min-h-11 items-center rounded-lg border border-line bg-surface/90 px-4 text-sm font-semibold text-ink shadow-sm transition hover:border-moss"
-      >
-        Back to packet
-      </button>
-
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Panel className="p-5 sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <p className="text-xs font-semibold uppercase text-moss">
-                Rescue sprint
-              </p>
-              <h1 className="safe-text mt-3 text-3xl font-semibold leading-tight text-ink sm:text-4xl">
-                {packet.title}
-              </h1>
-            </div>
-            <SignalPill value="Body double active" tone="moss" />
-          </div>
-
-          <div className="mt-7 rounded-lg border border-moss/25 bg-moss/10 p-5">
-            <p className="text-xs font-semibold uppercase text-mossDark">
-              First physical action
-            </p>
-            <p className="safe-text mt-2 text-2xl font-semibold leading-9 text-ink">
-              {packet.firstPhysicalAction}
-            </p>
-          </div>
-
-          <div className="mt-4 rounded-lg border border-line bg-paper/80 p-4">
-            <p className="text-sm font-semibold text-muted">
-              Minimum viable progress
-            </p>
-            <p className="safe-text mt-2 text-lg leading-7 text-ink">
-              {packet.minimumViableProgress}
-            </p>
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            {state === "idle" && (
-              <PrimaryAction onClick={() => setState("running")}>
-                <CirclePlay className="h-5 w-5" aria-hidden="true" />
-                Start 10 minutes
-              </PrimaryAction>
-            )}
-            {state === "running" && (
-              <button
-                type="button"
-                onClick={() => setState("paused")}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-ink px-5 font-semibold text-white transition hover:bg-ink/90"
-              >
-                <CirclePause className="h-5 w-5" aria-hidden="true" />
-                Pause
-              </button>
-            )}
-            {state === "paused" && (
-              <PrimaryAction onClick={() => setState("running")}>
-                <CirclePlay className="h-5 w-5" aria-hidden="true" />
-                Resume
-              </PrimaryAction>
-            )}
-            <button
-              type="button"
-              onClick={() => void complete("done_enough")}
-              className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
-            >
-              <Flag className="h-5 w-5 text-moss" aria-hidden="true" />
-              Done enough
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setState("completed");
-                onStuckAgain();
-              }}
-              className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
-            >
-              <RotateCcw className="h-5 w-5 text-moss" aria-hidden="true" />
-              Stuck again
-            </button>
-          </div>
-
-          {(state === "completed" || remaining === 0) && (
-            <div className="mt-8 border-t border-line pt-6">
-              <h2 className="text-xl font-semibold text-ink">What happened?</h2>
-              <textarea
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                className="mt-3 min-h-24 w-full resize-y rounded-lg border border-line bg-paper p-3 text-base text-ink"
-                placeholder="Optional note"
-              />
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <OutcomeButton label="I started" onClick={() => void complete("started")} />
-                <OutcomeButton
-                  label="I made tiny progress"
-                  onClick={() => void complete("tiny_progress")}
-                />
-                <OutcomeButton
-                  label="I got blocked"
-                  onClick={() => void complete("blocked")}
-                />
-                <OutcomeButton
-                  label="I need repair"
-                  onClick={() => void complete("repair")}
-                />
-                <OutcomeButton
-                  label="I need to stop responsibly"
-                  onClick={() => void complete("stop_responsibly")}
-                />
-              </div>
-            </div>
-          )}
-        </Panel>
-
-        <Panel tone="ink" className="p-5">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-paper/70">Still here</p>
-              <p className="mt-1 text-lg font-semibold text-paper">
-                I am here with you.
-              </p>
-            </div>
-            <BrandMark className="h-11 w-11 text-ink" title="Scaffold sprint" />
-          </div>
-          <div
-            className={`mt-8 flex aspect-square items-center justify-center rounded-full border border-white/20 bg-white/10 text-6xl font-semibold text-paper shadow-inner ${
-              state === "running" ? "breathe-timer" : ""
-            }`}
-          >
-            {formatTime(remaining)}
-          </div>
-          <p className="mt-6 text-base leading-7 text-paper/80">
-            Choose one next action. Keep it physical. Done enough counts.
-          </p>
+    <section className="rescue-session min-h-screen bg-ink text-paper">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
           <button
             type="button"
-            onClick={() => {
-              setRemaining(sprintSeconds);
-              setState("idle");
-            }}
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/25 px-4 font-semibold text-white transition hover:border-white/45"
+            onClick={onBack}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 text-sm font-semibold text-paper transition hover:border-white/35"
           >
-            <RotateCcw className="h-5 w-5" aria-hidden="true" />
-            Reset timer
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Back to packet
           </button>
-          <div className="mt-5 flex items-start gap-3 rounded-lg border border-white/10 bg-white/10 p-3 text-sm leading-6 text-paper/80">
-            <ShieldCheck className="mt-0.5 h-5 w-5 flex-none text-amberSoft" aria-hidden="true" />
-            <span>No explanation needed if you drift. Re-entry is part of the tool.</span>
+
+          <div className="flex items-center gap-3">
+            <BrandMark className="h-10 w-10 text-ink" title="Scaffold sprint" />
+            <div>
+              <p className="text-sm font-semibold text-paper">Scaffold sprint</p>
+              <p className="text-xs text-paper/60">Not reminders. Rescue.</p>
+            </div>
           </div>
-        </Panel>
+
+          <div className="flex flex-wrap gap-2">
+            <SignalPill value="Body double active" tone="moss" />
+            <SignalPill value={stateLabel(state)} />
+          </div>
+        </header>
+
+        <main className="grid flex-1 gap-5 py-5 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-stretch">
+          <div className="session-pane flex flex-col rounded-lg border border-white/10 bg-paper p-5 text-ink shadow-premium sm:p-7">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Rescue sprint
+                </p>
+                <h1 className="safe-text mt-2 text-3xl font-semibold leading-tight sm:text-5xl">
+                  {packet.title}
+                </h1>
+              </div>
+              <SignalPill value="10 minutes" tone="ink" />
+            </div>
+
+            <div className="mt-6 rounded-lg border border-ink bg-ink p-5 text-paper">
+              <p className="text-xs font-semibold uppercase text-moss">
+                First physical action
+              </p>
+              <p className="safe-text mt-2 text-2xl font-semibold leading-9 sm:text-3xl">
+                {packet.firstPhysicalAction}
+              </p>
+            </div>
+
+            {state === "idle" && (
+              <div className="mt-4 rounded-lg border border-line bg-surface p-4">
+                <p className="text-sm font-semibold text-ink">
+                  Ready the environment
+                </p>
+                <ol className="mt-3 grid gap-2 text-sm leading-6 text-muted sm:grid-cols-3">
+                  <li className="rounded-lg border border-line bg-paper p-3">
+                    Put the task surface in front of you.
+                  </li>
+                  <li className="rounded-lg border border-line bg-paper p-3">
+                    Open only the thing named above.
+                  </li>
+                  <li className="rounded-lg border border-line bg-paper p-3">
+                    Stop after one visible change.
+                  </li>
+                </ol>
+              </div>
+            )}
+
+            <div className="mt-4 rounded-lg border border-line bg-paper/80 p-4">
+              <p className="text-sm font-semibold text-muted">
+                Minimum viable progress
+              </p>
+              <p className="safe-text mt-2 text-lg leading-7 text-ink">
+                {packet.minimumViableProgress}
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {state === "idle" && (
+                <button
+                  type="button"
+                  onClick={() => setState("running")}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-action transition hover:bg-mossDark"
+                >
+                  <CirclePlay className="h-5 w-5" aria-hidden="true" />
+                  Start 10 minutes
+                </button>
+              )}
+              {state === "running" && (
+                <button
+                  type="button"
+                  onClick={() => setState("paused")}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-ink px-5 font-semibold text-white transition hover:bg-ink/90"
+                >
+                  <CirclePause className="h-5 w-5" aria-hidden="true" />
+                  Pause
+                </button>
+              )}
+              {state === "paused" && (
+                <button
+                  type="button"
+                  onClick={() => setState("running")}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-action transition hover:bg-mossDark"
+                >
+                  <CirclePlay className="h-5 w-5" aria-hidden="true" />
+                  Resume
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => void complete("done_enough")}
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
+              >
+                <Flag className="h-5 w-5 text-moss" aria-hidden="true" />
+                Done enough
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setState("completed");
+                  onStuckAgain();
+                }}
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
+              >
+                <RotateCcw className="h-5 w-5 text-moss" aria-hidden="true" />
+                Stuck again
+              </button>
+            </div>
+
+            {(state === "completed" || remaining === 0) && (
+              <div className="mt-8 border-t border-line pt-6">
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Re-entry
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold text-ink">
+                  What happened?
+                </h2>
+                <textarea
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  className="mt-3 min-h-24 w-full resize-y rounded-lg border border-line bg-paper p-3 text-base text-ink"
+                  placeholder="Optional note"
+                />
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <OutcomeButton label="I started" onClick={() => void complete("started")} />
+                  <OutcomeButton
+                    label="I made tiny progress"
+                    onClick={() => void complete("tiny_progress")}
+                  />
+                  <OutcomeButton
+                    label="I got blocked"
+                    onClick={() => void complete("blocked")}
+                  />
+                  <OutcomeButton
+                    label="I need repair"
+                    onClick={() => void complete("repair")}
+                  />
+                  <OutcomeButton
+                    label="I need to stop responsibly"
+                    onClick={() => void complete("stop_responsibly")}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <aside className="session-timer-panel flex flex-col rounded-lg border border-white/10 bg-white/[0.06] p-5 shadow-premium sm:p-7">
+            <div>
+              <p className="text-sm font-semibold text-paper/60">Still here</p>
+              <h2 className="mt-2 text-3xl font-semibold leading-tight text-paper">
+                {message.title}
+              </h2>
+              <p className="mt-3 text-base leading-7 text-paper/70">
+                {message.body}
+              </p>
+            </div>
+
+            <div
+              className={`my-8 flex aspect-square items-center justify-center rounded-full border border-white/20 bg-white/10 text-6xl font-semibold text-paper shadow-inner sm:text-7xl ${
+                state === "running" ? "breathe-timer" : ""
+              }`}
+            >
+              {formatTime(remaining)}
+            </div>
+
+            <div className="mt-auto space-y-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setRemaining(sprintSeconds);
+                  setState("idle");
+                }}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/25 px-4 font-semibold text-white transition hover:border-white/45"
+              >
+                <RotateCcw className="h-5 w-5" aria-hidden="true" />
+                Reset timer
+              </button>
+              <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/10 p-3 text-sm leading-6 text-paper/80">
+                <ShieldCheck
+                  className="mt-0.5 h-5 w-5 flex-none text-amberSoft"
+                  aria-hidden="true"
+                />
+                <span>
+                  No explanation needed if you drift. Re-entry is part of the tool.
+                </span>
+              </div>
+            </div>
+          </aside>
+        </main>
       </div>
     </section>
   );
