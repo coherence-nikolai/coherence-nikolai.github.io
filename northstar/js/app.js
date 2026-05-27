@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260526e";
+} from "./data/content.js?v=20260527a";
 import {
   clearNamespace,
   copyText,
@@ -16,13 +16,13 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260526e";
+} from "./state.js?v=20260527a";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
 
 const PANEL_LABELS = {
-  dashboard: "Today",
+  dashboard: "Guide",
   "dashboard-options": "Tune Today",
   regulate: "Regulate",
   planner: "Plan",
@@ -50,6 +50,7 @@ const PANEL_THEME_COLORS = {
 };
 
 const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "calendar", "focus", "unpack", "notes", "profile", "finish"]);
+const MOBILE_BOTTOM_PANELS = new Set(["dashboard", "calendar"]);
 
 const DELIVERABLE_GUIDANCE = {
   essay: {
@@ -208,10 +209,10 @@ const defaultCheckin = {
 };
 
 const defaultRegulateState = {
-  signal: "body",
-  anchor: "touch",
+  signal: "overwhelmed",
+  anchor: "pressure",
   load: "",
-  strategy: "sensory"
+  strategy: "pressure"
 };
 
 const defaultNotesState = {
@@ -717,6 +718,60 @@ function triggerMobileDockAction() {
   target.click();
 }
 
+function setMobileMoreSheetOpen(open) {
+  const sheet = $("#mobileMoreSheet");
+  const backdrop = $("#mobileMoreBackdrop");
+  const trigger = $("#mobileMoreBtn");
+  if (!sheet || !backdrop || !trigger) return;
+
+  sheet.hidden = !open;
+  backdrop.hidden = !open;
+  trigger.setAttribute("aria-expanded", String(open));
+  document.documentElement.dataset.mobileMore = open ? "open" : "closed";
+
+  if (open) {
+    nudgeHaptic(5);
+    requestAnimationFrame(() => $(".mobile-more-tool", sheet)?.focus());
+  }
+}
+
+function openMobileMoreSheet() {
+  document.documentElement.dataset.mobileSupport = "closed";
+  document.documentElement.dataset.mobileSettings = "closed";
+  setMobileMoreSheetOpen(true);
+}
+
+function closeMobileMoreSheet() {
+  setMobileMoreSheetOpen(false);
+}
+
+function syncMobileBottomNav(panelName) {
+  const moreButton = $("#mobileMoreBtn");
+  if (!moreButton) return;
+
+  const activePanel = navPanelTarget(panelName);
+  const isMorePanel = !MOBILE_BOTTOM_PANELS.has(activePanel);
+  moreButton.classList.toggle("is-active", isMorePanel);
+  moreButton.setAttribute("aria-current", isMorePanel ? "page" : "false");
+}
+
+function openMobileSupportDirectory() {
+  closeMobileMoreSheet();
+  document.documentElement.dataset.mobileSettings = "closed";
+  document.documentElement.dataset.mobileSupport = "open";
+  $(".resource-card")?.setAttribute("open", "");
+  $(".resource-card")?.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function openMobileAccessSettings() {
+  closeMobileMoreSheet();
+  document.documentElement.dataset.mobileSupport = "closed";
+  showPanel("dashboard");
+  document.documentElement.dataset.mobileSettings = "open";
+  $(".settings-panel")?.setAttribute("open", "");
+  requestAnimationFrame(() => $(".settings-panel")?.scrollIntoView({ block: "start", behavior: "smooth" }));
+}
+
 function setTodayExpanded(expanded) {
   document.documentElement.dataset.todayExpanded = expanded ? "on" : "off";
 
@@ -821,6 +876,11 @@ function applySettings() {
 
 function showPanel(panelName) {
   document.documentElement.dataset.activePanel = panelName;
+  closeMobileMoreSheet();
+  document.documentElement.dataset.mobileSupport = "closed";
+  if (panelName !== "dashboard") {
+    document.documentElement.dataset.mobileSettings = "closed";
+  }
   renderCurrentPanelLabel(panelName);
   updateMobileActionDock(panelName);
   if (panelName !== "dashboard") {
@@ -850,6 +910,7 @@ function showPanel(panelName) {
     button.setAttribute("aria-selected", String(isActive));
     button.setAttribute("tabindex", isActive ? "0" : "-1");
   });
+  syncMobileBottomNav(panelName);
 
   if (PRIMARY_PANELS.has(panelName)) {
     state.session.lastPanel = panelName;
@@ -1306,6 +1367,9 @@ function setInitialFormValues() {
 
   updateCalendarTermInputs();
 
+  state.regulate.signal = normalizeRegulationSignal(state.regulate.signal);
+  state.regulate.anchor = normalizeRegulationAnchor(state.regulate.anchor);
+  state.regulate.strategy = normalizeRegulationStrategy(state.regulate.strategy);
   $("#regulateSignalSelect").value = state.regulate.signal;
   $("#regulateAnchorSelect").value = state.regulate.anchor;
   $("#regulateLoadInput").value = state.regulate.load;
@@ -1327,47 +1391,119 @@ function setInitialFormValues() {
   $("#avoidInput").value = state.sessionMemory.avoid;
 }
 
+const REGULATION_SIGNAL_ALIASES = {
+  body: "agitated",
+  thoughts: "emotional",
+  sensory: "overwhelmed",
+  avoidance: "avoiding",
+  fog: "tired"
+};
+
+const REGULATION_ANCHOR_ALIASES = {
+  touch: "pressure",
+  sound: "sensory",
+  sight: "grounding",
+  breath: "breathing",
+  object: "grounding"
+};
+
+const REGULATION_STRATEGY_ALIASES = {
+  label: "grounding",
+  needs: "body"
+};
+
 const REGULATION_SIGNALS = {
-  body: "Your body feels tense, restless, or buzzy.",
-  thoughts: "Worry or fast thoughts are taking up space.",
-  sensory: "The room, screen, sound, or light feels like too much input.",
-  avoidance: "Starting feels too exposed, unclear, or demanding.",
-  fog: "Your brain feels foggy or overloaded."
-};
-
-const REGULATION_ANCHORS = {
-  touch: "Press your feet into the floor or hold one texture for 30 seconds.",
-  movement: "Do one tiny movement: stretch, pace, wall push-up, or posture shift.",
-  sound: "Choose one steady sound and let attention come back to it.",
-  sight: "Rest your eyes on one colour, edge, or object.",
-  breath: "Use breath only if it feels safe: one slower exhale is enough.",
-  object: "Hold or look at one familiar object that helps you feel here."
-};
-
-const REGULATION_STRATEGIES = {
-  sensory: {
-    label: "Feel one thing",
-    step: "Choose one safe sensory anchor and stay with it for 30 seconds.",
-    bridge: "When you are ready, make the task visible without starting it yet."
+  overwhelmed: {
+    label: "Overwhelmed",
+    copy: "Everything is arriving at once."
   },
-  movement: {
-    label: "Move pressure out",
-    step: "Move pressure through your body with one tiny movement set.",
-    bridge: "Come back and do only the first setup action."
+  frozen: {
+    label: "Frozen",
+    copy: "Your body is saying pause first."
   },
-  label: {
-    label: "Name one thing",
-    step: "Name one thing that is here without trying to fix it.",
-    bridge: "Then choose the smallest next move, even if it is only opening the task."
+  agitated: {
+    label: "Agitated",
+    copy: "There is too much charge in the system."
   },
-  needs: {
-    label: "Meet a body need",
-    step: "Check water, food, temperature, device pull, and noise before study effort.",
-    bridge: "After that, use a 10-minute Focus block or make a one-step Plan."
+  tired: {
+    label: "Tired",
+    copy: "Your energy is low and needs a softer start."
+  },
+  avoiding: {
+    label: "Avoiding",
+    copy: "The task feels hard to touch."
+  },
+  emotional: {
+    label: "Emotionally loaded",
+    copy: "The work is carrying feelings with it."
   }
 };
 
+const REGULATION_ANCHORS = {
+  pressure: "Add steady pressure: feet into the floor, a weighted item, or a wall push.",
+  movement: "Move a little: pace, stretch, shake out your hands, or change posture.",
+  sensory: "Lower one input: dim light, reduce sound, close tabs, or clear one patch of desk.",
+  grounding: "Pick one object and name its colour, edge, texture, or weight.",
+  breathing: "If breath feels okay, try one slower exhale. Stop if it feels wrong.",
+  body: "Check one body need: water, food, bathroom, meds, temperature, or pain."
+};
+
+const REGULATION_BRIDGES = {
+  overwhelmed: "When it feels a little safer, sit near the work. You do not have to start yet.",
+  frozen: "When movement returns, open the task and write one messy line.",
+  agitated: "When the charge drops slightly, choose one small move and stop there.",
+  tired: "If study is still too far away, save a return cue and come back later.",
+  avoiding: "Make the task visible for one minute, then decide the next tiny move.",
+  emotional: "Name the feeling, lower the pressure, then ask what support would help."
+};
+
+const REGULATION_STRATEGIES = {
+  pressure: {
+    label: "Add pressure",
+    step: "Use steady pressure for 30 seconds. Feet down, weighted item, or wall push.",
+    bridge: "Then sit near the work and choose one tiny next move."
+  },
+  movement: {
+    label: "Move a little",
+    step: "Move pressure through your body with a small movement set.",
+    bridge: "Then come back and open only the thing you need next."
+  },
+  sensory: {
+    label: "Lower input",
+    step: "Remove one bit of input: sound, light, tabs, clutter, or notifications.",
+    bridge: "Then make the work visible without starting it yet."
+  },
+  grounding: {
+    label: "Find one object",
+    step: "Use one object as an anchor. Notice colour, edge, texture, or weight.",
+    bridge: "Then write one plain sentence about what is here."
+  },
+  breathing: {
+    label: "Use breath gently",
+    step: "Try one slower exhale only if breath feels safe and useful.",
+    bridge: "Then choose the smallest possible contact with the task."
+  },
+  body: {
+    label: "Check body needs",
+    step: "Meet one body need before study effort: water, food, bathroom, meds, or temperature.",
+    bridge: "Then use a 10-minute Focus block or make a one-step Plan."
+  }
+};
+
+function normalizeRegulationSignal(signal) {
+  return REGULATION_SIGNALS[signal] ? signal : REGULATION_SIGNAL_ALIASES[signal] || "overwhelmed";
+}
+
+function normalizeRegulationAnchor(anchor) {
+  return REGULATION_ANCHORS[anchor] ? anchor : REGULATION_ANCHOR_ALIASES[anchor] || "pressure";
+}
+
+function normalizeRegulationStrategy(strategy) {
+  return REGULATION_STRATEGIES[strategy] ? strategy : REGULATION_STRATEGY_ALIASES[strategy] || "pressure";
+}
+
 function setRegulationStrategy(strategy, { feedback = true } = {}) {
+  strategy = normalizeRegulationStrategy(strategy);
   if (!REGULATION_STRATEGIES[strategy]) return;
   if (feedback) nudgeHaptic(5);
   state.regulate.strategy = strategy;
@@ -1383,18 +1519,22 @@ function setRegulationStrategy(strategy, { feedback = true } = {}) {
 function buildRegulationResult() {
   captureForms();
 
-  const strategy = REGULATION_STRATEGIES[state.regulate.strategy] || REGULATION_STRATEGIES.sensory;
-  const signal = REGULATION_SIGNALS[state.regulate.signal] || REGULATION_SIGNALS.body;
-  const anchor = REGULATION_ANCHORS[state.regulate.anchor] || REGULATION_ANCHORS.touch;
-  const loadStep = state.regulate.load || "Lower one demand: close a tab, dim the light, use headphones, move rooms, or get water.";
+  const strategyKey = normalizeRegulationStrategy(state.regulate.strategy);
+  const strategy = REGULATION_STRATEGIES[strategyKey] || REGULATION_STRATEGIES.pressure;
+  const signalKey = normalizeRegulationSignal(state.regulate.signal);
+  const anchorKey = normalizeRegulationAnchor(state.regulate.anchor);
+  const signal = REGULATION_SIGNALS[signalKey] || REGULATION_SIGNALS.overwhelmed;
+  const anchor = REGULATION_ANCHORS[anchorKey] || REGULATION_ANCHORS.pressure;
+  const loadStep = state.regulate.load || "Lower one demand: close a tab, dim the light, move rooms, get water, or text someone safe.";
+  const bridge = REGULATION_BRIDGES[signalKey] || strategy.bridge;
 
   return {
-    signal,
+    signal: `${signal.label}: ${signal.copy}`,
     anchor,
     strategyLabel: strategy.label,
     regulationStep: strategy.step,
     loadStep,
-    bridge: normalizeReturnCue(strategy.bridge),
+    bridge: normalizeReturnCue(bridge),
     experiment: "Afterward, check if study feels even a little more reachable. If not, stay with regulation."
   };
 }
@@ -1463,7 +1603,9 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
 }
 
 function syncRegulationSelection() {
-  setRegulationStrategy(state.regulate.strategy || "sensory", { feedback: false });
+  state.regulate.signal = normalizeRegulationSignal(state.regulate.signal);
+  state.regulate.anchor = normalizeRegulationAnchor(state.regulate.anchor);
+  setRegulationStrategy(state.regulate.strategy || "pressure", { feedback: false });
 }
 
 function focusNotificationCopy(phase = state.focus.phase) {
@@ -2038,10 +2180,10 @@ function captureForms() {
   };
 
   state.regulate = {
-    signal: $("#regulateSignalSelect").value,
-    anchor: $("#regulateAnchorSelect").value,
+    signal: normalizeRegulationSignal($("#regulateSignalSelect").value),
+    anchor: normalizeRegulationAnchor($("#regulateAnchorSelect").value),
     load: $("#regulateLoadInput").value.trim(),
-    strategy: state.regulate.strategy || "sensory"
+    strategy: normalizeRegulationStrategy(state.regulate.strategy)
   };
 
   state.unpack = {
@@ -2193,7 +2335,7 @@ function renderTodayInlineFeedback(result) {
 }
 
 function routeButtonLabel(section) {
-  return section === "dashboard" ? "Stay in Today" : `Open ${panelLabel(section)}`;
+  return section === "dashboard" ? "Stay in Guide" : `Open ${panelLabel(section)}`;
 }
 
 function renderTodayEmpty() {
@@ -2284,7 +2426,7 @@ function renderTodayRoute(result) {
 
   $("#openRouteBtn").disabled = false;
   $("#openRouteBtn").textContent = routeButtonLabel(result.section);
-  setQuickRouteSelection(["dashboard", "regulate", "planner", "focus", "unpack"].includes(result.section) ? result.section : null);
+  setQuickRouteSelection(["dashboard", "regulate", "planner", "calendar", "focus", "unpack"].includes(result.section) ? result.section : null);
   setTriageSelection(result.section);
   renderStudyStateSelection();
 }
@@ -4188,11 +4330,37 @@ function bindEvents() {
     renderFirstMinuteGuide();
     focusQuickStartChoices();
   });
-  $("#showMoreTodayBtn").addEventListener("click", () => showPanel("dashboard-options"));
+  $("#showMoreTodayBtn").addEventListener("click", () => {
+    if (shouldUseMobileResult()) {
+      openMobileMoreSheet();
+      return;
+    }
+    showPanel("dashboard-options");
+  });
   $("#backToTodayBtn").addEventListener("click", () => showPanel("dashboard"));
   $("#mobileHomeBtn").addEventListener("click", () => showPanel("dashboard"));
   $("#mobileDockHomeBtn").addEventListener("click", () => showPanel("dashboard"));
   $("#mobileDockPrimaryBtn").addEventListener("click", triggerMobileDockAction);
+  $("#mobileMoreBtn").addEventListener("click", openMobileMoreSheet);
+  $("#mobileMoreCloseBtn").addEventListener("click", closeMobileMoreSheet);
+  $("#mobileMoreBackdrop").addEventListener("click", closeMobileMoreSheet);
+  $$("#mobileMoreSheet [data-mobile-more-target]").forEach((button) => {
+    button.addEventListener("click", () => showPanel(button.dataset.mobileMoreTarget));
+  });
+  $$("#mobileMoreSheet [data-mobile-more-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.mobileMoreAction === "support") {
+        openMobileSupportDirectory();
+        return;
+      }
+      if (button.dataset.mobileMoreAction === "settings") {
+        openMobileAccessSettings();
+      }
+    });
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMobileMoreSheet();
+  });
   $("#mobileResultBackBtn").addEventListener("click", () => showPanel(mobileResultSourcePanel || "dashboard"));
   $("#mobileResultPrimaryBtn").addEventListener("click", () => showPanel(mobileResultPrimaryTarget || "dashboard"));
   $("#mobileResultCopyBtn").addEventListener("click", async () => {

@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260526e">
-  <link rel="icon" href="./icon.svg?v=20260526e" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260526e">
-  <link rel="stylesheet" href="./styles.css?v=20260526e">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260527a">
+  <link rel="icon" href="./icon.svg?v=20260527a" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260527a">
+  <link rel="stylesheet" href="./styles.css?v=20260527a">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260526e" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260527a" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -93,7 +93,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260526e" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260527a" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -185,17 +185,59 @@
         </div>
       </header>
 
-      <nav class="mobile-nav card" aria-label="Study sections" role="tablist">
-        <button class="nav-link is-active" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard">Today</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-regulate" data-panel-target="regulate">Regulate</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-planner" data-panel-target="planner">Plan</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel-target="calendar">Calendar</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-focus" data-panel-target="focus">Focus</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-unpack" data-panel-target="unpack">Unpack</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-notes" data-panel-target="notes">Notes</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-profile" data-panel-target="profile">Profile</button>
-        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-finish" data-panel-target="finish">Finish</button>
+      <nav class="mobile-nav mobile-bottom-nav" aria-label="Primary mobile sections">
+        <button class="nav-link is-active" role="tab" aria-selected="true" aria-controls="panel-dashboard" data-panel-target="dashboard" type="button">
+          <span>Guide</span>
+        </button>
+        <button class="nav-link" role="tab" aria-selected="false" aria-controls="panel-calendar" data-panel-target="calendar" type="button">
+          <span>Calendar</span>
+        </button>
+        <button class="mobile-more-trigger" id="mobileMoreBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobileMoreSheet">
+          <span>More</span>
+        </button>
       </nav>
+
+      <div class="mobile-more-backdrop" id="mobileMoreBackdrop" hidden></div>
+      <section class="mobile-more-sheet" id="mobileMoreSheet" role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle" hidden>
+        <div class="mobile-more-head">
+          <div>
+            <p class="eyebrow">More tools</p>
+            <h2 id="mobileMoreTitle">Choose one extra support</h2>
+            <p class="microcopy">Everything here can wait until you need it.</p>
+          </div>
+          <button class="button subtle" id="mobileMoreCloseBtn" type="button">Close</button>
+        </div>
+        <div class="mobile-more-grid" aria-label="Northstar tools">
+          <button class="mobile-more-tool" type="button" data-mobile-more-target="focus">
+            <strong>Focus</strong>
+            <span>Use a calm timer.</span>
+          </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-target="unpack">
+            <strong>Unpack</strong>
+            <span>Translate a brief.</span>
+          </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-target="notes">
+            <strong>Notes</strong>
+            <span>Catch the thread.</span>
+          </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-target="profile">
+            <strong>Profile</strong>
+            <span>Save what helps you study.</span>
+          </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-target="finish">
+            <strong>Finish</strong>
+            <span>Leave a return cue.</span>
+          </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-action="support">
+            <strong>Support contacts</strong>
+            <span>Names, emails, links, and numbers.</span>
+          </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-action="settings">
+            <strong>Access settings</strong>
+            <span>Text, contrast, and motion.</span>
+          </button>
+        </div>
+      </section>
 
       <section class="resume-banner card" aria-label="Resume your last study thread">
         <div class="resume-copy">
@@ -348,9 +390,9 @@
         <div class="panel-head">
           <div>
             <p class="eyebrow">Today</p>
-            <h2>Choose one way in</h2>
+            <h2>What do you need right now?</h2>
             <p class="panel-copy">
-              Pick the closest fit. You can adjust later.
+              Pick what is happening. Northstar will choose the right tool.
             </p>
           </div>
         </div>
@@ -359,7 +401,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260526e" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260527a" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -393,8 +435,8 @@
 
               <div class="section-heading today-entry-heading">
                 <p class="eyebrow">Start here</p>
-                <h3>Pick one first.</h3>
-                <p class="microcopy">Choose the closest fit, not the perfect one.</p>
+                <h3>What do you need right now?</h3>
+                <p class="microcopy">Not sure? Pick the closest one. Northstar will guide the next step.</p>
               </div>
 
               <p class="microcopy quick-route-note">The goal is orientation, not getting it exactly right.</p>
@@ -411,45 +453,27 @@
               <div class="quick-route-grid" id="quickRouteButtons" role="group" aria-label="Quick start choices">
                 <button class="quick-route-button" type="button" data-route-target="regulate" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Regulate</span>
+                  <span class="quick-route-kicker">Cannot start</span>
                   <strong>I am not ready yet</strong>
-                  <span>Lower pressure before starting.</span>
-                </button>
-                <button class="quick-route-button" type="button" data-route-target="dashboard" aria-pressed="false">
-                  <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Pressure</span>
-                  <strong>Everything feels too big</strong>
-                  <span>Make the task smaller first.</span>
+                  <span>Settle your body before study.</span>
                 </button>
                 <button class="quick-route-button" type="button" data-route-target="planner" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Begin</span>
+                  <span class="quick-route-kicker">First step</span>
                   <strong>I need the first step</strong>
-                  <span>Turn the task into one visible action.</span>
+                  <span>Make one visible next move.</span>
+                </button>
+                <button class="quick-route-button" type="button" data-route-target="calendar" aria-pressed="false">
+                  <span class="route-symbol" aria-hidden="true"></span>
+                  <span class="quick-route-kicker">Due date</span>
+                  <strong>I have a due date</strong>
+                  <span>Put it somewhere visible.</span>
                 </button>
                 <button class="quick-route-button" type="button" data-route-target="unpack" aria-pressed="false">
                   <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Unpack</span>
+                  <span class="quick-route-kicker">Task unclear</span>
                   <strong>I do not know what this wants</strong>
                   <span>Translate the brief before starting.</span>
-                </button>
-                <button class="quick-route-button" type="button" data-route-target="notes" aria-pressed="false">
-                  <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Notes</span>
-                  <strong>I need to catch the thread</strong>
-                  <span>Capture one idea before it disappears.</span>
-                </button>
-                <button class="quick-route-button" type="button" data-route-target="profile" aria-pressed="false">
-                  <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Profile</span>
-                  <strong>I need to understand my pattern</strong>
-                  <span>Answer one prompt about what makes studying more doable.</span>
-                </button>
-                <button class="quick-route-button" type="button" data-route-target="finish" aria-pressed="false">
-                  <span class="route-symbol" aria-hidden="true"></span>
-                  <span class="quick-route-kicker">Finish</span>
-                  <strong>I need to stop without losing it</strong>
-                  <span>Leave a clean return point before you step away.</span>
                 </button>
               </div>
 
@@ -463,7 +487,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260526e" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260527a" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -683,23 +707,24 @@
               <label class="field">
                 <span>What is your body saying?</span>
                 <select id="regulateSignalSelect">
-                  <option value="body">Tense, restless, or buzzy</option>
-                  <option value="thoughts">Worry or racing thoughts</option>
-                  <option value="sensory">Noise, light, clutter, or interruptions</option>
-                  <option value="avoidance">Frozen or hard to begin</option>
-                  <option value="fog">Foggy or overloaded</option>
+                  <option value="overwhelmed">Overwhelmed</option>
+                  <option value="frozen">Frozen</option>
+                  <option value="agitated">Agitated</option>
+                  <option value="tired">Tired</option>
+                  <option value="avoiding">Avoiding</option>
+                  <option value="emotional">Emotionally loaded</option>
                 </select>
               </label>
 
               <label class="field">
-                <span>What anchor feels okay?</span>
+                <span>What support feels okay?</span>
                 <select id="regulateAnchorSelect">
-                  <option value="touch">Touch or texture</option>
+                  <option value="pressure">Pressure or weight</option>
                   <option value="movement">Movement</option>
-                  <option value="sound">One steady sound</option>
-                  <option value="sight">One colour or visual point</option>
-                  <option value="breath">Breath, only if it feels safe</option>
-                  <option value="object">A familiar object</option>
+                  <option value="sensory">Less noise, light, or clutter</option>
+                  <option value="grounding">Grounding with one object</option>
+                  <option value="breathing">One slower exhale</option>
+                  <option value="body">Water, food, bathroom, temperature</option>
                 </select>
               </label>
             </div>
@@ -709,26 +734,34 @@
                 <input
                   id="regulateLoadInput"
                   type="text"
-                  placeholder="e.g. close tabs, dim light, use headphones, move rooms, get water"
+                  placeholder="e.g. dim light, get water, sit near the work, text someone"
                 >
               </label>
 
             <div class="regulation-menu" id="regulationMenu" role="group" aria-label="Regulation strategy menu">
-              <button class="regulation-option is-selected" type="button" data-regulation-strategy="sensory">
-                <strong>Feel one thing</strong>
-                <span>Feet, texture, sound, or colour.</span>
+              <button class="regulation-option is-selected" type="button" data-regulation-strategy="pressure">
+                <strong>Add pressure</strong>
+                <span>Feet down, weighted item, or wall push.</span>
               </button>
               <button class="regulation-option" type="button" data-regulation-strategy="movement">
-                <strong>Move pressure out</strong>
-                <span>Pace, stretch, wall push-up, or posture shift.</span>
+                <strong>Move a little</strong>
+                <span>Pace, stretch, shake out, or change posture.</span>
               </button>
-              <button class="regulation-option" type="button" data-regulation-strategy="label">
-                <strong>Name one thing</strong>
-                <span>Notice what is here without solving it.</span>
+              <button class="regulation-option" type="button" data-regulation-strategy="sensory">
+                <strong>Lower input</strong>
+                <span>Light, sound, tabs, clutter, or notifications.</span>
               </button>
-              <button class="regulation-option" type="button" data-regulation-strategy="needs">
-                <strong>Meet a body need</strong>
-                <span>Water, food, quiet, temperature, or less input.</span>
+              <button class="regulation-option" type="button" data-regulation-strategy="grounding">
+                <strong>Find one object</strong>
+                <span>Name colour, edge, texture, or weight.</span>
+              </button>
+              <button class="regulation-option" type="button" data-regulation-strategy="breathing">
+                <strong>Use breath gently</strong>
+                <span>Only one slower exhale if it feels okay.</span>
+              </button>
+              <button class="regulation-option" type="button" data-regulation-strategy="body">
+                <strong>Check body needs</strong>
+                <span>Water, food, bathroom, meds, or temperature.</span>
               </button>
             </div>
 
@@ -1368,6 +1401,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260526e"></script>
+  <script type="module" src="./js/app.js?v=20260527a"></script>
 </body>
 </html>
