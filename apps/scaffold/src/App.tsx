@@ -39,6 +39,24 @@ import {
 } from "./engine/rescueEngine";
 import { useScaffoldData } from "./hooks/useScaffoldData";
 import {
+  clearByokSettings,
+  defaultEndpointForProvider,
+  defaultModelForProvider,
+  labelForProvider,
+  loadByokSettings,
+  providerLabelFromSettings,
+  saveByokSettings,
+  summarizeByokSettings,
+  type ByokProvider,
+  type ByokSettings
+} from "./llm/byokSettings";
+import {
+  ByokConfigurationError,
+  ExternalLlmConsentRequiredError,
+  ExternalLlmRequestError,
+  createByokRescueAdapter
+} from "./llm/rescueAdapter";
+import {
   blockLabels,
   exitStatusLabels,
   missingItemLabels,
@@ -120,6 +138,7 @@ export default function App() {
     increaseSupport,
     recordReentryAction,
     incrementReentries,
+    deepRescuePacket,
     updateExternalLlmConsent,
     exportLocalData,
     importLocalData
@@ -128,6 +147,9 @@ export default function App() {
   const [selectedPacketId, setSelectedPacketId] = useState<string | null>(null);
   const [stuckText, setStuckText] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [byokSettings, setByokSettings] = useState<ByokSettings>(() =>
+    loadByokSettings()
+  );
   const [patternStarterMessage, setPatternStarterMessage] = useState<string | null>(
     null
   );
@@ -218,6 +240,18 @@ export default function App() {
     setScreen("packet");
   }
 
+  function handleSaveByokSettings(settings: ByokSettings) {
+    const saved = saveByokSettings(settings);
+    setByokSettings(saved);
+    return saved;
+  }
+
+  function handleClearByokSettings() {
+    const cleared = clearByokSettings();
+    setByokSettings(cleared);
+    return cleared;
+  }
+
   if (!isReady) {
     return (
       <main className="paper-field flex min-h-screen items-center justify-center bg-paper px-4 text-ink">
@@ -304,11 +338,17 @@ export default function App() {
       {screen === "packet" && selectedPacket && (
         <PacketDetail
           packet={selectedPacket}
+          meta={meta}
+          byokSettings={byokSettings}
           onBack={() => setScreen("home")}
           onStartSprint={() => setScreen("sprint")}
           onUpdatePacket={updatePacket}
           onChangeStatus={changeStatus}
           onIncreaseSupport={increaseSupport}
+          onDeepRescue={(packetId) =>
+            deepRescuePacket(packetId, createByokRescueAdapter(byokSettings))
+          }
+          onOpenSettings={() => setScreen("settings")}
         />
       )}
 
@@ -340,9 +380,12 @@ export default function App() {
       {screen === "settings" && (
         <SettingsScreen
           meta={meta}
+          byokSettings={byokSettings}
           onExport={exportLocalData}
           onImport={importLocalData}
           onSetExternalLlmConsent={updateExternalLlmConsent}
+          onSaveByokSettings={handleSaveByokSettings}
+          onClearByokSettings={handleClearByokSettings}
           packetCount={packets.length}
         />
       )}
@@ -570,13 +613,19 @@ function personalizeRepairScript(
 
 function PacketDetail({
   packet,
+  meta,
+  byokSettings,
   onBack,
   onStartSprint,
   onUpdatePacket,
   onChangeStatus,
-  onIncreaseSupport
+  onIncreaseSupport,
+  onDeepRescue,
+  onOpenSettings
 }: {
   packet: RescuePacket;
+  meta: Parameters<typeof generatePatternMap>[1];
+  byokSettings: ByokSettings;
   onBack: () => void;
   onStartSprint: () => void;
   onUpdatePacket: (
@@ -585,6 +634,8 @@ function PacketDetail({
   ) => Promise<RescuePacket | null>;
   onChangeStatus: (packetId: string, status: Status) => Promise<RescuePacket | null>;
   onIncreaseSupport: (packetId: string) => Promise<RescuePacket | null>;
+  onDeepRescue: (packetId: string) => Promise<{ packet: RescuePacket } | null>;
+  onOpenSettings: () => void;
 }) {
   const [notes, setNotes] = useState(packet.notes);
   const [showPersonalizer, setShowPersonalizer] = useState(false);
@@ -592,6 +643,11 @@ function PacketDetail({
   const [specificThing, setSpecificThing] = useState("");
   const [timeDate, setTimeDate] = useState("");
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const [showDeepConsent, setShowDeepConsent] = useState(false);
+  const [deepConsentChecked, setDeepConsentChecked] = useState(false);
+  const [deepRescueMessage, setDeepRescueMessage] = useState<string | null>(null);
+  const [deepRescueError, setDeepRescueError] = useState<string | null>(null);
+  const [isDeepRescuing, setIsDeepRescuing] = useState(false);
 
   useEffect(() => {
     setNotes(packet.notes);
@@ -603,6 +659,10 @@ function PacketDetail({
     setSpecificThing("");
     setTimeDate("");
     setCopyMessage(null);
+    setShowDeepConsent(false);
+    setDeepConsentChecked(false);
+    setDeepRescueMessage(null);
+    setDeepRescueError(null);
   }, [packet.id]);
 
   const moreSupportAvailable =
@@ -614,6 +674,13 @@ function PacketDetail({
     specificThing,
     timeDate
   });
+  const byokSummary = summarizeByokSettings(byokSettings);
+  const deepRescueConfigured =
+    byokSummary.hasApiKey &&
+    Boolean(byokSettings.model.trim()) &&
+    Boolean(byokSettings.endpoint.trim());
+  const deepRescueAllowed =
+    meta.llmConsent.externalLlmEnabled && Boolean(meta.llmConsent.consentedAt);
 
   async function chooseMissingItem(missingItem: MissingItemType) {
     await onUpdatePacket(packet.id, {
@@ -642,6 +709,33 @@ function PacketDetail({
       setCopyMessage("Copied.");
     } catch {
       setCopyMessage("Copy unavailable in this browser.");
+    }
+  }
+
+  async function runDeepRescue() {
+    setDeepRescueMessage(null);
+    setDeepRescueError(null);
+    setIsDeepRescuing(true);
+
+    try {
+      const result = await onDeepRescue(packet.id);
+      if (result) {
+        setDeepRescueMessage("Deep Rescue updated this packet. Local rescue remains available.");
+        setShowDeepConsent(false);
+        setDeepConsentChecked(false);
+      }
+    } catch (caught) {
+      if (caught instanceof ExternalLlmConsentRequiredError) {
+        setDeepRescueError("Turn on external LLM consent in Settings first.");
+      } else if (caught instanceof ByokConfigurationError) {
+        setDeepRescueError(caught.message);
+      } else if (caught instanceof ExternalLlmRequestError) {
+        setDeepRescueError(caught.message);
+      } else {
+        setDeepRescueError("Deep Rescue could not complete. The local packet is unchanged.");
+      }
+    } finally {
+      setIsDeepRescuing(false);
     }
   }
 
@@ -690,6 +784,111 @@ function PacketDetail({
               <SignalPill label="Support" value={supportLabels[packet.supportLevel]} />
               <SignalPill label="Status" value={statusLabels[packet.status]} tone="clay" />
             </div>
+          </Panel>
+
+          <Panel tone="paper">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Deep Rescue
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-ink">
+                  Optional BYOK refinement
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  Local rules are the default. Deep Rescue can send this packet text
+                  to your selected provider only after you confirm the exact text below.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <SignalPill value={byokSummary.providerLabel} tone="moss" />
+                <SignalPill
+                  value={deepRescueAllowed ? "Consent on" : "Consent off"}
+                  tone={deepRescueAllowed ? "moss" : "clay"}
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeepConsent((current) => !current);
+                  setDeepRescueError(null);
+                  setDeepRescueMessage(null);
+                }}
+                disabled={!deepRescueConfigured || !deepRescueAllowed}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-ink px-4 font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-muted"
+              >
+                <Sparkles className="h-5 w-5" aria-hidden="true" />
+                Deep Rescue
+              </button>
+              <button
+                type="button"
+                onClick={onOpenSettings}
+                className="inline-flex min-h-11 items-center rounded-lg border border-line bg-surface px-4 font-semibold text-ink transition hover:border-moss"
+              >
+                BYOK settings
+              </button>
+            </div>
+
+            {!deepRescueConfigured && (
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Add a provider, model, endpoint, and API key in Settings. The key
+                stays in this browser and is never included in JSON export.
+              </p>
+            )}
+            {!deepRescueAllowed && (
+              <p className="mt-3 text-sm leading-6 text-muted">
+                External processing consent is off. No task text can leave this browser.
+              </p>
+            )}
+
+            {showDeepConsent && (
+              <div className="mt-4 rounded-lg border border-line bg-surface p-4">
+                <p className="text-sm font-semibold text-ink">
+                  Text that will leave this browser
+                </p>
+                <textarea
+                  readOnly
+                  value={packet.originalText}
+                  className="mt-2 min-h-24 w-full resize-y rounded-lg border border-line bg-paper p-3 text-sm leading-6 text-ink"
+                />
+                <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-6 text-muted">
+                  <input
+                    type="checkbox"
+                    checked={deepConsentChecked}
+                    onChange={(event) =>
+                      setDeepConsentChecked(event.currentTarget.checked)
+                    }
+                    className="mt-1 h-5 w-5 accent-moss"
+                  />
+                  <span>
+                    I understand this sends the text above to my selected provider
+                    using my own API key.
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => void runDeepRescue()}
+                  disabled={!deepConsentChecked || isDeepRescuing}
+                  className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-moss px-4 font-semibold text-white transition hover:bg-mossDark disabled:cursor-not-allowed disabled:bg-muted"
+                >
+                  {isDeepRescuing ? "Running Deep Rescue" : "Run Deep Rescue"}
+                </button>
+              </div>
+            )}
+
+            {deepRescueMessage && (
+              <p className="mt-3 rounded-lg border border-moss/25 bg-moss/10 p-3 text-sm font-semibold text-mossDark">
+                {deepRescueMessage}
+              </p>
+            )}
+            {deepRescueError && (
+              <p className="mt-3 rounded-lg border border-clay/30 bg-clay/10 p-3 text-sm font-semibold text-clay">
+                {deepRescueError}
+              </p>
+            )}
           </Panel>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -1255,19 +1454,36 @@ function PatternList({
 
 function SettingsScreen({
   meta,
+  byokSettings,
   onExport,
   onImport,
   onSetExternalLlmConsent,
+  onSaveByokSettings,
+  onClearByokSettings,
   packetCount
 }: {
   meta: Parameters<typeof generatePatternMap>[1];
+  byokSettings: ByokSettings;
   onExport: () => Promise<unknown>;
   onImport: (raw: unknown) => Promise<unknown>;
-  onSetExternalLlmConsent: (enabled: boolean) => Promise<unknown>;
+  onSetExternalLlmConsent: (
+    enabled: boolean,
+    providerLabel?: string
+  ) => Promise<unknown>;
+  onSaveByokSettings: (settings: ByokSettings) => ByokSettings;
+  onClearByokSettings: () => ByokSettings;
   packetCount: number;
 }) {
   const [message, setMessage] = useState<string | null>(null);
   const [isSavingConsent, setIsSavingConsent] = useState(false);
+  const [draftByokSettings, setDraftByokSettings] =
+    useState<ByokSettings>(byokSettings);
+
+  useEffect(() => {
+    setDraftByokSettings(byokSettings);
+  }, [byokSettings]);
+
+  const byokSummary = summarizeByokSettings(byokSettings);
 
   async function handleExport() {
     const payload = await onExport();
@@ -1303,15 +1519,39 @@ function SettingsScreen({
   async function handleExternalLlmConsent(enabled: boolean) {
     setIsSavingConsent(true);
     try {
-      await onSetExternalLlmConsent(enabled);
+      await onSetExternalLlmConsent(
+        enabled,
+        providerLabelFromSettings(byokSettings)
+      );
       setMessage(
         enabled
-          ? "External LLM consent recorded locally. No external provider is connected in this MVP."
+          ? "External LLM consent recorded locally. Deep Rescue still asks before sending packet text."
           : "External LLM consent revoked locally."
       );
     } finally {
       setIsSavingConsent(false);
     }
+  }
+
+  function updateDraftProvider(provider: ByokProvider) {
+    setDraftByokSettings((current) => ({
+      ...current,
+      provider,
+      model: defaultModelForProvider(provider),
+      endpoint: defaultEndpointForProvider(provider)
+    }));
+  }
+
+  function handleSaveByok() {
+    const saved = onSaveByokSettings(draftByokSettings);
+    setDraftByokSettings(saved);
+    setMessage("BYOK settings saved locally. API keys are not included in export.");
+  }
+
+  function handleClearByok() {
+    const cleared = onClearByokSettings();
+    setDraftByokSettings(cleared);
+    setMessage("BYOK settings cleared from this browser.");
   }
 
   return (
@@ -1357,12 +1597,100 @@ function SettingsScreen({
             <div>
               <h2 className="text-lg font-semibold text-ink">LLM adapter</h2>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Scaffold uses local rules by default. Deep Rescue is the future
-                BYOK path: the user supplies their own API key, the key stays local,
-                task text leaves the browser only after explicit consent, and exports
-                never include API keys.
+                Scaffold uses local rules by default. Deep Rescue is optional BYOK:
+                you supply the key, it stays in this browser, and packet text leaves
+                only when you explicitly run Deep Rescue.
               </p>
             </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 rounded-lg border border-line bg-surface p-3">
+            <label className="text-sm font-semibold text-ink">
+              Provider
+              <select
+                value={draftByokSettings.provider}
+                onChange={(event) =>
+                  updateDraftProvider(event.target.value as ByokProvider)
+                }
+                className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+              >
+                <option value="openai">{labelForProvider("openai")}</option>
+                <option value="anthropic">{labelForProvider("anthropic")}</option>
+                <option value="custom_openai">
+                  {labelForProvider("custom_openai")}
+                </option>
+              </select>
+            </label>
+
+            <label className="text-sm font-semibold text-ink">
+              API key
+              <input
+                type="password"
+                value={draftByokSettings.apiKey}
+                onChange={(event) =>
+                  setDraftByokSettings((current) => ({
+                    ...current,
+                    apiKey: event.target.value
+                  }))
+                }
+                className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                placeholder="Stored locally only"
+              />
+            </label>
+
+            <label className="text-sm font-semibold text-ink">
+              Model
+              <input
+                value={draftByokSettings.model}
+                onChange={(event) =>
+                  setDraftByokSettings((current) => ({
+                    ...current,
+                    model: event.target.value
+                  }))
+                }
+                className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+              />
+            </label>
+
+            <label className="text-sm font-semibold text-ink">
+              Endpoint
+              <input
+                value={draftByokSettings.endpoint}
+                onChange={(event) =>
+                  setDraftByokSettings((current) => ({
+                    ...current,
+                    endpoint: event.target.value
+                  }))
+                }
+                className="mt-1 min-h-11 w-full rounded-lg border border-line bg-paper px-3 text-ink"
+                placeholder="Required for custom endpoints"
+              />
+            </label>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={handleSaveByok}
+                className="inline-flex min-h-11 items-center rounded-lg bg-ink px-4 font-semibold text-white transition hover:bg-ink/90"
+              >
+                Save BYOK settings
+              </button>
+              <button
+                type="button"
+                onClick={handleClearByok}
+                className="inline-flex min-h-11 items-center rounded-lg border border-line bg-paper px-4 font-semibold text-ink transition hover:border-clay"
+              >
+                Clear local key
+              </button>
+            </div>
+
+            <p className="text-sm leading-6 text-muted">
+              Stored provider: {byokSummary.providerLabel}. Key present:{" "}
+              {byokSummary.hasApiKey ? "yes" : "no"}. JSON export never includes
+              API keys. Some providers may block direct browser requests; a custom
+              OpenAI-compatible local endpoint can be used later without changing
+              packet storage.
+            </p>
           </div>
 
           <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-line bg-surface p-3">
@@ -1383,7 +1711,7 @@ function SettingsScreen({
                 Current mode: {meta.llmConsent.providerLabel}
               </span>
               <span className="mt-1 block text-sm leading-6 text-muted">
-                No external provider is connected in this MVP.
+                Deep Rescue will still ask before sending packet text.
               </span>
             </span>
           </label>

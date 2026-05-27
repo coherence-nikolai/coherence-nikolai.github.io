@@ -102,7 +102,7 @@ test("maps task, missing-item, exit, and successful-start patterns", async ({ pa
 test("exports and imports local JSON data", async ({ page }, testInfo) => {
   await page.getByLabel("Messy task").fill(messyTask);
   await page.getByRole("button", { name: "I'm stuck" }).click();
-  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
 
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export JSON" }).click();
@@ -127,15 +127,38 @@ test("exports and imports local JSON data", async ({ page }, testInfo) => {
 });
 
 test("records explicit external LLM consent in settings", async ({ page }) => {
-  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
 
   await expect(page.getByRole("heading", { name: "LLM adapter" })).toBeVisible();
+  await page.getByLabel("API key").fill("sk-local-test");
+  await page.getByRole("button", { name: "Save BYOK settings" }).click();
+  await expect(page.getByText("BYOK settings saved locally.")).toBeVisible();
+
   const consentCheckbox = page.getByLabel(
     "Allow task text to be sent to an external LLM adapter if one is connected."
   );
   await consentCheckbox.click();
   await expect(page.getByText("External LLM consent recorded locally.")).toBeVisible();
   await expect(consentCheckbox).toBeChecked();
+
+  await page.getByRole("button", { name: "Rescue", exact: true }).click();
+  await page.getByLabel("Messy task").fill(messyTask);
+  await page.getByRole("button", { name: "I'm stuck" }).click();
+  const deepRescueButton = page.getByRole("button", {
+    name: "Deep Rescue",
+    exact: true
+  });
+  await expect(deepRescueButton).toBeEnabled();
+  await deepRescueButton.click();
+  await expect(page.getByText("Text that will leave this browser")).toBeVisible();
+  const runButton = page.getByRole("button", { name: "Run Deep Rescue" });
+  await expect(runButton).toBeDisabled();
+  await page
+    .getByLabel("I understand this sends the text above to my selected provider")
+    .check();
+  await expect(runButton).toBeEnabled();
+
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
   await consentCheckbox.click();
   await expect(page.getByText("External LLM consent revoked locally.")).toBeVisible();
   await expect(consentCheckbox).not.toBeChecked();

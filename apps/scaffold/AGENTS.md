@@ -20,7 +20,8 @@ This project is a local-first ADHD executive-function scaffold. It is a rescue e
 - Keep deterministic rules modular so an LLM classifier can replace them later.
 - Put any future LLM integration behind `src/llm/rescueAdapter.ts`.
 - Never send task text to an external LLM without explicit consent recorded in local metadata.
-- Future external LLM support should be BYOK unless the user explicitly changes strategy: user supplies their own key, keys stay local, and exports never include keys.
+- External LLM support is BYOK unless the user explicitly changes strategy: user supplies their own key, keys stay in `localStorage`, and exports never include keys.
+- Deep Rescue must show the exact packet text that will leave the browser and require a per-action confirmation before calling any provider.
 - Keep persistence behind `src/data/` and app state operations behind hooks.
 - Prefer accessible, low-cognitive-load UI.
 - Avoid dense dashboards and excessive notifications.

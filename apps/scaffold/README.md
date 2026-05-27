@@ -17,7 +17,7 @@ Core slogan: **Not reminders. Rescue.**
 - Fades support after repeated successful starts while allowing the user to increase support again.
 - Shows a local pattern map without shame, streaks, or productivity scores.
 - Exports and imports all local data as JSON.
-- Includes an explicit-consent adapter boundary for any future external LLM use.
+- Includes explicit-consent Deep Rescue with local BYOK settings.
 - Uses a premium Rescue Frame visual system built around a minimalist scaffold/S mark.
 
 ## What It Is Not
@@ -71,7 +71,8 @@ src/
     patternMap.ts        Pure pattern summaries
     rescueEngine.test.ts Unit tests for core logic
   llm/
-    rescueAdapter.ts     Consent-gated adapter boundary for local rules and future LLMs
+    byokSettings.ts      Local-only BYOK provider/key storage helpers
+    rescueAdapter.ts     Consent-gated local, BYOK, and future LLM adapter boundary
   data/
     db.ts                Dexie IndexedDB persistence and JSON import/export
   hooks/
@@ -84,7 +85,7 @@ src/
   App.tsx                Screen orchestration and product UI
 ```
 
-The rescue engine is intentionally pure and modular. `src/llm/rescueAdapter.ts` is the only boundary where a future LLM task-decomposition backend should enter. The local rules adapter remains the default, and the external LLM adapter refuses to run unless explicit local consent is present.
+The rescue engine is intentionally pure and modular. `src/llm/rescueAdapter.ts` is the boundary for Deep Rescue and any future LLM task-decomposition backend. The local rules adapter remains the default, and the external LLM adapter refuses to run unless explicit local consent is present.
 
 ## Privacy Approach
 
@@ -92,7 +93,7 @@ Scaffold stores packets in the browser using IndexedDB via Dexie. The MVP has no
 
 Do not introduce cloud storage, sync, calendar access, email access, analytics, or passive signals without explicit user consent.
 
-External LLM processing is off by default. The settings screen can record local consent for a future BYOK adapter, but this MVP does not connect to a provider or send task text outside the browser. Any future key should stay local, task text should leave only after an explicit Deep Rescue action, and exports must never include API keys.
+External LLM processing is off by default. BYOK settings are stored separately in browser `localStorage`, not IndexedDB export data. Task text leaves the browser only after the user enables external processing and confirms the exact packet text during a Deep Rescue action. API keys are never included in JSON export.
 
 ## Future Roadmap
 

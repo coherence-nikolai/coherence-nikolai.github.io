@@ -15,7 +15,10 @@ import {
   statusForOutcome,
   updateSupportLevel
 } from "../engine/rescueEngine";
-import { generateRescuePacketWithAdapter } from "../llm/rescueAdapter";
+import {
+  generateRescuePacketWithAdapter,
+  type RescueGenerationAdapter
+} from "../llm/rescueAdapter";
 import type {
   AppMeta,
   ReentryActionType,
@@ -93,6 +96,23 @@ export function useScaffoldData() {
       return packet;
     },
     [meta.llmConsent, persistPacket]
+  );
+
+  const deepRescuePacket = useCallback(
+    async (packetId: string, adapter: RescueGenerationAdapter) => {
+      const current = packets.find((packet) => packet.id === packetId);
+      if (!current) return null;
+
+      const result = await generateRescuePacketWithAdapter(
+        current.originalText,
+        meta.llmConsent,
+        adapter,
+        current
+      );
+      await persistPacket(result.packet);
+      return result;
+    },
+    [meta.llmConsent, packets, persistPacket]
   );
 
   const updatePacket = useCallback(
@@ -265,7 +285,10 @@ export function useScaffoldData() {
     setMeta(nextMeta);
   }, []);
 
-  const updateExternalLlmConsent = useCallback(async (enabled: boolean) => {
+  const updateExternalLlmConsent = useCallback(async (
+    enabled: boolean,
+    providerLabel?: string
+  ) => {
     const current = await ensureMeta();
     const now = new Date().toISOString();
     const nextMeta: AppMeta = {
@@ -273,7 +296,7 @@ export function useScaffoldData() {
       llmConsent: {
         externalLlmEnabled: enabled,
         providerLabel: enabled
-          ? "External LLM adapter"
+          ? providerLabel ?? "External LLM adapter"
           : "No external LLM adapter connected",
         consentedAt: enabled ? now : current.llmConsent.consentedAt,
         revokedAt: enabled ? undefined : now
@@ -330,6 +353,7 @@ export function useScaffoldData() {
     increaseSupport,
     recordReentryAction,
     incrementReentries,
+    deepRescuePacket,
     updateExternalLlmConsent,
     exportLocalData,
     importLocalData,
