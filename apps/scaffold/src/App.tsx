@@ -34,8 +34,10 @@ import {
   generateSmartReentryList
 } from "./engine/reentryEngine";
 import {
+  decomposeTask,
   generateExitResponsiblyScript,
-  increaseSupportLevel
+  increaseSupportLevel,
+  scoreRepairRelevance
 } from "./engine/rescueEngine";
 import { useScaffoldData } from "./hooks/useScaffoldData";
 import {
@@ -164,7 +166,7 @@ export default function App() {
     increaseSupport,
     recordReentryAction,
     incrementReentries,
-    deepRescuePacket,
+    previewDeepRescuePacket,
     updateExternalLlmConsent,
     exportLocalData,
     importLocalData
@@ -396,8 +398,8 @@ export default function App() {
           onUpdatePacket={updatePacket}
           onChangeStatus={changeStatus}
           onIncreaseSupport={increaseSupport}
-          onDeepRescue={(packetId) =>
-            deepRescuePacket(packetId, createByokRescueAdapter(byokSettings))
+          onPreviewDeepRescue={(packetId) =>
+            previewDeepRescuePacket(packetId, createByokRescueAdapter(byokSettings))
           }
           onOpenSettings={() => setScreen("settings")}
         />
@@ -893,7 +895,7 @@ function PacketDetail({
   onUpdatePacket,
   onChangeStatus,
   onIncreaseSupport,
-  onDeepRescue,
+  onPreviewDeepRescue,
   onOpenSettings
 }: {
   packet: RescuePacket;
@@ -907,7 +909,7 @@ function PacketDetail({
   ) => Promise<RescuePacket | null>;
   onChangeStatus: (packetId: string, status: Status) => Promise<RescuePacket | null>;
   onIncreaseSupport: (packetId: string) => Promise<RescuePacket | null>;
-  onDeepRescue: (packetId: string) => Promise<{ packet: RescuePacket } | null>;
+  onPreviewDeepRescue: (packetId: string) => Promise<{ packet: RescuePacket } | null>;
   onOpenSettings: () => void;
 }) {
   const [notes, setNotes] = useState(packet.notes);
@@ -918,6 +920,7 @@ function PacketDetail({
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [showDeepConsent, setShowDeepConsent] = useState(false);
   const [deepConsentChecked, setDeepConsentChecked] = useState(false);
+  const [deepPreviewPacket, setDeepPreviewPacket] = useState<RescuePacket | null>(null);
   const [deepRescueMessage, setDeepRescueMessage] = useState<string | null>(null);
   const [deepRescueError, setDeepRescueError] = useState<string | null>(null);
   const [isDeepRescuing, setIsDeepRescuing] = useState(false);
@@ -934,6 +937,7 @@ function PacketDetail({
     setCopyMessage(null);
     setShowDeepConsent(false);
     setDeepConsentChecked(false);
+    setDeepPreviewPacket(null);
     setDeepRescueMessage(null);
     setDeepRescueError(null);
   }, [packet.id]);
@@ -941,6 +945,16 @@ function PacketDetail({
   const moreSupportAvailable =
     increaseSupportLevel(packet.supportLevel) !== packet.supportLevel;
   const confidencePercent = Math.round(packet.blockConfidence * 100);
+  const decomposition = decomposeTask(
+    packet.originalText,
+    packet.blockType,
+    packet.taskType
+  );
+  const repairRelevance = scoreRepairRelevance(
+    packet.originalText,
+    packet.blockType,
+    packet.taskType
+  );
   const canPersonalize = canPersonalizeRepairScript(packet.repairScript);
   const personalizedRepairScript = personalizeRepairScript(packet.repairScript, {
     recipientName,
@@ -991,9 +1005,10 @@ function PacketDetail({
     setIsDeepRescuing(true);
 
     try {
-      const result = await onDeepRescue(packet.id);
+      const result = await onPreviewDeepRescue(packet.id);
       if (result) {
-        setDeepRescueMessage("Deep Rescue updated this packet. Local rescue remains available.");
+        setDeepPreviewPacket(result.packet);
+        setDeepRescueMessage("Deep Rescue preview ready. Review changes before applying.");
         setShowDeepConsent(false);
         setDeepConsentChecked(false);
       }
@@ -1009,6 +1024,27 @@ function PacketDetail({
       }
     } finally {
       setIsDeepRescuing(false);
+    }
+  }
+
+  async function applyDeepRescuePreview() {
+    if (!deepPreviewPacket) return;
+
+    const applied = await onUpdatePacket(packet.id, (current) => ({
+      ...deepPreviewPacket,
+      id: current.id,
+      originalText: current.originalText,
+      createdAt: current.createdAt,
+      supportLevel: current.supportLevel,
+      status: current.status,
+      sprintHistory: current.sprintHistory,
+      reentryHistory: current.reentryHistory,
+      notes: current.notes
+    }));
+
+    if (applied) {
+      setDeepPreviewPacket(null);
+      setDeepRescueMessage("Deep Rescue applied. Local packet history stayed intact.");
     }
   }
 
@@ -1039,8 +1075,28 @@ function PacketDetail({
                 tone="moss"
               />
               <SignalPill label="Confidence" value={`${confidencePercent}%`} />
+              <SignalPill
+                label="Repair fit"
+                value={`${repairRelevance.label} ${repairRelevance.score}%`}
+                tone={repairRelevance.score >= 45 ? "moss" : "quiet"}
+              />
               <SignalPill label="Support" value={supportLabels[packet.supportLevel]} />
               <SignalPill label="Status" value={statusLabels[packet.status]} tone="clay" />
+            </div>
+          </Panel>
+
+          <Panel tone="paper">
+            <p className="text-xs font-semibold uppercase text-moss">
+              Task decomposition
+            </p>
+            <h2 className="mt-1 text-xl font-semibold text-ink">
+              The rescue boundary
+            </h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <InfoPanel title="Surface" body={decomposition.taskSurface} />
+              <InfoPanel title="Touch" body={decomposition.objectToTouch} />
+              <InfoPanel title="Visible change" body={decomposition.visibleChange} />
+              <InfoPanel title="Stop rule" body={decomposition.stopRule} />
             </div>
           </Panel>
 
@@ -1143,6 +1199,17 @@ function PacketDetail({
                 {deepRescueMessage}
               </p>
             )}
+            {deepPreviewPacket && (
+              <DeepRescueComparison
+                currentPacket={packet}
+                previewPacket={deepPreviewPacket}
+                onApply={() => void applyDeepRescuePreview()}
+                onDismiss={() => {
+                  setDeepPreviewPacket(null);
+                  setDeepRescueMessage("Kept the local rules packet.");
+                }}
+              />
+            )}
             {deepRescueError && (
               <p className="mt-3 rounded-lg border border-clay/30 bg-clay/10 p-3 text-sm font-semibold text-clay">
                 {deepRescueError}
@@ -1189,6 +1256,10 @@ function PacketDetail({
               <div className="tool-surface">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="text-lg font-semibold text-ink">Repair option</h3>
+                  <SignalPill
+                    value={`${repairRelevance.score}% fit`}
+                    tone={repairRelevance.score >= 45 ? "moss" : "quiet"}
+                  />
                   {canPersonalize && (
                     <button
                       type="button"
@@ -1202,6 +1273,16 @@ function PacketDetail({
                 <p className="safe-text mt-3 text-sm leading-6 text-muted">
                   {personalizedRepairScript}
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {repairRelevance.reasons.slice(0, 3).map((reason) => (
+                    <span
+                      key={reason}
+                      className="rounded-full border border-line bg-paper px-2.5 py-1 text-xs font-semibold text-muted"
+                    >
+                      {reason}
+                    </span>
+                  ))}
+                </div>
                 {canPersonalize && showPersonalizer && (
                   <div className="mt-4 grid gap-3 rounded-lg border border-line bg-surface p-3">
                     <label className="text-sm font-semibold text-ink">
@@ -1448,6 +1529,102 @@ function InfoPanel({ title, body }: { title: string; body: string }) {
     <div className="rounded-lg border border-line bg-paper p-4">
       <p className="text-sm font-semibold text-muted">{title}</p>
       <p className="safe-text mt-2 leading-7 text-ink">{body}</p>
+    </div>
+  );
+}
+
+function DeepRescueComparison({
+  currentPacket,
+  previewPacket,
+  onApply,
+  onDismiss
+}: {
+  currentPacket: RescuePacket;
+  previewPacket: RescuePacket;
+  onApply: () => void;
+  onDismiss: () => void;
+}) {
+  const rows = [
+    {
+      label: "Next physical action",
+      current: currentPacket.firstPhysicalAction,
+      preview: previewPacket.firstPhysicalAction
+    },
+    {
+      label: "Real task",
+      current: currentPacket.realTask,
+      preview: previewPacket.realTask
+    },
+    {
+      label: "Minimum progress",
+      current: currentPacket.minimumViableProgress,
+      preview: previewPacket.minimumViableProgress
+    },
+    {
+      label: "Repair",
+      current: currentPacket.repairScript,
+      preview: previewPacket.repairScript
+    }
+  ];
+
+  return (
+    <div className="mt-4 rounded-lg border border-moss/30 bg-moss/10 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase text-mossDark">
+            Deep Rescue comparison
+          </p>
+          <h3 className="mt-1 text-xl font-semibold text-ink">
+            Review before applying.
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-muted">
+            Nothing changed yet. Apply only if the proposed packet gives a clearer
+            first move.
+          </p>
+        </div>
+        <SignalPill
+          value={`${Math.round(previewPacket.blockConfidence * 100)}% confidence`}
+          tone="moss"
+        />
+      </div>
+
+      <div className="mt-4 grid gap-3">
+        {rows.map((row) => (
+          <div
+            key={row.label}
+            className="grid gap-2 rounded-lg border border-line bg-surface p-3 lg:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)]"
+          >
+            <p className="text-xs font-semibold uppercase text-muted">{row.label}</p>
+            <div>
+              <p className="text-xs font-semibold uppercase text-muted">Current</p>
+              <p className="safe-text mt-1 text-sm leading-6 text-ink">{row.current}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase text-moss">Proposed</p>
+              <p className="safe-text mt-1 text-sm font-semibold leading-6 text-ink">
+                {row.preview}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={onApply}
+          className="inline-flex min-h-11 items-center rounded-lg bg-moss px-4 font-semibold text-white transition hover:bg-mossDark"
+        >
+          Apply Deep Rescue
+        </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="inline-flex min-h-11 items-center rounded-lg border border-line bg-surface px-4 font-semibold text-ink transition hover:border-moss"
+        >
+          Keep local packet
+        </button>
+      </div>
     </div>
   );
 }

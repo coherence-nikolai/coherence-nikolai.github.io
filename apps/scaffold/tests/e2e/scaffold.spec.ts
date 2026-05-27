@@ -12,7 +12,7 @@ test("creates a rescue packet from messy text", async ({ page }) => {
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
   await expect(page.getByRole("heading", { name: "Reply to this email" })).toBeVisible();
-  await expect(page.getByText("Next physical action")).toBeVisible();
+  await expect(page.getByText("Next physical action", { exact: true })).toBeVisible();
   await expect(
     page.getByText(
       "Open the thread and write a two-sentence holding reply. Do not overexplain.",
@@ -168,6 +168,58 @@ test("records explicit external LLM consent in settings", async ({ page }) => {
     .getByLabel("I understand this sends the text above to my selected provider")
     .check();
   await expect(runButton).toBeEnabled();
+  await page.route("https://api.openai.com/v1/chat/completions", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
+      body: JSON.stringify({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                title: "Reply to this email",
+                realTask: "Send a late holding reply",
+                taskType: "email",
+                blockType: "shame_fear",
+                blockConfidence: 0.92,
+                emotionalLoad: 4,
+                urgency: 4,
+                consequence: 3,
+                effort: 2,
+                firstPhysicalAction:
+                  "Open the email thread and type one factual holding sentence.",
+                tenMinutePlan: [
+                  "Minute 0-1: Open the email thread and type one factual holding sentence.",
+                  "Minute 1-3: Name what you can send and when.",
+                  "Minute 3-6: Remove extra apology and explanation.",
+                  "Minute 6-8: Send it or save the draft.",
+                  "Minute 8-10: Put the next step beside it."
+                ],
+                minimumViableProgress: "A factual holding reply exists.",
+                repairScript:
+                  "Hi [Name], I'm sorry for the delay. I can send [specific thing] by [time/date]. Thanks for your patience.",
+                rescueMode: "repair",
+                missingItem: "courage",
+                exitScript:
+                  "Hi [Name], I can send a smaller update by [time/date], or close the loop if this is no longer needed.",
+                exitStatus: "not_chosen"
+              })
+            }
+          }
+        ]
+      })
+    });
+  });
+  await runButton.click();
+  await expect(page.getByRole("heading", { name: "Review before applying." })).toBeVisible();
+  await expect(
+    page.getByText("Open the email thread and type one factual holding sentence.")
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Apply Deep Rescue" }).click();
+  await expect(page.getByText("Deep Rescue applied.")).toBeVisible();
 
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await consentCheckbox.click();

@@ -115,6 +115,21 @@ export function useScaffoldData() {
     [meta.llmConsent, packets, persistPacket]
   );
 
+  const previewDeepRescuePacket = useCallback(
+    async (packetId: string, adapter: RescueGenerationAdapter) => {
+      const current = packets.find((packet) => packet.id === packetId);
+      if (!current) return null;
+
+      return generateRescuePacketWithAdapter(
+        current.originalText,
+        meta.llmConsent,
+        adapter,
+        current
+      );
+    },
+    [meta.llmConsent, packets]
+  );
+
   const updatePacket = useCallback(
     async (
       packetId: string,
@@ -354,6 +369,7 @@ export function useScaffoldData() {
     recordReentryAction,
     incrementReentries,
     deepRescuePacket,
+    previewDeepRescuePacket,
     updateExternalLlmConsent,
     exportLocalData,
     importLocalData,

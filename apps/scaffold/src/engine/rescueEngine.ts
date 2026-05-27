@@ -16,6 +16,20 @@ export interface BlockClassification {
   matchedPhrases: string[];
 }
 
+export interface TaskDecomposition {
+  taskType: TaskType;
+  taskSurface: string;
+  objectToTouch: string;
+  visibleChange: string;
+  stopRule: string;
+}
+
+export interface RepairRelevance {
+  score: number;
+  label: "none" | "low" | "medium" | "high";
+  reasons: string[];
+}
+
 const blockKeywordMap: Array<{ block: BlockType; phrases: string[] }> = [
   {
     block: "shame_fear",
@@ -310,6 +324,13 @@ function hasTask(input: string, terms: string[]): boolean {
   return terms.some((term) => normalized.includes(term));
 }
 
+function repairLabel(score: number): RepairRelevance["label"] {
+  if (score >= 75) return "high";
+  if (score >= 45) return "medium";
+  if (score > 0) return "low";
+  return "none";
+}
+
 function sentenceCase(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return "Untitled rescue";
@@ -587,11 +608,218 @@ export function chooseRescueMode(blockType: BlockType): RescueMode {
   }
 }
 
+export function decomposeTask(
+  input: string,
+  blockType: BlockType = classifyBlock(input),
+  taskType: TaskType = classifyTaskType(input)
+): TaskDecomposition {
+  const base: Record<TaskType, Omit<TaskDecomposition, "taskType">> = {
+    email: {
+      taskSurface: "message thread",
+      objectToTouch: "reply box",
+      visibleChange: "a factual two-sentence draft exists",
+      stopRule: "stop before explaining the whole backstory"
+    },
+    tax: {
+      taskSurface: "tax folder, email search, or finance portal",
+      objectToTouch: "one receipt, form, or income statement",
+      visibleChange: "one document is found or one missing document is named",
+      stopRule: "stop before sorting every document"
+    },
+    essay: {
+      taskSurface: "assignment document",
+      objectToTouch: "the prompt, heading, or first rough bullet",
+      visibleChange: "the prompt is pasted and one ugly bullet exists",
+      stopRule: "stop before polishing"
+    },
+    cleaning: {
+      taskSurface: "one visible surface or floor patch",
+      objectToTouch: "one item already in sight",
+      visibleChange: "five items move or one surface looks different",
+      stopRule: "stop before expanding to the whole room"
+    },
+    appointment: {
+      taskSurface: "calendar, portal, or message thread",
+      objectToTouch: "the date, time, phone number, or reschedule link",
+      visibleChange: "one appointment detail is confirmed or one draft exists",
+      stopRule: "stop before solving every related errand"
+    },
+    money: {
+      taskSurface: "bill, bank page, or invoice",
+      objectToTouch: "amount due, due date, or pay button",
+      visibleChange: "the exact next money action is written down",
+      stopRule: "stop before reviewing every account"
+    },
+    health: {
+      taskSurface: "health app, medication, portal, or note",
+      objectToTouch: "refill button, booking page, bottle, or symptom note",
+      visibleChange: "one health next step is visible",
+      stopRule: "stop before researching everything"
+    },
+    admin: {
+      taskSurface: "form, portal, or document",
+      objectToTouch: "the first known field",
+      visibleChange: "one field is filled or one missing field is named",
+      stopRule: "stop before completing the whole form"
+    },
+    work: {
+      taskSurface: "work document, inbox, or project surface",
+      objectToTouch: "the next deliverable line",
+      visibleChange: "one deliverable is stated in a sentence",
+      stopRule: "stop before planning the whole project"
+    },
+    study: {
+      taskSurface: "course material, notes, or assignment page",
+      objectToTouch: "one question, heading, or worked example",
+      visibleChange: "one heading or question is copied into a note",
+      stopRule: "stop before catching up on the whole course"
+    },
+    unknown: {
+      taskSurface: "the nearest relevant document, page, message, or object",
+      objectToTouch: "one physical object or on-screen field",
+      visibleChange: "one visible piece changes",
+      stopRule: "stop before redefining the whole task"
+    }
+  };
+
+  const decomposition = base[taskType];
+
+  if (blockType === "missing_information") {
+    return {
+      taskType,
+      ...decomposition,
+      visibleChange: "one missing piece is named or requested",
+      stopRule: "stop before solving the task around the missing piece"
+    };
+  }
+
+  if (blockType === "low_energy") {
+    return {
+      taskType,
+      ...decomposition,
+      objectToTouch: `the easiest reachable part of ${decomposition.objectToTouch}`,
+      stopRule: "stop before spending energy on setup"
+    };
+  }
+
+  if (blockType === "perfectionism") {
+    return {
+      taskType,
+      ...decomposition,
+      visibleChange: "one intentionally rough version exists",
+      stopRule: "stop before improving it"
+    };
+  }
+
+  return {
+    taskType,
+    ...decomposition
+  };
+}
+
+export function scoreRepairRelevance(
+  input: string,
+  blockType: BlockType = classifyBlock(input),
+  taskType: TaskType = classifyTaskType(input)
+): RepairRelevance {
+  const normalized = normalize(input);
+  const reasons: string[] = [];
+  let score = 0;
+
+  if (taskType === "email") {
+    score += 25;
+    reasons.push("message involved");
+  }
+
+  if (taskType === "appointment") {
+    score += 35;
+    reasons.push("appointment or meeting involved");
+  }
+
+  if (taskType === "work") {
+    score += 12;
+    reasons.push("another person may be affected");
+  }
+
+  if (blockType === "shame_fear") {
+    score += 28;
+    reasons.push("shame or fear language");
+  }
+
+  if (
+    includesAny(normalized, [
+      "late",
+      "delay",
+      "overdue",
+      "missed",
+      "forgot",
+      "sorry",
+      "apologize",
+      "apologise"
+    ])
+  ) {
+    score += 32;
+    reasons.push("lateness or apology context");
+  }
+
+  if (
+    includesAny(normalized, [
+      "extension",
+      "more time",
+      "clarify",
+      "help",
+      "scope",
+      "renegotiate",
+      "delegate",
+      "reschedule"
+    ])
+  ) {
+    score += 30;
+    reasons.push("contact or renegotiation needed");
+  }
+
+  if (
+    includesAny(normalized, [
+      "boss",
+      "client",
+      "teacher",
+      "professor",
+      "manager",
+      "doctor",
+      "dentist",
+      "landlord",
+      "someone",
+      "them"
+    ])
+  ) {
+    score += 16;
+    reasons.push("specific recipient implied");
+  }
+
+  if (
+    (taskType === "essay" || taskType === "study" || taskType === "cleaning") &&
+    !includesAny(normalized, ["late", "extension", "teacher", "professor", "submit"])
+  ) {
+    score -= 20;
+    reasons.push("private initiation task");
+  }
+
+  const clamped = Math.max(0, Math.min(100, score));
+
+  return {
+    score: clamped,
+    label: repairLabel(clamped),
+    reasons: reasons.length > 0 ? reasons : ["no repair context detected"]
+  };
+}
+
 export function generateFirstPhysicalAction(
   input: string,
   blockType: BlockType,
   taskType: TaskType = classifyTaskType(input)
 ): string {
+  const decomposition = decomposeTask(input, blockType, taskType);
+
   if (hasTask(input, ["scrolling", "phone", "social media"])) {
     return "Put the phone face down and open a 7-minute timer.";
   }
@@ -606,7 +834,7 @@ export function generateFirstPhysicalAction(
     if (blockType === "perfectionism") {
       return "Open a blank reply and write the rough two-sentence version first.";
     }
-    return "Open the message thread. Do not reply yet.";
+    return `Open the ${decomposition.taskSurface}. Put the cursor in the ${decomposition.objectToTouch}. Do not send yet.`;
   }
 
   if (taskType === "tax") {
@@ -616,7 +844,7 @@ export function generateFirstPhysicalAction(
     if (blockType === "missing_information") {
       return "Write the name of one missing tax document, then search for that exact item.";
     }
-    return "Search email or files for one relevant tax document, then stop.";
+    return `Open the ${decomposition.taskSurface} and find ${decomposition.objectToTouch}.`;
   }
 
   if (taskType === "essay") {
@@ -626,7 +854,7 @@ export function generateFirstPhysicalAction(
     if (blockType === "ambiguous_start") {
       return "Open a document and paste the assignment question or prompt at the top.";
     }
-    return "Open the essay document and write the heading only.";
+    return `Open the ${decomposition.taskSurface} and touch ${decomposition.objectToTouch}.`;
   }
 
   if (taskType === "cleaning") {
@@ -636,49 +864,52 @@ export function generateFirstPhysicalAction(
     if (blockType === "low_energy") {
       return "Stay seated and clear only the surface within arm's reach.";
     }
-    return "Stand up and put one visible item where it belongs.";
+    return `Stand up, touch ${decomposition.objectToTouch}, and move it to one obvious place.`;
   }
 
   if (taskType === "appointment") {
     if (blockType === "shame_fear") {
       return "Open the calendar or message and draft one reschedule sentence.";
     }
-    return "Open your calendar or messages and find the exact appointment details.";
+    if (blockType === "missing_information") {
+      return "Open the calendar, portal, or message thread and find the exact appointment details.";
+    }
+    return `Open the ${decomposition.taskSurface} and find ${decomposition.objectToTouch}.`;
   }
 
   if (taskType === "money") {
     if (blockType === "shame_fear") {
       return "Open the bill or account page and read only the amount due.";
     }
-    return "Open one bill, bank page, or invoice and write the exact next money action.";
+    return `Open the ${decomposition.taskSurface} and read only the ${decomposition.objectToTouch}.`;
   }
 
   if (taskType === "health") {
     if (blockType === "low_energy") {
       return "Put the medication, health note, or booking page within reach.";
     }
-    return "Open the health app, portal, or note and find the next required detail.";
+    return `Open the ${decomposition.taskSurface} and find the ${decomposition.objectToTouch}.`;
   }
 
   if (taskType === "admin") {
     if (blockType === "missing_information") {
       return "Open the form and circle or write the first field you cannot answer.";
     }
-    return "Open the form, portal, or document and fill one known field.";
+    return `Open the ${decomposition.taskSurface} and touch ${decomposition.objectToTouch}.`;
   }
 
   if (taskType === "work") {
     if (blockType === "overwhelm") {
       return "Open a note and write the three work pieces competing for attention.";
     }
-    return "Open the work surface and write the next deliverable in one sentence.";
+    return `Open the ${decomposition.taskSurface} and write ${decomposition.objectToTouch} in one sentence.`;
   }
 
   if (taskType === "study") {
     if (blockType === "boredom") {
       return "Open the notes and set a 7-minute timer for one tiny pass.";
     }
-    return "Open the course material and copy one question or heading into a note.";
+    return `Open the ${decomposition.taskSurface} and copy ${decomposition.objectToTouch} into a note.`;
   }
 
   switch (blockType) {
@@ -715,6 +946,27 @@ export function generateTenMinutePlan(
   taskType: TaskType = classifyTaskType(input)
 ): string[] {
   const firstAction = generateFirstPhysicalAction(input, blockType, taskType);
+  const decomposition = decomposeTask(input, blockType, taskType);
+  const blockSupport =
+    blockType === "perfectionism"
+      ? "Keep it deliberately rough."
+      : blockType === "overwhelm" || blockType === "task_too_large"
+        ? "Keep the scope smaller than feels necessary."
+        : blockType === "missing_information"
+          ? "Name the missing piece instead of solving around it."
+          : blockType === "shame_fear"
+            ? "Use accountable facts without overexplaining."
+            : "Do not expand the task.";
+
+  if (taskType !== "unknown") {
+    return [
+      `Minute 0-1: ${firstAction}`,
+      `Minute 1-3: Work only on ${decomposition.objectToTouch} on the ${decomposition.taskSurface}. ${blockSupport}`,
+      `Minute 3-6: Create the visible change: ${decomposition.visibleChange}.`,
+      `Minute 6-8: Park everything outside this rescue. ${sentenceCase(decomposition.stopRule)}.`,
+      "Minute 8-10: Mark done enough, repair, or choose the next physical action."
+    ];
+  }
 
   switch (blockType) {
     case "shame_fear":
@@ -811,6 +1063,7 @@ export function generateRepairScript(
   taskType: TaskType = classifyTaskType(input)
 ): string {
   const normalized = normalize(input);
+  const relevance = scoreRepairRelevance(input, blockType, taskType);
 
   if (taskType === "email" && includesAny(normalized, ["late", "delay", "ashamed", "overdue"])) {
     return "Hi [Name], I'm sorry for the delay. I'm working on this now and can send you [specific thing] by [time/date]. Thanks for your patience.";
@@ -856,9 +1109,22 @@ export function generateRepairScript(
     return "Hi [Name], I'm sorry for my part in this. I can take responsibility for [specific part] and my next step is [specific action].";
   }
 
+  if (relevance.score < 30) {
+    if (taskType === "essay" || taskType === "study") {
+      return "No repair needed yet. Start the assignment first: open the brief or document, paste the question, and write one rough bullet. If it is already late, switch to an extension request.";
+    }
+
+    if (taskType === "cleaning") {
+      return "No repair needed yet. Start with the first visible item. If someone else is waiting on this, send a brief update after one surface changes.";
+    }
+
+    return "No repair needed yet. Choose the first physical action. If another person is waiting on this, send a brief update with what you can do and when.";
+  }
+
   if (
-    blockType === "shame_fear" ||
-    includesAny(normalized, ["late", "delay", "email", "reply"])
+    relevance.score >= 45 &&
+    (blockType === "shame_fear" ||
+      includesAny(normalized, ["late", "delay", "email", "reply"]))
   ) {
     return "Hi [Name], I'm sorry for the delay. I'm working on this now and can send you [specific thing] by [time/date]. Thanks for your patience.";
   }

@@ -3,12 +3,15 @@ import type { BlockType, MissingItemType, TaskType } from "../types";
 import {
   classifyBlockWithConfidence,
   classifyTaskType,
+  decomposeTask,
   detectMissingItem,
   generateExitResponsiblyScript,
   generateFirstPhysicalAction,
+  generateTenMinutePlan,
   generateRepairScript,
   generateRescuePacket,
-  inferExitStatus
+  inferExitStatus,
+  scoreRepairRelevance
 } from "./rescueEngine";
 
 interface RescueFixture {
@@ -97,6 +100,36 @@ describe("fixture-based rescue generation", () => {
     ).toContain("three ugly bullets");
   });
 
+  it("decomposes tasks into a surface, touch target, visible change, and stop rule", () => {
+    const decomposition = decomposeTask(
+      "I need to do my tax but there are too many receipts.",
+      "overwhelm",
+      "tax"
+    );
+
+    expect(decomposition.taskSurface).toContain("tax");
+    expect(decomposition.objectToTouch).toContain("receipt");
+    expect(decomposition.visibleChange).toContain("document");
+    expect(decomposition.stopRule).toContain("sorting every document");
+  });
+
+  it("generates task-type-specific ten minute plans", () => {
+    const essayPlan = generateTenMinutePlan(
+      "I have an essay due and I don't know where to start.",
+      "ambiguous_start",
+      "essay"
+    );
+    const cleaningPlan = generateTenMinutePlan(
+      "The kitchen is a mess and everything is too much.",
+      "overwhelm",
+      "cleaning"
+    );
+
+    expect(essayPlan.join(" ")).toContain("assignment document");
+    expect(essayPlan.join(" ")).toContain("polishing");
+    expect(cleaningPlan.join(" ")).toContain("whole room");
+  });
+
   it("generates specific repair scripts for common obligations", () => {
     expect(generateRepairScript("late email reply", "shame_fear", "email")).toContain(
       "I'm sorry for the delay"
@@ -133,6 +166,24 @@ describe("fixture-based rescue generation", () => {
     expect(script).not.toContain("Hi [Name]");
     expect(packet.repairScript).toContain("No repair needed yet");
     expect(packet.repairScript).not.toContain("Hi [Name]");
+  });
+
+  it("scores repair relevance before offering scripts", () => {
+    const lateEmail = scoreRepairRelevance(
+      "I need to reply to this email but I feel ashamed it is late.",
+      "shame_fear",
+      "email"
+    );
+    const privateAssignment = scoreRepairRelevance(
+      "I need to start my assignment",
+      "ambiguous_start",
+      "study"
+    );
+
+    expect(lateEmail.score).toBeGreaterThanOrEqual(75);
+    expect(lateEmail.label).toBe("high");
+    expect(privateAssignment.score).toBe(0);
+    expect(privateAssignment.label).toBe("none");
   });
 
   it("does not treat a normal due date as a repair request", () => {
