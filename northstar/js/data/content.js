@@ -2,10 +2,10 @@ export const BLOCKERS = [
   { id: "overwhelmed", label: "Everything feels too big" },
   { id: "unclear", label: "I do not understand the task" },
   { id: "starting", label: "Beginning feels hard" },
-  { id: "perfectionism", label: "I am scared to do it badly" },
+  { id: "perfectionism", label: "I am worried it will not be good enough" },
   { id: "time", label: "Time feels slippery" },
   { id: "energy", label: "My energy is low" },
-  { id: "memory", label: "I will forget what I was doing" },
+  { id: "memory", label: "I do not want to lose my place" },
   { id: "sensory", label: "The environment is too noisy or intense" }
 ];
 
@@ -17,10 +17,10 @@ export const ROUTE_LIBRARY = {
     followUp: "If the task is still foggy after that, move to Unpack."
   },
   regulate: {
-    title: "Get steady first",
-    reason: "If your body or environment is too loud, studying may need a softer entry point.",
-    action: "Choose one anchor, one small movement, or one load-lowering change.",
-    followUp: "When things feel a little more reachable, bridge into Plan or Focus."
+    title: "Settle before study",
+    reason: "If everything feels too much, lower the pressure before starting.",
+    action: "Pick what feels closest and try one body-first step for 30 seconds.",
+    followUp: "When study feels a little closer, choose one tiny work step."
   },
   planner: {
     title: "Find the first visible step",
@@ -37,7 +37,7 @@ export const ROUTE_LIBRARY = {
   focus: {
     title: "Use a calm timer",
     reason: "When time feels slippery, a visible timer can make starting and stopping easier.",
-    action: "Choose the smallest timer that helps, then name what this block is for.",
+    action: "Choose the smallest timer that helps.",
     followUp: "When the timer ends, stop first. Then decide what comes next."
   },
   unpack: {

@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260527a";
+} from "./data/content.js?v=20260527d";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260527a";
+} from "./state.js?v=20260527d";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -210,9 +210,9 @@ const defaultCheckin = {
 
 const defaultRegulateState = {
   signal: "overwhelmed",
-  anchor: "pressure",
+  anchor: "sensory",
   load: "",
-  strategy: "pressure"
+  strategy: "sensory"
 };
 
 const defaultNotesState = {
@@ -575,13 +575,15 @@ let todayInlineFeedbackVisible = false;
 let mobileResultSourcePanel = "dashboard";
 let mobileResultPrimaryTarget = "dashboard";
 let mobileResultCopyText = "";
+let mobileResultSecondaryAction = "copy";
 let focusTimerRemaining = null;
 let focusTimerRunning = false;
 let focusTimerIntervalId = null;
+let calibrationManuallyOpened = false;
 
 const MOBILE_DOCK_ACTIONS = {
   regulate: {
-    label: "Show one settling step",
+    label: "Show one step",
     target: "#buildRegulationBtn"
   },
   planner: {
@@ -933,13 +935,16 @@ function openMobileResult({
   items = [],
   primaryLabel = "Back to Home",
   primaryTarget = "dashboard",
-  copyText: nextCopyText = ""
+  copyText: nextCopyText = "",
+  secondaryLabel = "Copy",
+  secondaryAction = "copy"
 } = {}) {
   if (!shouldUseMobileResult()) return;
 
   mobileResultSourcePanel = sourcePanel;
   mobileResultPrimaryTarget = primaryTarget;
   mobileResultCopyText = nextCopyText;
+  mobileResultSecondaryAction = secondaryAction;
 
   const icon = $("#mobileResultIcon");
   if (icon) icon.dataset.resultType = resultType;
@@ -947,6 +952,7 @@ function openMobileResult({
   $("#mobileResultTitle").textContent = title;
   $("#mobileResultSummary").textContent = summary;
   $("#mobileResultPrimaryBtn").textContent = primaryLabel;
+  $("#mobileResultCopyBtn").textContent = secondaryLabel;
 
   const visibleItems = items.filter(Boolean).slice(0, 4);
   $("#mobileResultBody").innerHTML = visibleItems.length
@@ -1414,81 +1420,99 @@ const REGULATION_STRATEGY_ALIASES = {
 
 const REGULATION_SIGNALS = {
   overwhelmed: {
-    label: "Overwhelmed",
-    copy: "Everything is arriving at once."
+    label: "Too much",
+    copy: "Everything feels big, loud, or sharp."
   },
   frozen: {
     label: "Frozen",
-    copy: "Your body is saying pause first."
+    copy: "Starting feels locked."
   },
   agitated: {
     label: "Agitated",
-    copy: "There is too much charge in the system."
+    copy: "There is too much charge."
   },
   tired: {
     label: "Tired",
-    copy: "Your energy is low and needs a softer start."
+    copy: "Energy is low."
   },
   avoiding: {
     label: "Avoiding",
-    copy: "The task feels hard to touch."
+    copy: "The task is hard to touch."
   },
   emotional: {
     label: "Emotionally loaded",
-    copy: "The work is carrying feelings with it."
+    copy: "This has feelings attached."
   }
 };
 
 const REGULATION_ANCHORS = {
-  pressure: "Add steady pressure: feet into the floor, a weighted item, or a wall push.",
-  movement: "Move a little: pace, stretch, shake out your hands, or change posture.",
-  sensory: "Lower one input: dim light, reduce sound, close tabs, or clear one patch of desk.",
-  grounding: "Pick one object and name its colour, edge, texture, or weight.",
-  breathing: "If breath feels okay, try one slower exhale. Stop if it feels wrong.",
-  body: "Check one body need: water, food, bathroom, meds, temperature, or pain."
+  pressure: "Press your feet into the floor, hold a weighted item, or push gently into a wall.",
+  movement: "Pace, stretch, shake out your hands, or change posture.",
+  sensory: "Dim light, reduce sound, close one tab, or clear one small patch.",
+  grounding: "Pick one object. Notice its colour, edge, texture, or weight.",
+  breathing: "Try one slower exhale only if breath feels safe.",
+  body: "Check water, food, bathroom, meds, temperature, or pain."
 };
 
 const REGULATION_BRIDGES = {
-  overwhelmed: "When it feels a little safer, sit near the work. You do not have to start yet.",
-  frozen: "When movement returns, open the task and write one messy line.",
-  agitated: "When the charge drops slightly, choose one small move and stop there.",
-  tired: "If study is still too far away, save a return cue and come back later.",
-  avoiding: "Make the task visible for one minute, then decide the next tiny move.",
-  emotional: "Name the feeling, lower the pressure, then ask what support would help."
+  overwhelmed: "Then sit near the work. You do not have to start yet.",
+  frozen: "Then open the task and write one messy line.",
+  agitated: "Then choose one tiny move and stop there.",
+  tired: "Then decide if one tiny step is possible. If not, save where to come back.",
+  avoiding: "Then make the task visible for one minute.",
+  emotional: "Then name one feeling and lower the pressure before deciding."
 };
 
 const REGULATION_STRATEGIES = {
   pressure: {
     label: "Add pressure",
     step: "Use steady pressure for 30 seconds. Feet down, weighted item, or wall push.",
-    bridge: "Then sit near the work and choose one tiny next move."
+    bridge: "Then sit near the work. You do not have to start yet."
   },
   movement: {
     label: "Move a little",
-    step: "Move pressure through your body with a small movement set.",
-    bridge: "Then come back and open only the thing you need next."
+    step: "Move a little for 30 seconds. Pace, stretch, shake out, or change posture.",
+    bridge: "Then open only the thing you need next."
   },
   sensory: {
     label: "Lower input",
-    step: "Remove one bit of input: sound, light, tabs, clutter, or notifications.",
+    step: "Lower one input. Dim light, reduce sound, close one tab, or clear one small patch.",
     bridge: "Then make the work visible without starting it yet."
   },
   grounding: {
     label: "Find one object",
-    step: "Use one object as an anchor. Notice colour, edge, texture, or weight.",
+    step: "Find one object. Notice its colour, edge, texture, or weight.",
     bridge: "Then write one plain sentence about what is here."
   },
   breathing: {
     label: "Use breath gently",
-    step: "Try one slower exhale only if breath feels safe and useful.",
+    step: "Try one slower exhale. Stop if breath feels wrong.",
     bridge: "Then choose the smallest possible contact with the task."
   },
   body: {
     label: "Check body needs",
-    step: "Meet one body need before study effort: water, food, bathroom, meds, or temperature.",
-    bridge: "Then use a 10-minute Focus block or make a one-step Plan."
+    step: "Check one body need: water, food, bathroom, meds, temperature, or pain.",
+    bridge: "Then use a 10-minute timer or make one first step."
   }
 };
+
+const REGULATION_SIGNAL_STRATEGIES = {
+  overwhelmed: "sensory",
+  frozen: "movement",
+  agitated: "pressure",
+  tired: "body",
+  avoiding: "grounding",
+  emotional: "breathing"
+};
+
+const REGULATION_SIGNAL_SEQUENCE = [
+  "overwhelmed",
+  "frozen",
+  "agitated",
+  "tired",
+  "avoiding",
+  "emotional"
+];
 
 function normalizeRegulationSignal(signal) {
   return REGULATION_SIGNALS[signal] ? signal : REGULATION_SIGNAL_ALIASES[signal] || "overwhelmed";
@@ -1514,18 +1538,93 @@ function setRegulationStrategy(strategy, { feedback = true } = {}) {
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
   });
+
+  renderRegulationStarterPreview();
+}
+
+function syncRegulationStateButtons() {
+  const signal = normalizeRegulationSignal(state.regulate.signal);
+  $$("#regulationStateButtons .regulation-state-button").forEach((button) => {
+    const isSelected = button.dataset.regulationSignal === signal;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+}
+
+function renderRegulationStarterPreview() {
+  const signalKey = normalizeRegulationSignal(state.regulate.signal);
+  const strategyKey = normalizeRegulationStrategy(state.regulate.strategy || REGULATION_SIGNAL_STRATEGIES[signalKey]);
+  const signal = REGULATION_SIGNALS[signalKey] || REGULATION_SIGNALS.overwhelmed;
+  const strategy = REGULATION_STRATEGIES[strategyKey] || REGULATION_STRATEGIES.sensory;
+  const bridge = REGULATION_BRIDGES[signalKey] || strategy.bridge;
+
+  const title = $("#regulationStepTitle");
+  const step = $("#regulationStepCopy");
+  const bridgeCopy = $("#regulationBridgeCopy");
+  if (title) title.textContent = strategy.label;
+  if (step) step.textContent = strategy.step;
+  if (bridgeCopy) bridgeCopy.textContent = bridge;
+
+  const signalSelect = $("#regulateSignalSelect");
+  const anchorSelect = $("#regulateAnchorSelect");
+  if (signalSelect) signalSelect.value = signalKey;
+  if (anchorSelect) anchorSelect.value = strategyKey;
+
+  syncRegulationStateButtons();
+  return { signal, strategy, bridge };
+}
+
+function setRegulationSignal(signal, { feedback = true, chooseDefaultStrategy = true } = {}) {
+  signal = normalizeRegulationSignal(signal);
+  if (feedback) nudgeHaptic(5);
+  state.regulate.signal = signal;
+
+  if (chooseDefaultStrategy) {
+    state.regulate.strategy = REGULATION_SIGNAL_STRATEGIES[signal] || "sensory";
+    state.regulate.anchor = state.regulate.strategy;
+  }
+
+  saveState("regulate", state.regulate);
+  renderRegulationStarterPreview();
+}
+
+function tryAnotherRegulationStep() {
+  const currentSignal = normalizeRegulationSignal(state.regulate.signal);
+  const currentIndex = REGULATION_SIGNAL_SEQUENCE.indexOf(currentSignal);
+  const nextSignal = REGULATION_SIGNAL_SEQUENCE[(currentIndex + 1) % REGULATION_SIGNAL_SEQUENCE.length] || "overwhelmed";
+  setRegulationSignal(nextSignal, { feedback: true, chooseDefaultStrategy: true });
+  renderRegulation({ openResult: shouldUseMobileResult(), remember: false });
+}
+
+function showOneSmallMove() {
+  state.regulate = {
+    ...state.regulate,
+    signal: "overwhelmed",
+    anchor: "sensory",
+    strategy: "sensory",
+    load: state.regulate.load || ""
+  };
+  saveState("regulate", state.regulate);
+  renderRegulationStarterPreview();
+  renderRegulation({ openResult: shouldUseMobileResult(), remember: true });
+
+  if (!shouldUseMobileResult()) {
+    showPanel("regulate");
+    const output = $("#regulateOutput");
+    requestAnimationFrame(() => output?.focus?.({ preventScroll: true }));
+  }
 }
 
 function buildRegulationResult() {
   captureForms();
 
   const strategyKey = normalizeRegulationStrategy(state.regulate.strategy);
-  const strategy = REGULATION_STRATEGIES[strategyKey] || REGULATION_STRATEGIES.pressure;
+  const strategy = REGULATION_STRATEGIES[strategyKey] || REGULATION_STRATEGIES.sensory;
   const signalKey = normalizeRegulationSignal(state.regulate.signal);
   const anchorKey = normalizeRegulationAnchor(state.regulate.anchor);
   const signal = REGULATION_SIGNALS[signalKey] || REGULATION_SIGNALS.overwhelmed;
   const anchor = REGULATION_ANCHORS[anchorKey] || REGULATION_ANCHORS.pressure;
-  const loadStep = state.regulate.load || "Lower one demand: close a tab, dim the light, move rooms, get water, or text someone safe.";
+  const loadStep = state.regulate.load;
   const bridge = REGULATION_BRIDGES[signalKey] || strategy.bridge;
 
   return {
@@ -1535,7 +1634,7 @@ function buildRegulationResult() {
     regulationStep: strategy.step,
     loadStep,
     bridge: normalizeReturnCue(bridge),
-    experiment: "Afterward, check if study feels even a little more reachable. If not, stay with regulation."
+    experiment: "You can stop after this. One small move is enough."
   };
 }
 
@@ -1545,26 +1644,23 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
   saveState("outputs", state.outputs);
 
   $("#regulateOutput").classList.remove("empty");
+  renderRegulationStarterPreview();
+
   $("#regulateOutput").innerHTML = `
     <div class="output-block">
-      <h4>What is loudest</h4>
+      <h4>What feels closest</h4>
       <p>${escapeHtml(result.signal)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Try this first</h4>
-      <ul class="summary-list">
-        ${toListItems([
-          result.regulationStep,
-          result.anchor,
-          result.loadStep
-        ])}
-      </ul>
+      <h4>Try this for 30 seconds</h4>
+      <p>${escapeHtml(result.regulationStep)}</p>
     </div>
 
     <div class="output-block">
-      <h4>Bridge back</h4>
+      <h4>Then</h4>
       <p>${escapeHtml(result.bridge)}</p>
+      ${result.loadStep ? `<p class="output-subtle">${escapeHtml(result.loadStep)}</p>` : ""}
       <p class="output-subtle">${escapeHtml(result.experiment)}</p>
     </div>
   `;
@@ -1584,18 +1680,19 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
       sourcePanel: "regulate",
       resultType: "regulate",
       kicker: "No rush",
-      title: "Help your body arrive first",
+      title: "Try this first",
       summary: result.regulationStep,
-      items: [result.anchor, result.loadStep, result.bridge],
-      primaryLabel: "Make first step",
+      items: [result.bridge, result.experiment],
+      primaryLabel: "I can do one tiny work step",
       primaryTarget: "planner",
+      secondaryLabel: "Not yet, try another",
+      secondaryAction: "try-regulation",
       copyText: [
         "NORTHSTAR REGULATION STEP",
         "",
         result.signal,
         result.regulationStep,
-        result.anchor,
-        result.loadStep,
+        result.loadStep || "",
         result.bridge
       ].join("\n")
     });
@@ -1605,7 +1702,10 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
 function syncRegulationSelection() {
   state.regulate.signal = normalizeRegulationSignal(state.regulate.signal);
   state.regulate.anchor = normalizeRegulationAnchor(state.regulate.anchor);
-  setRegulationStrategy(state.regulate.strategy || "pressure", { feedback: false });
+  state.regulate.strategy = normalizeRegulationStrategy(state.regulate.strategy || REGULATION_SIGNAL_STRATEGIES[state.regulate.signal]);
+  state.regulate.anchor = state.regulate.strategy;
+  setRegulationStrategy(state.regulate.strategy, { feedback: false });
+  renderRegulationStarterPreview();
 }
 
 function focusNotificationCopy(phase = state.focus.phase) {
@@ -1616,7 +1716,7 @@ function focusNotificationCopy(phase = state.focus.phase) {
     }
     : {
       title: "Northstar focus block complete",
-      body: "Stop first. Add a return cue before deciding what comes next."
+      body: "Stop first. Save where to come back before deciding what comes next."
     };
 }
 
@@ -1784,7 +1884,7 @@ function renderCalibration() {
   const card = $("#calibrationCard");
   if (!card) return;
   const activePanel = document.documentElement.dataset.activePanel || "dashboard";
-  card.hidden = Boolean(state.calibration.completed) || activePanel !== "dashboard";
+  card.hidden = !calibrationManuallyOpened || Boolean(state.calibration.completed) || activePanel !== "dashboard";
 
   $$("#calibrationCard [data-calibration-support]").forEach((button) => {
     const isSelected = button.dataset.calibrationSupport === state.calibration.supportState;
@@ -1855,6 +1955,7 @@ function applyCalibration() {
 
   state.calibration.completed = true;
   state.calibration.updatedAt = stampNow();
+  calibrationManuallyOpened = false;
   saveState("settings", state.settings);
   saveState("focus", state.focus);
   saveState("checkin", state.checkin);
@@ -1873,11 +1974,13 @@ function applyCalibration() {
 function skipCalibration() {
   state.calibration.completed = true;
   state.calibration.updatedAt = stampNow();
+  calibrationManuallyOpened = false;
   saveState("calibration", state.calibration);
   renderCalibration();
 }
 
 function showCalibration() {
+  calibrationManuallyOpened = true;
   state.calibration.completed = false;
   state.calibration.updatedAt = stampNow();
   saveState("calibration", state.calibration);
@@ -2358,7 +2461,7 @@ function renderFirstMinuteGuide() {
   const guide = $("#firstMinuteGuide");
   if (!guide) return;
 
-  const shouldShow = !isPhoneLayout() && !state.settings.introDismissed && !hasMeaningfulThread();
+  const shouldShow = false;
   guide.hidden = !shouldShow;
   document.documentElement.dataset.firstMinuteGuide = shouldShow ? "on" : "off";
 }
@@ -2372,6 +2475,13 @@ function focusQuickStartChoices() {
     behavior: state.settings.motion === "normal" ? "smooth" : "auto"
   });
   requestAnimationFrame(() => firstChoice.focus({ preventScroll: true }));
+}
+
+function returnToGuide() {
+  closeMobileMoreSheet();
+  setTodayExpanded(false);
+  showPanel("dashboard");
+  requestAnimationFrame(() => $("#quickRouteButtons .quick-route-button")?.focus?.({ preventScroll: true }));
 }
 
 function renderTodayRoute(result) {
@@ -2472,8 +2582,8 @@ function openRouteMobileResult(result) {
   openMobileResult({
     sourcePanel: "dashboard",
     resultType: result.section,
-    kicker: isPressureRoute ? "Pressure lowered" : isRegulationRoute ? "Get steady first" : "Route ready",
-    title: isPressureRoute ? "Do this first" : isRegulationRoute ? "Start when it feels possible" : result.title,
+    kicker: isPressureRoute ? "Pressure lowered" : isRegulationRoute ? "Not ready yet" : "Route ready",
+    title: isPressureRoute ? "Do this first" : isRegulationRoute ? "Start by settling" : result.title,
       summary: isPressureRoute
         ? "One setup action, one sentence, or one question is enough."
         : isRegulationRoute
@@ -2486,9 +2596,9 @@ function openRouteMobileResult(result) {
       ]
       : isRegulationRoute
         ? [
-          "Name what is loudest: body, thoughts, sensory load, hard-to-start feeling, or fog.",
-          "Use one concrete anchor or movement.",
-          "Move into Focus only when it feels possible."
+          "Pick what feels closest.",
+          "Try one body-first step for 30 seconds.",
+          "Move into work only when it feels possible."
         ]
       : [
         result.action,
@@ -2510,6 +2620,10 @@ function openRouteMobileResult(result) {
 
 function chooseTriageRoute(section, overrides = {}, options = {}) {
   const result = routeResultForSection(section, overrides);
+  if (result.section === "regulate" && options.autoOpen) {
+    const signal = overrides.studyState === "avoiding" ? "avoiding" : "overwhelmed";
+    setRegulationSignal(signal, { feedback: false, chooseDefaultStrategy: true });
+  }
   setTodayInlineFeedbackVisible(Boolean(options.revealInline && isPhoneLayout() && result.section === "dashboard"));
   state.outputs.route = result;
   saveState("outputs", state.outputs);
@@ -2517,7 +2631,7 @@ function chooseTriageRoute(section, overrides = {}, options = {}) {
   renderSnapshotPreview();
   renderStatus();
 
-  if (options.autoOpen && shouldUseMobileResult()) {
+  if (options.autoOpen) {
     if (result.section === "dashboard") {
       setTodayExpanded(false);
       openRouteMobileResult(result);
@@ -2606,9 +2720,9 @@ function recommendRoute(options = {}) {
   renderSnapshotPreview();
   renderStatus();
 
-  if (options.autoOpen && shouldUseMobileResult() && result.section !== "dashboard") {
+  if (options.autoOpen && result.section !== "dashboard") {
     showPanel(result.section);
-  } else if (options.autoOpen && shouldUseMobileResult() && todayInlineFeedbackVisible) {
+  } else if (options.autoOpen && shouldUseMobileResult()) {
     openRouteMobileResult(result);
   }
 }
@@ -3953,7 +4067,7 @@ function renderFinishSummary({ openResult = false } = {}) {
       completed >= 4
         ? "You left a clear return point."
         : "Good enough is enough. Leave one clear next step if you can.",
-    nextTime: state.finish.nextTime || "No return cue saved yet.",
+    nextTime: state.finish.nextTime || "No saved place yet.",
     worked: state.sessionMemory.worked,
     avoid: state.sessionMemory.avoid
   };
@@ -4016,7 +4130,7 @@ function renderFinishSummary({ openResult = false } = {}) {
       summary: result.summary,
       items: [
         `${completed} of ${total} finish checks are complete.`,
-        result.nextTime ? `Start here next time: ${result.nextTime}` : "Add one return cue if you want an easier restart.",
+        result.nextTime ? `Start here next time: ${result.nextTime}` : "Save one place to come back to if you want an easier restart.",
         "You can stop here without carrying the whole task in your head."
       ],
       primaryLabel: "Back to Home",
@@ -4110,14 +4224,14 @@ function snapshotText() {
     route ? `Why: ${route.reason}` : "",
     "",
     regulate ? `Regulation step: ${regulate.regulationStep}` : "",
-    regulate ? `Regulation bridge: ${normalizeReturnCue(regulate.bridge)}` : "",
+    regulate ? `Regulation next step: ${normalizeReturnCue(regulate.bridge)}` : "",
     planner ? `Task: ${planner.task}` : "",
     planner ? `First step: ${planner.firstStep}` : "",
     calendar ? `Calendar: ${calendar.termLabel}` : "",
     calendar?.nextDue ? `Next due date: ${calendar.nextDue.title} · ${formatCalendarDate(calendar.nextDue.dueDate)}` : "",
     focus ? `Focus timer: ${focus.presetLabel} · ${focus.phaseLabel}` : "",
     state.focus.intention ? `Focus intention: ${state.focus.intention}` : "",
-    state.focus.returnCue ? `Focus return cue: ${state.focus.returnCue}` : "",
+    state.focus.returnCue ? `Focus saved place: ${state.focus.returnCue}` : "",
     unpack ? `Assignment focus: ${TASK_VERBS[unpack.verb].label} · ${unpack.dueLabel}` : "",
     notes ? `Notes summary: ${notes.summary}` : "",
     profile ? `Support needs: ${profile.content.map((item) => item.label).join(", ")}` : "",
@@ -4318,10 +4432,11 @@ function bindEvents() {
   if (todayDesktopResumeBtn) {
     todayDesktopResumeBtn.addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
   }
+  $("#lostButton").addEventListener("click", returnToGuide);
   $("#firstMinuteStartBtn").addEventListener("click", () => {
     state.settings.introDismissed = true;
     saveState("settings", state.settings);
-    applyStudyStatePreset("overwhelmed", { autoOpen: true, revealInline: true });
+    showOneSmallMove();
   });
   $("#firstMinuteChooseBtn").addEventListener("click", focusQuickStartChoices);
   $("#firstMinuteDismissBtn").addEventListener("click", () => {
@@ -4338,8 +4453,8 @@ function bindEvents() {
     showPanel("dashboard-options");
   });
   $("#backToTodayBtn").addEventListener("click", () => showPanel("dashboard"));
-  $("#mobileHomeBtn").addEventListener("click", () => showPanel("dashboard"));
-  $("#mobileDockHomeBtn").addEventListener("click", () => showPanel("dashboard"));
+  $("#mobileHomeBtn").addEventListener("click", returnToGuide);
+  $("#mobileDockHomeBtn").addEventListener("click", returnToGuide);
   $("#mobileDockPrimaryBtn").addEventListener("click", triggerMobileDockAction);
   $("#mobileMoreBtn").addEventListener("click", openMobileMoreSheet);
   $("#mobileMoreCloseBtn").addEventListener("click", closeMobileMoreSheet);
@@ -4364,6 +4479,10 @@ function bindEvents() {
   $("#mobileResultBackBtn").addEventListener("click", () => showPanel(mobileResultSourcePanel || "dashboard"));
   $("#mobileResultPrimaryBtn").addEventListener("click", () => showPanel(mobileResultPrimaryTarget || "dashboard"));
   $("#mobileResultCopyBtn").addEventListener("click", async () => {
+    if (mobileResultSecondaryAction === "try-regulation") {
+      tryAnotherRegulationStep();
+      return;
+    }
     await copyText(mobileResultCopyText || snapshotText());
     nudgeHaptic([6, 16, 6]);
   });
@@ -4418,7 +4537,7 @@ function bindEvents() {
   });
 
   $("#lowEnergyAssistBtn").addEventListener("click", () => {
-    applyStudyStatePreset("overwhelmed", { autoOpen: true, revealInline: true });
+    showOneSmallMove();
   });
 
   $$("#studyStateButtons .state-card").forEach((button) => {
@@ -4495,7 +4614,22 @@ function bindEvents() {
   $$("#regulationMenu .regulation-option").forEach((button) => {
     button.addEventListener("click", () => setRegulationStrategy(button.dataset.regulationStrategy));
   });
-  $("#buildRegulationBtn").addEventListener("click", () => renderRegulation({ openResult: true }));
+  $$("#regulationStateButtons .regulation-state-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      setRegulationSignal(button.dataset.regulationSignal, { feedback: true, chooseDefaultStrategy: true });
+      renderRegulation({ openResult: false, remember: false });
+    });
+  });
+  $("#buildRegulationBtn").addEventListener("click", () => renderRegulation({ openResult: shouldUseMobileResult() }));
+  $("#tryAnotherRegulationBtn").addEventListener("click", tryAnotherRegulationStep);
+  $("#regulateToPlanBtn").addEventListener("click", () => {
+    renderRegulation({ openResult: false });
+    showPanel("planner");
+  });
+  $("#regulateSaveCueBtn").addEventListener("click", () => {
+    renderRegulation({ openResult: false });
+    showPanel("finish");
+  });
   $("#copyRegulationBtn").addEventListener("click", async () => {
     const regulation = state.outputs.regulate;
     if (!regulation) return;

@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260527a">
-  <link rel="icon" href="./icon.svg?v=20260527a" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260527a">
-  <link rel="stylesheet" href="./styles.css?v=20260527a">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260527d">
+  <link rel="icon" href="./icon.svg?v=20260527d" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260527d">
+  <link rel="stylesheet" href="./styles.css?v=20260527d">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260527a" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260527d" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -93,7 +93,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260527a" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260527d" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -105,6 +105,10 @@
           <div class="topbar-actions">
             <button class="button subtle utility-button" id="focusModeBtn" type="button" aria-pressed="false">
               Focus mode off
+            </button>
+
+            <button class="button subtle utility-button lost-button" id="lostButton" type="button">
+              I'm lost
             </button>
 
             <details class="settings-panel disclosure toolbar-panel">
@@ -202,34 +206,38 @@
         <div class="mobile-more-head">
           <div>
             <p class="eyebrow">More tools</p>
-            <h2 id="mobileMoreTitle">Choose one extra support</h2>
+            <h2 id="mobileMoreTitle">I need...</h2>
             <p class="microcopy">Everything here can wait until you need it.</p>
           </div>
           <button class="button subtle" id="mobileMoreCloseBtn" type="button">Close</button>
         </div>
         <div class="mobile-more-grid" aria-label="Northstar tools">
           <button class="mobile-more-tool" type="button" data-mobile-more-target="focus">
-            <strong>Focus</strong>
+            <strong>a timer</strong>
             <span>Use a calm timer.</span>
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-target="unpack">
-            <strong>Unpack</strong>
+            <strong>to understand the task</strong>
             <span>Translate a brief.</span>
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-target="notes">
-            <strong>Notes</strong>
+            <strong>to save notes</strong>
             <span>Catch the thread.</span>
           </button>
+          <button class="mobile-more-tool" type="button" data-mobile-more-target="calendar">
+            <strong>to add a due date</strong>
+            <span>Put the date somewhere visible.</span>
+          </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-target="profile">
-            <strong>Profile</strong>
+            <strong>to save what helps</strong>
             <span>Save what helps you study.</span>
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-target="finish">
-            <strong>Finish</strong>
-            <span>Leave a return cue.</span>
+            <strong>to stop safely</strong>
+            <span>Save where to come back.</span>
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-action="support">
-            <strong>Support contacts</strong>
+            <strong>to save support contacts</strong>
             <span>Names, emails, links, and numbers.</span>
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-action="settings">
@@ -280,7 +288,7 @@
       </button>
 
       <div class="mobile-action-dock" id="mobileActionDock" hidden>
-        <button class="button subtle" id="mobileDockHomeBtn" type="button">Home</button>
+        <button class="button subtle" id="mobileDockHomeBtn" type="button">I'm lost</button>
         <button class="button primary" id="mobileDockPrimaryBtn" type="button">Do this now</button>
       </div>
 
@@ -357,8 +365,8 @@
 
       <section class="memory-banner card" id="sessionMemoryCard" aria-labelledby="sessionMemoryTitle" hidden>
         <div>
-          <p class="eyebrow">Return cue</p>
-          <h3 id="sessionMemoryTitle">One useful cue will appear here</h3>
+          <p class="eyebrow">Saved place</p>
+          <h3 id="sessionMemoryTitle">One useful starting point will appear here</h3>
           <p class="microcopy" id="sessionMemoryCopy">Finish once and Northstar will keep the next return point visible.</p>
           <p class="memory-meta" id="sessionMemoryMeta"></p>
         </div>
@@ -401,14 +409,14 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260527a" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260527d" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
                 </div>
               </div>
 
-              <section class="first-minute-guide" id="firstMinuteGuide" aria-labelledby="firstMinuteTitle">
+              <section class="first-minute-guide" id="firstMinuteGuide" aria-labelledby="firstMinuteTitle" hidden>
                 <div class="first-minute-copy">
                   <p class="eyebrow">First minute</p>
                   <h3 id="firstMinuteTitle">Start where you are.</h3>
@@ -487,7 +495,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260527a" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260527d" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -501,7 +509,7 @@
           <button class="button subtle back-button" id="backToTodayBtn" type="button">Back to Today</button>
           <div>
             <p class="eyebrow">More tools</p>
-            <h2>Choose one support</h2>
+            <h2>I need...</h2>
             <p class="panel-copy">
               A small toolbox for when the first three choices do not quite fit.
             </p>
@@ -566,43 +574,43 @@
 
             <div class="triage-grid" id="triageButtons">
               <button class="path-card" type="button" data-route-target="regulate">
-                <span class="path-kicker">Regulate first</span>
-                <strong>Lower the pressure first</strong>
+                <span class="path-kicker">Not ready yet</span>
+                <strong>to settle before study</strong>
                 <span>Best when you are not ready to work yet.</span>
               </button>
               <button class="path-card" type="button" data-route-target="planner">
-                <span class="path-kicker">Start a task</span>
-                <strong>Make the first step visible</strong>
+                <span class="path-kicker">First step</span>
+                <strong>to make a task smaller</strong>
                 <span>Best when you know the task but cannot get going.</span>
               </button>
               <button class="path-card" type="button" data-route-target="calendar">
-                <span class="path-kicker">Map the term</span>
-                <strong>See what is coming</strong>
+                <span class="path-kicker">Due dates</span>
+                <strong>to add a due date</strong>
                 <span>Best when due dates, weeks, or the study-period shape feel hard to hold.</span>
               </button>
               <button class="path-card" type="button" data-route-target="focus">
-                <span class="path-kicker">Use a timer</span>
-                <strong>Give the task a clear stop</strong>
+                <span class="path-kicker">Timer</span>
+                <strong>a calm timer</strong>
                 <span>Best when time feels slippery or starting needs a calm edge.</span>
               </button>
               <button class="path-card" type="button" data-route-target="unpack">
-                <span class="path-kicker">Understand a task</span>
-                <strong>Translate the brief</strong>
+                <span class="path-kicker">Task unclear</span>
+                <strong>to understand the task</strong>
                 <span>Best when the assignment language is muddy or stressful.</span>
               </button>
               <button class="path-card" type="button" data-route-target="notes">
-                <span class="path-kicker">Capture notes</span>
-                <strong>Keep the thread from disappearing</strong>
+                <span class="path-kicker">Notes</span>
+                <strong>to save notes</strong>
                 <span>Best when ideas, questions, or reading details keep slipping away.</span>
               </button>
               <button class="path-card" type="button" data-route-target="profile">
-                <span class="path-kicker">Study profile</span>
-                <strong>Name what helps you work</strong>
+                <span class="path-kicker">Study supports</span>
+                <strong>to save what helps</strong>
                 <span>Best when you need to understand your study pattern or prepare for advising.</span>
               </button>
               <button class="path-card" type="button" data-route-target="finish">
-                <span class="path-kicker">Stop well</span>
-                <strong>Leave a clean return point</strong>
+                <span class="path-kicker">Stop safely</span>
+                <strong>to save where to come back</strong>
                 <span>Best when you need to stop without losing the thread.</span>
               </button>
             </div>
@@ -696,16 +704,50 @@
         </div>
 
         <div class="grid two-up regulate-grid">
-          <article class="card">
+          <article class="card regulate-start-card">
             <div class="section-heading">
               <p class="eyebrow">Start here</p>
-              <h3>What would help your body feel safer?</h3>
-              <p class="microcopy">Choose the closest fit. If you feel unsafe, contact a trusted person or local support.</p>
+              <h3>What feels closest?</h3>
+              <p class="microcopy">Pick one. It does not have to be exact.</p>
             </div>
 
-            <div class="field-row">
+            <div class="regulation-state-grid" id="regulationStateButtons" role="group" aria-label="What feels closest">
+              <button class="regulation-state-button is-selected" type="button" data-regulation-signal="overwhelmed" aria-pressed="true">
+                <strong>Too much</strong>
+                <span>Everything feels big or loud.</span>
+              </button>
+              <button class="regulation-state-button" type="button" data-regulation-signal="frozen" aria-pressed="false">
+                <strong>Frozen</strong>
+                <span>Starting feels locked.</span>
+              </button>
+              <button class="regulation-state-button" type="button" data-regulation-signal="agitated" aria-pressed="false">
+                <strong>Agitated</strong>
+                <span>There is too much charge.</span>
+              </button>
+              <button class="regulation-state-button" type="button" data-regulation-signal="tired" aria-pressed="false">
+                <strong>Tired</strong>
+                <span>Energy is low.</span>
+              </button>
+              <button class="regulation-state-button" type="button" data-regulation-signal="avoiding" aria-pressed="false">
+                <strong>Avoiding</strong>
+                <span>The task is hard to touch.</span>
+              </button>
+              <button class="regulation-state-button" type="button" data-regulation-signal="emotional" aria-pressed="false">
+                <strong>Emotionally loaded</strong>
+                <span>This has feelings attached.</span>
+              </button>
+            </div>
+
+            <article class="regulation-next-card" id="regulationNextCard" aria-live="polite">
+              <p class="eyebrow">Try this for 30 seconds</p>
+              <h4 id="regulationStepTitle">Lower the input first</h4>
+              <p id="regulationStepCopy">Dim light, reduce sound, close one tab, or clear one small patch.</p>
+              <p class="microcopy" id="regulationBridgeCopy">Then sit near the work. You do not have to start yet.</p>
+            </article>
+
+            <div class="regulation-hidden-controls" hidden>
               <label class="field">
-                <span>What is your body saying?</span>
+                <span>What feels closest?</span>
                 <select id="regulateSignalSelect">
                   <option value="overwhelmed">Overwhelmed</option>
                   <option value="frozen">Frozen</option>
@@ -729,7 +771,12 @@
               </label>
             </div>
 
-            <label class="field">
+            <details class="regulation-detail disclosure">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">Optional</p>
+                <h4>Add detail if useful</h4>
+              </summary>
+              <label class="field">
                 <span>Add more detail if useful</span>
                 <input
                   id="regulateLoadInput"
@@ -737,8 +784,9 @@
                   placeholder="e.g. dim light, get water, sit near the work, text someone"
                 >
               </label>
+            </details>
 
-            <div class="regulation-menu" id="regulationMenu" role="group" aria-label="Regulation strategy menu">
+            <div class="regulation-menu" id="regulationMenu" role="group" aria-label="Regulation strategy menu" hidden>
               <button class="regulation-option is-selected" type="button" data-regulation-strategy="pressure">
                 <strong>Add pressure</strong>
                 <span>Feet down, weighted item, or wall push.</span>
@@ -766,18 +814,23 @@
             </div>
 
             <div class="button-row">
-              <button class="button primary" id="buildRegulationBtn" type="button">Show one settling step</button>
-              <button class="button subtle" id="copyRegulationBtn" type="button">Copy step</button>
+              <button class="button primary" id="buildRegulationBtn" type="button">Show one step</button>
+              <button class="button subtle" id="tryAnotherRegulationBtn" type="button">Try another</button>
             </div>
           </article>
 
-          <article class="card output-card">
+          <article class="card output-card regulate-bridge-card">
             <div class="section-heading">
-              <p class="eyebrow">Next gentle step</p>
-              <h3>Start when it feels possible</h3>
+              <p class="eyebrow">After that</p>
+              <h3>One tiny work step</h3>
             </div>
             <div id="regulateOutput" class="rich-output empty">
-              Choose what is loudest. Northstar will suggest one small settling step.
+              Pick what feels closest. Northstar will show one step, then one gentle bridge back.
+            </div>
+            <div class="button-row regulate-after-actions">
+              <button class="button primary" id="regulateToPlanBtn" type="button">I can do one tiny work step</button>
+              <button class="button subtle" id="regulateSaveCueBtn" type="button">Not yet, save where to come back</button>
+              <button class="button subtle" id="copyRegulationBtn" type="button">Copy step</button>
             </div>
           </article>
         </div>
@@ -1401,6 +1454,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260527a"></script>
+  <script type="module" src="./js/app.js?v=20260527d"></script>
 </body>
 </html>

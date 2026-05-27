@@ -2826,6 +2826,99 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
   box-shadow: inset 4px 0 0 var(--accent);
 }
 
+.regulate-start-card {
+  gap: 1rem;
+}
+
+.regulation-state-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.regulation-state-button {
+  display: grid;
+  gap: 0.28rem;
+  min-height: 4.7rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(115, 137, 77, 0.22);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 96% 6%, rgba(115, 137, 77, 0.13), transparent 7rem),
+    linear-gradient(180deg, rgba(255, 253, 248, 0.88), rgba(248, 243, 235, 0.94));
+  color: var(--text);
+  text-align: left;
+  transition:
+    border-color var(--motion-fast),
+    background var(--motion-fast),
+    transform var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+
+.regulation-state-button strong {
+  color: var(--heading);
+  font-family: var(--font-brand);
+  font-size: 1.06rem;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.regulation-state-button span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.regulation-state-button.is-selected,
+.regulation-state-button:hover,
+.regulation-state-button:focus-visible {
+  border-color: var(--section-rim);
+  background:
+    radial-gradient(circle at 96% 6%, rgba(115, 137, 77, 0.28), transparent 7rem),
+    linear-gradient(180deg, rgba(255, 250, 238, 0.98), rgba(238, 231, 212, 0.96));
+  box-shadow:
+    inset 5px 0 0 var(--accent),
+    0 12px 26px rgba(59, 75, 44, 0.12);
+}
+
+.regulation-next-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid var(--section-rim);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(216, 180, 99, 0.22), transparent 9rem),
+    linear-gradient(135deg, rgba(255, 250, 240, 0.98), rgba(232, 237, 217, 0.86));
+  box-shadow: inset 5px 0 0 var(--accent);
+}
+
+.regulation-next-card h4 {
+  margin: 0;
+  color: var(--heading);
+  font-family: var(--font-brand);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  letter-spacing: -0.04em;
+}
+
+.regulation-next-card p {
+  margin: 0;
+}
+
+.regulation-detail {
+  border-color: rgba(115, 137, 77, 0.22);
+  background: rgba(255, 250, 240, 0.58);
+}
+
+.regulation-menu[hidden] {
+  display: none !important;
+}
+
+.regulate-after-actions {
+  margin-top: 0.8rem;
+}
+
 .memory-banner {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -3661,6 +3754,8 @@ html[data-focus-mode="on"] .status-strip,
 html[data-focus-mode="on"] .settings-panel,
 html[data-focus-mode="on"] .support-state-panel,
 html[data-focus-mode="on"] .resume-banner,
+html[data-focus-mode="on"] .calibration-card,
+html[data-focus-mode="on"] .memory-banner,
 html[data-focus-mode="on"] .sidebar {
   display: none !important;
 }
@@ -3696,6 +3791,50 @@ html[data-focus-mode="on"] .topbar-context {
 html[data-focus-mode="on"] .brand-mark {
   width: 2.35rem;
   height: 2.35rem;
+}
+
+html[data-focus-mode="on"] .main {
+  gap: 0.85rem;
+}
+
+html[data-focus-mode="on"] .panel.is-active {
+  gap: 0.85rem;
+}
+
+html[data-focus-mode="on"] .panel-head {
+  padding: 1rem 1.05rem;
+}
+
+html[data-focus-mode="on"] .panel-head::after {
+  content: "Do this now";
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  padding: 0.32rem 0.55rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.76);
+  color: var(--accent-deep);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-focus-mode="on"] .grid.two-up,
+html[data-focus-mode="on"] .grid.three-up,
+html[data-focus-mode="on"] .regulate-grid,
+html[data-focus-mode="on"] .focus-grid {
+  grid-template-columns: minmax(0, min(100%, 50rem));
+}
+
+html[data-focus-mode="on"] #todayDeepDive,
+html[data-focus-mode="on"] .today-route-card,
+html[data-focus-mode="on"] .regulation-detail,
+html[data-focus-mode="on"] .regulate-bridge-card,
+html[data-focus-mode="on"] #panel-focus .focus-support-card,
+html[data-focus-mode="on"] #panel-focus .timer-alert-panel {
+  display: none !important;
 }
 
 html[data-runtime="native"] .button,
@@ -5803,8 +5942,12 @@ html[data-runtime="native"] .support-state-button {
     order: 2;
   }
 
-  html[data-active-panel="dashboard"] .quick-route-button[data-route-target="unpack"] {
+  html[data-active-panel="dashboard"] .quick-route-button[data-route-target="calendar"] {
     order: 3;
+  }
+
+  html[data-active-panel="dashboard"] .quick-route-button[data-route-target="unpack"] {
+    order: 4;
   }
 
   html[data-active-panel="dashboard"] .quick-route-button {
@@ -6542,5 +6685,25 @@ html[data-runtime="native"] .support-state-button {
 
   .mobile-more-sheet:not([hidden]) {
     display: grid !important;
+  }
+
+  .regulation-state-grid {
+    grid-template-columns: 1fr;
+    gap: 0.54rem;
+  }
+
+  .regulation-state-button {
+    min-height: 4rem;
+    padding: 0.82rem 0.9rem;
+    border-radius: 18px;
+  }
+
+  .regulation-next-card {
+    padding: 0.9rem;
+    border-radius: 18px;
+  }
+
+  .regulate-after-actions {
+    grid-template-columns: 1fr;
   }
 }
