@@ -209,11 +209,26 @@ function downloadJsonPayload(payload: unknown, filenamePrefix: string) {
 }
 
 const starterPrompts = [
-  "I need to start my assignment and I don't know where to start.",
-  "I need to reply to this email but I feel ashamed it is late.",
-  "I have too many things and I am frozen.",
-  "I need to clean but the room feels too big.",
-  "I am bored and I keep scrolling."
+  {
+    label: "Assignment",
+    prompt: "I need to start my assignment and I don't know where to start."
+  },
+  {
+    label: "Late email",
+    prompt: "I need to reply to this email but I feel ashamed it is late."
+  },
+  {
+    label: "Too many things",
+    prompt: "I have too many things and I am frozen."
+  },
+  {
+    label: "Cleaning",
+    prompt: "I need to clean but the room feels too big."
+  },
+  {
+    label: "Scrolling",
+    prompt: "I am bored and I keep scrolling."
+  }
 ];
 
 interface ComposerPreview {
@@ -253,7 +268,6 @@ export default function App() {
     meta,
     isReady,
     error,
-    packetCountByStatus,
     createPacket,
     updatePacket,
     changeStatus,
@@ -281,10 +295,6 @@ export default function App() {
     null
   );
   const selectedPacket = packets.find((packet) => packet.id === selectedPacketId) ?? null;
-  const activeCount =
-    packetCountByStatus.rescue_now +
-    packetCountByStatus.in_progress +
-    packetCountByStatus.waiting;
   const isSprintScreen = screen === "sprint";
 
   useEffect(() => {
@@ -474,7 +484,6 @@ export default function App() {
 
       {screen === "home" && (
         <HomeScreen
-          activeCount={activeCount}
           packets={packets}
           meta={meta}
           byokSettings={byokSettings}
@@ -663,7 +672,6 @@ function MobileCommandRail({
 }
 
 function HomeScreen({
-  activeCount,
   packets,
   meta,
   byokSettings,
@@ -678,7 +686,6 @@ function HomeScreen({
   onListen,
   onOpenPacket
 }: {
-  activeCount: number;
   packets: RescuePacket[];
   meta: Parameters<typeof generatePatternMap>[1];
   byokSettings: ByokSettings;
@@ -712,32 +719,58 @@ function HomeScreen({
   return (
     <main>
       <Shell className="pb-3">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mx-auto max-w-5xl">
           <Panel className="rescue-console relative overflow-hidden p-4 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
-              <div>
+              <div className="max-w-3xl">
                 <p className="text-xs font-semibold uppercase text-moss">
                   No explanation needed.
                 </p>
                 <h1 className="safe-text mt-3 text-3xl font-semibold leading-tight text-ink sm:text-5xl">
-                  What is worth rescuing?
+                  Start with the stuck thing.
                 </h1>
                 <p className="mt-3 max-w-2xl text-base leading-7 text-muted sm:mt-4 sm:text-lg sm:leading-8">
-                  Drop the messy version. Scaffold turns it into one next physical
-                  action, a short rescue plan, and a repair option only when repair
-                  is actually relevant.
+                  Type one messy sentence. Scaffold turns it into a next physical
+                  action, a 10-minute rescue, and repair only when repair is
+                  actually relevant.
                 </p>
               </div>
               <SignalPill value="Local-first" tone="moss" />
             </div>
 
-            <div className="mt-5 rounded-lg border border-line/75 bg-paper/58 p-3 shadow-inner-soft sm:mt-7 sm:p-4">
-              <label
-                className="block text-sm font-semibold text-ink"
-                htmlFor="stuck"
-              >
-                Messy task
-              </label>
+            <ol className="mt-6 grid gap-3 border-y border-line/70 py-4 text-sm sm:grid-cols-3">
+              <li>
+                <span className="font-semibold text-ink">1. Drop the messy version</span>
+                <span className="mt-1 block leading-6 text-muted">
+                  No sorting. No perfect wording.
+                </span>
+              </li>
+              <li>
+                <span className="font-semibold text-ink">2. Get the first move</span>
+                <span className="mt-1 block leading-6 text-muted">
+                  One physical action, not a task list.
+                </span>
+              </li>
+              <li>
+                <span className="font-semibold text-ink">3. Start tiny</span>
+                <span className="mt-1 block leading-6 text-muted">
+                  Done enough counts. Repair is progress.
+                </span>
+              </li>
+            </ol>
+
+            <div className="mt-6">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label
+                  className="block text-sm font-semibold text-ink"
+                  htmlFor="stuck"
+                >
+                  Start here
+                </label>
+                <span className="text-sm leading-6 text-muted">
+                  Messy is fine.
+                </span>
+              </div>
               {starterMessage && (
                 <p className="mt-3 rounded-lg border border-line bg-surface p-3 text-sm font-semibold leading-6 text-ink">
                   Starter loaded: {starterMessage}
@@ -747,8 +780,8 @@ function HomeScreen({
                 id="stuck"
                 value={stuckText}
                 onChange={(event) => onTextChange(event.target.value)}
-                className="console-textarea mt-3 min-h-28 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70 sm:min-h-44"
-                placeholder="I need to reply to this email but I feel ashamed it is late."
+                className="console-textarea mt-3 min-h-32 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70 sm:min-h-40"
+                placeholder="Example: I need to start my assignment and I don't know where to start."
               />
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm leading-6 text-muted">
@@ -758,7 +791,7 @@ function HomeScreen({
                   <button
                     type="button"
                     onClick={onClearDraft}
-                  className="secondary-action min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-clay"
+                    className="secondary-action min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-clay"
                   >
                     Clear draft
                   </button>
@@ -766,13 +799,16 @@ function HomeScreen({
               </div>
             </div>
 
-            <LiveComposerPreview preview={composerPreview} hasInput={Boolean(stuckText.trim())} />
+            <LiveComposerPreview
+              preview={composerPreview}
+              hasInput={Boolean(stuckText.trim())}
+            />
 
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
               <PrimaryAction
                 onClick={onCreatePacket}
                 disabled={!stuckText.trim()}
-                className="text-lg"
+                className="w-full justify-center text-lg sm:w-auto"
               >
                 <BrandMark className="h-7 w-7 text-ink" decorative />
                 I'm stuck
@@ -781,49 +817,38 @@ function HomeScreen({
                 type="button"
                 onClick={onListen}
                 disabled={!speechSupported || isListening}
-                className="secondary-action inline-flex min-h-14 items-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
+                className="secondary-action inline-flex min-h-14 items-center justify-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
               >
                 <Mic className="h-5 w-5" aria-hidden="true" />
                 {isListening ? "Listening" : "Speak"}
               </button>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {starterPrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => onTextChange(prompt)}
-                  className="secondary-action rounded-full border border-line/75 bg-paper/72 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:bg-surface hover:text-ink"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          </Panel>
-
-          <div className="space-y-4">
-            <Panel tone="ink" className="overflow-hidden p-5 sm:p-6">
-              <p className="text-sm font-semibold text-paper/70">Rescue engine</p>
-              <p className="mt-4 text-5xl font-semibold text-paper">{activeCount}</p>
-              <p className="mt-3 text-lg leading-7 text-paper/80">
-                Choose one next action. Done enough counts.
+            <div className="mt-5 border-t border-line/70 pt-4">
+              <p className="text-xs font-semibold uppercase text-moss">
+                Try a stuck moment
               </p>
-              <div className="mt-7 space-y-3 text-sm font-medium text-paper/75">
-                <p>Start tiny.</p>
-                <p>Make it ugly.</p>
-                <p>Repair is progress.</p>
-                <p>Exit responsibly.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {starterPrompts.map((starter) => (
+                  <button
+                    key={starter.label}
+                    type="button"
+                    onClick={() => onTextChange(starter.prompt)}
+                    className="secondary-action rounded-full border border-line/75 bg-paper/72 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:bg-surface hover:text-ink"
+                  >
+                    {starter.label}
+                  </button>
+                ))}
               </div>
-            </Panel>
+            </div>
 
-            <LocalVaultStatus
+            <LocalVaultInline
               meta={meta}
               byokSettings={byokSettings}
               onExport={onExport}
               onOpenSettings={onOpenSettings}
             />
-          </div>
+          </Panel>
         </div>
       </Shell>
 
@@ -881,7 +906,7 @@ function HomeScreen({
   );
 }
 
-function LocalVaultStatus({
+function LocalVaultInline({
   meta,
   byokSettings,
   onExport,
@@ -904,36 +929,18 @@ function LocalVaultStatus({
   }
 
   return (
-    <Panel tone="paper" className="p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase text-moss">Local vault</p>
-          <h2 className="mt-1 text-lg font-semibold text-ink">Last saved</h2>
-          <p className="mt-1 text-sm leading-6 text-muted">
-            {formatShortDate(meta.updatedAt)}
-          </p>
-        </div>
-        <ShieldCheck className="h-6 w-6 flex-none text-moss" aria-hidden="true" />
-      </div>
-
-      <div className="mt-4 grid gap-2 text-sm">
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-3 py-2">
-          <span className="font-semibold text-muted">Deep Rescue</span>
-          <span className="font-semibold text-ink">
-            {deepRescueOn ? "On" : "Off"}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-3 py-2">
-          <span className="font-semibold text-muted">API keys</span>
-          <span className="font-semibold text-ink">Not exported</span>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
+    <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line/70 pt-4 text-sm leading-6 text-muted">
+      <span className="inline-flex items-center gap-2 font-semibold text-ink">
+        <ShieldCheck className="h-4 w-4 text-moss" aria-hidden="true" />
+        Local vault saved {formatShortDate(meta.updatedAt)}
+      </span>
+      <span>Deep Rescue {deepRescueOn ? "On" : "Off"}</span>
+      <span>API keys: Not exported</span>
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => void handleExport()}
-          className="secondary-action inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
+          className="secondary-action inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-paper/80 px-3 text-sm font-semibold text-ink transition hover:border-moss"
         >
           <Download className="h-4 w-4" aria-hidden="true" />
           Export
@@ -941,7 +948,7 @@ function LocalVaultStatus({
         <button
           type="button"
           onClick={onOpenSettings}
-          className="secondary-action inline-flex min-h-10 items-center rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
+          className="secondary-action inline-flex min-h-10 items-center rounded-lg border border-line bg-paper/80 px-3 text-sm font-semibold text-ink transition hover:border-moss"
         >
           Vault settings
         </button>
@@ -951,7 +958,7 @@ function LocalVaultStatus({
           </span>
         )}
       </div>
-    </Panel>
+    </div>
   );
 }
 
@@ -964,15 +971,18 @@ function LiveComposerPreview({
 }) {
   if (!hasInput) {
     return (
-      <div className="mt-4 rounded-lg border border-line/70 bg-paper/55 p-4 text-sm leading-6 text-muted">
-        Local preview appears as you type.
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm leading-6 text-muted">
+        <span className="font-semibold text-ink">As you type:</span>
+        <span>likely block</span>
+        <span>first physical action</span>
+        <span>repair relevance</span>
       </div>
     );
   }
 
   if (!preview) {
     return (
-      <div className="mt-4 rounded-lg border border-line/70 bg-paper/55 p-4 text-sm leading-6 text-muted">
+      <div className="mt-4 text-sm leading-6 text-muted">
         Keep going. The first move will sharpen.
       </div>
     );
@@ -1015,72 +1025,39 @@ function LiveComposerPreview({
 
 function FirstRunPanel({ onLoadDemo }: { onLoadDemo: () => void }) {
   const steps = [
-    {
-      title: "Pick a stuck moment",
-      body: "Use the messy words you already have."
-    },
-    {
-      title: "See the next physical action",
-      body: "Scaffold finds the first thing your hands can do."
-    },
-    {
-      title: "Start a 10-minute sprint",
-      body: "Stay with the visible piece."
-    },
-    {
-      title: "Done enough counts",
-      body: "Repair, continue, or stop cleanly."
-    }
+    "Pick a stuck moment",
+    "See the next physical action",
+    "Start a 10-minute sprint",
+    "Done enough counts"
   ];
 
   return (
-    <Panel className="rescue-enter overflow-hidden p-0">
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="p-5 sm:p-6">
+    <Panel className="rescue-enter p-5 sm:p-6">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
           <p className="text-xs font-semibold uppercase text-moss">
             First rescue
           </p>
           <h2 className="mt-2 text-2xl font-semibold leading-tight text-ink">
-            One guided rescue. No onboarding sludge.
+            Want to see it once?
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-            Pick one stuck moment, get one physical next action, and decide what
-            is still possible after the sprint.
+            Load one demo stuck moment, see the first move, then clear it or make
+            your own.
           </p>
-          <ol className="mt-5 grid gap-3 sm:grid-cols-2">
-            {steps.map((step, index) => (
-              <li
-                key={step.title}
-                className="rounded-lg border border-line bg-paper/80 p-4"
-              >
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-moss/10 text-sm font-semibold text-mossDark">
-                  {index + 1}
-                </span>
-                <p className="mt-3 font-semibold text-ink">{step.title}</p>
-                <p className="mt-1 text-sm leading-6 text-muted">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <PrimaryAction onClick={onLoadDemo} className="min-h-12">
-              Try a guided rescue
-            </PrimaryAction>
-            <SignalPill value="Local rescue first" tone="moss" />
-          </div>
         </div>
-        <div className="border-t border-line bg-paper/80 p-5 lg:border-l lg:border-t-0">
-          <div className="rounded-lg border border-line bg-surface p-4">
-            <p className="text-sm font-semibold text-ink">Local rescue</p>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              Stays in this browser. Deep Rescue stays off unless you explicitly
-              choose it and provide your own key.
-            </p>
-            <p className="mt-4 text-sm font-semibold text-mossDark">
-              Choose one next action.
-            </p>
-          </div>
-        </div>
+        <PrimaryAction onClick={onLoadDemo} className="min-h-12 justify-center">
+          Try a guided rescue
+        </PrimaryAction>
       </div>
+      <ol className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-line pt-4 text-sm leading-6 text-muted">
+        {steps.map((step, index) => (
+          <li key={step}>
+            <span className="font-semibold text-mossDark">{index + 1}.</span>{" "}
+            {step}
+          </li>
+        ))}
+      </ol>
     </Panel>
   );
 }

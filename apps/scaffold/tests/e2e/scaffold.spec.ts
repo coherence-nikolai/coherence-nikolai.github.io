@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("creates a rescue packet from messy text", async ({ page }) => {
-  await page.getByLabel("Messy task").fill(messyTask);
+  await page.getByLabel("Start here").fill(messyTask);
   await expect(page.getByText("Local rescue preview")).toBeVisible();
   await expect(page.getByText("Next physical action forming.")).toBeVisible();
   await expect(page.getByText("Repair needed")).toBeVisible();
@@ -26,23 +26,23 @@ test("creates a rescue packet from messy text", async ({ page }) => {
 });
 
 test("autosaves and clears messy draft text locally", async ({ page }) => {
-  await page.getByLabel("Messy task").fill("I need to start the grant report.");
+  await page.getByLabel("Start here").fill("I need to start the grant report.");
   await expect(page.getByText("Draft autosaves locally in this browser.")).toBeVisible();
   await expect(page.getByText("Local vault")).toBeVisible();
   await expect(page.getByText("API keys")).toBeVisible();
   await expect(page.getByText("Not exported")).toBeVisible();
 
   await page.reload();
-  await expect(page.getByLabel("Messy task")).toHaveValue(
+  await expect(page.getByLabel("Start here")).toHaveValue(
     "I need to start the grant report."
   );
 
   await page.getByRole("button", { name: "Clear draft" }).click();
-  await expect(page.getByLabel("Messy task")).toHaveValue("");
+  await expect(page.getByLabel("Start here")).toHaveValue("");
 });
 
 test("runs a sprint and records done enough", async ({ page }) => {
-  await page.getByLabel("Messy task").fill("I have an essay due and I don't know where to start.");
+  await page.getByLabel("Start here").fill("I have an essay due and I don't know where to start.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Start rescue sprint" }).click();
   await expect(page.getByRole("heading", { name: "Essay due" })).toBeVisible();
@@ -58,7 +58,7 @@ test("runs a sprint and records done enough", async ({ page }) => {
 });
 
 test("shows unfinished packets on the re-entry screen", async ({ page }) => {
-  await page.getByLabel("Messy task").fill("I need to do my tax today but I keep avoiding it.");
+  await page.getByLabel("Start here").fill("I need to do my tax today but I keep avoiding it.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Re-entry" }).click();
 
@@ -76,7 +76,7 @@ test("shows unfinished packets on the re-entry screen", async ({ page }) => {
 });
 
 test("uses unblock and exit responsibly controls", async ({ page }) => {
-  await page.getByLabel("Messy task").fill("I need to finish the work proposal but the scope is too much.");
+  await page.getByLabel("Start here").fill("I need to finish the work proposal but the scope is too much.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
   await expect(page.getByText("Next physical action", { exact: true })).toBeVisible();
@@ -96,14 +96,14 @@ test("uses unblock and exit responsibly controls", async ({ page }) => {
 });
 
 test("maps task, missing-item, exit, and successful-start patterns", async ({ page }) => {
-  await page.getByLabel("Messy task").fill(messyTask);
+  await page.getByLabel("Start here").fill(messyTask);
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Start rescue sprint" }).click();
   await page.getByRole("button", { name: "Done enough" }).click();
   await page.getByRole("button", { name: "Done enough counts" }).click();
 
   await page.getByRole("button", { name: "Rescue", exact: true }).click();
-  await page.getByLabel("Messy task").fill("I need to finish the work proposal but the scope is too much.");
+  await page.getByLabel("Start here").fill("I need to finish the work proposal but the scope is too much.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("tab", { name: "Exit responsibly" }).click();
   await page.getByRole("button", { name: "Renegotiate" }).click();
@@ -127,13 +127,13 @@ test("maps task, missing-item, exit, and successful-start patterns", async ({ pa
 
   await page.getByRole("button", { name: /Email \/ message often starts with Repair/ }).click();
   await expect(page.getByText("Starter loaded: Email / message often starts with Repair.")).toBeVisible();
-  await expect(page.getByLabel("Messy task")).toHaveValue(
+  await expect(page.getByLabel("Start here")).toHaveValue(
     "I need to rescue an email / message task. The likely block is shame or fear. Start me with Repair."
   );
 });
 
 test("exports and imports local JSON data", async ({ page }, testInfo) => {
-  await page.getByLabel("Messy task").fill(messyTask);
+  await page.getByLabel("Start here").fill(messyTask);
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Settings", exact: true }).click();
 
@@ -222,7 +222,7 @@ test("records explicit external LLM consent in settings", async ({ page }) => {
   await expect(consentCheckbox).toBeChecked();
 
   await page.getByRole("button", { name: "Rescue", exact: true }).click();
-  await page.getByLabel("Messy task").fill(messyTask);
+  await page.getByLabel("Start here").fill(messyTask);
   await page.getByRole("button", { name: "I'm stuck" }).click();
   const deepRescueButton = page.getByRole("button", {
     name: "Deep Rescue",
