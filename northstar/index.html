@@ -20,10 +20,10 @@
     name="description"
     content="A calmer study companion for neurodivergent students."
   >
-  <link rel="manifest" href="./manifest.webmanifest?v=20260528a">
-  <link rel="icon" href="./icon.svg?v=20260528a" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.svg?v=20260528a">
-  <link rel="stylesheet" href="./styles.css?v=20260528a">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260528b">
+  <link rel="icon" href="./icon.svg?v=20260528b" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg?v=20260528b">
+  <link rel="stylesheet" href="./styles.css?v=20260528b">
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -33,7 +33,7 @@
     <aside class="sidebar">
       <nav class="nav-card card" aria-label="Primary sections" role="tablist">
         <div class="rail-brand">
-          <img class="rail-mark" src="./brand-mark.svg?v=20260528a" alt="">
+          <img class="rail-mark" src="./brand-mark.svg?v=20260528b" alt="">
           <div>
             <p class="eyebrow">Northstar</p>
             <strong>Student space</strong>
@@ -93,7 +93,7 @@
             <p class="eyebrow">Academic companion</p>
             <div class="app-brand">
               <span class="brand-crest">
-                <img class="brand-mark" src="./brand-mark.svg?v=20260528a" alt="Northstar logo">
+                <img class="brand-mark" src="./brand-mark.svg?v=20260528b" alt="Northstar logo">
               </span>
               <div class="app-brand-copy">
                 <h1>Northstar</h1>
@@ -222,7 +222,7 @@
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-target="notes">
             <strong>to save notes</strong>
-            <span>Catch the thread.</span>
+            <span>Catch one thought.</span>
           </button>
           <button class="mobile-more-tool" type="button" data-mobile-more-target="calendar">
             <strong>to add a due date</strong>
@@ -247,39 +247,46 @@
         </div>
       </section>
 
-      <section class="resume-banner card" aria-label="Resume your last study thread">
+      <section class="resume-banner card" aria-label="Continue where you left off">
         <div class="resume-copy">
           <p class="eyebrow">Return</p>
-          <h3 id="resumePanelLabel">Pick up where you left off</h3>
+          <h3 id="resumePanelLabel">Continue where I left off</h3>
           <p class="microcopy" id="resumePanelCopy">
-            Northstar keeps your place, drafts, and next step visible so coming back takes less effort.
+            Your next useful step will stay here.
           </p>
-          <p class="resume-meta" id="resumePanelMeta">Last save not available yet.</p>
-          <p class="resume-summary" id="resumeSummary">
-            If you stop now, Northstar will reopen here and keep your current notes, task, and drafts.
-          </p>
-          <div class="resume-stats" aria-label="Saved thread snapshot">
-            <article class="resume-stat">
-              <span class="status-label">Last section</span>
-              <strong id="statusRoute">Not set yet</strong>
-            </article>
-            <article class="resume-stat">
-              <span class="status-label">Saved notes</span>
-              <strong id="statusNotes">0 sessions</strong>
-            </article>
-            <article class="resume-stat">
-              <span class="status-label">Finish steps</span>
-              <strong id="statusFinish">0 of 0</strong>
-            </article>
-            <article class="resume-stat">
-              <span class="status-label">Opens at</span>
-              <strong id="statusResume">Dashboard</strong>
-            </article>
-          </div>
+          <details class="resume-details disclosure">
+            <summary class="disclosure-summary compact-summary">
+              <span>Saved details</span>
+            </summary>
+            <div class="disclosure-body">
+              <p class="resume-meta" id="resumePanelMeta">Last save not available yet.</p>
+              <p class="resume-summary" id="resumeSummary">
+                Northstar saves this on your device.
+              </p>
+              <div class="resume-stats" aria-label="Saved place details">
+                <article class="resume-stat">
+                  <span class="status-label">Last section</span>
+                  <strong id="statusRoute">Not set yet</strong>
+                </article>
+                <article class="resume-stat">
+                  <span class="status-label">Saved notes</span>
+                  <strong id="statusNotes">0 sessions</strong>
+                </article>
+                <article class="resume-stat">
+                  <span class="status-label">Finish steps</span>
+                  <strong id="statusFinish">0 of 0</strong>
+                </article>
+                <article class="resume-stat">
+                  <span class="status-label">Opens at</span>
+                  <strong id="statusResume">Today</strong>
+                </article>
+              </div>
+              <button class="button subtle" id="saveThreadBtn">Save where to come back</button>
+            </div>
+          </details>
         </div>
         <div class="button-row">
-          <button class="button primary" id="resumeNowBtn">Resume</button>
-          <button class="button subtle" id="saveThreadBtn">Save my place</button>
+          <button class="button primary" id="resumeNowBtn">Continue where I left off</button>
         </div>
       </section>
 
@@ -409,7 +416,7 @@
           <div class="today-quickstart-shell">
             <div class="today-entry-copy">
               <div class="today-mobile-brand" aria-hidden="true">
-            <img class="brand-mark" src="./brand-mark.svg?v=20260528a" alt="">
+            <img class="brand-mark" src="./brand-mark.svg?v=20260528b" alt="">
                 <div class="today-mobile-brand-copy">
                   <p class="eyebrow">Northstar</p>
                   <strong>Northstar</strong>
@@ -432,7 +439,7 @@
                 </div>
 
                 <div class="first-minute-actions">
-                  <button class="button primary" id="firstMinuteStartBtn" type="button">Show one small move</button>
+                  <button class="button primary" id="firstMinuteStartBtn" type="button">Choose for me</button>
                   <button class="button subtle" id="firstMinuteChooseBtn" type="button">Choose myself</button>
                 </div>
 
@@ -451,8 +458,7 @@
               <div class="today-inline-feedback" id="todayInlineFeedback" hidden></div>
 
               <div class="button-row quickstart-actions">
-                <button class="button subtle" id="lowEnergyAssistBtn">Show one small move</button>
-                <button class="button subtle today-desktop-resume" id="todayDesktopResumeBtn" type="button">Resume</button>
+                <button class="button subtle" id="lowEnergyAssistBtn">Choose for me</button>
               </div>
 
             </div>
@@ -487,7 +493,6 @@
 
               <div class="today-mobile-secondary">
                 <button class="button subtle" id="showMoreTodayBtn" type="button">More tools</button>
-                <button class="button subtle" id="quickResumeBtn" type="button">Resume</button>
               </div>
 
               <p class="today-desktop-note">Need reflection or a clean stop? Open <strong>Profile</strong> or <strong>Finish</strong> from the sidebar when you are ready.</p>
@@ -495,7 +500,7 @@
           </div>
 
           <div class="dashboard-brand-echo" role="img" aria-label="Northstar. One next step is enough.">
-            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260528a" alt="">
+            <img class="dashboard-brand-mark" src="./brand-mark.svg?v=20260528b" alt="">
             <div class="dashboard-brand-wordmark">
               <strong>Northstar</strong>
               <span>One next step is enough.</span>
@@ -509,15 +514,15 @@
           <button class="button subtle back-button" id="backToTodayBtn" type="button">Back to Today</button>
           <div>
             <p class="eyebrow">More tools</p>
-            <h2>I need...</h2>
+            <h2>Choose one tool</h2>
             <p class="panel-copy">
-              A small toolbox for when the first three choices do not quite fit.
+              Pick the closest one. You do not need to set anything up first.
             </p>
           </div>
         </div>
 
         <div class="grid two-up today-grid today-options-grid">
-          <details class="card today-deep-dive disclosure" id="todayDeepDive" open>
+          <details class="card today-deep-dive disclosure" id="todayDeepDive" hidden>
             <summary class="disclosure-summary">
               <p class="eyebrow">How it feels</p>
               <h3>Pick what is getting in the way</h3>
@@ -547,7 +552,7 @@
                   <span>Use this when the task feels hard to touch.</span>
                 </button>
                 <button class="state-card" type="button" data-study-state="drifting" aria-pressed="false">
-                  <span class="state-kicker">Losing the thread</span>
+                  <span class="state-kicker">Losing pieces</span>
                   <strong>I keep losing pieces</strong>
                   <span>Use this when notes, reading details, or next steps keep slipping away.</span>
                 </button>
@@ -567,9 +572,9 @@
 
           <div class="card today-options-card">
             <div class="section-heading today-direct-heading">
-              <p class="eyebrow">Tool drawer</p>
-              <h3>Pick the closest tool</h3>
-              <p class="microcopy">Nothing here is required. Choose one thing that would lower the pressure.</p>
+              <p class="eyebrow">Toolbox</p>
+              <h3>What would help?</h3>
+              <p class="microcopy">Choose one tool. Everything else can wait.</p>
             </div>
 
             <div class="triage-grid" id="triageButtons">
@@ -611,19 +616,17 @@
               <button class="path-card" type="button" data-route-target="finish">
                 <span class="path-kicker">Stop safely</span>
                 <strong>to save where to come back</strong>
-                <span>Best when you need to stop without losing the thread.</span>
+                <span>Best when you need to stop without carrying it all in your head.</span>
               </button>
             </div>
 
-            <div class="button-row today-options-actions">
-              <button class="button subtle" id="resumeThreadBtn">Return to my last thread</button>
-            </div>
+            <button class="button subtle today-options-actions" id="resumeThreadBtn" hidden>Continue where I left off</button>
 
             <details class="today-checkin disclosure" id="todayCheckin">
               <summary class="disclosure-summary">
-                <p class="eyebrow">Optional detail</p>
-                <h3>Add detail if you want</h3>
-                <p class="microcopy">Use this when you want the suggestion to fit your time, energy, and blockers.</p>
+                <p class="eyebrow">More detail</p>
+                <h3>Fit the suggestion</h3>
+                <p class="microcopy">Only use this if extra detail would help.</p>
               </summary>
               <div class="disclosure-body">
                 <div class="field-group">
@@ -671,7 +674,7 @@
               </div>
             </details>
 
-            <article class="card output-card today-route-card">
+            <article class="card output-card today-route-card" hidden>
               <div class="section-heading">
                 <p class="eyebrow">Right now</p>
                 <h3 id="todayRouteLabel">Choose a path that fits what is happening</h3>
@@ -706,7 +709,7 @@
         <div class="grid two-up regulate-grid">
           <article class="card regulate-start-card">
             <div class="section-heading">
-              <p class="eyebrow">Start here</p>
+              <p class="eyebrow">Step 1</p>
               <h3>What feels closest?</h3>
               <p class="microcopy">Pick one. It does not have to be exact.</p>
             </div>
@@ -733,13 +736,13 @@
                 <span>The task is hard to touch.</span>
               </button>
               <button class="regulation-state-button" type="button" data-regulation-signal="emotional" aria-pressed="false">
-                <strong>Emotionally loaded</strong>
+                <strong>Big feelings</strong>
                 <span>This has feelings attached.</span>
               </button>
             </div>
 
             <article class="regulation-next-card" id="regulationNextCard" aria-live="polite">
-              <p class="eyebrow">Try this for 30 seconds</p>
+              <p class="eyebrow">Step 2</p>
               <h4 id="regulationStepTitle">Lower the input first</h4>
               <p id="regulationStepCopy">Dim light, reduce sound, close one tab, or clear one small patch.</p>
               <p class="microcopy" id="regulationBridgeCopy">Then sit near the work. You do not have to start yet.</p>
@@ -814,18 +817,18 @@
             </div>
 
             <div class="button-row">
-              <button class="button primary" id="buildRegulationBtn" type="button">Show one step</button>
-              <button class="button subtle" id="tryAnotherRegulationBtn" type="button">Try another</button>
+              <button class="button primary" id="buildRegulationBtn" type="button">Show one settling step</button>
+              <button class="button subtle" id="tryAnotherRegulationBtn" type="button" hidden>Try another</button>
             </div>
           </article>
 
-          <article class="card output-card regulate-bridge-card">
+          <article class="card output-card regulate-bridge-card" hidden>
             <div class="section-heading">
-              <p class="eyebrow">After that</p>
-              <h3>One tiny work step</h3>
+              <p class="eyebrow">Step 3</p>
+              <h3>Choose what happens next</h3>
             </div>
             <div id="regulateOutput" class="rich-output empty">
-              Pick what feels closest. Northstar will show one step, then one gentle bridge back.
+              Your settling step will appear here.
             </div>
             <div class="button-row regulate-after-actions">
               <button class="button primary" id="regulateToPlanBtn" type="button">I can do one tiny work step</button>
@@ -881,11 +884,11 @@
 
             <div class="button-row">
               <button class="button primary" id="buildPlanBtn">Build my first-step plan</button>
-              <button class="button subtle" id="copyPlanBtn">Copy plan</button>
+              <button class="button subtle" id="copyPlanBtn" hidden>Copy plan</button>
             </div>
           </article>
 
-          <article class="card output-card">
+          <article class="card output-card planner-output-card" hidden>
             <div class="section-heading">
               <p class="eyebrow">Micro-plan</p>
               <h3>One visible step</h3>
@@ -1009,40 +1012,42 @@
               <p class="microcopy">Tap a day to add a due date. Tap a coloured block to edit it.</p>
             </div>
 
-            <div class="calendar-term-card">
-              <div class="section-heading">
-                <p class="eyebrow">Term dates</p>
-                <h3>Choose the months</h3>
-                <p class="microcopy">Set this once for your school calendar. The calendar will roll forward without an app update.</p>
+            <details class="calendar-term-card disclosure">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">More detail</p>
+                <h3>Set term dates</h3>
+                <p class="microcopy">Optional: choose trimester, semester, or term dates.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div class="field-row">
+                  <label class="field">
+                    <span>School calendar</span>
+                    <select id="termTypeSelect">
+                      <option value="trimester">Trimester</option>
+                      <option value="semester">Semester</option>
+                      <option value="term">Term</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Study period name</span>
+                    <input id="termNameInput" type="text" placeholder="e.g. Semester 1, 2026">
+                  </label>
+                  <label class="field">
+                    <span>Start date</span>
+                    <input id="termStartInput" type="date">
+                  </label>
+                  <label class="field">
+                    <span>End date</span>
+                    <input id="termEndInput" type="date">
+                  </label>
+                </div>
+                <div class="button-row calendar-term-actions" aria-label="Quick term date actions">
+                  <button class="button subtle" id="calendarPrevTermBtn" type="button">Previous 13 weeks</button>
+                  <button class="button subtle" id="calendarMake13WeeksBtn" type="button">Use 13 weeks</button>
+                  <button class="button subtle" id="calendarNextTermBtn" type="button">Next 13 weeks</button>
+                </div>
               </div>
-              <div class="field-row">
-                <label class="field">
-                  <span>School calendar</span>
-                  <select id="termTypeSelect">
-                    <option value="trimester">Trimester</option>
-                    <option value="semester">Semester</option>
-                    <option value="term">Term</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>Study period name</span>
-                  <input id="termNameInput" type="text" placeholder="e.g. Semester 1, 2026">
-                </label>
-                <label class="field">
-                  <span>Start date</span>
-                  <input id="termStartInput" type="date">
-                </label>
-                <label class="field">
-                  <span>End date</span>
-                  <input id="termEndInput" type="date">
-                </label>
-              </div>
-              <div class="button-row calendar-term-actions" aria-label="Quick term date actions">
-                <button class="button subtle" id="calendarPrevTermBtn" type="button">Previous 13 weeks</button>
-                <button class="button subtle" id="calendarMake13WeeksBtn" type="button">Use 13 weeks</button>
-                <button class="button subtle" id="calendarNextTermBtn" type="button">Next 13 weeks</button>
-              </div>
-            </div>
+            </details>
 
             <div class="calendar-board-shell">
               <div class="calendar-board-head">
@@ -1070,7 +1075,7 @@
               Add one due date. Northstar will build a calm term map here.
             </div>
 
-            <div class="button-row calendar-copy-actions">
+            <div class="button-row calendar-copy-actions" hidden>
               <button class="button subtle" id="copyCalendarBtn" type="button">Copy term plan</button>
             </div>
           </article>
@@ -1117,41 +1122,52 @@
               </button>
             </div>
 
-            <label class="field">
-              <span>What is this block for?</span>
-              <input
-                id="focusIntentionInput"
-                type="text"
-                placeholder="e.g. read two pages, write one messy paragraph, sort my notes"
-              >
-            </label>
+            <details class="focus-detail disclosure">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">More detail</p>
+                <h3>Name the block</h3>
+                <p class="microcopy">Optional: add what this timer is for.</p>
+              </summary>
+              <div class="disclosure-body">
+                <label class="field">
+                  <span>What is this block for?</span>
+                  <input
+                    id="focusIntentionInput"
+                    type="text"
+                    placeholder="e.g. read two pages, write one messy paragraph, sort my notes"
+                  >
+                </label>
 
-            <label class="field">
-              <span>When the timer ends, remind me to...</span>
-              <input
-                id="focusReturnCueInput"
-                type="text"
-                placeholder="e.g. write where I stopped before opening another tab"
-              >
-            </label>
+                <label class="field">
+                  <span>When the timer ends, remind me to...</span>
+                  <input
+                    id="focusReturnCueInput"
+                    type="text"
+                    placeholder="e.g. write where I stopped before opening another tab"
+                  >
+                </label>
+              </div>
+            </details>
 
             <div class="button-row focus-actions">
               <button class="button primary" id="focusStartBtn" type="button">Start the block</button>
-              <button class="button subtle" id="focusPauseBtn" type="button">Pause</button>
-              <button class="button subtle" id="focusResetBtn" type="button">Reset</button>
-              <button class="button subtle" id="focusCompleteBtn" type="button">Mark done</button>
+              <button class="button subtle" id="focusPauseBtn" type="button" hidden>Pause</button>
+              <button class="button subtle" id="focusResetBtn" type="button" hidden>Reset</button>
+              <button class="button subtle" id="focusCompleteBtn" type="button" hidden>Mark done</button>
             </div>
 
-            <div class="timer-alert-panel">
-              <div>
-                <p class="eyebrow">Timer alerts</p>
+            <details class="timer-alert-panel disclosure">
+              <summary class="disclosure-summary compact-summary">
+                <span>Timer alerts</span>
+              </summary>
+              <div class="disclosure-body timer-alert-body">
                 <p class="microcopy" id="focusNotificationStatus">Alerts are off. You can still use the timer without them.</p>
+                <button class="button subtle" id="enableTimerAlertsBtn" type="button">Enable alerts</button>
               </div>
-              <button class="button subtle" id="enableTimerAlertsBtn" type="button">Enable alerts</button>
-            </div>
+            </details>
           </article>
 
-          <article class="card output-card focus-support-card">
+          <article class="card output-card focus-support-card" hidden>
             <div class="section-heading">
               <p class="eyebrow">Session cue</p>
               <h3>Know where to stop</h3>
@@ -1231,11 +1247,11 @@
 
             <div class="button-row">
               <button class="button primary" id="unpackBtn">Unpack this task</button>
-              <button class="button subtle" id="copyUnpackBtn">Copy unpack summary</button>
+              <button class="button subtle" id="copyUnpackBtn" hidden>Copy unpack summary</button>
             </div>
           </article>
 
-          <article class="card output-card">
+          <article class="card output-card unpack-output-card" hidden>
             <div class="section-heading">
               <p class="eyebrow">Clear task notes</p>
               <h3>Plain-language task notes</h3>
@@ -1251,7 +1267,7 @@
         <div class="panel-head">
           <div>
             <p class="eyebrow">Notes</p>
-            <h2>Catch the thread</h2>
+            <h2>Catch one thought</h2>
             <p class="panel-copy">
               Capture ideas in blocks you can return to later.
             </p>
@@ -1261,27 +1277,36 @@
         <div class="grid two-up">
           <article class="card">
             <div class="section-heading">
-              <p class="eyebrow">Capture board</p>
-              <h3>Use small note blocks</h3>
-              <p class="microcopy">Add the block that matches what is in your head now.</p>
+              <p class="eyebrow">Start here</p>
+              <h3>Write one thing you do not want to lose</h3>
+              <p class="microcopy">One sentence is enough. You can sort it later.</p>
             </div>
 
-            <div class="field-row">
-              <label class="field">
-                <span>Session or source title</span>
-                <input id="notesTitleInput" type="text" placeholder="e.g. Week 4 lecture, article on inclusive pedagogy">
-              </label>
+            <details class="notes-detail disclosure">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">More detail</p>
+                <h3>Add title or purpose</h3>
+                <p class="microcopy">Optional. Use only if it helps future-you.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div class="field-row">
+                  <label class="field">
+                    <span>Session or source title</span>
+                    <input id="notesTitleInput" type="text" placeholder="e.g. Week 4 lecture, article on inclusive pedagogy">
+                  </label>
 
-              <label class="field">
-                <span>Where is this from?</span>
-                <input id="notesContextInput" type="text" placeholder="e.g. Sociology tutorial, EDU300 reading, meeting with advisor">
-              </label>
-            </div>
+                  <label class="field">
+                    <span>Where is this from?</span>
+                    <input id="notesContextInput" type="text" placeholder="e.g. Sociology tutorial, EDU300 reading, meeting with advisor">
+                  </label>
+                </div>
 
-            <label class="field">
-              <span>What do you need these notes to help with later?</span>
-              <input id="notesGoalInput" type="text" placeholder="e.g. draft my discussion post, revise for class, bring one question to advising">
-            </label>
+                <label class="field">
+                  <span>What should these notes help with later?</span>
+                  <input id="notesGoalInput" type="text" placeholder="e.g. draft my discussion post, revise for class, bring one question to advising">
+                </label>
+              </div>
+            </details>
 
             <div class="note-palette" id="notesPalette" aria-label="Add note blocks">
               <button class="note-chip" type="button" data-note-add="idea">Add idea</button>
@@ -1295,13 +1320,13 @@
             <div id="notesBlocks" class="notes-block-list"></div>
 
             <div class="button-row notes-actions">
-              <button class="button primary" id="buildNotesBtn">Make review notes</button>
+              <button class="button primary" id="buildNotesBtn">Save this thought</button>
               <button class="button subtle" id="saveNotesBtn">Save this notes session</button>
-              <button class="button subtle" id="copyNotesBtn">Copy review notes</button>
+              <button class="button subtle" id="copyNotesBtn" hidden>Copy review notes</button>
             </div>
           </article>
 
-          <article class="card output-card">
+          <article class="card output-card notes-output-card" hidden>
             <div class="section-heading">
               <p class="eyebrow">Review notes</p>
               <h3>A return point for later</h3>
@@ -1340,7 +1365,7 @@
               <p class="microcopy">Choose what feels familiar in real study life.</p>
             </div>
 
-            <div class="profile-progress-card">
+            <div class="profile-progress-card" hidden>
               <div class="profile-progress-head">
                 <div>
                   <p class="eyebrow">Progress</p>
@@ -1362,21 +1387,30 @@
               <button class="button primary" id="profileNextBtn" type="button">Next prompt</button>
             </div>
 
-            <div class="subpanel">
-              <div class="section-heading">
-              <p class="eyebrow">Answers so far</p>
-                <h3>What you have answered so far</h3>
-              </div>
-              <div id="profileAnswerTrail" class="stack-sm empty">No pattern answers saved yet.</div>
-            </div>
+            <details class="profile-detail disclosure">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">More detail</p>
+                <h3>See saved answers</h3>
+                <p class="microcopy">Optional. Keep answering one prompt at a time.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div class="subpanel">
+                  <div class="section-heading">
+                    <p class="eyebrow">Answers so far</p>
+                    <h3>What you have answered so far</h3>
+                  </div>
+                  <div id="profileAnswerTrail" class="stack-sm empty">No pattern answers saved yet.</div>
+                </div>
 
-            <div class="button-row">
-              <button class="button primary" id="buildProfileBtn">Show what helps me</button>
-              <button class="button subtle" id="copyProfileBtn">Copy profile</button>
-            </div>
+                <div class="button-row">
+                  <button class="button primary" id="buildProfileBtn">Show what helps me</button>
+                  <button class="button subtle" id="copyProfileBtn" hidden>Copy profile</button>
+                </div>
+              </div>
+            </details>
           </article>
 
-          <article class="card output-card">
+          <article class="card output-card profile-output-card" hidden>
             <div class="section-heading">
               <p class="eyebrow">What helps</p>
               <h3>What tends to help you work</h3>
@@ -1402,10 +1436,10 @@
         <div class="grid two-up">
           <article class="card">
             <div class="section-heading">
-              <p class="eyebrow">Checklist</p>
-              <h3>Close the loop</h3>
+              <p class="eyebrow">Start here</p>
+              <h3>Save where to come back</h3>
+              <p class="microcopy">Write the smallest useful return cue.</p>
             </div>
-            <div id="finishChecklist" class="stack-sm"></div>
 
             <label class="field">
               <span>What should be easy to find next time?</span>
@@ -1416,31 +1450,42 @@
               ></textarea>
             </label>
 
-            <label class="field">
-              <span>What helped?</span>
-              <input
-                id="workedInput"
-                type="text"
-                placeholder="e.g. 10-minute timer, low pressure plan, writing the first ugly sentence"
-              >
-            </label>
+            <details class="finish-detail disclosure">
+              <summary class="disclosure-summary">
+                <p class="eyebrow">More detail</p>
+                <h3>Close gently</h3>
+                <p class="microcopy">Optional: note what helped or what to make lighter.</p>
+              </summary>
+              <div class="disclosure-body">
+                <div id="finishChecklist" class="stack-sm"></div>
 
-            <label class="field">
-              <span>What should feel lighter next time?</span>
-              <input
-                id="avoidInput"
-                type="text"
-                placeholder="e.g. too many options, long reading blocks, starting with the whole brief"
-              >
-            </label>
+                <label class="field">
+                  <span>What helped?</span>
+                  <input
+                    id="workedInput"
+                    type="text"
+                    placeholder="e.g. 10-minute timer, low pressure plan, writing the first ugly sentence"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>What should feel lighter next time?</span>
+                  <input
+                    id="avoidInput"
+                    type="text"
+                    placeholder="e.g. too many options, long reading blocks, starting with the whole brief"
+                  >
+                </label>
+              </div>
+            </details>
 
             <div class="button-row">
               <button class="button primary" id="saveFinishBtn">Save my return point</button>
-              <button class="button subtle" id="copyFinishBtn">Copy summary</button>
+              <button class="button subtle" id="copyFinishBtn" hidden>Copy summary</button>
             </div>
           </article>
 
-          <article class="card output-card">
+          <article class="card output-card finish-output-card" hidden>
             <div class="section-heading">
               <p class="eyebrow">Return point</p>
               <h3>Make coming back easier</h3>
@@ -1454,6 +1499,6 @@
     </main>
   </div>
 
-  <script type="module" src="./js/app.js?v=20260528a"></script>
+  <script type="module" src="./js/app.js?v=20260528b"></script>
 </body>
 </html>

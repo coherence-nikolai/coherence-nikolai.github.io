@@ -2919,6 +2919,42 @@ html[data-first-minute-guide="on"] .dashboard-brand-echo {
   margin-top: 0.8rem;
 }
 
+.compact-summary {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.28rem 0.58rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.resume-details {
+  width: min(100%, 42rem);
+  margin-top: 0.35rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.resume-details .disclosure-body {
+  margin-top: 0.5rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--section-rim);
+}
+
+.timer-alert-panel.disclosure {
+  display: block;
+}
+
+.timer-alert-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+}
+
 .memory-banner {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;

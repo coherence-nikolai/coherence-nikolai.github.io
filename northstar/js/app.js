@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260528a";
+} from "./data/content.js?v=20260528b";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260528a";
+} from "./state.js?v=20260528b";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -603,7 +603,7 @@ const MOBILE_DOCK_ACTIONS = {
     target: "#unpackBtn"
   },
   notes: {
-    label: "Catch the thread",
+    label: "Catch one thought",
     target: "#buildNotesBtn"
   },
   profile: {
@@ -1643,6 +1643,10 @@ function renderRegulation({ openResult = false, remember = true } = {}) {
   state.outputs.regulate = result;
   saveState("outputs", state.outputs);
 
+  const bridgeCard = $(".regulate-bridge-card");
+  const tryAnotherBtn = $("#tryAnotherRegulationBtn");
+  if (bridgeCard) bridgeCard.hidden = false;
+  if (tryAnotherBtn) tryAnotherBtn.hidden = false;
   $("#regulateOutput").classList.remove("empty");
   renderRegulationStarterPreview();
 
@@ -1858,26 +1862,7 @@ function updateSessionMemory(patch = {}) {
 function renderSessionMemory() {
   const card = $("#sessionMemoryCard");
   if (!card) return;
-
-  const { worked, avoid, nextCue, updatedAt, focusRounds, lastPanel } = state.sessionMemory;
-  const hasMemory = Boolean(worked || avoid || nextCue || focusRounds);
-  const activePanel = document.documentElement.dataset.activePanel || "dashboard";
-  card.hidden = !hasMemory || (state.settings.supportState === "low" && activePanel !== "dashboard");
-  if (!hasMemory) return;
-
-  const safeNextCue = normalizeReturnCue(nextCue);
-  const title = safeNextCue || worked || `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed`;
-  const helper = avoid ? `Make lighter: ${avoid}` : worked && safeNextCue ? `Helpful: ${worked}` : "";
-  const copyParts = [
-    helper,
-    focusRounds ? `${focusRounds} focus block${focusRounds === 1 ? "" : "s"} completed.` : ""
-  ].filter(Boolean);
-
-  $("#sessionMemoryTitle").textContent = title;
-  $("#sessionMemoryCopy").textContent = copyParts.join(" · ") || "Use this as the next starting point.";
-  $("#sessionMemoryMeta").textContent = updatedAt
-    ? `Saved from ${panelLabel(lastPanel || "dashboard")}`
-    : "";
+  card.hidden = true;
 }
 
 function renderCalibration() {
@@ -2046,18 +2031,18 @@ function renderFocusOutput() {
     ? "Breaks are part of the work here. They protect re-entry instead of rewarding overextension."
     : preset.hint;
   const hasFocusContent = Boolean(
-    focus ||
-    state.focus.intention ||
-    state.focus.returnCue ||
+    ["running", "paused", "timer-ended", "marked-done"].includes(focus?.status) ||
     state.focus.completedRounds
   );
 
   if (!hasFocusContent) {
+    $(".focus-support-card")?.setAttribute("hidden", "");
     output.classList.add("empty");
-    output.textContent = "Pick a timer, name what this block is for, then start. Northstar will keep the instruction narrow and help you stop cleanly.";
+    output.textContent = "Pick a timer and press Start.";
     return;
   }
 
+  $(".focus-support-card")?.removeAttribute("hidden");
   output.classList.remove("empty");
   output.innerHTML = `
     <div class="summary-grid">
@@ -2102,8 +2087,14 @@ function renderFocusTimer() {
   const timerShell = $(".focus-timer-display");
   const startBtn = $("#focusStartBtn");
   const pauseBtn = $("#focusPauseBtn");
+  const resetBtn = $("#focusResetBtn");
+  const completeBtn = $("#focusCompleteBtn");
   const alertStatus = $("#focusNotificationStatus");
   const alertBtn = $("#enableTimerAlertsBtn");
+  const hasStartedTimer = Boolean(
+    focusTimerRunning ||
+    ["running", "paused", "timer-ended", "marked-done"].includes(state.outputs.focus?.status)
+  );
 
   if (!display || !label || !hint || !timerShell) return;
 
@@ -2112,8 +2103,16 @@ function renderFocusTimer() {
   hint.textContent = state.focus.phase === "break" ? phaseCopy.action : preset.hint;
   timerShell.classList.toggle("is-break", state.focus.phase === "break");
 
-  if (startBtn) startBtn.textContent = focusTimerRunning ? "Block running" : state.focus.phase === "break" ? "Start break" : "Start the block";
-  if (pauseBtn) pauseBtn.disabled = !focusTimerRunning;
+  if (startBtn) {
+    startBtn.textContent = focusTimerRunning ? "Block running" : state.focus.phase === "break" ? "Start break" : "Start the block";
+    startBtn.disabled = focusTimerRunning;
+  }
+  if (pauseBtn) {
+    pauseBtn.hidden = !hasStartedTimer;
+    pauseBtn.disabled = !focusTimerRunning;
+  }
+  if (resetBtn) resetBtn.hidden = !hasStartedTimer;
+  if (completeBtn) completeBtn.hidden = !hasStartedTimer;
   if (alertStatus) {
     alertStatus.textContent = state.focus.alertPreference
       ? "Alerts are on. Northstar will schedule a phone reminder for the end of the active block."
@@ -2450,7 +2449,7 @@ function renderTodayEmpty() {
   $("#todayOutput").innerHTML = "Choose one quick start above. That is enough to begin.";
   $("#openRouteBtn").disabled = true;
   $("#openRouteBtn").textContent = "Open this space";
-  if (routeCard) routeCard.hidden = isPhoneLayout();
+  if (routeCard) routeCard.hidden = true;
   setQuickRouteSelection(null);
   setTriageSelection(null);
   setTodayInlineFeedbackVisible(false);
@@ -2546,9 +2545,7 @@ function renderTodayRoute(result) {
   const studyStateMeta = STUDY_STATES[result.studyState];
   const compactPhone = isPhoneLayout();
 
-  if (routeCard) {
-    routeCard.hidden = compactPhone;
-  }
+  if (routeCard) routeCard.hidden = true;
 
   renderTodayInlineFeedback(result);
   $("#todayRouteLabel").textContent = result.section === "dashboard"
@@ -2894,6 +2891,9 @@ function renderPlanner({ openResult = true } = {}) {
   const result = buildPlannerResult();
   if (!result) return;
 
+  $(".planner-output-card")?.removeAttribute("hidden");
+  const copyPlanBtn = $("#copyPlanBtn");
+  if (copyPlanBtn) copyPlanBtn.hidden = false;
   $("#plannerOutput").classList.remove("empty");
   $("#plannerOutput").innerHTML = `
     <div class="output-block">
@@ -3485,10 +3485,12 @@ function renderCalendar() {
   if (!sorted.length) {
     output.classList.add("empty");
     output.innerHTML = "Add one due date. Northstar will build a calm term map here.";
+    $(".calendar-copy-actions")?.setAttribute("hidden", "");
     return result;
   }
 
   const nextDue = result.nextDue;
+  $(".calendar-copy-actions")?.removeAttribute("hidden");
   output.classList.remove("empty");
   output.innerHTML = `
     ${nextDue ? `
@@ -3581,6 +3583,9 @@ function renderUnpack({ openResult = true } = {}) {
   const result = buildUnpackResult();
   if (!result) return;
 
+  $(".unpack-output-card")?.removeAttribute("hidden");
+  const copyUnpackBtn = $("#copyUnpackBtn");
+  if (copyUnpackBtn) copyUnpackBtn.hidden = false;
   $("#unpackOutput").classList.remove("empty");
   $("#unpackOutput").innerHTML = `
     <div class="summary-grid">
@@ -3835,6 +3840,9 @@ function renderNotes({ openResult = true } = {}) {
   const result = buildNotesResult();
   if (!result) return;
 
+  $(".notes-output-card")?.removeAttribute("hidden");
+  const copyNotesBtn = $("#copyNotesBtn");
+  if (copyNotesBtn) copyNotesBtn.hidden = false;
   $("#notesOutput").classList.remove("empty");
   $("#notesOutput").innerHTML = `
     <div class="summary-grid notes-summary-grid">
@@ -3932,6 +3940,7 @@ function renderNotesHistory() {
     return;
   }
 
+  $(".notes-output-card")?.removeAttribute("hidden");
   container.classList.remove("empty");
   container.innerHTML = state.notesHistory.map((item) => `
     <div class="history-item">
@@ -4033,11 +4042,15 @@ function buildProfileResult() {
 function renderProfile({ openResult = false } = {}) {
   const result = buildProfileResult();
   if (!result) {
+    $(".profile-output-card")?.setAttribute("hidden", "");
     $("#profileOutput").classList.add("empty");
     $("#profileOutput").textContent = "What helps you study will appear here as you answer the prompts.";
     return;
   }
 
+  $(".profile-output-card")?.removeAttribute("hidden");
+  const copyProfileBtn = $("#copyProfileBtn");
+  if (copyProfileBtn) copyProfileBtn.hidden = false;
   $("#profileOutput").classList.remove("empty");
   $("#profileOutput").innerHTML = `
     <div class="summary-grid">
@@ -4138,6 +4151,9 @@ function renderFinishSummary({ openResult = false } = {}) {
     lastPanel: "finish"
   });
 
+  $(".finish-output-card")?.removeAttribute("hidden");
+  const copyFinishBtn = $("#copyFinishBtn");
+  if (copyFinishBtn) copyFinishBtn.hidden = false;
   $("#finishOutput").classList.remove("empty");
   $("#finishOutput").innerHTML = `
     <div class="summary-grid">
@@ -4353,7 +4369,7 @@ function currentResumeHint() {
     return normalizeReturnCue(state.outputs.route.action);
   }
 
-  return "Open the task, make the next step visible, and keep the thread alive.";
+  return "Open the task and choose one small next step.";
 }
 
 function renderCurrentPanelLabel(panelName) {
@@ -4373,14 +4389,10 @@ function renderResumeBanner() {
   const saveThreadBtn = $("#saveThreadBtn");
   const resumeNowBtn = $("#resumeNowBtn");
   const resumeThreadBtn = $("#resumeThreadBtn");
-  const quickResumeBtn = $("#quickResumeBtn");
-  const todayDesktopResumeBtn = $("#todayDesktopResumeBtn");
   const activePanel = document.documentElement.dataset.activePanel || "dashboard";
 
-  resumeBanner.hidden = !hasSavedThread;
-  resumeThreadBtn.hidden = !hasSavedThread;
-  if (quickResumeBtn) quickResumeBtn.hidden = !hasSavedThread;
-  if (todayDesktopResumeBtn) todayDesktopResumeBtn.hidden = !hasSavedThread;
+  resumeBanner.hidden = !hasSavedThread || activePanel !== "dashboard";
+  if (resumeThreadBtn) resumeThreadBtn.hidden = true;
 
   if (state.settings.supportState === "low" && activePanel !== "dashboard") {
     resumeBanner.hidden = true;
@@ -4389,25 +4401,20 @@ function renderResumeBanner() {
 
   if (!hasSavedThread) {
     resumeBanner.classList.add("is-slim");
-    saveThreadBtn.hidden = true;
-    resumeNowBtn.textContent = "Open Today";
+    if (saveThreadBtn) saveThreadBtn.hidden = true;
+    if (resumeNowBtn) resumeNowBtn.textContent = "Open Today";
     return;
   }
 
-  const lowSupport = state.settings.supportState === "low";
-  $("#resumePanelLabel").textContent = lowSupport
-    ? `Start here: ${nextPanelLabel}`
-    : `Return to ${nextPanelLabel}`;
-  $("#resumePanelCopy").textContent = lowSupport
-    ? currentResumeHint()
-    : `Next useful step: ${currentResumeHint()}`;
+  $("#resumePanelLabel").textContent = `Continue in ${nextPanelLabel}`;
+  $("#resumePanelCopy").textContent = currentResumeHint();
   $("#resumePanelMeta").textContent = updatedAt
     ? `Last saved ${updatedAt}`
     : "Progress saved on this device.";
 
   resumeBanner.classList.remove("is-slim");
-  saveThreadBtn.hidden = false;
-  resumeNowBtn.textContent = "Resume now";
+  if (saveThreadBtn) saveThreadBtn.hidden = false;
+  if (resumeNowBtn) resumeNowBtn.textContent = "Continue where I left off";
 }
 
 function renderStatus() {
@@ -4421,7 +4428,7 @@ function renderStatus() {
   $("#statusResume").textContent = panelLabel(panelName);
   const resumeSummary = $("#resumeSummary");
   if (resumeSummary) {
-    resumeSummary.textContent = `If you stop now, Northstar will reopen on ${$("#statusResume").textContent} and keep your current notes, task, and drafts.`;
+    resumeSummary.textContent = "Northstar saves this on your device. Open details only if useful.";
   }
   renderResumeBanner();
   renderFirstMinuteGuide();
@@ -4477,19 +4484,14 @@ function bindEvents() {
     showPanel("dashboard-options");
   });
   $("#resumeNowBtn").addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
-  $("#saveThreadBtn").addEventListener("click", () => {
+  $("#saveThreadBtn")?.addEventListener("click", () => {
     captureForms();
     state.session.updatedAt = stampNow();
     saveState("session", state.session);
     renderStatus();
   });
 
-  $("#resumeThreadBtn").addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
-  $("#quickResumeBtn").addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
-  const todayDesktopResumeBtn = $("#todayDesktopResumeBtn");
-  if (todayDesktopResumeBtn) {
-    todayDesktopResumeBtn.addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
-  }
+  $("#resumeThreadBtn")?.addEventListener("click", () => showPanel(state.session.lastPanel || "dashboard"));
   $("#lostButton").addEventListener("click", returnToGuide);
   $("#firstMinuteStartBtn").addEventListener("click", () => {
     state.settings.introDismissed = true;
@@ -4664,7 +4666,6 @@ function bindEvents() {
   $$("#regulationStateButtons .regulation-state-button").forEach((button) => {
     button.addEventListener("click", () => {
       setRegulationSignal(button.dataset.regulationSignal, { feedback: true, chooseDefaultStrategy: true });
-      renderRegulation({ openResult: false, remember: false });
     });
   });
   $("#buildRegulationBtn").addEventListener("click", () => renderRegulation({ openResult: shouldUseMobileResult() }));
