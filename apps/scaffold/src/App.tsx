@@ -720,7 +720,7 @@ function HomeScreen({
     <main>
       <Shell className="pb-3">
         <div className="mx-auto max-w-5xl">
-          <Panel className="rescue-console relative overflow-hidden p-4 sm:p-8">
+          <Panel className="home-rescue-panel rescue-console relative overflow-hidden p-4 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div className="max-w-3xl">
                 <p className="text-xs font-semibold uppercase text-moss">
@@ -738,28 +738,37 @@ function HomeScreen({
               <SignalPill value="Local-first" tone="moss" />
             </div>
 
-            <ol className="mt-6 grid gap-3 border-y border-line/70 py-4 text-sm sm:grid-cols-3">
-              <li>
-                <span className="font-semibold text-ink">1. Drop the messy version</span>
+            <ol className="rescue-map mt-6 grid gap-3 rounded-lg border border-line/80 bg-paper/72 p-3 text-sm sm:grid-cols-3 sm:p-4">
+              <li className="rescue-map-step">
+                <span className="rescue-step-marker">1</span>
+                <span className="mt-3 block font-semibold text-ink">
+                  Drop the messy version
+                </span>
                 <span className="mt-1 block leading-6 text-muted">
                   No sorting. No perfect wording.
                 </span>
               </li>
-              <li>
-                <span className="font-semibold text-ink">2. Get the first move</span>
+              <li className="rescue-map-step">
+                <span className="rescue-step-marker">2</span>
+                <span className="mt-3 block font-semibold text-ink">
+                  Get the first move
+                </span>
                 <span className="mt-1 block leading-6 text-muted">
                   One physical action, not a task list.
                 </span>
               </li>
-              <li>
-                <span className="font-semibold text-ink">3. Start tiny</span>
+              <li className="rescue-map-step">
+                <span className="rescue-step-marker rescue-step-marker-accent">3</span>
+                <span className="mt-3 block font-semibold text-ink">
+                  Start tiny
+                </span>
                 <span className="mt-1 block leading-6 text-muted">
                   Done enough counts. Repair is progress.
                 </span>
               </li>
             </ol>
 
-            <div className="mt-6">
+            <div className="rescue-entry-surface mt-6 rounded-lg border border-line/85 p-4 sm:p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <label
                   className="block text-sm font-semibold text-ink"
@@ -804,7 +813,7 @@ function HomeScreen({
               hasInput={Boolean(stuckText.trim())}
             />
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="rescue-command-bar mt-5 grid gap-3 rounded-lg border border-line/75 p-2 sm:grid-cols-[minmax(0,1fr)_auto]">
               <PrimaryAction
                 onClick={onCreatePacket}
                 disabled={!stuckText.trim()}
