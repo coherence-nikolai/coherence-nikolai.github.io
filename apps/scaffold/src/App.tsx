@@ -35,7 +35,10 @@ import {
   generateSmartReentryList
 } from "./engine/reentryEngine";
 import {
+  classifyBlockWithConfidence,
+  classifyTaskType,
   decomposeTask,
+  generateFirstPhysicalAction,
   generateExitResponsiblyScript,
   generateRescuePacket,
   increaseSupportLevel,
@@ -212,6 +215,37 @@ const starterPrompts = [
   "I need to clean but the room feels too big.",
   "I am bored and I keep scrolling."
 ];
+
+interface ComposerPreview {
+  taskTypeLabel: string;
+  blockLabel: string;
+  blockConfidence: number;
+  firstPhysicalAction: string;
+  repairNeeded: boolean;
+  repairLabel: string;
+}
+
+function buildComposerPreview(input: string): ComposerPreview | null {
+  const trimmed = input.trim();
+  if (trimmed.length < 6) return null;
+
+  const taskType = classifyTaskType(trimmed);
+  const block = classifyBlockWithConfidence(trimmed);
+  const repair = scoreRepairRelevance(trimmed, block.blockType, taskType);
+
+  return {
+    taskTypeLabel: taskTypeLabels[taskType],
+    blockLabel: blockLabels[block.blockType],
+    blockConfidence: Math.round(block.confidence * 100),
+    firstPhysicalAction: generateFirstPhysicalAction(
+      trimmed,
+      block.blockType,
+      taskType
+    ),
+    repairNeeded: repair.score >= 45,
+    repairLabel: repair.score >= 45 ? "Repair needed" : "No repair needed"
+  };
+}
 
 export default function App() {
   const {
@@ -410,13 +444,7 @@ export default function App() {
                 onClick={() => setScreen("patterns")}
               />
               <NavButton
-                active={screen === "quality"}
-                icon={<FlaskConical className="h-4 w-4" aria-hidden="true" />}
-                label="Lab"
-                onClick={() => setScreen("quality")}
-              />
-              <NavButton
-                active={screen === "settings"}
+                active={screen === "settings" || screen === "quality"}
                 icon={<Settings className="h-4 w-4" aria-hidden="true" />}
                 label="Settings"
                 onClick={() => setScreen("settings")}
@@ -508,7 +536,6 @@ export default function App() {
           packets={packets}
           meta={meta}
           onUseSuggestion={usePatternSuggestion}
-          onOpenQualityLab={() => setScreen("quality")}
         />
       )}
 
@@ -533,6 +560,7 @@ export default function App() {
           onSetExternalLlmConsent={updateExternalLlmConsent}
           onSaveByokSettings={handleSaveByokSettings}
           onClearByokSettings={handleClearByokSettings}
+          onOpenQualityLab={() => setScreen("quality")}
           packetCount={packets.length}
         />
       )}
@@ -596,13 +624,13 @@ function MobileCommandRail({
     {
       label: "Map",
       icon: <MapIcon className="h-5 w-5" aria-hidden="true" />,
-      active: screen === "patterns" || screen === "quality",
+      active: screen === "patterns",
       onClick: onMap
     },
     {
       label: "Settings",
       icon: <Settings className="h-5 w-5" aria-hidden="true" />,
-      active: screen === "settings",
+      active: screen === "settings" || screen === "quality",
       onClick: onSettings
     }
   ];
@@ -676,6 +704,10 @@ function HomeScreen({
   const speechSupported =
     typeof window !== "undefined" &&
     Boolean(window.SpeechRecognition ?? window.webkitSpeechRecognition);
+  const composerPreview = useMemo(
+    () => buildComposerPreview(stuckText),
+    [stuckText]
+  );
 
   return (
     <main>
@@ -733,6 +765,8 @@ function HomeScreen({
                 )}
               </div>
             </div>
+
+            <LiveComposerPreview preview={composerPreview} hasInput={Boolean(stuckText.trim())} />
 
             <div className="mt-5 flex flex-wrap gap-3">
               <PrimaryAction
@@ -921,6 +955,64 @@ function LocalVaultStatus({
   );
 }
 
+function LiveComposerPreview({
+  preview,
+  hasInput
+}: {
+  preview: ComposerPreview | null;
+  hasInput: boolean;
+}) {
+  if (!hasInput) {
+    return (
+      <div className="mt-4 rounded-lg border border-line/70 bg-paper/55 p-4 text-sm leading-6 text-muted">
+        Local preview appears as you type.
+      </div>
+    );
+  }
+
+  if (!preview) {
+    return (
+      <div className="mt-4 rounded-lg border border-line/70 bg-paper/55 p-4 text-sm leading-6 text-muted">
+        Keep going. The first move will sharpen.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 rounded-lg border border-line/70 bg-surface/82 p-4 shadow-inner-soft">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase text-moss">
+            Local rescue preview
+          </p>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            Next physical action forming.
+          </p>
+        </div>
+        <SignalPill
+          value={preview.repairLabel}
+          tone={preview.repairNeeded ? "clay" : "moss"}
+        />
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <SignalPill label="Likely task" value={preview.taskTypeLabel} />
+        <SignalPill label="Likely block" value={preview.blockLabel} tone="moss" />
+        <SignalPill label="Confidence" value={`${preview.blockConfidence}%`} />
+      </div>
+
+      <div className="mt-4 rounded-lg border border-line bg-paper/80 p-3">
+        <p className="text-xs font-semibold uppercase text-muted">
+          First move
+        </p>
+        <p className="safe-text mt-1 text-base font-semibold leading-7 text-ink">
+          {preview.firstPhysicalAction}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function FirstRunPanel({ onLoadDemo }: { onLoadDemo: () => void }) {
   const steps = [
     {
@@ -1079,6 +1171,76 @@ function ActionDisplay({
         </button>
       </div>
     </section>
+  );
+}
+
+function PacketActionStrip({
+  activeTool,
+  onStartSprint,
+  onDoneEnough,
+  onStuckAgain,
+  onSelectTool
+}: {
+  activeTool: ActiveRescueTool;
+  onStartSprint: () => void;
+  onDoneEnough: () => void;
+  onStuckAgain: () => void;
+  onSelectTool: (tool: ActiveRescueTool) => void;
+}) {
+  const toolItems: Array<{ id: ActiveRescueTool; label: string }> = [
+    { id: "repair", label: "Repair" },
+    { id: "unblock", label: "Unblock" },
+    { id: "exit", label: "Exit" }
+  ];
+
+  return (
+    <div className="sticky top-[5.25rem] z-10 mt-3 rounded-lg border border-line/75 bg-surface/90 p-2 shadow-premium backdrop-blur-xl">
+      <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onStartSprint}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-ink px-4 text-sm font-semibold text-paper transition hover:bg-mossDark"
+          >
+            <Play className="h-4 w-4" aria-hidden="true" />
+            Start sprint
+          </button>
+          <button
+            type="button"
+            onClick={onDoneEnough}
+            className="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 text-sm font-semibold text-ink transition hover:border-moss"
+          >
+            <Check className="h-4 w-4 text-moss" aria-hidden="true" />
+            Done enough
+          </button>
+          <button
+            type="button"
+            onClick={onStuckAgain}
+            className="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 text-sm font-semibold text-ink transition hover:border-moss"
+          >
+            <RotateCcw className="h-4 w-4 text-moss" aria-hidden="true" />
+            Stuck again
+          </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-1 rounded-lg border border-line bg-paper/80 p-1">
+          {toolItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onSelectTool(item.id)}
+              className={`min-h-10 rounded-md px-3 text-sm font-semibold transition ${
+                activeTool === item.id
+                  ? "bg-moss text-white"
+                  : "text-muted hover:bg-surface hover:text-ink"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1316,6 +1478,20 @@ function PacketDetail({
     }
   }
 
+  function selectRescueTool(tool: ActiveRescueTool) {
+    setActiveTool(tool);
+    window.setTimeout(() => {
+      document
+        .getElementById("rescue-tools")
+        ?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }, 0);
+  }
+
+  async function markStuckAgain() {
+    selectRescueTool("unblock");
+    await onChangeStatus(packet.id, "rescue_now");
+  }
+
   return (
     <Shell className="max-w-6xl">
       <button
@@ -1327,6 +1503,14 @@ function PacketDetail({
       </button>
 
       <ActionDisplay packet={packet} onStartSprint={onStartSprint} />
+
+      <PacketActionStrip
+        activeTool={activeTool}
+        onStartSprint={onStartSprint}
+        onDoneEnough={() => void onChangeStatus(packet.id, "done_enough")}
+        onStuckAgain={() => void markStuckAgain()}
+        onSelectTool={selectRescueTool}
+      />
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-5">
@@ -1505,6 +1689,7 @@ function PacketDetail({
             </ol>
           </Panel>
 
+          <div id="rescue-tools" className="scroll-mt-32">
           <Panel tone="paper" className="rescue-enter p-4 sm:p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -1683,6 +1868,7 @@ function PacketDetail({
               )}
             </div>
           </Panel>
+          </div>
 
           <DisclosurePanel
             title="Notes"
@@ -1977,11 +2163,13 @@ function getReentryReasons(packet: RescuePacket): string[] {
 function ReentryTriageCard({
   packet,
   packets,
+  rank,
   onOpenPacket,
   onReentryAction
 }: {
   packet: RescuePacket;
   packets: RescuePacket[];
+  rank: number;
   onOpenPacket: (packet: RescuePacket) => void;
   onReentryAction: (
     packet: RescuePacket,
@@ -1999,8 +2187,10 @@ function ReentryTriageCard({
   const reasons = getReentryReasons(packet);
 
   return (
-    <article className="reentry-card flex h-full flex-col rounded-lg border border-line/80 bg-surface/95 p-4 shadow-premium">
+    <article className="reentry-card relative flex h-full flex-col overflow-hidden rounded-lg border border-line/80 bg-surface/95 p-4 shadow-premium">
+      <span className="absolute inset-y-4 left-0 w-1 rounded-r bg-moss/80" aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-2">
+        <SignalPill value={`Rescue ${rank}`} tone="ink" />
         <SignalPill value={reentryStateLabels[reentryState]} tone="moss" />
         <SignalPill value={statusLabels[packet.status]} />
       </div>
@@ -2047,7 +2237,7 @@ function ReentryTriageCard({
               onClick={() => void onReentryAction(packet, actionType)}
               className={`rounded-lg border p-3 text-left transition hover:shadow-sm ${
                 actionType === "resume_first_move"
-                  ? "border-moss bg-moss text-white hover:bg-mossDark"
+                  ? "border-moss bg-moss text-white shadow-action hover:bg-mossDark"
                   : "border-line bg-paper text-ink hover:border-moss"
               }`}
             >
@@ -2086,18 +2276,19 @@ function ReentryScreen({
       <RescueBrief
         eyebrow="Re-entry"
         title="No explanation needed. Choose what is still possible."
-        body="Calm triage only. Pick one next action, repair what needs repair, or exit responsibly."
+        body="Top three rescue candidates. Pick one first move, repair what needs repair, or exit responsibly."
       />
 
       <section className="mt-6">
         <h2 className="text-2xl font-semibold text-ink">Most worth rescuing</h2>
         <div className="mt-4 grid gap-5 lg:grid-cols-3">
           {reentryList.length > 0 ? (
-            reentryList.map((packet) => (
+            reentryList.map((packet, index) => (
               <ReentryTriageCard
                 key={packet.id}
                 packet={packet}
                 packets={packets}
+                rank={index + 1}
                 onOpenPacket={onOpenPacket}
                 onReentryAction={onReentryAction}
               />
@@ -3505,13 +3696,11 @@ function QualitySignalSummaryPanel({
 function PatternScreen({
   packets,
   meta,
-  onUseSuggestion,
-  onOpenQualityLab
+  onUseSuggestion
 }: {
   packets: RescuePacket[];
   meta: Parameters<typeof generatePatternMap>[1];
   onUseSuggestion: (suggestion: PatternActionSuggestion) => void;
-  onOpenQualityLab: () => void;
 }) {
   const patternMap = generatePatternMap(packets, meta);
 
@@ -3521,16 +3710,6 @@ function PatternScreen({
         eyebrow="Pattern map"
         title="What helps you restart?"
         body="Patterns only. No score. No streaks. Use what is useful and ignore the rest."
-        action={
-          <button
-            type="button"
-            onClick={onOpenQualityLab}
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm font-semibold text-ink transition hover:border-moss"
-          >
-            <FlaskConical className="h-4 w-4" aria-hidden="true" />
-            Quality Lab
-          </button>
-        }
       />
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -3701,6 +3880,7 @@ function SettingsScreen({
   onSetExternalLlmConsent,
   onSaveByokSettings,
   onClearByokSettings,
+  onOpenQualityLab,
   packetCount
 }: {
   meta: Parameters<typeof generatePatternMap>[1];
@@ -3713,6 +3893,7 @@ function SettingsScreen({
   ) => Promise<unknown>;
   onSaveByokSettings: (settings: ByokSettings) => ByokSettings;
   onClearByokSettings: () => ByokSettings;
+  onOpenQualityLab: () => void;
   packetCount: number;
 }) {
   const [message, setMessage] = useState<string | null>(null);
@@ -3852,6 +4033,31 @@ function SettingsScreen({
             </p>
           </div>
           <SignalPill value="No account required" tone="moss" />
+        </div>
+      </Panel>
+
+      <Panel className="mt-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase text-moss">
+              Developer lab
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold text-ink">
+              Rescue Quality Lab
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              Golden fixtures, local feedback, and regression checks. Hidden from
+              the main rescue path.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenQualityLab}
+            className="secondary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-paper px-4 text-sm font-semibold text-ink transition hover:border-moss"
+          >
+            <FlaskConical className="h-4 w-4" aria-hidden="true" />
+            Open Rescue Quality Lab
+          </button>
         </div>
       </Panel>
 

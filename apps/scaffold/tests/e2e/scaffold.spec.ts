@@ -9,6 +9,9 @@ test.beforeEach(async ({ page }) => {
 
 test("creates a rescue packet from messy text", async ({ page }) => {
   await page.getByLabel("Messy task").fill(messyTask);
+  await expect(page.getByText("Local rescue preview")).toBeVisible();
+  await expect(page.getByText("Next physical action forming.")).toBeVisible();
+  await expect(page.getByText("Repair needed")).toBeVisible();
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
   await expect(page.getByRole("heading", { name: "Reply to this email" })).toBeVisible();
@@ -47,6 +50,7 @@ test("runs a sprint and records done enough", async ({ page }) => {
   await page.getByRole("button", { name: "Done enough" }).click();
   await expect(page.getByRole("heading", { name: "What changed?" })).toBeVisible();
   await expect(page.getByText("What is still possible?")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Exit responsibly" })).toBeVisible();
   await page.getByRole("button", { name: "Done enough counts" }).click();
 
   await page.getByText("Packet controls").click();
@@ -76,6 +80,10 @@ test("uses unblock and exit responsibly controls", async ({ page }) => {
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
   await expect(page.getByText("Next physical action", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Start sprint", exact: true })
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Stuck again" })).toBeVisible();
   await page.getByRole("tab", { name: "Unblock" }).click();
   await page.getByRole("button", { name: "Decision" }).click();
   await expect(page.getByText("Current: Decision")).toBeVisible();
@@ -147,8 +155,8 @@ test("exports and imports local JSON data", async ({ page }, testInfo) => {
 });
 
 test("uses the Rescue Quality Lab and saves a local signal", async ({ page }, testInfo) => {
-  await page.getByRole("button", { name: "Map" }).click();
-  await page.getByRole("button", { name: "Quality Lab" }).click();
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Open Rescue Quality Lab" }).click();
 
   await expect(
     page.getByRole("heading", {

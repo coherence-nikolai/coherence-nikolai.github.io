@@ -103,6 +103,9 @@ export function SprintMode({
     () => Math.max(1, Math.ceil((sprintSeconds - remaining) / 60)),
     [remaining]
   );
+  const progressDegrees = Math.round(
+    ((sprintSeconds - remaining) / sprintSeconds) * 360
+  );
   const message = bodyDoubleCopy(state, remaining);
 
   useEffect(() => {
@@ -173,7 +176,7 @@ export function SprintMode({
               <SignalPill value="10 minutes" tone="ink" />
             </div>
 
-            <div className="mt-6 rounded-lg border border-ink bg-ink p-5 text-paper">
+            <div className="instrument-display mt-6 rounded-lg border border-ink bg-ink p-5 text-paper">
               <p className="text-xs font-semibold uppercase text-moss">
                 First physical action
               </p>
@@ -305,7 +308,8 @@ export function SprintMode({
                       Repair if another person is affected.
                     </p>
                     <p className="rounded-lg border border-line bg-paper p-3">
-                      Close as done enough if there is a visible change.
+                      Exit responsibly if the honest move is renegotiate, defer,
+                      delegate, or stop.
                     </p>
                   </div>
                 </div>
@@ -327,7 +331,7 @@ export function SprintMode({
                     onClick={() => void complete("repair")}
                   />
                   <OutcomeButton
-                    label="Stop responsibly"
+                    label="Exit responsibly"
                     onClick={() => void complete("stop_responsibly")}
                   />
                   <OutcomeButton
@@ -341,21 +345,45 @@ export function SprintMode({
 
           <aside className="session-timer-panel flex flex-col rounded-lg border border-white/10 bg-white/[0.06] p-5 shadow-premium sm:p-7">
             <div>
-              <p className="text-sm font-semibold text-paper/60">Still here</p>
+              <p className="text-sm font-semibold text-paper/60">
+                Body double
+              </p>
               <h2 className="mt-2 text-3xl font-semibold leading-tight text-paper">
                 {message.title}
               </h2>
               <p className="mt-3 text-base leading-7 text-paper/70">
                 {message.body}
               </p>
+              <div className="mt-5 rounded-lg border border-white/10 bg-white/10 p-4">
+                <p className="text-sm font-semibold text-paper">
+                  I'm here with you.
+                </p>
+                <p className="mt-1 text-sm leading-6 text-paper/70">
+                  Keep the first move visible. No extra setup.
+                </p>
+              </div>
             </div>
 
             <div
-              className={`my-8 flex aspect-square items-center justify-center rounded-full border border-white/20 bg-white/10 text-6xl font-semibold text-paper shadow-inner sm:text-7xl ${
+              className={`timer-shell my-8 flex aspect-square items-center justify-center rounded-full border border-white/20 p-4 shadow-inner ${
                 state === "running" ? "breathe-timer" : ""
               }`}
+              style={{
+                background: `conic-gradient(rgba(62, 120, 106, 0.72) ${progressDegrees}deg, rgba(255, 255, 255, 0.08) ${progressDegrees}deg)`
+              }}
+              aria-label={`${formatTime(remaining)} remaining`}
             >
-              {formatTime(remaining)}
+              <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/15 bg-ink/82 text-paper">
+                <span className="text-xs font-semibold uppercase text-paper/50">
+                  Remaining
+                </span>
+                <span className="mt-2 text-6xl font-semibold sm:text-7xl">
+                  {formatTime(remaining)}
+                </span>
+                <span className="mt-2 text-sm font-semibold text-moss">
+                  10-minute rescue
+                </span>
+              </div>
             </div>
 
             <div className="mt-auto space-y-4">
