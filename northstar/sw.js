@@ -1,15 +1,15 @@
-const CACHE_NAME = "northstar-shell-v53";
+const CACHE_NAME = "northstar-shell-v54";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=20260527d",
-  "./manifest.webmanifest?v=20260527d",
-  "./icon.svg?v=20260527d",
-  "./brand-mark.svg?v=20260527d",
-  "./brand-mark-light.svg?v=20260527d",
-  "./js/app.js?v=20260527d",
-  "./js/state.js?v=20260527d",
-  "./js/data/content.js?v=20260527d"
+  "./styles.css?v=20260528a",
+  "./manifest.webmanifest?v=20260528a",
+  "./icon.svg?v=20260528a",
+  "./brand-mark.svg?v=20260528a",
+  "./brand-mark-light.svg?v=20260528a",
+  "./js/app.js?v=20260528a",
+  "./js/state.js?v=20260528a",
+  "./js/data/content.js?v=20260528a"
 ];
 
 self.addEventListener("install", (event) => {

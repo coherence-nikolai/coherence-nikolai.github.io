@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260527d";
+} from "./data/content.js?v=20260528a";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260527d";
+} from "./state.js?v=20260528a";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -2397,7 +2397,9 @@ function applyStudyStatePreset(studyStateId, options = {}) {
 
 function setTriageSelection(section) {
   $$("#triageButtons .path-card").forEach((button) => {
-    button.classList.toggle("is-selected", button.dataset.routeTarget === section);
+    const isSelected = button.dataset.routeTarget === section;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
   });
 }
 
@@ -2482,6 +2484,60 @@ function returnToGuide() {
   setTodayExpanded(false);
   showPanel("dashboard");
   requestAnimationFrame(() => $("#quickRouteButtons .quick-route-button")?.focus?.({ preventScroll: true }));
+}
+
+function activateRouteChoice(button) {
+  const target = button?.dataset?.routeTarget;
+  if (!target || button.disabled) return;
+
+  nudgeHaptic();
+
+  if (target === "dashboard" || target === "pressure") {
+    applyStudyStatePreset("overwhelmed", { autoOpen: true, revealInline: true });
+    return;
+  }
+
+  if (!ROUTE_LIBRARY[target]) {
+    showPanel(target);
+    return;
+  }
+
+  chooseTriageRoute(target, {}, { autoOpen: true, revealInline: true });
+}
+
+function activateStudyStateChoice(button) {
+  const studyState = button?.dataset?.studyState;
+  if (!studyState || button.disabled) return;
+
+  nudgeHaptic();
+  applyStudyStatePreset(studyState, { autoOpen: true, revealInline: true });
+}
+
+function bindPrimaryDelegatedActions() {
+  document.addEventListener("click", (event) => {
+    const navButton = event.target.closest(".nav-link[data-panel-target]");
+    if (navButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      showPanel(navButton.dataset.panelTarget);
+      return;
+    }
+
+    const studyStateButton = event.target.closest("#studyStateButtons .state-card[data-study-state]");
+    if (studyStateButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      activateStudyStateChoice(studyStateButton);
+      return;
+    }
+
+    const routeButton = event.target.closest("#quickRouteButtons [data-route-target], #triageButtons [data-route-target]");
+    if (routeButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      activateRouteChoice(routeButton);
+    }
+  }, true);
 }
 
 function renderTodayRoute(result) {
@@ -4374,6 +4430,8 @@ function renderStatus() {
 }
 
 function bindEvents() {
+  bindPrimaryDelegatedActions();
+
   $$(".nav-link").forEach((button) => {
     button.addEventListener("click", () => showPanel(button.dataset.panelTarget));
     button.addEventListener("keydown", (event) => {
@@ -4541,26 +4599,15 @@ function bindEvents() {
   });
 
   $$("#studyStateButtons .state-card").forEach((button) => {
-    button.addEventListener("click", () => applyStudyStatePreset(button.dataset.studyState, { autoOpen: true, revealInline: true }));
+    button.addEventListener("click", () => activateStudyStateChoice(button));
   });
 
   $$("#quickRouteButtons .quick-route-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      nudgeHaptic();
-      if (button.dataset.routeTarget === "dashboard") {
-        applyStudyStatePreset("overwhelmed", { autoOpen: true, revealInline: true });
-        return;
-      }
-
-      chooseTriageRoute(button.dataset.routeTarget, {}, { autoOpen: true, revealInline: true });
-    });
+    button.addEventListener("click", () => activateRouteChoice(button));
   });
 
   $$("#triageButtons .path-card").forEach((button) => {
-    button.addEventListener("click", () => {
-      nudgeHaptic();
-      chooseTriageRoute(button.dataset.routeTarget, {}, { autoOpen: true, revealInline: true });
-    });
+    button.addEventListener("click", () => activateRouteChoice(button));
   });
 
   $("#openRouteBtn").addEventListener("click", () => {
