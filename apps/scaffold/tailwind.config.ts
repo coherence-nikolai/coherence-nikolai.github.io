@@ -5,22 +5,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: "#F6F1E7",
-        surface: "#FFFCF6",
-        ink: "#22251F",
-        muted: "#636B61",
-        line: "#D8CFBF",
-        moss: "#3F7C6B",
-        mossDark: "#28584D",
-        clay: "#A85F4F",
-        brass: "#B18B4D",
+        paper: "#F7F1E6",
+        surface: "#FFFDF8",
+        ink: "#20231D",
+        muted: "#667064",
+        line: "#D9CFBE",
+        moss: "#3E786A",
+        mossDark: "#28594F",
+        clay: "#A76555",
+        brass: "#AA8749",
         blueGrey: "#5F6F75",
-        amberSoft: "#D8B765"
+        amberSoft: "#D9B86A"
       },
       boxShadow: {
         soft: "0 18px 60px rgba(36, 38, 32, 0.10)",
-        premium: "0 24px 70px rgba(34, 37, 31, 0.08)",
-        action: "0 16px 34px rgba(63, 124, 107, 0.22)"
+        premium: "0 28px 80px rgba(34, 37, 31, 0.10)",
+        action: "0 18px 36px rgba(63, 120, 106, 0.24)",
+        "inner-soft": "inset 0 1px 0 rgba(255, 255, 255, 0.70)"
       }
     }
   },

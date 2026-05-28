@@ -31,12 +31,16 @@ export function PacketCard({ packet, onOpen }: PacketCardProps) {
     <button
       type="button"
       onClick={() => onOpen(packet)}
-      className="group relative w-full overflow-hidden rounded-lg border border-line/80 bg-surface/90 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-moss hover:shadow-premium"
+      className="packet-card group relative w-full overflow-hidden rounded-lg border border-line/75 bg-surface/88 p-4 text-left transition hover:-translate-y-0.5 hover:border-moss"
     >
-      <span className="absolute inset-y-3 left-0 w-1 rounded-r bg-moss/80" aria-hidden="true" />
+      <span className="absolute inset-y-4 left-0 w-1 rounded-r bg-moss/85" aria-hidden="true" />
+      <span
+        className="absolute inset-x-0 top-0 h-px bg-white/80"
+        aria-hidden="true"
+      />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 pl-2">
-          <p className="safe-text text-sm font-semibold uppercase text-moss">
+          <p className="safe-text text-xs font-semibold uppercase text-moss">
             {statusLabels[packet.status]}
           </p>
           <p className="safe-text mt-1 text-lg font-semibold text-ink">
@@ -60,7 +64,7 @@ export function PacketCard({ packet, onOpen }: PacketCardProps) {
         <SignalPill value={`U${packet.urgency} / C${packet.consequence}`} tone="clay" />
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 pl-2 text-xs font-medium text-muted">
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-line/65 pt-3 pl-2 text-xs font-medium text-muted">
         <span>Last touched {formatDate(packet.lastTouchedAt)}</span>
         <span>Choose one next action</span>
       </div>

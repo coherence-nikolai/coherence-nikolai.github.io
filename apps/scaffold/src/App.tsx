@@ -374,7 +374,7 @@ export default function App() {
       }`}
     >
       {!isSprintScreen && (
-        <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/90 backdrop-blur">
+        <header className="app-header sticky top-0 z-20 border-b border-line/70 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <button
               type="button"
@@ -557,8 +557,8 @@ function NavButton({
       onClick={onClick}
       className={`${navButtonBase} ${
         active
-          ? "bg-ink text-white shadow-sm"
-          : "border border-line/80 bg-surface/90 text-ink hover:border-moss"
+                ? "bg-ink text-white shadow-sm"
+                : "secondary-action border border-line/80 bg-surface/88 text-ink hover:border-moss hover:bg-surface"
       }`}
     >
       {icon}
@@ -610,7 +610,7 @@ function MobileCommandRail({
   return (
     <nav
       aria-label="Mobile command rail"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-line/80 bg-surface/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 shadow-premium backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-surface/92 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 shadow-premium backdrop-blur-xl md:hidden"
     >
       <div className="mx-auto grid max-w-xl grid-cols-4 gap-2">
         {items.map((item) => (
@@ -622,7 +622,7 @@ function MobileCommandRail({
             className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-lg px-2 text-xs font-semibold transition ${
               item.active
                 ? "bg-ink text-paper shadow-sm"
-                : "text-muted hover:bg-paper hover:text-ink"
+                : "text-muted hover:bg-paper/85 hover:text-ink"
             }`}
           >
             {item.icon}
@@ -681,7 +681,7 @@ function HomeScreen({
     <main>
       <Shell className="pb-3">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <Panel className="relative overflow-hidden p-4 sm:p-8">
+          <Panel className="rescue-console relative overflow-hidden p-4 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div>
                 <p className="text-xs font-semibold uppercase text-moss">
@@ -699,7 +699,7 @@ function HomeScreen({
               <SignalPill value="Local-first" tone="moss" />
             </div>
 
-            <div className="mt-5 rounded-lg border border-line/80 bg-paper/70 p-3 sm:mt-7 sm:p-4">
+            <div className="mt-5 rounded-lg border border-line/75 bg-paper/58 p-3 shadow-inner-soft sm:mt-7 sm:p-4">
               <label
                 className="block text-sm font-semibold text-ink"
                 htmlFor="stuck"
@@ -726,7 +726,7 @@ function HomeScreen({
                   <button
                     type="button"
                     onClick={onClearDraft}
-                    className="min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-clay"
+                  className="secondary-action min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink transition hover:border-clay"
                   >
                     Clear draft
                   </button>
@@ -747,7 +747,7 @@ function HomeScreen({
                 type="button"
                 onClick={onListen}
                 disabled={!speechSupported || isListening}
-                className="inline-flex min-h-14 items-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
+                className="secondary-action inline-flex min-h-14 items-center gap-2 rounded-lg border border-line bg-surface px-5 text-base font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
               >
                 <Mic className="h-5 w-5" aria-hidden="true" />
                 {isListening ? "Listening" : "Speak"}
@@ -760,7 +760,7 @@ function HomeScreen({
                   key={prompt}
                   type="button"
                   onClick={() => onTextChange(prompt)}
-                  className="rounded-full border border-line/80 bg-paper/80 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:text-ink"
+                  className="secondary-action rounded-full border border-line/75 bg-paper/72 px-3 py-2 text-left text-xs font-semibold text-muted transition hover:border-moss hover:bg-surface hover:text-ink"
                 >
                   {prompt}
                 </button>
@@ -769,7 +769,7 @@ function HomeScreen({
           </Panel>
 
           <div className="space-y-4">
-            <Panel tone="ink" className="p-5 sm:p-6">
+            <Panel tone="ink" className="overflow-hidden p-5 sm:p-6">
               <p className="text-sm font-semibold text-paper/70">Rescue engine</p>
               <p className="mt-4 text-5xl font-semibold text-paper">{activeCount}</p>
               <p className="mt-3 text-lg leading-7 text-paper/80">
@@ -899,7 +899,7 @@ function LocalVaultStatus({
         <button
           type="button"
           onClick={() => void handleExport()}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
+          className="secondary-action inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
         >
           <Download className="h-4 w-4" aria-hidden="true" />
           Export
@@ -907,7 +907,7 @@ function LocalVaultStatus({
         <button
           type="button"
           onClick={onOpenSettings}
-          className="inline-flex min-h-10 items-center rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
+          className="secondary-action inline-flex min-h-10 items-center rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
         >
           Vault settings
         </button>
@@ -1047,9 +1047,10 @@ function ActionDisplay({
 }) {
   return (
     <section className="instrument-display rescue-enter relative overflow-hidden rounded-lg border border-ink bg-ink p-5 text-paper shadow-premium sm:p-7">
-      <div className="absolute right-5 top-5 hidden opacity-20 sm:block" aria-hidden="true">
+      <div className="absolute right-5 top-5 hidden opacity-[0.16] sm:block" aria-hidden="true">
         <BrandMark className="h-16 w-16 text-paper" decorative />
       </div>
+      <div className="absolute inset-x-5 top-0 h-px bg-white/15" aria-hidden="true" />
       <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase text-moss">
@@ -1071,7 +1072,7 @@ function ActionDisplay({
         <button
           type="button"
           onClick={onStartSprint}
-          className="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-paper px-5 font-semibold text-ink shadow-action transition hover:bg-white"
+          className="secondary-action inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-paper px-5 font-semibold text-ink shadow-action transition hover:bg-white"
         >
           <Play className="h-5 w-5" aria-hidden="true" />
           Start rescue sprint
@@ -1097,7 +1098,7 @@ function DisclosurePanel({
   return (
     <details
       open={defaultOpen}
-      className="group rounded-lg border border-line/80 bg-surface/85 shadow-sm"
+      className="disclosure-surface group rounded-lg border border-line/75 bg-surface/82"
     >
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded-lg px-4 py-3 text-left [&::-webkit-details-marker]:hidden sm:px-5">
         <span>
@@ -1114,7 +1115,7 @@ function DisclosurePanel({
           )}
         </span>
         <span
-          className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-line bg-paper text-lg font-semibold text-muted transition group-open:rotate-45"
+          className="secondary-action flex h-8 w-8 flex-none items-center justify-center rounded-full border border-line bg-paper text-lg font-semibold text-muted transition group-open:rotate-45"
           aria-hidden="true"
         >
           +

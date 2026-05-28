@@ -33,9 +33,10 @@ export function Panel({
   tone?: "surface" | "paper" | "ink";
 }) {
   const toneClass = {
-    surface: "border-line/80 bg-surface/95 text-ink shadow-premium",
-    paper: "border-line/80 bg-paper/70 text-ink",
-    ink: "border-ink bg-ink text-paper shadow-premium"
+    surface:
+      "premium-surface border-line/70 bg-surface/90 text-ink shadow-premium",
+    paper: "premium-paper border-line/70 bg-paper/60 text-ink",
+    ink: "premium-ink border-ink bg-ink text-paper shadow-premium"
   }[tone];
 
   return (
@@ -54,7 +55,7 @@ export function PrimaryAction({
     <button
       type="button"
       className={cx(
-        "inline-flex min-h-14 items-center justify-center gap-3 rounded-lg bg-moss px-6 text-base font-semibold text-white shadow-action transition hover:bg-mossDark disabled:cursor-not-allowed disabled:bg-muted",
+        "primary-action inline-flex min-h-14 items-center justify-center gap-3 rounded-lg bg-moss px-6 text-base font-semibold text-white shadow-action transition hover:bg-mossDark disabled:cursor-not-allowed disabled:bg-muted",
         className
       )}
       {...props}
@@ -74,7 +75,7 @@ export function SignalPill({
   tone?: "quiet" | "moss" | "clay" | "ink";
 }) {
   const toneClass = {
-    quiet: "border-line/80 bg-paper/70 text-ink",
+    quiet: "border-line/70 bg-paper/75 text-ink",
     moss: "border-moss/25 bg-moss/10 text-mossDark",
     clay: "border-clay/25 bg-clay/10 text-clay",
     ink: "border-ink/10 bg-ink text-paper"
@@ -83,7 +84,7 @@ export function SignalPill({
   return (
     <span
       className={cx(
-        "inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold",
+        "signal-pill inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold",
         toneClass
       )}
     >
@@ -107,8 +108,8 @@ export function RescueBrief({
   className?: string;
 }) {
   return (
-    <Panel className={cx("relative overflow-hidden p-6 sm:p-8", className)}>
-      <div className="absolute inset-y-0 left-0 w-1 bg-moss" aria-hidden="true" />
+    <Panel className={cx("premium-brief relative overflow-hidden p-6 sm:p-8", className)}>
+      <div className="absolute inset-y-5 left-0 w-1 rounded-r bg-moss" aria-hidden="true" />
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase text-moss">{eyebrow}</p>
@@ -135,7 +136,7 @@ export function EmptyState({
   return (
     <div
       className={cx(
-        "rounded-lg border border-dashed border-line bg-surface/70 p-4 text-sm leading-6 text-muted",
+        "rounded-lg border border-dashed border-line/80 bg-surface/72 p-4 text-sm leading-6 text-muted shadow-inner-soft",
         className
       )}
     >
