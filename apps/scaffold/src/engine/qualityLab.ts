@@ -4,29 +4,16 @@ import {
   qualitySignalDimensionLabels,
   rescueModeLabels,
   taskTypeLabels,
-  type BlockType,
+  type QualityBaseline,
+  type QualityFixture,
   type QualitySignal,
   type QualitySignalChoice,
   type QualitySignalDimension,
-  type RescueMode,
   type RescuePacket,
-  type TaskType
+  type QualityThresholds
 } from "../types";
 
-export interface GoldenRescueFixture {
-  id: string;
-  title: string;
-  messyInput: string;
-  whyItMatters: string;
-  expected: {
-    taskType: TaskType;
-    blockType: BlockType;
-    rescueMode?: RescueMode;
-    repair: "needed" | "not_needed";
-    firstActionIncludes: string[];
-    planIncludes?: string[];
-  };
-}
+export type GoldenRescueFixture = QualityFixture;
 
 export interface QualityCriterion {
   id: string;
@@ -68,8 +55,73 @@ export interface QualitySignalSummary {
   recentSignals: QualitySignal[];
 }
 
+export interface QualityRegressionItem {
+  fixtureId: string;
+  title: string;
+  baselineScore?: number;
+  currentScore: number;
+  delta?: number;
+  state: "new" | "improved" | "regressed" | "unchanged";
+}
+
+export interface DeepRescueEvalSummary {
+  improved: number;
+  localWon: number;
+  tied: number;
+  total: number;
+}
+
+export interface QualityExportPayload {
+  version: 1;
+  exportedAt: string;
+  fixtures: QualityFixture[];
+  thresholds: QualityThresholds;
+  baselines: QualityBaseline[];
+  signals: QualitySignal[];
+  localScores: Array<{
+    fixtureId: string;
+    title: string;
+    score: number;
+    suggestions: string[];
+  }>;
+}
+
+const starterTimestamp = "2026-05-28T00:00:00.000Z";
+
+export const defaultQualityThresholds: QualityThresholds = {
+  nextActionMustBePhysical: true,
+  repairMustBeRelevant: true,
+  planMustBeBounded: true,
+  minimumProgressMustBeVisible: true,
+  forbidVagueVerbs: true
+};
+
+function starterFixture(
+  fixture: Omit<QualityFixture, "source" | "createdAt" | "updatedAt">
+): QualityFixture {
+  return {
+    ...fixture,
+    source: "starter",
+    createdAt: starterTimestamp,
+    updatedAt: starterTimestamp
+  };
+}
+
+function cloneFixture(fixture: QualityFixture): QualityFixture {
+  return {
+    ...fixture,
+    expected: {
+      ...fixture.expected,
+      firstActionIncludes: [...fixture.expected.firstActionIncludes],
+      planIncludes: fixture.expected.planIncludes
+        ? [...fixture.expected.planIncludes]
+        : undefined
+    }
+  };
+}
+
 export const goldenRescueFixtures: GoldenRescueFixture[] = [
-  {
+  starterFixture({
     id: "late-email-shame",
     title: "Late email with shame",
     messyInput: "I need to reply to this email but I feel ashamed it is late.",
@@ -82,8 +134,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       firstActionIncludes: ["thread", "reply"],
       planIncludes: ["overexplain"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "assignment-ambiguous-start",
     title: "Assignment blank start",
     messyInput: "I need to start my assignment and I don't know where to start.",
@@ -95,8 +147,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       repair: "not_needed",
       firstActionIncludes: ["course", "question"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "tax-overwhelm",
     title: "Tax overwhelm",
     messyInput: "I need to do my tax but there are too many receipts and I keep avoiding it.",
@@ -109,8 +161,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       firstActionIncludes: ["receipt"],
       planIncludes: ["sorting every document"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "cleaning-too-big",
     title: "Room feels too big",
     messyInput: "I need to clean but the room feels too big and everything is too much.",
@@ -123,8 +175,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       firstActionIncludes: ["visible"],
       planIncludes: ["whole room"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "missed-appointment",
     title: "Missed appointment",
     messyInput: "I missed a dentist appointment and I feel embarrassed about calling.",
@@ -137,8 +189,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       firstActionIncludes: ["calendar", "message"],
       planIncludes: ["accountable"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "money-bill-avoidance",
     title: "Bill avoidance",
     messyInput: "I need to pay this bill but I keep avoiding looking at my bank account.",
@@ -150,8 +202,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       repair: "not_needed",
       firstActionIncludes: ["bill"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "health-low-energy",
     title: "Health low energy",
     messyInput: "I need to refill my medication but I am exhausted and can't get up.",
@@ -163,8 +215,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       repair: "not_needed",
       firstActionIncludes: ["medication"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "admin-missing-info",
     title: "Admin missing info",
     messyInput: "I need to fill in this insurance form but I don't understand what they want.",
@@ -176,8 +228,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       repair: "not_needed",
       firstActionIncludes: ["form", "field"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "work-scope-renegotiate",
     title: "Work scope too large",
     messyInput: "I need to finish the client proposal but the scope is too much.",
@@ -190,8 +242,8 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       firstActionIncludes: ["work"],
       planIncludes: ["scope"]
     }
-  },
-  {
+  }),
+  starterFixture({
     id: "essay-perfectionism",
     title: "Essay perfectionism",
     messyInput: "My essay draft is not good enough and I keep trying to make it perfect.",
@@ -204,8 +256,12 @@ export const goldenRescueFixtures: GoldenRescueFixture[] = [
       firstActionIncludes: ["document"],
       planIncludes: ["polishing"]
     }
-  }
+  })
 ];
+
+export function makeDefaultQualityFixtures(): QualityFixture[] {
+  return goldenRescueFixtures.map(cloneFixture);
+}
 
 const vagueFragments = [
   "work on",
@@ -257,6 +313,14 @@ function includesSome(value: string, fragments: string[]): boolean {
 function isVague(value: string): boolean {
   const normalized = normalize(value);
   return vagueFragments.some((fragment) => normalized.includes(fragment));
+}
+
+function packetHasVagueLanguage(packet: RescuePacket): boolean {
+  return [
+    packet.firstPhysicalAction,
+    packet.minimumViableProgress,
+    packet.tenMinutePlan.join(" ")
+  ].some(isVague);
 }
 
 function hasPhysicalVerb(value: string): boolean {
@@ -313,22 +377,41 @@ function planIsConcrete(packet: RescuePacket, fixture?: GoldenRescueFixture): bo
   return planHasShape && planAvoidsVagueLanguage && matchesFixture;
 }
 
+function minimumProgressIsVisible(packet: RescuePacket): boolean {
+  return packet.minimumViableProgress.length >= 16 && !isVague(packet.minimumViableProgress);
+}
+
+function thresholdPassed(enabled: boolean, passed: boolean): boolean {
+  return enabled ? passed : true;
+}
+
+function thresholdDetail(enabled: boolean, detail: string): string {
+  return enabled ? detail : "This quality threshold is currently off.";
+}
+
 export function scorePacketQuality(
   packet: RescuePacket,
-  fixture?: GoldenRescueFixture
+  fixture?: GoldenRescueFixture,
+  thresholds: QualityThresholds = defaultQualityThresholds
 ): PacketQualityScore {
   const criteria: QualityCriterion[] = [
     criterion(
       "next_action_concrete",
       "Concrete next physical action",
-      24,
-      isConcreteNextAction(packet.firstPhysicalAction),
-      "The first move names a physical or on-screen action instead of vague effort."
+      20,
+      thresholdPassed(
+        thresholds.nextActionMustBePhysical,
+        isConcreteNextAction(packet.firstPhysicalAction)
+      ),
+      thresholdDetail(
+        thresholds.nextActionMustBePhysical,
+        "The first move names a physical or on-screen action instead of vague effort."
+      )
     ),
     criterion(
       "next_action_matches_fixture",
       "Next action touches the expected object",
-      12,
+      10,
       fixture
         ? includesEvery(packet.firstPhysicalAction, fixture.expected.firstActionIncludes)
         : true,
@@ -368,23 +451,45 @@ export function scorePacketQuality(
     criterion(
       "plan_shape",
       "Plan is bounded and concrete",
-      16,
-      planIsConcrete(packet, fixture),
-      "The 10-minute plan should be small, bounded, and task-specific."
+      14,
+      thresholdPassed(thresholds.planMustBeBounded, planIsConcrete(packet, fixture)),
+      thresholdDetail(
+        thresholds.planMustBeBounded,
+        "The 10-minute plan should be small, bounded, and task-specific."
+      )
     ),
     criterion(
       "repair_relevance",
       "Repair relevance",
       12,
-      repairMatches(packet, fixture),
-      "Repair appears only when another person, lateness, help, clarification, or scope needs it."
+      thresholdPassed(thresholds.repairMustBeRelevant, repairMatches(packet, fixture)),
+      thresholdDetail(
+        thresholds.repairMustBeRelevant,
+        "Repair appears only when another person, lateness, help, clarification, or scope needs it."
+      )
     ),
     criterion(
       "minimum_progress",
       "Minimum viable progress is visible",
       8,
-      packet.minimumViableProgress.length >= 16 && !isVague(packet.minimumViableProgress),
-      "Done enough should describe a visible change, not a mood or score."
+      thresholdPassed(
+        thresholds.minimumProgressMustBeVisible,
+        minimumProgressIsVisible(packet)
+      ),
+      thresholdDetail(
+        thresholds.minimumProgressMustBeVisible,
+        "Done enough should describe a visible change, not a mood or score."
+      )
+    ),
+    criterion(
+      "no_vague_verbs",
+      "No vague rescue language",
+      8,
+      thresholdPassed(thresholds.forbidVagueVerbs, !packetHasVagueLanguage(packet)),
+      thresholdDetail(
+        thresholds.forbidVagueVerbs,
+        "Avoid work on, get organized, focus, make progress, or similar vague verbs."
+      )
     )
   ];
 
@@ -417,10 +522,11 @@ function rowWinner(
 export function comparePacketQuality(
   localPacket: RescuePacket,
   candidatePacket: RescuePacket,
-  fixture?: GoldenRescueFixture
+  fixture?: GoldenRescueFixture,
+  thresholds: QualityThresholds = defaultQualityThresholds
 ): PacketQualityComparison {
-  const local = scorePacketQuality(localPacket, fixture);
-  const candidate = scorePacketQuality(candidatePacket, fixture);
+  const local = scorePacketQuality(localPacket, fixture, thresholds);
+  const candidate = scorePacketQuality(candidatePacket, fixture, thresholds);
   const localCriteria = new Map(local.criteria.map((item) => [item.id, item]));
   const candidateCriteria = new Map(candidate.criteria.map((item) => [item.id, item]));
 
@@ -475,6 +581,142 @@ export function comparePacketQuality(
         : local.score > candidate.score + 4
           ? "local"
           : "tie"
+  };
+}
+
+export function generateRewriteSuggestions(score: PacketQualityScore): string[] {
+  const failed = new Set(
+    score.criteria.filter((item) => !item.passed).map((item) => item.id)
+  );
+  const suggestions: string[] = [];
+
+  if (failed.has("next_action_concrete")) {
+    suggestions.push("First action is too vague. Name one physical or on-screen move.");
+  }
+
+  if (failed.has("next_action_matches_fixture")) {
+    suggestions.push("First action does not touch the expected object for this fixture.");
+  }
+
+  if (failed.has("task_type")) {
+    suggestions.push("Task type is off. Re-check the real task before planning.");
+  }
+
+  if (failed.has("block_type")) {
+    suggestions.push("Likely block is off. The rescue mode may be solving the wrong friction.");
+  }
+
+  if (failed.has("rescue_mode")) {
+    suggestions.push("Rescue mode does not match the expected support pattern.");
+  }
+
+  if (failed.has("plan_shape")) {
+    suggestions.push("Plan expands scope too early or is not bounded enough.");
+  }
+
+  if (failed.has("repair_relevance")) {
+    suggestions.push("Repair script appears when repair is not relevant, or repair is missing when another person is affected.");
+  }
+
+  if (failed.has("minimum_progress")) {
+    suggestions.push("Minimum progress is not visible enough. Define what changes on screen or in the room.");
+  }
+
+  if (failed.has("no_vague_verbs")) {
+    suggestions.push("Remove vague verbs like focus, work on, get organized, or make progress.");
+  }
+
+  return suggestions.length > 0
+    ? suggestions
+    : ["No rewrite suggested. This packet meets the active quality thresholds."];
+}
+
+export function buildQualityRegressionWatch(
+  fixtures: QualityFixture[],
+  currentScores: Array<{ fixtureId: string; score: number }>,
+  baselines: QualityBaseline[]
+): QualityRegressionItem[] {
+  const baselineByFixture = new Map(
+    baselines.map((baseline) => [baseline.fixtureId, baseline])
+  );
+  const scoreByFixture = new Map(
+    currentScores.map((current) => [current.fixtureId, current.score])
+  );
+
+  return fixtures.map((fixture) => {
+    const currentScore = scoreByFixture.get(fixture.id) ?? 0;
+    const baseline = baselineByFixture.get(fixture.id);
+    const delta =
+      baseline === undefined ? undefined : currentScore - baseline.score;
+
+    return {
+      fixtureId: fixture.id,
+      title: fixture.title,
+      baselineScore: baseline?.score,
+      currentScore,
+      delta,
+      state:
+        delta === undefined
+          ? "new"
+          : delta >= 3
+            ? "improved"
+            : delta <= -3
+              ? "regressed"
+              : "unchanged"
+    };
+  });
+}
+
+export function makeQualityBaselines(
+  scores: Array<{ fixtureId: string; score: number }>,
+  capturedAt = new Date().toISOString()
+): QualityBaseline[] {
+  return scores.map((score) => ({
+    fixtureId: score.fixtureId,
+    score: score.score,
+    capturedAt
+  }));
+}
+
+export function summarizeDeepRescueEval(
+  comparisons: PacketQualityComparison[]
+): DeepRescueEvalSummary {
+  return comparisons.reduce<DeepRescueEvalSummary>(
+    (summary, comparison) => {
+      if (comparison.recommendation === "candidate") {
+        summary.improved += 1;
+      } else if (comparison.recommendation === "local") {
+        summary.localWon += 1;
+      } else {
+        summary.tied += 1;
+      }
+      summary.total += 1;
+      return summary;
+    },
+    { improved: 0, localWon: 0, tied: 0, total: 0 }
+  );
+}
+
+export function buildQualityExport(
+  fixtures: QualityFixture[],
+  thresholds: QualityThresholds,
+  baselines: QualityBaseline[],
+  signals: QualitySignal[],
+  localScores: Array<{ fixtureId: string; title: string; score: PacketQualityScore }>
+): QualityExportPayload {
+  return {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    fixtures: fixtures.map(cloneFixture),
+    thresholds: { ...thresholds },
+    baselines: [...baselines],
+    signals: [...signals],
+    localScores: localScores.map((item) => ({
+      fixtureId: item.fixtureId,
+      title: item.title,
+      score: item.score.score,
+      suggestions: generateRewriteSuggestions(item.score)
+    }))
   };
 }
 

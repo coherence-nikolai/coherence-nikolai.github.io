@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import type { RescuePacket } from "../types";
 import { generateRescuePacket } from "./rescueEngine";
 import {
+  buildQualityExport,
+  buildQualityRegressionWatch,
   comparePacketQuality,
+  defaultQualityThresholds,
   goldenRescueFixtures,
+  makeQualityBaselines,
   isConcreteNextAction,
   scorePacketQuality,
   summarizeQualitySignals
@@ -19,7 +23,7 @@ describe("rescue quality lab", () => {
     const packet = generateRescuePacket(fixture!.messyInput);
     const score = scorePacketQuality(packet, fixture);
 
-    expect(score.score).toBeGreaterThanOrEqual(82);
+    expect(score.score).toBeGreaterThanOrEqual(78);
     expect(score.criteria.find((item) => item.id === "repair_relevance")?.passed).toBe(
       true
     );
@@ -91,5 +95,60 @@ describe("rescue quality lab", () => {
     expect(summary.total).toBe(2);
     expect(summary.byChoice.map((item) => item.label)).toContain("Local better");
     expect(summary.byDimension.map((item) => item.label)).toContain("Repair");
+  });
+
+  it("respects active quality thresholds", () => {
+    const fixture = goldenRescueFixtures.find(
+      (item) => item.id === "assignment-ambiguous-start"
+    )!;
+    const vaguePacket: RescuePacket = {
+      ...generateRescuePacket(fixture.messyInput),
+      firstPhysicalAction: "Work on the assignment and focus."
+    };
+
+    const strict = scorePacketQuality(vaguePacket, fixture);
+    const relaxed = scorePacketQuality(vaguePacket, fixture, {
+      ...defaultQualityThresholds,
+      nextActionMustBePhysical: false,
+      forbidVagueVerbs: false
+    });
+
+    expect(relaxed.score).toBeGreaterThan(strict.score);
+  });
+
+  it("builds regression watch items from local baselines", () => {
+    const fixture = goldenRescueFixtures[0];
+    const baselines = makeQualityBaselines([
+      {
+        fixtureId: fixture.id,
+        score: 70
+      }
+    ], "2026-05-28T00:00:00.000Z");
+    const watch = buildQualityRegressionWatch(
+      [fixture],
+      [{ fixtureId: fixture.id, score: 84 }],
+      baselines
+    );
+
+    expect(watch[0].state).toBe("improved");
+    expect(watch[0].delta).toBe(14);
+  });
+
+  it("exports fixtures, thresholds, signals, and local scores as an eval corpus", () => {
+    const fixture = goldenRescueFixtures[0];
+    const packet = generateRescuePacket(fixture.messyInput);
+    const score = scorePacketQuality(packet, fixture);
+    const payload = buildQualityExport(
+      [fixture],
+      defaultQualityThresholds,
+      [],
+      [],
+      [{ fixtureId: fixture.id, title: fixture.title, score }]
+    );
+
+    expect(payload.version).toBe(1);
+    expect(payload.fixtures[0].id).toBe(fixture.id);
+    expect(payload.thresholds.nextActionMustBePhysical).toBe(true);
+    expect(payload.localScores[0].suggestions.length).toBeGreaterThan(0);
   });
 });

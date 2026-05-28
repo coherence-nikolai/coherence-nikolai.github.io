@@ -42,10 +42,16 @@ import {
   scoreRepairRelevance
 } from "./engine/rescueEngine";
 import {
+  buildQualityExport,
+  buildQualityRegressionWatch,
   comparePacketQuality,
-  goldenRescueFixtures,
+  generateRewriteSuggestions,
+  makeDefaultQualityFixtures,
+  makeQualityBaselines,
   scorePacketQuality,
+  summarizeDeepRescueEval,
   summarizeQualitySignals,
+  type DeepRescueEvalSummary,
   type GoldenRescueFixture,
   type PacketQualityComparison,
   type PacketQualityScore
@@ -76,6 +82,7 @@ import {
   missingItemLabels,
   qualitySignalChoiceLabels,
   qualitySignalDimensionLabels,
+  qualityRepairExpectationLabels,
   reentryStateLabels,
   rescueModeLabels,
   statusLabels,
@@ -84,9 +91,12 @@ import {
   type ExitResponsibilityStatus,
   type MissingItemType,
   type PatternActionSuggestion,
+  type QualityBaseline,
+  type QualityFixture,
   type QualitySignal,
   type QualitySignalChoice,
   type QualitySignalDimension,
+  type QualityThresholds,
   type ReentryActionType,
   type RescueMode,
   type RescuePacket,
@@ -183,6 +193,18 @@ function saveStuckDraft(value: string) {
   }
 }
 
+function downloadJsonPayload(payload: unknown, filenamePrefix: string) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json"
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${filenamePrefix}-${new Date().toISOString().slice(0, 10)}.json`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 const starterPrompts = [
   "I need to start my assignment and I don't know where to start.",
   "I need to reply to this email but I feel ashamed it is late.",
@@ -208,6 +230,9 @@ export default function App() {
     previewDeepRescuePacket,
     updateExternalLlmConsent,
     recordQualitySignal,
+    saveQualityFixtures,
+    saveQualityThresholds,
+    saveQualityBaselines,
     exportLocalData,
     importLocalData
   } = useScaffoldData();
@@ -238,6 +263,12 @@ export default function App() {
   useEffect(() => {
     saveStuckDraft(stuckText);
   }, [stuckText]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [screen, selectedPacketId]);
 
   async function handleCreatePacket() {
     const trimmed = stuckText.trim();
@@ -417,9 +448,13 @@ export default function App() {
         <HomeScreen
           activeCount={activeCount}
           packets={packets}
+          meta={meta}
+          byokSettings={byokSettings}
           stuckText={stuckText}
           isListening={isListening}
           starterMessage={patternStarterMessage}
+          onExport={exportLocalData}
+          onOpenSettings={() => setScreen("settings")}
           onTextChange={(value) => {
             setStuckText(value);
             if (patternStarterMessage) setPatternStarterMessage(null);
@@ -482,6 +517,9 @@ export default function App() {
           meta={meta}
           byokSettings={byokSettings}
           onRecordQualitySignal={recordQualitySignal}
+          onSaveQualityFixtures={saveQualityFixtures}
+          onSaveQualityThresholds={saveQualityThresholds}
+          onSaveQualityBaselines={saveQualityBaselines}
           onOpenSettings={() => setScreen("settings")}
         />
       )}
@@ -599,9 +637,13 @@ function MobileCommandRail({
 function HomeScreen({
   activeCount,
   packets,
+  meta,
+  byokSettings,
   stuckText,
   isListening,
   starterMessage,
+  onExport,
+  onOpenSettings,
   onTextChange,
   onClearDraft,
   onCreatePacket,
@@ -610,9 +652,13 @@ function HomeScreen({
 }: {
   activeCount: number;
   packets: RescuePacket[];
+  meta: Parameters<typeof generatePatternMap>[1];
+  byokSettings: ByokSettings;
   stuckText: string;
   isListening: boolean;
   starterMessage: string | null;
+  onExport: () => Promise<unknown>;
+  onOpenSettings: () => void;
   onTextChange: (value: string) => void;
   onClearDraft: () => void;
   onCreatePacket: () => void;
@@ -635,16 +681,16 @@ function HomeScreen({
     <main>
       <Shell className="pb-3">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <Panel className="relative overflow-hidden p-5 sm:p-8">
+          <Panel className="relative overflow-hidden p-4 sm:p-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div>
                 <p className="text-xs font-semibold uppercase text-moss">
                   No explanation needed.
                 </p>
-                <h1 className="safe-text mt-3 text-4xl font-semibold leading-tight text-ink sm:text-5xl">
+                <h1 className="safe-text mt-3 text-3xl font-semibold leading-tight text-ink sm:text-5xl">
                   What is worth rescuing?
                 </h1>
-                <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
+                <p className="mt-3 max-w-2xl text-base leading-7 text-muted sm:mt-4 sm:text-lg sm:leading-8">
                   Drop the messy version. Scaffold turns it into one next physical
                   action, a short rescue plan, and a repair option only when repair
                   is actually relevant.
@@ -653,7 +699,7 @@ function HomeScreen({
               <SignalPill value="Local-first" tone="moss" />
             </div>
 
-            <div className="mt-7 rounded-lg border border-line/80 bg-paper/70 p-3 sm:p-4">
+            <div className="mt-5 rounded-lg border border-line/80 bg-paper/70 p-3 sm:mt-7 sm:p-4">
               <label
                 className="block text-sm font-semibold text-ink"
                 htmlFor="stuck"
@@ -669,7 +715,7 @@ function HomeScreen({
                 id="stuck"
                 value={stuckText}
                 onChange={(event) => onTextChange(event.target.value)}
-                className="console-textarea mt-3 min-h-32 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70 sm:min-h-44"
+                className="console-textarea mt-3 min-h-28 w-full resize-y rounded-lg border border-line bg-surface p-4 text-lg leading-8 text-ink placeholder:text-muted/70 sm:min-h-44"
                 placeholder="I need to reply to this email but I feel ashamed it is late."
               />
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -722,19 +768,28 @@ function HomeScreen({
             </div>
           </Panel>
 
-          <Panel tone="ink" className="p-5 sm:p-6">
-            <p className="text-sm font-semibold text-paper/70">Rescue engine</p>
-            <p className="mt-4 text-5xl font-semibold text-paper">{activeCount}</p>
-            <p className="mt-3 text-lg leading-7 text-paper/80">
-              Choose one next action. Done enough counts.
-            </p>
-            <div className="mt-7 space-y-3 text-sm font-medium text-paper/75">
-              <p>Start tiny.</p>
-              <p>Make it ugly.</p>
-              <p>Repair is progress.</p>
-              <p>Exit responsibly.</p>
-            </div>
-          </Panel>
+          <div className="space-y-4">
+            <Panel tone="ink" className="p-5 sm:p-6">
+              <p className="text-sm font-semibold text-paper/70">Rescue engine</p>
+              <p className="mt-4 text-5xl font-semibold text-paper">{activeCount}</p>
+              <p className="mt-3 text-lg leading-7 text-paper/80">
+                Choose one next action. Done enough counts.
+              </p>
+              <div className="mt-7 space-y-3 text-sm font-medium text-paper/75">
+                <p>Start tiny.</p>
+                <p>Make it ugly.</p>
+                <p>Repair is progress.</p>
+                <p>Exit responsibly.</p>
+              </div>
+            </Panel>
+
+            <LocalVaultStatus
+              meta={meta}
+              byokSettings={byokSettings}
+              onExport={onExport}
+              onOpenSettings={onOpenSettings}
+            />
+          </div>
         </div>
       </Shell>
 
@@ -792,7 +847,100 @@ function HomeScreen({
   );
 }
 
+function LocalVaultStatus({
+  meta,
+  byokSettings,
+  onExport,
+  onOpenSettings
+}: {
+  meta: Parameters<typeof generatePatternMap>[1];
+  byokSettings: ByokSettings;
+  onExport: () => Promise<unknown>;
+  onOpenSettings: () => void;
+}) {
+  const [message, setMessage] = useState<string | null>(null);
+  const byokSummary = summarizeByokSettings(byokSettings);
+  const deepRescueOn =
+    meta.llmConsent.externalLlmEnabled && byokSummary.hasApiKey;
+
+  async function handleExport() {
+    const payload = await onExport();
+    downloadJsonPayload(payload, "scaffold-export");
+    setMessage("Export created.");
+  }
+
+  return (
+    <Panel tone="paper" className="p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase text-moss">Local vault</p>
+          <h2 className="mt-1 text-lg font-semibold text-ink">Last saved</h2>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            {formatShortDate(meta.updatedAt)}
+          </p>
+        </div>
+        <ShieldCheck className="h-6 w-6 flex-none text-moss" aria-hidden="true" />
+      </div>
+
+      <div className="mt-4 grid gap-2 text-sm">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-3 py-2">
+          <span className="font-semibold text-muted">Deep Rescue</span>
+          <span className="font-semibold text-ink">
+            {deepRescueOn ? "On" : "Off"}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface px-3 py-2">
+          <span className="font-semibold text-muted">API keys</span>
+          <span className="font-semibold text-ink">Not exported</span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => void handleExport()}
+          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
+        >
+          <Download className="h-4 w-4" aria-hidden="true" />
+          Export
+        </button>
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          className="inline-flex min-h-10 items-center rounded-lg border border-line bg-paper px-3 text-sm font-semibold text-ink transition hover:border-moss"
+        >
+          Vault settings
+        </button>
+        {message && (
+          <span className="inline-flex min-h-10 items-center text-sm font-semibold text-mossDark">
+            {message}
+          </span>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
 function FirstRunPanel({ onLoadDemo }: { onLoadDemo: () => void }) {
+  const steps = [
+    {
+      title: "Pick a stuck moment",
+      body: "Use the messy words you already have."
+    },
+    {
+      title: "See the next physical action",
+      body: "Scaffold finds the first thing your hands can do."
+    },
+    {
+      title: "Start a 10-minute sprint",
+      body: "Stay with the visible piece."
+    },
+    {
+      title: "Done enough counts",
+      body: "Repair, continue, or stop cleanly."
+    }
+  ];
+
   return (
     <Panel className="rescue-enter overflow-hidden p-0">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -801,29 +949,42 @@ function FirstRunPanel({ onLoadDemo }: { onLoadDemo: () => void }) {
             First rescue
           </p>
           <h2 className="mt-2 text-2xl font-semibold leading-tight text-ink">
-            Start with one guided packet.
+            One guided rescue. No onboarding sludge.
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-            Scaffold stays local in this browser. No account, no streaks, no
-            shame loop. Local rules create the first move; Deep Rescue only runs
-            when you explicitly choose it.
+            Pick one stuck moment, get one physical next action, and decide what
+            is still possible after the sprint.
           </p>
+          <ol className="mt-5 grid gap-3 sm:grid-cols-2">
+            {steps.map((step, index) => (
+              <li
+                key={step.title}
+                className="rounded-lg border border-line bg-paper/80 p-4"
+              >
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-moss/10 text-sm font-semibold text-mossDark">
+                  {index + 1}
+                </span>
+                <p className="mt-3 font-semibold text-ink">{step.title}</p>
+                <p className="mt-1 text-sm leading-6 text-muted">{step.body}</p>
+              </li>
+            ))}
+          </ol>
           <div className="mt-5 flex flex-wrap gap-3">
             <PrimaryAction onClick={onLoadDemo} className="min-h-12">
-              Load demo stuck moment
+              Try a guided rescue
             </PrimaryAction>
             <SignalPill value="Local rescue first" tone="moss" />
           </div>
         </div>
         <div className="border-t border-line bg-paper/80 p-5 lg:border-l lg:border-t-0">
           <div className="rounded-lg border border-line bg-surface p-4">
-            <p className="text-sm font-semibold text-ink">Demo packet</p>
+            <p className="text-sm font-semibold text-ink">Local rescue</p>
             <p className="mt-2 text-sm leading-6 text-muted">
-              A late reply becomes one holding message, a 10-minute plan, and a
-              copyable repair option.
+              Stays in this browser. Deep Rescue stays off unless you explicitly
+              choose it and provide your own key.
             </p>
             <p className="mt-4 text-sm font-semibold text-mossDark">
-              Repair is progress.
+              Choose one next action.
             </p>
           </div>
         </div>
@@ -853,6 +1014,28 @@ function personalizeRepairScript(
     .join(details.timeDate.trim() || "[time/date]")
     .split("[date/time]")
     .join(details.timeDate.trim() || "[date/time]");
+}
+
+type ActiveRescueTool = "repair" | "unblock" | "exit";
+
+function initialRescueTool(packet: RescuePacket): ActiveRescueTool {
+  if (
+    packet.rescueMode === "exit_responsibly" ||
+    packet.exitStatus !== "not_chosen" ||
+    packet.status === "exited_responsibly"
+  ) {
+    return "exit";
+  }
+
+  if (packet.rescueMode === "repair") {
+    return "repair";
+  }
+
+  if (packet.rescueMode === "unblock" || packet.status === "waiting") {
+    return "unblock";
+  }
+
+  return "repair";
 }
 
 function ActionDisplay({
@@ -980,6 +1163,9 @@ function PacketDetail({
   const [deepRescueMessage, setDeepRescueMessage] = useState<string | null>(null);
   const [deepRescueError, setDeepRescueError] = useState<string | null>(null);
   const [isDeepRescuing, setIsDeepRescuing] = useState(false);
+  const [activeTool, setActiveTool] = useState<ActiveRescueTool>(() =>
+    initialRescueTool(packet)
+  );
 
   useEffect(() => {
     setNotes(packet.notes);
@@ -996,6 +1182,7 @@ function PacketDetail({
     setDeepPreviewPacket(null);
     setDeepRescueMessage(null);
     setDeepRescueError(null);
+    setActiveTool(initialRescueTool(packet));
   }, [packet.id]);
 
   const moreSupportAvailable =
@@ -1024,6 +1211,30 @@ function PacketDetail({
     Boolean(byokSettings.endpoint.trim());
   const deepRescueAllowed =
     meta.llmConsent.externalLlmEnabled && Boolean(meta.llmConsent.consentedAt);
+  const rescueToolTabs: Array<{
+    id: ActiveRescueTool;
+    label: string;
+    body: string;
+  }> = [
+    {
+      id: "repair",
+      label: "Repair",
+      body:
+        repairRelevance.score >= 45
+          ? "Copy or personalize a clean script."
+          : "Check whether repair is needed."
+    },
+    {
+      id: "unblock",
+      label: "Unblock",
+      body: "Name the missing piece."
+    },
+    {
+      id: "exit",
+      label: "Exit responsibly",
+      body: "Renegotiate, defer, delegate, or abandon clearly."
+    }
+  ];
 
   async function chooseMissingItem(missingItem: MissingItemType) {
     await onUpdatePacket(packet.id, {
@@ -1141,20 +1352,18 @@ function PacketDetail({
             </div>
           </Panel>
 
-          <Panel tone="paper">
-            <p className="text-xs font-semibold uppercase text-moss">
-              Task decomposition
-            </p>
-            <h2 className="mt-1 text-xl font-semibold text-ink">
-              The rescue boundary
-            </h2>
+          <DisclosurePanel
+            title="Task decomposition"
+            eyebrow="Rescue boundary"
+            summary="Surface, touch, visible change, and stop rule."
+          >
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <InfoPanel title="Surface" body={decomposition.taskSurface} />
               <InfoPanel title="Touch" body={decomposition.objectToTouch} />
               <InfoPanel title="Visible change" body={decomposition.visibleChange} />
               <InfoPanel title="Stop rule" body={decomposition.stopRule} />
             </div>
-          </Panel>
+          </DisclosurePanel>
 
           <DisclosurePanel
             title="Deep Rescue adapter"
@@ -1308,10 +1517,36 @@ function PacketDetail({
               <SignalPill value={rescueModeLabels[packet.rescueMode]} tone="moss" />
             </div>
 
-            <div className="mt-4 grid gap-3 lg:grid-cols-3">
-              <div className="tool-surface">
+            <div
+              className="mt-4 grid gap-2 sm:grid-cols-3"
+              role="tablist"
+              aria-label="Rescue tools"
+            >
+              {rescueToolTabs.map((tool) => (
+                <button
+                  key={tool.id}
+                  type="button"
+                  role="tab"
+                  aria-label={tool.label}
+                  aria-selected={activeTool === tool.id}
+                  onClick={() => setActiveTool(tool.id)}
+                  className={`min-h-20 rounded-lg border p-3 text-left transition ${
+                    activeTool === tool.id
+                      ? "border-moss bg-moss/10 text-ink shadow-sm"
+                      : "border-line bg-surface text-muted hover:border-moss hover:text-ink"
+                  }`}
+                >
+                  <span className="block font-semibold">{tool.label}</span>
+                  <span className="mt-1 block text-xs leading-5">{tool.body}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="tool-surface mt-4">
+              {activeTool === "repair" && (
+                <div>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-lg font-semibold text-ink">Repair option</h3>
+                  <h3 className="text-lg font-semibold text-ink">Repair check</h3>
                   <SignalPill
                     value={`${repairRelevance.score}% fit`}
                     tone={repairRelevance.score >= 45 ? "moss" : "quiet"}
@@ -1387,11 +1622,15 @@ function PacketDetail({
                     )}
                   </div>
                 )}
-              </div>
+                </div>
+              )}
 
-              <div className="tool-surface">
+              {activeTool === "unblock" && (
+                <div>
                 <h3 className="text-lg font-semibold text-ink">Unblock</h3>
-                <p className="mt-2 text-sm leading-6 text-muted">What is missing?</p>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  What is missing? Pick the smallest honest blocker.
+                </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {missingItemOrder.map((missingItem) => (
                     <button
@@ -1411,9 +1650,11 @@ function PacketDetail({
                 <p className="safe-text mt-4 text-sm leading-6 text-muted">
                   Current: {missingItemLabels[packet.missingItem]}
                 </p>
-              </div>
+                </div>
+              )}
 
-              <div className="tool-surface">
+              {activeTool === "exit" && (
+                <div>
                 <h3 className="text-lg font-semibold text-ink">Exit responsibly</h3>
                 <p className="mt-2 text-sm leading-6 text-muted">
                   Renegotiate, defer, delegate, or abandon clearly.
@@ -1437,7 +1678,8 @@ function PacketDetail({
                 <p className="safe-text mt-4 text-sm leading-6 text-muted">
                   {packet.exitScript}
                 </p>
-              </div>
+                </div>
+              )}
             </div>
           </Panel>
 
@@ -1875,6 +2117,9 @@ function QualityLabScreen({
   meta,
   byokSettings,
   onRecordQualitySignal,
+  onSaveQualityFixtures,
+  onSaveQualityThresholds,
+  onSaveQualityBaselines,
   onOpenSettings
 }: {
   meta: Parameters<typeof generatePatternMap>[1];
@@ -1882,20 +2127,45 @@ function QualityLabScreen({
   onRecordQualitySignal: (
     signal: Omit<QualitySignal, "id" | "createdAt">
   ) => Promise<QualitySignal>;
+  onSaveQualityFixtures: (fixtures: QualityFixture[]) => Promise<unknown>;
+  onSaveQualityThresholds: (thresholds: QualityThresholds) => Promise<unknown>;
+  onSaveQualityBaselines: (baselines: QualityBaseline[]) => Promise<unknown>;
   onOpenSettings: () => void;
 }) {
+  const fixtures = useMemo(
+    () =>
+      meta.qualityFixtures.length > 0
+        ? meta.qualityFixtures
+        : makeDefaultQualityFixtures(),
+    [meta.qualityFixtures]
+  );
   const [selectedFixtureId, setSelectedFixtureId] = useState(
-    goldenRescueFixtures[0]?.id ?? ""
+    fixtures[0]?.id ?? ""
   );
   const selectedFixture =
-    goldenRescueFixtures.find((fixture) => fixture.id === selectedFixtureId) ??
-    goldenRescueFixtures[0]!;
+    fixtures.find((fixture) => fixture.id === selectedFixtureId) ??
+    fixtures[0]!;
   const [labInput, setLabInput] = useState(selectedFixture.messyInput);
+  const [draftFixture, setDraftFixture] =
+    useState<QualityFixture>(selectedFixture);
   const [deepPacket, setDeepPacket] = useState<RescuePacket | null>(null);
   const [deepConsentChecked, setDeepConsentChecked] = useState(false);
+  const [batchConsentChecked, setBatchConsentChecked] = useState(false);
   const [isRunningDeepRescue, setIsRunningDeepRescue] = useState(false);
+  const [isRunningBatchEval, setIsRunningBatchEval] = useState(false);
+  const [batchComparisons, setBatchComparisons] = useState<
+    Array<{
+      fixture: QualityFixture;
+      comparison: PacketQualityComparison;
+    }>
+  >([]);
+  const [batchSummary, setBatchSummary] = useState<DeepRescueEvalSummary | null>(
+    null
+  );
   const [labMessage, setLabMessage] = useState<string | null>(null);
   const [labError, setLabError] = useState<string | null>(null);
+  const [fixtureMessage, setFixtureMessage] = useState<string | null>(null);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
   const [signalChoice, setSignalChoice] =
     useState<QualitySignalChoice>("local_better");
   const [signalDimension, setSignalDimension] =
@@ -1910,43 +2180,171 @@ function QualityLabScreen({
   const deepRescueAllowed =
     meta.llmConsent.externalLlmEnabled && Boolean(meta.llmConsent.consentedAt);
 
+  useEffect(() => {
+    const nextFixture =
+      fixtures.find((fixture) => fixture.id === selectedFixtureId) ?? fixtures[0];
+    if (!nextFixture) return;
+    setDraftFixture(nextFixture);
+    setLabInput(nextFixture.messyInput);
+  }, [selectedFixtureId, fixtures]);
+
   const localPacket = useMemo(
     () => generateRescuePacket(labInput.trim() || selectedFixture.messyInput),
     [labInput, selectedFixture.messyInput]
   );
   const localScore = useMemo(
-    () => scorePacketQuality(localPacket, selectedFixture),
-    [localPacket, selectedFixture]
+    () => scorePacketQuality(localPacket, selectedFixture, meta.qualityThresholds),
+    [localPacket, meta.qualityThresholds, selectedFixture]
   );
   const deepScore = useMemo(
-    () => (deepPacket ? scorePacketQuality(deepPacket, selectedFixture) : null),
-    [deepPacket, selectedFixture]
+    () =>
+      deepPacket
+        ? scorePacketQuality(deepPacket, selectedFixture, meta.qualityThresholds)
+        : null,
+    [deepPacket, meta.qualityThresholds, selectedFixture]
   );
   const comparison = useMemo<PacketQualityComparison | null>(
-    () => (deepPacket ? comparePacketQuality(localPacket, deepPacket, selectedFixture) : null),
-    [deepPacket, localPacket, selectedFixture]
+    () =>
+      deepPacket
+        ? comparePacketQuality(
+            localPacket,
+            deepPacket,
+            selectedFixture,
+            meta.qualityThresholds
+          )
+        : null,
+    [deepPacket, localPacket, meta.qualityThresholds, selectedFixture]
   );
   const fixtureScores = useMemo(
     () =>
-      goldenRescueFixtures.map((fixture) => {
+      fixtures.map((fixture) => {
         const packet = generateRescuePacket(fixture.messyInput);
         return {
           fixture,
-          score: scorePacketQuality(packet, fixture)
+          packet,
+          score: scorePacketQuality(packet, fixture, meta.qualityThresholds)
         };
       }),
-    []
+    [fixtures, meta.qualityThresholds]
+  );
+  const regressionWatch = buildQualityRegressionWatch(
+    fixtures,
+    fixtureScores.map((item) => ({
+      fixtureId: item.fixture.id,
+      score: item.score.score
+    })),
+    meta.qualityBaselines
   );
   const signalSummary = summarizeQualitySignals(meta.qualitySignals);
+  const rewriteSuggestions = generateRewriteSuggestions(localScore);
 
   function chooseFixture(fixture: GoldenRescueFixture) {
     setSelectedFixtureId(fixture.id);
     setLabInput(fixture.messyInput);
+    setDraftFixture(fixture);
     setDeepPacket(null);
     setDeepConsentChecked(false);
     setLabMessage(null);
     setLabError(null);
     setSignalMessage(null);
+  }
+
+  function updateDraftFixture(updater: (fixture: QualityFixture) => QualityFixture) {
+    setDraftFixture((current) => updater(current));
+    setFixtureMessage(null);
+  }
+
+  function makeBlankFixture(): QualityFixture {
+    const now = new Date().toISOString();
+    return {
+      id: `fixture-${Date.now()}`,
+      title: "New rescue fixture",
+      messyInput: "I need to...",
+      whyItMatters: "This protects packet quality for a real stuck moment.",
+      expected: {
+        taskType: "unknown",
+        blockType: "unknown",
+        rescueMode: "start_tiny",
+        repair: "not_needed",
+        firstActionIncludes: [],
+        planIncludes: []
+      },
+      source: "custom",
+      createdAt: now,
+      updatedAt: now
+    };
+  }
+
+  async function saveDraftFixture() {
+    const now = new Date().toISOString();
+    const trimmedFixture: QualityFixture = {
+      ...draftFixture,
+      title: draftFixture.title.trim() || "Untitled fixture",
+      messyInput: draftFixture.messyInput.trim(),
+      whyItMatters:
+        draftFixture.whyItMatters.trim() ||
+        "This protects packet quality for a real stuck moment.",
+      expected: {
+        ...draftFixture.expected,
+        firstActionIncludes: draftFixture.expected.firstActionIncludes
+          .map((item) => item.trim())
+          .filter(Boolean),
+        planIncludes: (draftFixture.expected.planIncludes ?? [])
+          .map((item) => item.trim())
+          .filter(Boolean)
+      },
+      source: "custom",
+      updatedAt: now
+    };
+
+    if (!trimmedFixture.messyInput) {
+      setFixtureMessage("Add messy input before saving this fixture.");
+      return;
+    }
+
+    const nextFixtures = fixtures.some((fixture) => fixture.id === trimmedFixture.id)
+      ? fixtures.map((fixture) =>
+          fixture.id === trimmedFixture.id ? trimmedFixture : fixture
+        )
+      : [trimmedFixture, ...fixtures];
+
+    await onSaveQualityFixtures(nextFixtures);
+    setSelectedFixtureId(trimmedFixture.id);
+    setFixtureMessage("Fixture saved locally.");
+  }
+
+  async function startNewFixture() {
+    const nextFixture = makeBlankFixture();
+    setDraftFixture(nextFixture);
+    setFixtureMessage("Draft fixture ready. Save when it is useful.");
+  }
+
+  async function resetStarterFixtures() {
+    const nextFixtures = makeDefaultQualityFixtures();
+    await onSaveQualityFixtures(nextFixtures);
+    setSelectedFixtureId(nextFixtures[0]?.id ?? "");
+    setFixtureMessage("Starter fixtures restored locally.");
+  }
+
+  async function updateThreshold(
+    key: keyof QualityThresholds,
+    value: boolean
+  ) {
+    await onSaveQualityThresholds({
+      ...meta.qualityThresholds,
+      [key]: value
+    });
+  }
+
+  async function captureRegressionBaseline() {
+    const baselines = makeQualityBaselines(
+      fixtureScores.map((item) => ({
+        fixtureId: item.fixture.id,
+        score: item.score.score
+      }))
+    );
+    await onSaveQualityBaselines(baselines);
+    setLabMessage("Quality baseline captured locally.");
   }
 
   async function runDeepRescueComparison() {
@@ -1995,6 +2393,76 @@ function QualityLabScreen({
     }
   }
 
+  async function runBatchDeepRescueEval() {
+    setLabError(null);
+    setLabMessage(null);
+    setBatchSummary(null);
+    setBatchComparisons([]);
+
+    if (!deepRescueConfigured) {
+      setLabError("Add a local BYOK provider before running batch Deep Rescue eval.");
+      return;
+    }
+
+    if (!deepRescueAllowed) {
+      setLabError("Turn on external LLM consent in Settings first.");
+      return;
+    }
+
+    if (!batchConsentChecked) {
+      setLabError("Confirm all fixture inputs can leave the browser for this eval.");
+      return;
+    }
+
+    setIsRunningBatchEval(true);
+
+    try {
+      const adapter = createByokRescueAdapter(byokSettings);
+      const comparisons: Array<{
+        fixture: QualityFixture;
+        comparison: PacketQualityComparison;
+      }> = [];
+
+      for (const fixture of fixtures) {
+        const local = generateRescuePacket(fixture.messyInput);
+        const result = await generateRescuePacketWithAdapter(
+          fixture.messyInput,
+          meta.llmConsent,
+          adapter,
+          local
+        );
+        comparisons.push({
+          fixture,
+          comparison: comparePacketQuality(
+            local,
+            result.packet,
+            fixture,
+            meta.qualityThresholds
+          )
+        });
+      }
+
+      setBatchComparisons(comparisons);
+      setBatchSummary(
+        summarizeDeepRescueEval(comparisons.map((item) => item.comparison))
+      );
+      setBatchConsentChecked(false);
+      setLabMessage("Deep Rescue batch eval complete. Nothing was saved as a packet.");
+    } catch (caught) {
+      if (caught instanceof ExternalLlmConsentRequiredError) {
+        setLabError("External LLM consent is off. Turn it on in Settings to compare.");
+      } else if (caught instanceof ByokConfigurationError) {
+        setLabError(caught.message);
+      } else if (caught instanceof ExternalLlmRequestError) {
+        setLabError(caught.message);
+      } else {
+        setLabError("Deep Rescue batch eval could not complete.");
+      }
+    } finally {
+      setIsRunningBatchEval(false);
+    }
+  }
+
   async function saveSignal() {
     await onRecordQualitySignal({
       fixtureId: selectedFixture.id,
@@ -2007,6 +2475,32 @@ function QualityLabScreen({
     });
     setSignalMessage("Quality signal saved locally.");
     setSignalNote("");
+  }
+
+  function exportQualityJson() {
+    const payload = buildQualityExport(
+      fixtures,
+      meta.qualityThresholds,
+      meta.qualityBaselines,
+      meta.qualitySignals,
+      fixtureScores.map((item) => ({
+        fixtureId: item.fixture.id,
+        title: item.fixture.title,
+        score: item.score
+      }))
+    );
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json"
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `scaffold-quality-${new Date()
+      .toISOString()
+      .slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    setExportMessage("Quality export created.");
   }
 
   return (
@@ -2029,7 +2523,7 @@ function QualityLabScreen({
                 Messy inputs worth protecting.
               </h2>
             </div>
-            <SignalPill value={`${goldenRescueFixtures.length} fixtures`} />
+            <SignalPill value={`${fixtures.length} fixtures`} />
           </div>
           <div className="mt-4 space-y-2">
             {fixtureScores.map(({ fixture, score }) => (
@@ -2051,6 +2545,51 @@ function QualityLabScreen({
                 </span>
               </button>
             ))}
+          </div>
+
+          <div className="mt-5 border-t border-line pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Fixture editor
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-ink">
+                  Edit the eval corpus.
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => void startNewFixture()}
+                className="min-h-10 rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink hover:border-moss"
+              >
+                New fixture
+              </button>
+            </div>
+            <QualityFixtureEditor
+              fixture={draftFixture}
+              onChange={updateDraftFixture}
+            />
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void saveDraftFixture()}
+                className="inline-flex min-h-10 items-center rounded-lg bg-moss px-3 text-sm font-semibold text-white hover:bg-mossDark"
+              >
+                Save fixture
+              </button>
+              <button
+                type="button"
+                onClick={() => void resetStarterFixtures()}
+                className="inline-flex min-h-10 items-center rounded-lg border border-line bg-surface px-3 text-sm font-semibold text-ink hover:border-clay"
+              >
+                Reset starters
+              </button>
+            </div>
+            {fixtureMessage && (
+              <p className="mt-3 rounded-lg border border-line bg-surface p-3 text-sm font-semibold text-muted">
+                {fixtureMessage}
+              </p>
+            )}
           </div>
         </Panel>
 
@@ -2111,6 +2650,18 @@ function QualityLabScreen({
           </Panel>
 
           <section className="grid gap-5 xl:grid-cols-2">
+            <QualityThresholdsPanel
+              thresholds={meta.qualityThresholds}
+              onChange={(key, value) => void updateThreshold(key, value)}
+            />
+            <RegressionWatchPanel
+              items={regressionWatch}
+              baselines={meta.qualityBaselines}
+              onCaptureBaseline={() => void captureRegressionBaseline()}
+            />
+          </section>
+
+          <section className="grid gap-5 xl:grid-cols-2">
             <QualityPacketPanel
               title="Local rules packet"
               packet={localPacket}
@@ -2133,6 +2684,30 @@ function QualityLabScreen({
               }
             />
           </section>
+
+          <Panel tone="paper">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-moss">
+                  Packet rewrite suggestions
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-ink">
+                  Fix the packet, not the person.
+                </h2>
+              </div>
+              <ScoreBadge score={localScore} />
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {rewriteSuggestions.map((suggestion) => (
+                <div
+                  key={suggestion}
+                  className="rounded-lg border border-line bg-surface p-3 text-sm font-semibold leading-6 text-ink"
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          </Panel>
 
           <Panel tone="paper">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -2214,6 +2789,82 @@ function QualityLabScreen({
             )}
 
             {comparison && <QualityComparisonTable comparison={comparison} />}
+
+            <div className="mt-6 border-t border-line pt-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase text-moss">
+                    Deep Rescue eval mode
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold text-ink">
+                    Compare across all fixtures.
+                  </h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+                    Runs your BYOK adapter once per fixture and keeps the results in
+                    this Lab session only.
+                  </p>
+                </div>
+                {batchSummary && (
+                  <SignalPill
+                    value={`Deep improved ${batchSummary.improved}, local won ${batchSummary.localWon}, tied ${batchSummary.tied}`}
+                    tone="moss"
+                  />
+                )}
+              </div>
+              <label className="mt-4 flex gap-3 rounded-lg border border-line bg-surface p-3 text-sm leading-6 text-muted">
+                <input
+                  type="checkbox"
+                  checked={batchConsentChecked}
+                  onChange={(event) => setBatchConsentChecked(event.target.checked)}
+                  className="mt-1 h-4 w-4 accent-moss"
+                />
+                <span>
+                  I understand all fixture inputs will be sent to my selected
+                  provider for this eval run.
+                </span>
+              </label>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => void runBatchDeepRescueEval()}
+                  disabled={isRunningBatchEval}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-surface px-4 font-semibold text-ink transition hover:border-moss disabled:cursor-not-allowed disabled:text-muted"
+                >
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  {isRunningBatchEval ? "Running eval" : "Run all fixtures"}
+                </button>
+              </div>
+              {batchComparisons.length > 0 && (
+                <div className="mt-4 grid gap-2">
+                  {batchComparisons.map(({ fixture, comparison: item }) => (
+                    <div
+                      key={fixture.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface p-3"
+                    >
+                      <span className="safe-text font-semibold text-ink">
+                        {fixture.title}
+                      </span>
+                      <span className="flex flex-wrap gap-2">
+                        <SignalPill value={`Local ${item.local.score}`} />
+                        <SignalPill value={`Deep ${item.candidate.score}`} />
+                        <SignalPill
+                          value={
+                            item.recommendation === "candidate"
+                              ? "Deep improved"
+                              : item.recommendation === "local"
+                                ? "Local won"
+                                : "Tied"
+                          }
+                          tone={
+                            item.recommendation === "tie" ? "quiet" : "moss"
+                          }
+                        />
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </Panel>
 
           <Panel>
@@ -2293,10 +2944,362 @@ function QualityLabScreen({
             </div>
 
             <QualitySignalSummaryPanel summary={signalSummary} />
+
+            <div className="mt-6 border-t border-line pt-5">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase text-moss">
+                    Quality export
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold text-ink">
+                    Export the eval corpus.
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    Includes fixtures, thresholds, baselines, local scores, and
+                    feedback signals. API keys are never included.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={exportQualityJson}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-surface px-4 font-semibold text-ink hover:border-moss"
+                >
+                  <Download className="h-4 w-4" aria-hidden="true" />
+                  Export quality JSON
+                </button>
+              </div>
+              {exportMessage && (
+                <p className="mt-3 text-sm font-semibold text-mossDark">
+                  {exportMessage}
+                </p>
+              )}
+            </div>
           </Panel>
         </div>
       </section>
     </Shell>
+  );
+}
+
+function splitFixtureFragments(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function joinFixtureFragments(value: string[] | undefined): string {
+  return (value ?? []).join(", ");
+}
+
+function QualityFixtureEditor({
+  fixture,
+  onChange
+}: {
+  fixture: QualityFixture;
+  onChange: (updater: (fixture: QualityFixture) => QualityFixture) => void;
+}) {
+  return (
+    <div className="mt-4 grid gap-3">
+      <label className="text-sm font-semibold text-ink">
+        Fixture title
+        <input
+          value={fixture.title}
+          onChange={(event) =>
+            onChange((current) => ({ ...current, title: event.target.value }))
+          }
+          className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+        />
+      </label>
+      <label className="text-sm font-semibold text-ink">
+        Fixture messy input
+        <textarea
+          value={fixture.messyInput}
+          onChange={(event) =>
+            onChange((current) => ({ ...current, messyInput: event.target.value }))
+          }
+          className="mt-1 min-h-24 w-full resize-y rounded-lg border border-line bg-surface p-3 text-sm leading-6 text-ink"
+        />
+      </label>
+      <label className="text-sm font-semibold text-ink">
+        Why this matters
+        <textarea
+          value={fixture.whyItMatters}
+          onChange={(event) =>
+            onChange((current) => ({
+              ...current,
+              whyItMatters: event.target.value
+            }))
+          }
+          className="mt-1 min-h-20 w-full resize-y rounded-lg border border-line bg-surface p-3 text-sm leading-6 text-ink"
+        />
+      </label>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="text-sm font-semibold text-ink">
+          Expected task type
+          <select
+            value={fixture.expected.taskType}
+            onChange={(event) =>
+              onChange((current) => ({
+                ...current,
+                expected: {
+                  ...current.expected,
+                  taskType: event.target.value as QualityFixture["expected"]["taskType"]
+                }
+              }))
+            }
+            className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+          >
+            {Object.entries(taskTypeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm font-semibold text-ink">
+          Expected block
+          <select
+            value={fixture.expected.blockType}
+            onChange={(event) =>
+              onChange((current) => ({
+                ...current,
+                expected: {
+                  ...current.expected,
+                  blockType: event.target.value as QualityFixture["expected"]["blockType"]
+                }
+              }))
+            }
+            className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+          >
+            {Object.entries(blockLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm font-semibold text-ink">
+          Repair expectation
+          <select
+            value={fixture.expected.repair}
+            onChange={(event) =>
+              onChange((current) => ({
+                ...current,
+                expected: {
+                  ...current.expected,
+                  repair: event.target.value as QualityFixture["expected"]["repair"]
+                }
+              }))
+            }
+            className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+          >
+            {Object.entries(qualityRepairExpectationLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm font-semibold text-ink">
+          Expected mode
+          <select
+            value={fixture.expected.rescueMode ?? ""}
+            onChange={(event) =>
+              onChange((current) => ({
+                ...current,
+                expected: {
+                  ...current.expected,
+                  rescueMode:
+                    event.target.value === ""
+                      ? undefined
+                      : (event.target.value as QualityFixture["expected"]["rescueMode"])
+                }
+              }))
+            }
+            className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+          >
+            <option value="">No strict mode</option>
+            {Object.entries(rescueModeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <label className="text-sm font-semibold text-ink">
+        Expected action fragments
+        <input
+          value={joinFixtureFragments(fixture.expected.firstActionIncludes)}
+          onChange={(event) =>
+            onChange((current) => ({
+              ...current,
+              expected: {
+                ...current.expected,
+                firstActionIncludes: splitFixtureFragments(event.target.value)
+              }
+            }))
+          }
+          placeholder="thread, reply"
+          className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+        />
+      </label>
+      <label className="text-sm font-semibold text-ink">
+        Expected plan fragments
+        <input
+          value={joinFixtureFragments(fixture.expected.planIncludes)}
+          onChange={(event) =>
+            onChange((current) => ({
+              ...current,
+              expected: {
+                ...current.expected,
+                planIncludes: splitFixtureFragments(event.target.value)
+              }
+            }))
+          }
+          placeholder="whole room, stop before polishing"
+          className="mt-1 min-h-10 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink"
+        />
+      </label>
+    </div>
+  );
+}
+
+function QualityThresholdsPanel({
+  thresholds,
+  onChange
+}: {
+  thresholds: QualityThresholds;
+  onChange: (key: keyof QualityThresholds, value: boolean) => void;
+}) {
+  const items: Array<{
+    key: keyof QualityThresholds;
+    label: string;
+    body: string;
+  }> = [
+    {
+      key: "nextActionMustBePhysical",
+      label: "Next action must be physical",
+      body: "The packet names something the user can touch, open, type, move, or read."
+    },
+    {
+      key: "repairMustBeRelevant",
+      label: "No repair unless relevant",
+      body: "Repair appears only for another person, lateness, help, clarification, scope, or apology."
+    },
+    {
+      key: "planMustBeBounded",
+      label: "Plan must be bounded",
+      body: "The 10-minute plan keeps scope small and protects the stop rule."
+    },
+    {
+      key: "minimumProgressMustBeVisible",
+      label: "Minimum progress must be visible",
+      body: "Done enough describes a visible change, not effort or mood."
+    },
+    {
+      key: "forbidVagueVerbs",
+      label: "No vague verbs",
+      body: "Avoid focus, work on, get organized, make progress, and similar fog."
+    }
+  ];
+
+  return (
+    <Panel tone="paper">
+      <p className="text-xs font-semibold uppercase text-moss">
+        Quality thresholds
+      </p>
+      <h2 className="mt-1 text-xl font-semibold text-ink">
+        Define what “good rescue” means.
+      </h2>
+      <div className="mt-4 grid gap-3">
+        {items.map((item) => (
+          <label
+            key={item.key}
+            className="flex gap-3 rounded-lg border border-line bg-surface p-3"
+          >
+            <input
+              type="checkbox"
+              checked={thresholds[item.key]}
+              onChange={(event) => onChange(item.key, event.target.checked)}
+              className="mt-1 h-4 w-4 accent-moss"
+            />
+            <span>
+              <span className="block font-semibold text-ink">{item.label}</span>
+              <span className="safe-text mt-1 block text-sm leading-6 text-muted">
+                {item.body}
+              </span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function RegressionWatchPanel({
+  items,
+  baselines,
+  onCaptureBaseline
+}: {
+  items: ReturnType<typeof buildQualityRegressionWatch>;
+  baselines: QualityBaseline[];
+  onCaptureBaseline: () => void;
+}) {
+  return (
+    <Panel tone="paper">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase text-moss">
+            Regression watch
+          </p>
+          <h2 className="mt-1 text-xl font-semibold text-ink">
+            Product quality only.
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-muted">
+            This watches packet quality across fixtures. It is not a user score.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onCaptureBaseline}
+          className="inline-flex min-h-10 items-center rounded-lg bg-ink px-3 text-sm font-semibold text-paper hover:bg-mossDark"
+        >
+          Capture baseline
+        </button>
+      </div>
+      <p className="mt-3 text-xs font-semibold uppercase text-muted">
+        {baselines.length > 0 ? `${baselines.length} baselines saved` : "No baseline yet"}
+      </p>
+      <div className="mt-4 grid gap-2">
+        {items.slice(0, 6).map((item) => (
+          <div
+            key={item.fixtureId}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface p-3"
+          >
+            <span className="safe-text font-semibold text-ink">{item.title}</span>
+            <span className="flex flex-wrap gap-2">
+              <SignalPill value={`Now ${item.currentScore}`} />
+              <SignalPill
+                value={
+                  item.delta === undefined
+                    ? "New"
+                    : `${item.delta >= 0 ? "+" : ""}${item.delta}`
+                }
+                tone={
+                  item.state === "improved"
+                    ? "moss"
+                    : item.state === "regressed"
+                      ? "clay"
+                      : "quiet"
+                }
+              />
+            </span>
+          </div>
+        ))}
+      </div>
+    </Panel>
   );
 }
 
@@ -2752,15 +3755,7 @@ function SettingsScreen({
 
   async function handleExport() {
     const payload = await onExport();
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: "application/json"
-    });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `scaffold-export-${new Date().toISOString().slice(0, 10)}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadJsonPayload(payload, "scaffold-export");
     setMessage("Export created.");
   }
 

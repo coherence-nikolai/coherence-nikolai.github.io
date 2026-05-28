@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { generateRescuePacket } from "./rescueEngine";
 import { generatePatternMap } from "./patternMap";
+import { defaultQualityThresholds } from "./qualityLab";
 import type { AppMeta, RescuePacket } from "../types";
 
 const meta: AppMeta = {
@@ -8,6 +9,9 @@ const meta: AppMeta = {
   reentries: 2,
   repairs: 0,
   supportFadingEvents: 1,
+  qualityFixtures: [],
+  qualityThresholds: defaultQualityThresholds,
+  qualityBaselines: [],
   qualitySignals: [],
   llmConsent: {
     externalLlmEnabled: false,

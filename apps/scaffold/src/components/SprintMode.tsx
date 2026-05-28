@@ -96,6 +96,9 @@ export function SprintMode({
   const [state, setState] = useState<SprintState>("idle");
   const [remaining, setRemaining] = useState(sprintSeconds);
   const [notes, setNotes] = useState("");
+  const [suggestedOutcome, setSuggestedOutcome] = useState<SprintOutcome | null>(
+    null
+  );
   const elapsedMinutes = useMemo(
     () => Math.max(1, Math.ceil((sprintSeconds - remaining) / 60)),
     [remaining]
@@ -122,6 +125,11 @@ export function SprintMode({
 
   async function complete(outcome: SprintOutcome) {
     await onRecordOutcome(outcome, elapsedMinutes, notes);
+  }
+
+  function openCompletion(outcome: SprintOutcome | null = null) {
+    setSuggestedOutcome(outcome);
+    setState("completed");
   }
 
   return (
@@ -202,89 +210,129 @@ export function SprintMode({
               </p>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              {state === "idle" && (
+            {state !== "completed" && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {state === "idle" && (
+                  <button
+                    type="button"
+                    onClick={() => setState("running")}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-action transition hover:bg-mossDark"
+                  >
+                    <CirclePlay className="h-5 w-5" aria-hidden="true" />
+                    Start 10 minutes
+                  </button>
+                )}
+                {state === "running" && (
+                  <button
+                    type="button"
+                    onClick={() => setState("paused")}
+                    className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-ink px-5 font-semibold text-white transition hover:bg-ink/90"
+                  >
+                    <CirclePause className="h-5 w-5" aria-hidden="true" />
+                    Pause
+                  </button>
+                )}
+                {state === "paused" && (
+                  <button
+                    type="button"
+                    onClick={() => setState("running")}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-action transition hover:bg-mossDark"
+                  >
+                    <CirclePlay className="h-5 w-5" aria-hidden="true" />
+                    Resume
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => setState("running")}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-action transition hover:bg-mossDark"
+                  onClick={() => openCompletion("done_enough")}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
                 >
-                  <CirclePlay className="h-5 w-5" aria-hidden="true" />
-                  Start 10 minutes
+                  <Flag className="h-5 w-5 text-moss" aria-hidden="true" />
+                  Done enough
                 </button>
-              )}
-              {state === "running" && (
                 <button
                   type="button"
-                  onClick={() => setState("paused")}
-                  className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-ink px-5 font-semibold text-white transition hover:bg-ink/90"
+                  onClick={() => {
+                    openCompletion("blocked");
+                    onStuckAgain();
+                  }}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
                 >
-                  <CirclePause className="h-5 w-5" aria-hidden="true" />
-                  Pause
+                  <RotateCcw className="h-5 w-5 text-moss" aria-hidden="true" />
+                  Stuck again
                 </button>
-              )}
-              {state === "paused" && (
-                <button
-                  type="button"
-                  onClick={() => setState("running")}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-moss px-5 font-semibold text-white shadow-action transition hover:bg-mossDark"
-                >
-                  <CirclePlay className="h-5 w-5" aria-hidden="true" />
-                  Resume
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => void complete("done_enough")}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
-              >
-                <Flag className="h-5 w-5 text-moss" aria-hidden="true" />
-                Done enough
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setState("completed");
-                  onStuckAgain();
-                }}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-line bg-surface px-5 font-semibold text-ink transition hover:border-moss"
-              >
-                <RotateCcw className="h-5 w-5 text-moss" aria-hidden="true" />
-                Stuck again
-              </button>
-            </div>
+              </div>
+            )}
 
             {(state === "completed" || remaining === 0) && (
-              <div className="mt-8 border-t border-line pt-6">
-                <p className="text-xs font-semibold uppercase text-moss">
-                  Re-entry
+              <div className="reentry-card mt-8 rounded-lg border border-line bg-paper p-5 shadow-sm">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-moss">
+                      Re-entry
+                    </p>
+                    <h2 className="mt-2 text-2xl font-semibold text-ink">
+                      What changed?
+                    </h2>
+                  </div>
+                  {suggestedOutcome === "done_enough" && (
+                    <SignalPill value="Done enough is available" tone="moss" />
+                  )}
+                </div>
+                <p className="mt-3 text-sm leading-6 text-muted">
+                  No explanation needed. Name what moved, then choose what is still
+                  possible.
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold text-ink">
-                  What happened?
-                </h2>
                 <textarea
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
                   className="mt-3 min-h-24 w-full resize-y rounded-lg border border-line bg-paper p-3 text-base text-ink"
-                  placeholder="Optional note"
+                  placeholder="Optional note: what moved, what blocked, or what changed."
                 />
+                <div className="mt-4 rounded-lg border border-line bg-surface p-4">
+                  <h3 className="text-lg font-semibold text-ink">
+                    What is still possible?
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    Repair, continue, or done enough. Choose the smallest honest
+                    next move.
+                  </p>
+                  <div className="mt-3 grid gap-2 text-sm leading-6 text-muted sm:grid-cols-3">
+                    <p className="rounded-lg border border-line bg-paper p-3">
+                      Continue this first move.
+                    </p>
+                    <p className="rounded-lg border border-line bg-paper p-3">
+                      Repair if another person is affected.
+                    </p>
+                    <p className="rounded-lg border border-line bg-paper p-3">
+                      Close as done enough if there is a visible change.
+                    </p>
+                  </div>
+                </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <OutcomeButton label="I started" onClick={() => void complete("started")} />
                   <OutcomeButton
-                    label="I made tiny progress"
+                    label="Continue: I started"
+                    onClick={() => void complete("started")}
+                  />
+                  <OutcomeButton
+                    label="Tiny progress"
                     onClick={() => void complete("tiny_progress")}
                   />
                   <OutcomeButton
-                    label="I got blocked"
+                    label="Still blocked"
                     onClick={() => void complete("blocked")}
                   />
                   <OutcomeButton
-                    label="I need repair"
+                    label="Repair this"
                     onClick={() => void complete("repair")}
                   />
                   <OutcomeButton
-                    label="I need to stop responsibly"
+                    label="Stop responsibly"
                     onClick={() => void complete("stop_responsibly")}
+                  />
+                  <OutcomeButton
+                    label="Done enough counts"
+                    onClick={() => void complete("done_enough")}
                   />
                 </div>
               </div>
@@ -316,6 +364,7 @@ export function SprintMode({
                 onClick={() => {
                   setRemaining(sprintSeconds);
                   setState("idle");
+                  setSuggestedOutcome(null);
                 }}
                 className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/25 px-4 font-semibold text-white transition hover:border-white/45"
               >

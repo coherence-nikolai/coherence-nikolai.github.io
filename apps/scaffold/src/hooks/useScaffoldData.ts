@@ -21,7 +21,10 @@ import {
 } from "../llm/rescueAdapter";
 import type {
   AppMeta,
+  QualityBaseline,
+  QualityFixture,
   QualitySignal,
+  QualityThresholds,
   ReentryActionType,
   ReentryEvent,
   RescuePacket,
@@ -347,6 +350,45 @@ export function useScaffoldData() {
     []
   );
 
+  const saveQualityFixtures = useCallback(async (fixtures: QualityFixture[]) => {
+    const current = await ensureMeta();
+    const nextMeta: AppMeta = {
+      ...current,
+      qualityFixtures: fixtures,
+      updatedAt: new Date().toISOString()
+    };
+
+    await saveMeta(nextMeta);
+    setMeta(nextMeta);
+    return nextMeta;
+  }, []);
+
+  const saveQualityThresholds = useCallback(async (thresholds: QualityThresholds) => {
+    const current = await ensureMeta();
+    const nextMeta: AppMeta = {
+      ...current,
+      qualityThresholds: thresholds,
+      updatedAt: new Date().toISOString()
+    };
+
+    await saveMeta(nextMeta);
+    setMeta(nextMeta);
+    return nextMeta;
+  }, []);
+
+  const saveQualityBaselines = useCallback(async (baselines: QualityBaseline[]) => {
+    const current = await ensureMeta();
+    const nextMeta: AppMeta = {
+      ...current,
+      qualityBaselines: baselines,
+      updatedAt: new Date().toISOString()
+    };
+
+    await saveMeta(nextMeta);
+    setMeta(nextMeta);
+    return nextMeta;
+  }, []);
+
   const exportLocalData = useCallback(async (): Promise<ScaffoldExport> => {
     return buildExport();
   }, []);
@@ -395,6 +437,9 @@ export function useScaffoldData() {
     previewDeepRescuePacket,
     updateExternalLlmConsent,
     recordQualitySignal,
+    saveQualityFixtures,
+    saveQualityThresholds,
+    saveQualityBaselines,
     exportLocalData,
     importLocalData,
     refresh

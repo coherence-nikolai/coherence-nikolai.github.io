@@ -12,9 +12,13 @@ import {
   type ExitResponsibilityStatus,
   type LlmConsentState,
   type MissingItemType,
+  type QualityBaseline,
+  type QualityFixture,
+  type QualityRepairExpectation,
   type QualitySignal,
   type QualitySignalChoice,
   type QualitySignalDimension,
+  type QualityThresholds,
   type RescueMode,
   type ReentryEvent,
   type RescuePacket,
@@ -30,6 +34,10 @@ import {
   detectMissingItem,
   generateExitResponsiblyScript
 } from "../engine/rescueEngine";
+import {
+  defaultQualityThresholds,
+  makeDefaultQualityFixtures
+} from "../engine/qualityLab";
 
 export interface ScaffoldExport {
   version: 1;
@@ -59,6 +67,9 @@ export function defaultMeta(): AppMeta {
     reentries: 0,
     repairs: 0,
     supportFadingEvents: 0,
+    qualityFixtures: makeDefaultQualityFixtures(),
+    qualityThresholds: { ...defaultQualityThresholds },
+    qualityBaselines: [],
     qualitySignals: [],
     llmConsent: defaultLlmConsent(),
     updatedAt: new Date().toISOString()
@@ -76,7 +87,13 @@ export async function ensureMeta(): Promise<AppMeta> {
   const existing = await db.meta.get("default");
   if (existing) {
     const meta = normalizeMeta(existing);
-    if (!isLlmConsentState(existing.llmConsent)) {
+    if (
+      !isLlmConsentState(existing.llmConsent) ||
+      !Array.isArray(existing.qualityFixtures) ||
+      !isQualityThresholds(existing.qualityThresholds) ||
+      !Array.isArray(existing.qualityBaselines) ||
+      !Array.isArray(existing.qualitySignals)
+    ) {
       await db.meta.put(meta);
     }
     return meta;
@@ -157,6 +174,8 @@ const qualitySignalDimensions = [
   "repair",
   "overall"
 ] as const;
+
+const qualityRepairExpectations = ["needed", "not_needed"] as const;
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -262,6 +281,61 @@ function isQualityScore(value: unknown): value is number {
     Number.isFinite(value) &&
     value >= 0 &&
     value <= 100
+  );
+}
+
+function isQualityRepairExpectation(
+  value: unknown
+): value is QualityRepairExpectation {
+  return (
+    typeof value === "string" &&
+    qualityRepairExpectations.includes(
+      value as (typeof qualityRepairExpectations)[number]
+    )
+  );
+}
+
+function isQualityFixture(value: unknown): value is QualityFixture {
+  if (!isRecord(value) || !isRecord(value.expected)) return false;
+
+  return (
+    typeof value.id === "string" &&
+    typeof value.title === "string" &&
+    typeof value.messyInput === "string" &&
+    typeof value.whyItMatters === "string" &&
+    isTaskType(value.expected.taskType) &&
+    isBlockType(value.expected.blockType) &&
+    (value.expected.rescueMode === undefined ||
+      isRescueMode(value.expected.rescueMode)) &&
+    isQualityRepairExpectation(value.expected.repair) &&
+    isStringArray(value.expected.firstActionIncludes) &&
+    (value.expected.planIncludes === undefined ||
+      isStringArray(value.expected.planIncludes)) &&
+    (value.source === "starter" || value.source === "custom") &&
+    isIsoDateLike(value.createdAt) &&
+    isIsoDateLike(value.updatedAt)
+  );
+}
+
+function isQualityThresholds(value: unknown): value is QualityThresholds {
+  if (!isRecord(value)) return false;
+
+  return (
+    typeof value.nextActionMustBePhysical === "boolean" &&
+    typeof value.repairMustBeRelevant === "boolean" &&
+    typeof value.planMustBeBounded === "boolean" &&
+    typeof value.minimumProgressMustBeVisible === "boolean" &&
+    typeof value.forbidVagueVerbs === "boolean"
+  );
+}
+
+function isQualityBaseline(value: unknown): value is QualityBaseline {
+  if (!isRecord(value)) return false;
+
+  return (
+    typeof value.fixtureId === "string" &&
+    isQualityScore(value.score) &&
+    isIsoDateLike(value.capturedAt)
   );
 }
 
@@ -407,6 +481,19 @@ function normalizeMeta(value: unknown): AppMeta {
     reentries: safeCount(metaRaw.reentries),
     repairs: safeCount(metaRaw.repairs),
     supportFadingEvents: safeCount(metaRaw.supportFadingEvents),
+    qualityFixtures:
+      Array.isArray(metaRaw.qualityFixtures) &&
+      metaRaw.qualityFixtures.every(isQualityFixture)
+        ? metaRaw.qualityFixtures
+        : makeDefaultQualityFixtures(),
+    qualityThresholds: isQualityThresholds(metaRaw.qualityThresholds)
+      ? metaRaw.qualityThresholds
+      : { ...defaultQualityThresholds },
+    qualityBaselines:
+      Array.isArray(metaRaw.qualityBaselines) &&
+      metaRaw.qualityBaselines.every(isQualityBaseline)
+        ? metaRaw.qualityBaselines
+        : [],
     qualitySignals:
       Array.isArray(metaRaw.qualitySignals) &&
       metaRaw.qualitySignals.every(isQualitySignal)

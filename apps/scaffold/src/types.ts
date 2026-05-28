@@ -97,6 +97,40 @@ export type QualitySignalDimension =
   | "repair"
   | "overall";
 
+export type QualityRepairExpectation = "needed" | "not_needed";
+
+export interface QualityFixture {
+  id: string;
+  title: string;
+  messyInput: string;
+  whyItMatters: string;
+  expected: {
+    taskType: TaskType;
+    blockType: BlockType;
+    rescueMode?: RescueMode;
+    repair: QualityRepairExpectation;
+    firstActionIncludes: string[];
+    planIncludes?: string[];
+  };
+  source: "starter" | "custom";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QualityThresholds {
+  nextActionMustBePhysical: boolean;
+  repairMustBeRelevant: boolean;
+  planMustBeBounded: boolean;
+  minimumProgressMustBeVisible: boolean;
+  forbidVagueVerbs: boolean;
+}
+
+export interface QualityBaseline {
+  fixtureId: string;
+  score: number;
+  capturedAt: string;
+}
+
 export interface Sprint {
   id: string;
   packetId: string;
@@ -210,6 +244,9 @@ export interface AppMeta {
   reentries: number;
   repairs: number;
   supportFadingEvents: number;
+  qualityFixtures: QualityFixture[];
+  qualityThresholds: QualityThresholds;
+  qualityBaselines: QualityBaseline[];
   qualitySignals: QualitySignal[];
   llmConsent: LlmConsentState;
   updatedAt: string;
@@ -315,4 +352,9 @@ export const qualitySignalDimensionLabels: Record<QualitySignalDimension, string
   plan: "Plan",
   repair: "Repair",
   overall: "Overall"
+};
+
+export const qualityRepairExpectationLabels: Record<QualityRepairExpectation, string> = {
+  needed: "Repair needed",
+  not_needed: "No repair needed"
 };

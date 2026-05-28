@@ -25,6 +25,9 @@ test("creates a rescue packet from messy text", async ({ page }) => {
 test("autosaves and clears messy draft text locally", async ({ page }) => {
   await page.getByLabel("Messy task").fill("I need to start the grant report.");
   await expect(page.getByText("Draft autosaves locally in this browser.")).toBeVisible();
+  await expect(page.getByText("Local vault")).toBeVisible();
+  await expect(page.getByText("API keys")).toBeVisible();
+  await expect(page.getByText("Not exported")).toBeVisible();
 
   await page.reload();
   await expect(page.getByLabel("Messy task")).toHaveValue(
@@ -42,6 +45,9 @@ test("runs a sprint and records done enough", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Essay due" })).toBeVisible();
   await expect(page.getByText("Ready the environment", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Done enough" }).click();
+  await expect(page.getByRole("heading", { name: "What changed?" })).toBeVisible();
+  await expect(page.getByText("What is still possible?")).toBeVisible();
+  await page.getByRole("button", { name: "Done enough counts" }).click();
 
   await page.getByText("Packet controls").click();
   await expect(page.getByLabel("Status")).toHaveValue("done_enough");
@@ -70,9 +76,11 @@ test("uses unblock and exit responsibly controls", async ({ page }) => {
   await page.getByRole("button", { name: "I'm stuck" }).click();
 
   await expect(page.getByText("Next physical action", { exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Unblock" }).click();
   await page.getByRole("button", { name: "Decision" }).click();
   await expect(page.getByText("Current: Decision")).toBeVisible();
 
+  await page.getByRole("tab", { name: "Exit responsibly" }).click();
   await page.getByRole("button", { name: "Renegotiate" }).click();
   await expect(page.getByText("current scope")).toBeVisible();
   await page.getByText("Packet controls").click();
@@ -84,10 +92,12 @@ test("maps task, missing-item, exit, and successful-start patterns", async ({ pa
   await page.getByRole("button", { name: "I'm stuck" }).click();
   await page.getByRole("button", { name: "Start rescue sprint" }).click();
   await page.getByRole("button", { name: "Done enough" }).click();
+  await page.getByRole("button", { name: "Done enough counts" }).click();
 
   await page.getByRole("button", { name: "Rescue", exact: true }).click();
   await page.getByLabel("Messy task").fill("I need to finish the work proposal but the scope is too much.");
   await page.getByRole("button", { name: "I'm stuck" }).click();
+  await page.getByRole("tab", { name: "Exit responsibly" }).click();
   await page.getByRole("button", { name: "Renegotiate" }).click();
 
   await page.getByRole("button", { name: "Map" }).click();
@@ -136,7 +146,7 @@ test("exports and imports local JSON data", async ({ page }, testInfo) => {
   await expect(page.getByText("1 local", { exact: true })).toBeVisible();
 });
 
-test("uses the Rescue Quality Lab and saves a local signal", async ({ page }) => {
+test("uses the Rescue Quality Lab and saves a local signal", async ({ page }, testInfo) => {
   await page.getByRole("button", { name: "Map" }).click();
   await page.getByRole("button", { name: "Quality Lab" }).click();
 
@@ -146,10 +156,27 @@ test("uses the Rescue Quality Lab and saves a local signal", async ({ page }) =>
     })
   ).toBeVisible();
   await expect(page.getByText("Golden fixtures")).toBeVisible();
+  await page.getByRole("button", { name: "New fixture" }).click();
+  await page.getByLabel("Fixture title").fill("Custom appointment fixture");
+  await page
+    .getByLabel("Fixture messy input")
+    .fill("I need to book a doctor appointment but I am scared to call.");
+  await page.getByLabel("Expected task type").selectOption("appointment");
+  await page.getByLabel("Expected block").selectOption("shame_fear");
+  await page.getByLabel("Repair expectation").selectOption("needed");
+  await page.getByLabel("Expected action fragments").fill("calendar, message");
+  await page.getByRole("button", { name: "Save fixture" }).click();
+  await expect(page.getByText("Fixture saved locally.")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Custom appointment fixture/ })).toBeVisible();
+
   await page.getByRole("button", { name: /Assignment blank start/ }).click();
-  await expect(page.getByLabel("Messy input")).toHaveValue(
+  await expect(page.getByLabel("Messy input", { exact: true })).toHaveValue(
     "I need to start my assignment and I don't know where to start."
   );
+  await page.getByLabel("No vague verbs").click();
+  await expect(page.getByLabel("No vague verbs")).not.toBeChecked();
+  await page.getByRole("button", { name: "Capture baseline" }).click();
+  await expect(page.getByText("Quality baseline captured locally.")).toBeVisible();
   await expect(page.getByText("Local rules packet")).toBeVisible();
   await expect(page.getByText("No repair needed yet")).toBeVisible();
 
@@ -163,6 +190,12 @@ test("uses the Rescue Quality Lab and saves a local signal", async ({ page }) =>
   await expect(page.getByText("Quality signal saved locally.")).toBeVisible();
   await expect(page.getByText("1 saved")).toBeVisible();
   await expect(page.getByText("Local action is more physical")).toBeVisible();
+
+  const qualityDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export quality JSON" }).click();
+  const qualityDownload = await qualityDownloadPromise;
+  await qualityDownload.saveAs(testInfo.outputPath("scaffold-quality-export.json"));
+  await expect(page.getByText("Quality export created.")).toBeVisible();
 });
 
 test("records explicit external LLM consent in settings", async ({ page }) => {
