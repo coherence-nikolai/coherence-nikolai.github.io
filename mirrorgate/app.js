@@ -528,16 +528,18 @@
     const h = canvas.height;
     const cx = w / 2;
     const cy = h / 2;
-    const r = Math.min(w, h) * (compact ? 0.28 : 0.38);
+    const side = Math.min(w, h);
+    const r = side * (compact ? 0.28 : 0.38);
     const t = time / 1000;
+    const rotation = t * 0.16;
     ctx.clearRect(0, 0, w, h);
     ctx.save();
-    ctx.translate(cx, cy);
 
     const gradient = ctx.createRadialGradient(0, 0, 10, 0, 0, r * 1.6);
     gradient.addColorStop(0, "rgba(226,184,86,0.24)");
     gradient.addColorStop(0.5, "rgba(60,70,130,0.16)");
     gradient.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.translate(cx, cy);
     ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2);
@@ -549,51 +551,73 @@
     ctx.arc(0, 0, r * 1.08, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.rotate(t * 0.12);
-    const nodes = 5;
-    const points = [];
-    for (let i = 0; i < nodes; i += 1) {
-      const angle = -Math.PI / 2 + i * Math.PI * 2 / nodes;
-      points.push([Math.cos(angle) * r * 0.82, Math.sin(angle) * r * 0.82]);
-    }
-    ctx.strokeStyle = "rgba(225,230,248,0.72)";
-    ctx.lineWidth = compact ? 1.7 : 2.1;
+    const point = (radius, angle) => [Math.cos(angle) * radius, Math.sin(angle) * radius];
+    const top = point(r, -Math.PI / 2 + rotation);
+    const left = point(r, Math.PI * 0.82 + rotation);
+    const right = point(r, Math.PI * 0.18 + rotation);
+    const bottom = point(r, Math.PI / 2 + rotation);
+
+    ctx.strokeStyle = "rgba(226,184,86,0.72)";
+    ctx.lineWidth = compact ? 1.1 : 1.3;
     ctx.beginPath();
-    points.forEach(([x, y], index) => {
-      if (index === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
+    ctx.moveTo(top[0], top[1]);
+    ctx.lineTo(right[0], right[1]);
+    ctx.lineTo(bottom[0], bottom[1]);
+    ctx.lineTo(left[0], left[1]);
     ctx.closePath();
     ctx.stroke();
-    ctx.strokeStyle = "rgba(226,184,86,0.46)";
+
+    ctx.strokeStyle = "rgba(225,230,248,0.7)";
+    ctx.lineWidth = compact ? 0.9 : 1;
     ctx.beginPath();
-    for (let i = 0; i < points.length; i += 1) {
-      const [x, y] = points[i];
-      const [x2, y2] = points[(i + 2) % points.length];
-      ctx.moveTo(x, y);
-      ctx.lineTo(x2, y2);
-    }
+    ctx.moveTo(top[0], top[1]);
+    ctx.lineTo(left[0], left[1]);
+    ctx.lineTo(right[0], right[1]);
+    ctx.closePath();
+    ctx.moveTo(top[0], top[1]);
+    ctx.lineTo(bottom[0], bottom[1]);
+    ctx.moveTo(left[0], left[1]);
+    ctx.lineTo(bottom[0], bottom[1]);
+    ctx.moveTo(right[0], right[1]);
+    ctx.lineTo(bottom[0], bottom[1]);
     ctx.stroke();
 
     ctx.fillStyle = "#e2b856";
-    points.forEach(([x, y]) => {
+    [top, left, right, bottom, [0, 0]].forEach(([x, y], index) => {
+      const nodeRadius = index === 4 ? side * (compact ? 0.024 : 0.028) : side * (compact ? 0.019 : 0.022);
       ctx.beginPath();
-      ctx.arc(x, y, compact ? 5 : 8, 0, Math.PI * 2);
+      ctx.arc(x, y, nodeRadius, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    ctx.rotate(-t * 0.32);
     ctx.strokeStyle = "rgba(226,184,86,0.9)";
-    ctx.lineWidth = compact ? 2 : 3;
+    ctx.lineWidth = compact ? 1.4 : 1.8;
     ctx.beginPath();
-    for (let a = 0; a < Math.PI * 5.2; a += 0.08) {
-      const sr = a * (compact ? 2.2 : 3.5);
-      const x = Math.cos(a) * sr;
-      const y = Math.sin(a) * sr;
-      if (a === 0) ctx.moveTo(x, y);
+    for (let index = 0; index < 96; index += 1) {
+      const step = index / 95;
+      const currentRadius = side * (compact ? 0.14 : 0.2) * step;
+      const angle = step * Math.PI * 7.4 - rotation * 2.2;
+      const x = Math.cos(angle) * currentRadius;
+      const y = Math.sin(angle) * currentRadius;
+      if (index === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
     ctx.stroke();
+
+    ctx.strokeStyle = "rgba(226,184,86,0.2)";
+    ctx.lineWidth = compact ? 0.7 : 0.8;
+    [-1, 1].forEach((mirror) => {
+      ctx.beginPath();
+      for (let index = 0; index < 84; index += 1) {
+        const step = index / 83;
+        const x = mirror * side * (0.12 + step * 0.3);
+        const y = Math.sin(step * Math.PI * 3 + rotation * 2.5) * side * 0.18;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+
     ctx.restore();
   }
 
