@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /mirrorgate/
 
 Sitemap: https://coherence-nikolai.app/sitemap.xml

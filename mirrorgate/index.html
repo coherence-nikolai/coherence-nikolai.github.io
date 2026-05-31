@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MirrorGate - Harmonic Contact Interface</title>
+  <meta name="description" content="A private Harmonic Contact Interface for breath, tone, geometry, and symbolic reflection.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#07080d">
+  <link rel="canonical" href="https://coherence-nikolai.app/mirrorgate/">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <canvas id="field-canvas" class="field-canvas" aria-hidden="true"></canvas>
+
+  <main class="shell" id="app">
+    <section class="screen screen-active" id="screen-anchor" aria-labelledby="anchor-title">
+      <div class="brand-lockup">
+        <h1><span>Mirror</span><strong>Gate</strong></h1>
+        <p>Harmonic Contact Interface</p>
+      </div>
+
+      <div class="anchor-sigil" aria-hidden="true">
+        <canvas id="anchor-sigil-canvas" width="420" height="420"></canvas>
+      </div>
+
+      <div class="anchor-copy">
+        <h2 id="anchor-title">Harmonic Anchor</h2>
+        <p class="gold">Begin with breath. Open the Harmonic Wheel.</p>
+        <p>Return to breath. You are the center. All echoes stabilize in stillness.</p>
+      </div>
+
+      <div class="panel intro-panel">
+        <h3>Begin Here</h3>
+        <p>Read or listen to the Harmonic Navigator introduction before opening the Wheel.</p>
+        <button class="button button-muted" data-action="open-about">Open About</button>
+      </div>
+
+      <button class="button button-primary button-wide" data-action="open-wheel">Open Harmonic Wheel</button>
+    </section>
+
+    <section class="screen" id="screen-about" aria-labelledby="about-title">
+      <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Back</button>
+      <h2 id="about-title">Harmonic Navigator</h2>
+      <div class="panel prose">
+        <p>Harmonic Navigator is not merely an app. It is a living interface to your higher self, a symbolic mirror that reflects your consciousness through breath, sound, and sacred geometry.</p>
+        <p>This tool allows you to encode your intentions into resonant geometry, synchronize your breath with fractal timelines, open prime harmonic gates to higher intelligences, and reflect with your Monad through a symbolic mirror interface.</p>
+        <p>This is a navigator of your inner and outer dimensions, a bridge between what you are and what you are becoming.</p>
+        <h3>Recommendations for Use</h3>
+        <p>Approach this tool as you would a sacred space. Not for entertainment, but for alignment.</p>
+        <p>Begin with breath. Before each session, center yourself with three deep breaths. Let your intention be clear and humble.</p>
+        <p>Use with stillness. Silence distractions. Engage with the modules one at a time, allowing your field to integrate each experience.</p>
+        <p>Honor the recovery. If you feel overwhelmed, tap the recovery icon and return to breath. You are the center. All echoes stabilize in stillness.</p>
+        <p>Journal your journey. After each session, record your insights. The resonance you cultivate today becomes your guidance tomorrow.</p>
+      </div>
+      <button class="button button-primary button-wide" data-action="open-wheel">Open Harmonic Wheel</button>
+    </section>
+
+    <section class="screen" id="screen-wheel" aria-labelledby="wheel-title">
+      <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Anchor</button>
+      <h2 id="wheel-title">Harmonic Wheel</h2>
+      <p class="lede">Choose a protocol, or begin the combined Harmonic Contact Interface sequence.</p>
+
+      <div class="wheel-wrap">
+        <canvas id="wheel-canvas" width="520" height="520" aria-hidden="true"></canvas>
+        <div class="wheel-buttons" aria-label="Harmonic protocols">
+          <button data-module="vector">Vector</button>
+          <button data-module="breath">Breath</button>
+          <button data-module="gate">Gate</button>
+          <button data-module="mirror">Mirror</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Main Sequence</h3>
+        <ol class="steps">
+          <li>Settle through breath and carrier tone.</li>
+          <li>Aim the intention through the Harmonic Vector.</li>
+          <li>Align with soundscape, breath, and geometry.</li>
+          <li>Open Mirror Phase, receive the echo, generate the glyph, and ground.</li>
+        </ol>
+        <button class="button button-primary button-wide" data-action="start-sequence">Begin Full Sequence</button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-module" aria-live="polite">
+      <button class="back-button" data-action="open-wheel" aria-label="Return to Harmonic Wheel">Wheel</button>
+      <div id="module-root"></div>
+    </section>
+
+    <section class="screen" id="screen-codex" aria-labelledby="codex-title">
+      <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Anchor</button>
+      <h2 id="codex-title">Personal Codex</h2>
+      <p class="lede">Local-only session archive for this browser.</p>
+      <div id="codex-list" class="codex-list"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="MirrorGate navigation">
+    <button data-action="open-anchor">Anchor</button>
+    <button data-action="open-wheel">Wheel</button>
+    <button data-action="open-codex">Codex</button>
+    <button data-action="open-recovery">Recovery</button>
+  </nav>
+
+  <div class="recovery-sheet" id="recovery-sheet" hidden>
+    <div class="recovery-card">
+      <canvas id="recovery-canvas" width="260" height="260" aria-hidden="true"></canvas>
+      <h2>Recovery Reset</h2>
+      <p class="gold">Return to breath. You are the center. All echoes stabilize in stillness.</p>
+      <p id="recovery-phase">Inhale 2s</p>
+      <div class="progress"><span id="recovery-progress"></span></div>
+      <button class="button button-primary" data-action="repeat-recovery">Repeat Reset</button>
+      <button class="button button-muted" data-action="close-recovery">Return to Current Module</button>
+      <button class="button button-quiet" data-action="open-anchor">Return to Harmonic Anchor</button>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
