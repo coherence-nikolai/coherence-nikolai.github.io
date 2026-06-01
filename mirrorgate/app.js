@@ -2297,16 +2297,6 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         renderModule(invocation.sequence[0]);
       }
     }
-    if (action === "toggle-contact-paths") {
-      const list = $("#contact-paths-list");
-      const chevron = $("#contact-paths-chevron");
-      if (list) {
-        const nextHidden = !list.hidden;
-        list.hidden = nextHidden;
-        target.setAttribute("aria-expanded", String(!nextHidden));
-        if (chevron) chevron.textContent = nextHidden ? "⌄" : "⌃";
-      }
-    }
     if (action === "play-about") playAsset("AboutHarmonicNavigatorVoice.mp3");
     if (action === "stop-audio") { stopActiveAudio(); stopTone(); }
     if (action === "play-soundscape") playAsset(getProfile().asset, true);
