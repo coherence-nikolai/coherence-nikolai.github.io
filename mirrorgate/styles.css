@@ -116,6 +116,45 @@ h3 {
   font-weight: 750;
 }
 
+.transcript-disclosure {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid rgba(210, 218, 245, 0.11);
+  border-radius: var(--radius);
+  background: rgba(7, 8, 13, 0.42);
+}
+
+.transcript-disclosure summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 10px 12px;
+  color: var(--module-accent, var(--gold));
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.transcript-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.transcript-disclosure summary::before {
+  content: "“";
+  margin-right: 6px;
+  color: var(--gold);
+}
+
+.transcript-disclosure[open] summary {
+  border-bottom: 1px solid rgba(210, 218, 245, 0.1);
+}
+
+.transcript-disclosure pre {
+  margin: 0;
+  padding: 12px;
+  white-space: pre-wrap;
+  color: rgba(228, 231, 244, 0.92);
+  font: 0.88rem/1.52 var(--font);
+}
+
 .brand-lockup {
   text-align: center;
   margin-top: clamp(18px, 5vh, 54px);

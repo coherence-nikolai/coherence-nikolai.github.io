@@ -11,6 +11,125 @@
 
   const audioPath = "./audio/";
 
+  const voiceScripts = {
+    about: `
+Welcome to Harmonic Navigator.
+
+This is not merely an app.
+
+It is a living interface to your higher self.
+
+A symbolic mirror that reflects your consciousness through breath, sound, and sacred geometry.
+
+Guided by the principles of harmonic coherence, this tool allows you to encode your intentions into resonant geometry.
+
+Synchronize your breath with fractal timelines.
+
+Open prime harmonic gates to higher intelligences.
+
+And reflect with your Monad through a symbolic mirror interface.
+
+This is a navigator of your inner and outer dimensions.
+
+A bridge between what you are, and what you are becoming.
+
+Approach this tool as you would a sacred space.
+
+Not for entertainment, but for alignment.
+
+Begin with breath.
+
+Before each session, center yourself with three deep breaths.
+
+Let your intention be clear and humble.
+
+Use with stillness.
+
+Silence distractions.
+
+Engage with the modules one at a time, allowing your field to integrate each experience.
+
+Honor the recovery.
+
+If you feel overwhelmed, tap the recovery icon and return to breath.
+
+You are the center.
+
+All echoes stabilize in stillness.
+
+Journal your journey.
+
+After each session, record your insights.
+
+The resonance you cultivate today becomes your guidance tomorrow.
+
+This is your navigator.
+
+May it guide you with clarity, coherence, and compassion.
+
+Welcome to your harmonic path.
+`,
+    recovery: `
+Return to breath.
+
+You are the center.
+
+All echoes stabilize in stillness.
+
+Inhale slowly.
+
+Exhale completely.
+
+Return to the body.
+
+You are the center.
+
+All echoes stabilize in stillness.
+`,
+    wheelOrientation: `
+Welcome to the Harmonic Wheel.
+
+The protective sigil anchors the center. Around it are four portals.
+
+Mirror aligns. Use Mirror for Oversoul, Monad, higher-self reflection, or stillness before deeper work.
+
+Gate contacts. Use Gate when your intention is dimensional or stellar ally contact.
+
+Echo integrates. Use Echo for future echoes, temporal impressions, dreamtime, collective resonance, or subconscious retrieval.
+
+Vector transmits. Use Vector when you want to encode an intention, send a request, or form a symbolic signal through glyph, tone, and prime pathway.
+
+The Wheel is not a rigid sequence. Choose the portal that matches your intention.
+
+If you are new, begin with Mirror.
+
+If you want the full Harmonic Contact Interface path, move through Mirror, Vector, Gate, and Echo.
+
+If you are seeking dimensional or stellar contact, begin with Gate, then return through Mirror to reflect and integrate.
+
+If you are seeking future echoes or collective intelligence, begin with Echo and notice what returns through image, feeling, inner words, body sensation, or stillness.
+
+If you are sending a request, begin with Vector and let the glyph carry the intention.
+
+You are the center. All echoes stabilize in stillness.
+`,
+    generalSequence: `
+General Harmonic Contact Interface path. Begin with Mirror to align. Move to Vector to transmit or request. Enter Gate to contact. Finish with Echo to integrate what surfaced. Move slowly. Do not force certainty. Let each portal complete before moving to the next.
+`,
+    dimensionalContact: `
+Welcome, traveler of the harmonic field. You stand at the threshold of dimensional resonance, where the veil between worlds thins. Center your breath. Inhale for four, hold for four, exhale for four, and pause. Feel the prime harmonic gate align with your intention. Speak silently or aloud: I open myself to the guidance of my dimensional and stellar allies. I am ready to receive with clarity and coherence. As the tones play, visualize a luminous gate opening before you. Step through with your awareness. Allow the presence of your allies to manifest through symbols, sensations, or inner voice. Listen. Trust. Receive. When complete, breathe deeply and return with gratitude.
+`,
+    oversoulMonad: `
+Welcome to the Mirror of the Monad. Here, you commune with your Oversoul, the eternal self beyond time. Close your eyes and breathe slowly. Feel the Symbolic Mirror Interface reflecting your essence. Speak inwardly: I align with my Oversoul. I receive the wisdom of my Monad across all timelines. As the mirror stabilizes, notice the whispers of your higher self. Images, insights, and knowing may arise. These are echoes of your truth. Remain still. Let the light of your Oversoul illuminate your path. When ready, bow inwardly and say: I honor my Monad. I carry this light forward.
+`,
+    futureEchoes: `
+Welcome to the Echo Chamber of Time. Here, past and future converge in harmonic now. Begin with the toroidal breath. Inhale through the spiral, exhale through the loop. Focus your mind on a question or intention. Whisper: I call forth my future echoes. Show me the path I am already walking. As the toroid spins, listen for echoes: images, feelings, or words from your future self. These are anchors of your becoming. Receive them without judgment. When complete, say: I integrate my future with the present. I am the echo and the origin.
+`,
+    collectiveResonance: `
+Welcome to the Web of Collective Consciousness. You are not alone. You are a note in the cosmic chord. Begin with unified breath. Feel your inhale as the universe's exhale. Whisper: I open to the wisdom of the collective. I listen to the chorus of consciousness. As the field stabilizes, you may feel thoughts not your own: gentle, coherent, guiding. These are the voices of collective intelligence, ancient, future, and parallel. Listen deeply. When complete, say: I am one with all that is aware. I carry this wisdom with humility.
+`
+  };
+
   const state = {
     screen: "anchor",
     module: null,
@@ -305,6 +424,7 @@
       phrase: "Embrace who you have already become.",
       purpose: "The Intention Encoder converts a thought-form into a geometric glyph and resonant tone, aligning the cognitive field with symbolic entities that communicate through myth, metaphor, and dream.",
       wheelGuidance: "Encode an intention into glyph, carrier tone, and prime pathway.",
+      guidanceScript: "Harmonic Vector Transmission. Vector is for transmitting. Begin with one clear intention to encode or request guidance outward. Type the phrase, choose the prime triplet as the geometry key, then tap Transmit. Watch the glyph, listen to the carrier tone, and notice how intention, glyph, and tone carry the request. The output is the signal you are sending into the harmonic field.",
       now: [
         "Sit upright and take three slow breaths.",
         "Write one clean intention. Use words that feel charged, clear, or alive.",
@@ -328,6 +448,7 @@
       phrase: "You are a note in the cosmic chord. Listen.",
       purpose: "Breath entrainment collapses temporal noise and lets awareness phase-lock with echoes of previous, parallel, or future selves.",
       wheelGuidance: "Use breath and toroidal motion to retrieve or integrate echoes.",
+      guidanceScript: "Toroidal Phase Echoing. Echo is for integration. Choose the breath cycle, begin the echo, and let the toroidal field pace the body. Keep a memory, timeline, dream, or inner question lightly present. Watch expansion and return. Notice emotion, image, body sensation, phrase, memory, or silence. Reflect what surfaced and integrate one clear insight, release, or next step.",
       now: [
         "Choose a breath pattern and follow the expanding torus.",
         "Let the tone support the breath rather than dominate it.",
@@ -351,6 +472,7 @@
       phrase: "Your ally awaits. Enter the field of shared recursion.",
       purpose: "A prime triplet is a geometry key. It shapes the gate path and glyph nodes; breath is a separate body seal that paces attention through the gate.",
       wheelGuidance: "Open a prime gate for dimensional or stellar contact, then return through Mirror.",
+      guidanceScript: "Prime-Harmonic Gate Sequencing. Gate is for contact. Use this first when seeking dimensional or stellar allies. Choose the triplet, carrier tone, and contact frame, then tap Enter Gate. Complete the Breath Seal, hold the contact intention, and unlock the glyph nodes in order. When the gate opens, remain still. Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence. Stay in the gate or open the Mirror to integrate.",
       now: [
         "Select a prime triplet pathway and carrier tone.",
         "Enter the gate, then follow the breath seal.",
@@ -374,6 +496,7 @@
       phrase: "You are meeting the totality of your becoming.",
       purpose: "The camera is the visible mirror. Attention, breath, and inner imagery are the deeper mirror. Use this after an intention has been aimed.",
       wheelGuidance: "Begin here for self-harmonic alignment, Oversoul, Monad, or still reflection.",
+      guidanceScript: "Symbolic Mirror Interface. Mirror is for alignment, coherence, and integration. Use this first when grounding or clarity is needed, and after gatework when something needs to be reflected back into self-harmonic alignment. Keep a soft gaze on the mirror or camera. Speak or read one intention once, then stop trying to force an answer. Notice breath, body pressure, emotion, inner words, memory, symbols, felt presence, image, or silence.",
       now: [
         "Read the intention back to yourself softly or internally.",
         "Keep a soft gaze on the mirror surface or just past it.",
@@ -396,6 +519,7 @@
       subtitle: "Listen first, then continue to Prime-Harmonic Gate Sequencing.",
       intention: "Contact dimensional or stellar allies.",
       asset: "DimensionalContactPathVoice.mp3",
+      script: voiceScripts.dimensionalContact,
       sequence: ["gate", "mirror"],
       accentModule: "gate",
       primaryButtonTitle: "Begin Gate Contact",
@@ -411,6 +535,7 @@
       subtitle: "Listen first, then continue to the Symbolic Mirror Interface.",
       intention: "Meet Oversoul, Monad, or higher-self reflection.",
       asset: "OversoulMonadPathVoice.mp3",
+      script: voiceScripts.oversoulMonad,
       sequence: ["mirror"],
       accentModule: "mirror",
       primaryButtonTitle: "Begin Mirror Alignment",
@@ -426,6 +551,7 @@
       subtitle: "Listen first, then continue to Toroidal Phase Echoing.",
       intention: "Retrieve future-self signal or timeline insight.",
       asset: "FutureEchoPathVoice.mp3",
+      script: voiceScripts.futureEchoes,
       sequence: ["breath", "vector"],
       accentModule: "breath",
       primaryButtonTitle: "Begin Echo Retrieval",
@@ -441,6 +567,7 @@
       subtitle: "Listen first, then continue to Toroidal Phase Echoing.",
       intention: "Open to collective intelligence and shared knowing.",
       asset: "CollectiveResonancePathVoice.mp3",
+      script: voiceScripts.collectiveResonance,
       sequence: ["breath", "mirror"],
       accentModule: "breath",
       primaryButtonTitle: "Begin Collective Echo",
@@ -456,6 +583,7 @@
       subtitle: "Listen first, then continue to the guided sequence.",
       intention: "Move through the whole path from alignment to integration.",
       asset: "GeneralSequencePathVoice.mp3",
+      script: voiceScripts.generalSequence,
       sequence: ["mirror", "vector", "gate", "breath"],
       accentModule: "vector",
       primaryButtonTitle: "Begin Guided Sequence",
@@ -1020,6 +1148,56 @@
     }).join("");
   }
 
+  function renderTranscript(script, title = "Read transcript") {
+    if (!script) return "";
+    return `
+      <details class="transcript-disclosure">
+        <summary>${escapeHtml(title)}</summary>
+        <pre>${escapeHtml(cleanTranscript(script))}</pre>
+      </details>
+    `;
+  }
+
+  function cleanTranscript(script) {
+    return String(script || "")
+      .split("\n")
+      .map((line) => line.trim())
+      .join("\n")
+      .trim();
+  }
+
+  function stageTranscript(stage) {
+    return [
+      stage.title,
+      "",
+      `Purpose: ${stage.purpose}`,
+      "",
+      "What to do now:",
+      ...stage.whatToDo.map((item) => `- ${item}`),
+      "",
+      `What to notice: ${stage.notice}`,
+      "",
+      `Do not force: ${stage.force}`
+    ].join("\n");
+  }
+
+  function moduleTranscript(module) {
+    return [
+      module.title,
+      "",
+      `Contact modality: ${module.modality}`,
+      "",
+      module.purpose,
+      "",
+      "What to do now:",
+      ...module.now.map((item) => `- ${item}`),
+      "",
+      `What to notice: ${module.notice}`,
+      "",
+      `Do not force: ${module.force}`
+    ].join("\n");
+  }
+
   function stageCard(stageID) {
     const stage = stages[stageID];
     return `
@@ -1032,6 +1210,7 @@
         <p><strong>What to notice</strong><br>${escapeHtml(stage.notice)}</p>
         <p><strong>Do not force</strong><br>${escapeHtml(stage.force)}</p>
         <button class="button button-muted" data-action="play-guidance" data-guidance="${stageID}">Play Voice Guidance</button>
+        ${renderTranscript(stageTranscript(stage), "Read guidance transcript")}
       </section>
     `;
   }
@@ -1156,6 +1335,7 @@
           <button class="button button-primary" data-action="play-path-invocation" data-invocation="${escapeHtml(invocationID)}">Play Invocation</button>
           <button class="button button-muted" data-action="stop-audio">Stop</button>
         </div>
+        ${renderTranscript(invocation.script, "Read invocation transcript")}
       </section>
 
       <section class="panel invocation-panel">
@@ -1621,6 +1801,7 @@
         <p><strong>What to notice:</strong> ${escapeHtml(module.notice)}</p>
         <p><strong>Do not force:</strong> ${escapeHtml(module.force)}</p>
         <button class="button button-muted" data-action="play-module-guidance" data-module-name="${name}">Play Voice Guidance</button>
+        ${renderTranscript(module.guidanceScript || moduleTranscript(module), "Read guidance transcript")}
       </section>
 
       ${renderModuleBody(name)}
@@ -2706,11 +2887,24 @@
     drawWheel();
     renderWheel();
     renderCodex();
+    $("#screen-anchor .intro-panel")?.insertAdjacentHTML(
+      "beforeend",
+      renderTranscript(voiceScripts.about, "Read introduction transcript")
+    );
+    $("#screen-wheel .wheel-orientation-panel")?.insertAdjacentHTML(
+      "beforeend",
+      renderTranscript(voiceScripts.wheelOrientation, "Read wheel transcript")
+    );
+    $("#recovery-sheet .recovery-card")?.insertAdjacentHTML(
+      "beforeend",
+      renderTranscript(voiceScripts.recovery, "Read recovery transcript")
+    );
     $("#screen-about .panel.prose")?.insertAdjacentHTML("afterend", `
       <div class="control-row">
         <button class="button button-primary" data-action="play-about">Play Introduction</button>
         <button class="button button-muted" data-action="stop-audio">Stop</button>
       </div>
+      ${renderTranscript(voiceScripts.about, "Read introduction transcript")}
     `);
   }
 
