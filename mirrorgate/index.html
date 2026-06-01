@@ -8,6 +8,7 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="theme-color" content="#07080d">
   <link rel="canonical" href="https://coherence-nikolai.app/mirrorgate/">
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -63,28 +64,61 @@
     <section class="screen" id="screen-wheel" aria-labelledby="wheel-title">
       <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Anchor</button>
       <h2 id="wheel-title">Harmonic Wheel</h2>
-      <p class="lede">Choose a protocol, or begin the combined Harmonic Contact Interface sequence.</p>
+      <p class="lede">Select a portal. The Wheel will orient the path.</p>
 
-      <div class="wheel-wrap">
-        <canvas id="wheel-canvas" width="520" height="520" aria-hidden="true"></canvas>
-        <div class="wheel-buttons" aria-label="Harmonic protocols">
-          <button data-module="vector">Vector</button>
-          <button data-module="breath">Breath</button>
-          <button data-module="gate">Gate</button>
-          <button data-module="mirror">Mirror</button>
+      <div class="wheel-card" aria-label="Harmonic Wheel">
+        <div class="quadrant-wheel" id="quadrant-wheel">
+          <button class="wheel-quadrant quadrant-mirror selected" data-wheel-module="mirror" aria-label="Symbolic Mirror Interface">
+            <span class="wheel-icon">▣</span>
+            <strong>Mirror</strong>
+            <small>Align</small>
+          </button>
+          <button class="wheel-quadrant quadrant-gate" data-wheel-module="gate" aria-label="Prime-Harmonic Gate Sequencing">
+            <span class="wheel-icon">⌬</span>
+            <strong>Gate</strong>
+            <small>Contact</small>
+          </button>
+          <button class="wheel-quadrant quadrant-echo" data-wheel-module="breath" aria-label="Toroidal Phase Echoing">
+            <span class="wheel-icon">≋</span>
+            <strong>Echo</strong>
+            <small>Integrate</small>
+          </button>
+          <button class="wheel-quadrant quadrant-vector" data-wheel-module="vector" aria-label="Harmonic Vector Transmission">
+            <span class="wheel-icon">↗</span>
+            <strong>Vector</strong>
+            <small>Transmit</small>
+          </button>
+          <div class="wheel-center" aria-hidden="true">
+            <canvas id="wheel-center-sigil-canvas" width="220" height="220"></canvas>
+          </div>
         </div>
+        <div class="wheel-selected-panel" id="wheel-selected-panel"></div>
       </div>
 
-      <div class="panel">
-        <h3>Main Sequence</h3>
-        <ol class="steps">
-          <li>Settle through breath and carrier tone.</li>
-          <li>Aim the intention through the Harmonic Vector.</li>
-          <li>Align with soundscape, breath, and geometry.</li>
-          <li>Open Mirror Phase, receive the echo, generate the glyph, and ground.</li>
-        </ol>
-        <button class="button button-primary button-wide" data-action="start-sequence">Begin Full Sequence</button>
+      <div class="panel intention-panel">
+        <h3>What is your intention today?</h3>
+        <div id="intention-options" class="intention-options"></div>
       </div>
+
+      <div class="panel contact-paths-panel">
+        <button class="section-toggle" data-action="toggle-contact-paths" aria-expanded="false">
+          <span>Contact Paths</span>
+          <span id="contact-paths-chevron">⌄</span>
+        </button>
+        <p class="small-copy">These are suggested paths. Choose an intention above when you want matching voice guidance.</p>
+        <div id="contact-paths-list" class="contact-paths-list" hidden></div>
+      </div>
+
+      <div class="panel wheel-orientation-panel">
+        <h3>Wheel Orientation</h3>
+        <p>The Wheel is not a rigid sequence. Choose a portal by intention, or use a suggested path when you want a complete route.</p>
+        <button class="button button-muted button-wide" data-action="play-wheel-guidance">Play Wheel Guidance</button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-invocation" aria-labelledby="invocation-title">
+      <button class="back-button" data-action="open-wheel" aria-label="Return to Harmonic Wheel">Wheel</button>
+      <div id="invocation-root"></div>
     </section>
 
     <section class="screen" id="screen-module" aria-live="polite">

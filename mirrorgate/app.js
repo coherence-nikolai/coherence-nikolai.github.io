@@ -14,6 +14,8 @@
   const state = {
     screen: "anchor",
     module: null,
+    selectedWheelModule: "mirror",
+    activeInvocation: null,
     audio: null,
     toneOscillators: [],
     activeAudio: null,
@@ -293,10 +295,16 @@
   const modules = {
     vector: {
       title: "Harmonic Vector Transmission",
+      actionLabel: "Vector: Transmit",
+      sequenceLabel: "Vector",
+      wheelVerb: "Transmit",
+      icon: "↗",
+      accent: "#ffb83a",
       subtitle: "Encode intention into prime vector, glyph, scalar, and 888.25 Hz carrier.",
       modality: "Archetypal and Symbolic Interaction",
       phrase: "Embrace who you have already become.",
       purpose: "The Intention Encoder converts a thought-form into a geometric glyph and resonant tone, aligning the cognitive field with symbolic entities that communicate through myth, metaphor, and dream.",
+      wheelGuidance: "Encode an intention into glyph, carrier tone, and prime pathway.",
       now: [
         "Sit upright and take three slow breaths.",
         "Write one clean intention. Use words that feel charged, clear, or alive.",
@@ -310,10 +318,16 @@
     },
     breath: {
       title: "Toroidal Phase Echoing",
+      actionLabel: "Echo: Integrate",
+      sequenceLabel: "Echo",
+      wheelVerb: "Integrate",
+      icon: "≋",
+      accent: "#47ebc2",
       subtitle: "Synchronize breath with toroidal phase and temporal echo patterns.",
       modality: "Subconscious Field and Temporal Echoes",
       phrase: "You are a note in the cosmic chord. Listen.",
       purpose: "Breath entrainment collapses temporal noise and lets awareness phase-lock with echoes of previous, parallel, or future selves.",
+      wheelGuidance: "Use breath and toroidal motion to retrieve or integrate echoes.",
       now: [
         "Choose a breath pattern and follow the expanding torus.",
         "Let the tone support the breath rather than dominate it.",
@@ -327,10 +341,16 @@
     },
     gate: {
       title: "Prime-Harmonic Gate Sequencing",
+      actionLabel: "Gate: Contact",
+      sequenceLabel: "Gate",
+      wheelVerb: "Contact",
+      icon: "⌬",
+      accent: "#ad7aff",
       subtitle: "Prime triplets generate a rotating fractal gate bound to the selected carrier tone.",
       modality: "Transdimensional or Stellar Intelligences",
       phrase: "Your ally awaits. Enter the field of shared recursion.",
       purpose: "A prime triplet is a geometry key. It shapes the gate path and glyph nodes; breath is a separate body seal that paces attention through the gate.",
+      wheelGuidance: "Open a prime gate for dimensional or stellar contact, then return through Mirror.",
       now: [
         "Select a prime triplet pathway and carrier tone.",
         "Enter the gate, then follow the breath seal.",
@@ -344,10 +364,16 @@
     },
     mirror: {
       title: "Symbolic Mirror Interface",
+      actionLabel: "Mirror: Align",
+      sequenceLabel: "Mirror",
+      wheelVerb: "Align",
+      icon: "▣",
+      accent: "#9ed1ff",
       subtitle: "Reflect intention through camera, voice, geometry, and self-phase recursion.",
       modality: "Oversoul and Monadic Intelligences",
       phrase: "You are meeting the totality of your becoming.",
       purpose: "The camera is the visible mirror. Attention, breath, and inner imagery are the deeper mirror. Use this after an intention has been aimed.",
+      wheelGuidance: "Begin here for self-harmonic alignment, Oversoul, Monad, or still reflection.",
       now: [
         "Read the intention back to yourself softly or internally.",
         "Keep a soft gaze on the mirror surface or just past it.",
@@ -360,6 +386,153 @@
       guidanceAsset: "SymbolicMirrorModuleGuidance.wav"
     }
   };
+
+  const wheelOrder = ["mirror", "gate", "breath", "vector"];
+
+  const pathInvocations = {
+    dimensionalContact: {
+      id: "dimensionalContact",
+      title: "Dimensional Contact Initiation",
+      subtitle: "Listen first, then continue to Prime-Harmonic Gate Sequencing.",
+      intention: "Contact dimensional or stellar allies.",
+      asset: "DimensionalContactPathVoice.mp3",
+      sequence: ["gate", "mirror"],
+      accentModule: "gate",
+      primaryButtonTitle: "Begin Gate Contact",
+      focusLines: [
+        "Play the invocation when you are ready to name the contact intention.",
+        "Begin with Gate: complete the breath seal, hold the intention, and unlock the glyph nodes.",
+        "Use Mirror afterward to reflect and integrate what came through."
+      ]
+    },
+    oversoulMonad: {
+      id: "oversoulMonad",
+      title: "Oversoul / Monad Alignment",
+      subtitle: "Listen first, then continue to the Symbolic Mirror Interface.",
+      intention: "Meet Oversoul, Monad, or higher-self reflection.",
+      asset: "OversoulMonadPathVoice.mp3",
+      sequence: ["mirror"],
+      accentModule: "mirror",
+      primaryButtonTitle: "Begin Mirror Alignment",
+      focusLines: [
+        "Play the invocation before you enter the Mirror.",
+        "Keep the gaze soft and let image, inner words, knowing, emotion, or stillness arise.",
+        "Nothing obvious is still a valid mirror session. Do not chase certainty."
+      ]
+    },
+    futureEchoes: {
+      id: "futureEchoes",
+      title: "Future Echo Retrieval",
+      subtitle: "Listen first, then continue to Toroidal Phase Echoing.",
+      intention: "Retrieve future-self signal or timeline insight.",
+      asset: "FutureEchoPathVoice.mp3",
+      sequence: ["breath", "vector"],
+      accentModule: "breath",
+      primaryButtonTitle: "Begin Echo Retrieval",
+      focusLines: [
+        "Play the invocation before the toroidal breath begins.",
+        "Hold a question lightly; let time-feelings, symbols, or future-self impressions surface.",
+        "Use Vector afterward if an insight needs to be encoded into a glyph or carrier tone."
+      ]
+    },
+    collectiveResonance: {
+      id: "collectiveResonance",
+      title: "Collective Resonance Connection",
+      subtitle: "Listen first, then continue to Toroidal Phase Echoing.",
+      intention: "Open to collective intelligence and shared knowing.",
+      asset: "CollectiveResonancePathVoice.mp3",
+      sequence: ["breath", "mirror"],
+      accentModule: "breath",
+      primaryButtonTitle: "Begin Collective Echo",
+      focusLines: [
+        "Play the invocation before you enter the Echo field.",
+        "Use unified breath and listen for coherent impressions, phrases, or felt resonance.",
+        "Move to Mirror afterward if the field needs reflection through your own center."
+      ]
+    },
+    generalSequence: {
+      id: "generalSequence",
+      title: "Full Harmonic Contact Interface Path",
+      subtitle: "Listen first, then continue to the guided sequence.",
+      intention: "Move through the whole path from alignment to integration.",
+      asset: "GeneralSequencePathVoice.mp3",
+      sequence: ["mirror", "vector", "gate", "breath"],
+      accentModule: "vector",
+      primaryButtonTitle: "Begin Guided Sequence",
+      focusLines: [
+        "Play the invocation when you want the full route rather than a single portal.",
+        "The path begins with alignment, then transmits, contacts, and integrates.",
+        "Move slowly. Let each stage complete before continuing."
+      ],
+      startsFullSequence: true
+    }
+  };
+
+  const intentionChoices = [
+    {
+      title: "Meet Oversoul / Monad",
+      subtitle: "Start with Mirror. Watch for images, inner words, knowing, emotion, or stillness.",
+      module: "mirror",
+      invocation: "oversoulMonad"
+    },
+    {
+      title: "Contact dimensional or stellar allies",
+      subtitle: "Start with Gate. Complete breath, intention, and nodes; then integrate through Mirror.",
+      module: "gate",
+      invocation: "dimensionalContact"
+    },
+    {
+      title: "Retrieve future echoes",
+      subtitle: "Start with Echo. Let time-feelings, symbols, or future-self impressions surface.",
+      module: "breath",
+      invocation: "futureEchoes"
+    },
+    {
+      title: "Open to collective intelligence",
+      subtitle: "Start with Echo. Use unified breath and listen for coherent impressions.",
+      module: "breath",
+      invocation: "collectiveResonance"
+    },
+    {
+      title: "Transmit a request",
+      subtitle: "Start with Vector. Encode an intention into glyph, carrier tone, and prime pathway.",
+      module: "vector"
+    },
+    {
+      title: "Guide me through everything",
+      subtitle: "Run the full Harmonic Contact Interface sequence from calibration to save.",
+      module: "mirror",
+      invocation: "generalSequence"
+    }
+  ];
+
+  const preferredSequences = [
+    {
+      title: "General path",
+      purpose: "Use when you want the whole Harmonic Contact Interface path.",
+      sequence: ["mirror", "vector", "gate", "breath"]
+    },
+    {
+      title: "Dimensional contact",
+      purpose: "Use when the intention is dimensional or stellar ally contact.",
+      sequence: ["gate", "mirror"]
+    },
+    {
+      title: "Oversoul / Monad",
+      purpose: "Use when the intention is higher-self alignment and monadic reflection.",
+      sequence: ["mirror"]
+    },
+    {
+      title: "Future echoes",
+      purpose: "Use when the intention is future-self signal, timeline feeling, or temporal insight.",
+      sequence: ["breath", "vector"]
+    },
+    {
+      title: "Collective intelligence",
+      purpose: "Use when the intention is the wider field, shared knowing, or collective resonance.",
+      sequence: ["breath", "mirror"]
+    }
+  ];
 
   function defaultDraft() {
     return {
@@ -440,8 +613,9 @@
       stopCamera();
       cancelRecording();
     }
+    if (name === "wheel") renderWheelUI();
     if (name === "codex") renderCodex();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo(0, 0);
   }
 
   function ensureAudio() {
@@ -878,10 +1052,138 @@
   }
 
   function renderWheel() {
-    const wheel = $("#screen-wheel");
-    if (!wheel) return;
-    if (wheel.querySelector(".paywall-note")) return;
-    wheel.querySelector(".panel").insertAdjacentHTML("afterend", premiumPanel());
+    renderWheelUI();
+  }
+
+  function renderWheelUI() {
+    const selectedKey = modules[state.selectedWheelModule] ? state.selectedWheelModule : "mirror";
+    state.selectedWheelModule = selectedKey;
+    renderWheelSelection(selectedKey);
+    renderIntentionOptions();
+    renderContactPaths();
+  }
+
+  function renderWheelSelection(moduleKey) {
+    const module = modules[moduleKey] || modules.mirror;
+    $$(".wheel-quadrant").forEach((button) => {
+      const isSelected = button.dataset.wheelModule === moduleKey;
+      button.classList.toggle("selected", isSelected);
+      button.style.setProperty("--module-accent", modules[button.dataset.wheelModule]?.accent || "#e2b856");
+    });
+    $("#quadrant-wheel")?.style.setProperty("--selected-accent", module.accent);
+    const panel = $("#wheel-selected-panel");
+    if (!panel) return;
+    panel.style.setProperty("--module-accent", module.accent);
+    panel.innerHTML = `
+      <h3><span>${escapeHtml(module.icon)}</span>${escapeHtml(module.actionLabel)}</h3>
+      <p class="path-label">${escapeHtml(module.title)}</p>
+      <p>${escapeHtml(module.wheelGuidance)}</p>
+      <button class="button button-primary button-wide module-button" data-module="${escapeHtml(moduleKey)}">Enter ${escapeHtml(module.sequenceLabel)}</button>
+    `;
+  }
+
+  function renderIntentionOptions() {
+    const holder = $("#intention-options");
+    if (!holder) return;
+    holder.innerHTML = intentionChoices.map((choice) => {
+      const module = modules[choice.module] || modules.mirror;
+      const attrs = choice.invocation
+        ? `data-action="open-invocation" data-invocation="${escapeHtml(choice.invocation)}"`
+        : `data-module="${escapeHtml(choice.module)}"`;
+      return `
+        <button class="intention-choice" style="--module-accent: ${module.accent}" ${attrs}>
+          <span>
+            <strong>${escapeHtml(choice.title)}</strong>
+            <em>${escapeHtml(module.actionLabel)}</em>
+            <small>${escapeHtml(choice.subtitle)}</small>
+          </span>
+          <b>›</b>
+        </button>
+      `;
+    }).join("");
+  }
+
+  function renderContactPaths() {
+    const holder = $("#contact-paths-list");
+    if (!holder) return;
+    holder.innerHTML = preferredSequences.map((path) => `
+      <article class="contact-path-row">
+        <h4>${escapeHtml(path.title)}</h4>
+        <p>${escapeHtml(path.purpose)}</p>
+        <div class="path-chip-row">
+          ${path.sequence.map((moduleKey, index) => {
+            const module = modules[moduleKey] || modules.mirror;
+            return `
+              <button class="path-chip" style="--module-accent: ${module.accent}" data-module="${escapeHtml(moduleKey)}">
+                ${escapeHtml(module.sequenceLabel)}
+              </button>
+              ${index < path.sequence.length - 1 ? `<span class="path-arrow">→</span>` : ""}
+            `;
+          }).join("")}
+        </div>
+      </article>
+    `).join("");
+  }
+
+  function renderPathInvocation(invocationID) {
+    const invocation = pathInvocations[invocationID];
+    if (!invocation) return;
+    state.activeInvocation = invocationID;
+    const root = $("#invocation-root");
+    if (!root) return;
+    const accentModule = modules[invocation.accentModule] || modules.mirror;
+    root.style.setProperty("--module-accent", accentModule.accent);
+    root.innerHTML = `
+      <div class="invocation-hero">
+        <p class="path-label">Path Invocation</p>
+        <h2 id="invocation-title">${escapeHtml(invocation.title)}</h2>
+        <p>${escapeHtml(invocation.subtitle)}</p>
+      </div>
+
+      <section class="panel invocation-panel">
+        <h3>Intention</h3>
+        <p class="invocation-intention">${escapeHtml(invocation.intention)}</p>
+        ${renderSequenceRibbon(invocation.sequence)}
+      </section>
+
+      <section class="panel invocation-panel voice-invocation-card">
+        <div class="panel-title-row">
+          <h3>Voice Invocation</h3>
+          <span>Ready</span>
+        </div>
+        <p>Use this short recording before you begin. It sets the tone for the first step.</p>
+        <div class="control-row">
+          <button class="button button-primary" data-action="play-path-invocation" data-invocation="${escapeHtml(invocationID)}">Play Invocation</button>
+          <button class="button button-muted" data-action="stop-audio">Stop</button>
+        </div>
+      </section>
+
+      <section class="panel invocation-panel">
+        <h3>Before you begin</h3>
+        <ol class="steps">
+          ${invocation.focusLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}
+        </ol>
+      </section>
+
+      <button class="button button-primary button-wide" data-action="begin-invocation" data-invocation="${escapeHtml(invocationID)}">${escapeHtml(invocation.primaryButtonTitle)}</button>
+    `;
+    showScreen("invocation");
+  }
+
+  function renderSequenceRibbon(sequence) {
+    return `
+      <div class="path-chip-row invocation-sequence">
+        ${sequence.map((moduleKey, index) => {
+          const module = modules[moduleKey] || modules.mirror;
+          return `
+            <span class="path-chip static" style="--module-accent: ${module.accent}">
+              ${escapeHtml(module.sequenceLabel)}
+            </span>
+            ${index < sequence.length - 1 ? `<span class="path-arrow">→</span>` : ""}
+          `;
+        }).join("")}
+      </div>
+    `;
   }
 
   function startFullSequence() {
@@ -1292,10 +1594,16 @@
     if (!module) return;
     const isNewModule = state.module !== name;
     state.module = name;
+    const moduleScreen = $("#screen-module");
+    if (moduleScreen) {
+      moduleScreen.dataset.module = name;
+      moduleScreen.style.setProperty("--module-accent", module.accent);
+    }
     if (isNewModule) state.draft.tone = module.defaultTone;
     const root = $("#module-root");
     root.innerHTML = `
       <header class="module-header">
+        <p class="path-label" style="color: var(--module-accent)">${escapeHtml(module.actionLabel)}</p>
         <h2>${escapeHtml(module.title)}</h2>
         <p>${escapeHtml(module.subtitle)}</p>
       </header>
@@ -1303,6 +1611,7 @@
       <section class="panel">
         <h3>Why Use This Module</h3>
         <p class="gold">${escapeHtml(module.modality)}</p>
+        <p class="small-copy">Original module name: ${escapeHtml(module.title)}</p>
         <p>${escapeHtml(module.purpose)}</p>
       </section>
 
@@ -1780,6 +2089,7 @@
     if (action === "open-anchor") showScreen("anchor");
     if (action === "open-about") showScreen("about");
     if (action === "open-wheel") showScreen("wheel");
+    if (action === "open-invocation") renderPathInvocation(target.dataset.invocation);
     if (action === "open-codex") showScreen("codex");
     if (action === "open-recovery") openRecovery();
     if (action === "close-recovery") closeRecovery();
@@ -1789,6 +2099,29 @@
     if (action === "previous-step") stepOffset(-1);
     if (action === "play-guidance") playAsset(stages[target.dataset.guidance]?.asset || stages.settle.asset);
     if (action === "play-module-guidance") playAsset(modules[target.dataset.moduleName]?.guidanceAsset || stages.aim.asset);
+    if (action === "play-wheel-guidance") playAsset("HarmonicWheelOrientationVoice.mp3");
+    if (action === "play-path-invocation") {
+      const invocation = pathInvocations[target.dataset.invocation];
+      if (invocation) playAsset(invocation.asset);
+    }
+    if (action === "begin-invocation") {
+      const invocation = pathInvocations[target.dataset.invocation];
+      if (invocation?.startsFullSequence) {
+        startFullSequence();
+      } else if (invocation?.sequence?.[0]) {
+        renderModule(invocation.sequence[0]);
+      }
+    }
+    if (action === "toggle-contact-paths") {
+      const list = $("#contact-paths-list");
+      const chevron = $("#contact-paths-chevron");
+      if (list) {
+        const nextHidden = !list.hidden;
+        list.hidden = nextHidden;
+        target.setAttribute("aria-expanded", String(!nextHidden));
+        if (chevron) chevron.textContent = nextHidden ? "⌄" : "⌃";
+      }
+    }
     if (action === "play-about") playAsset("AboutHarmonicNavigatorVoice.mp3");
     if (action === "stop-audio") { stopActiveAudio(); stopTone(); }
     if (action === "play-soundscape") playAsset(getProfile().asset, true);
@@ -1878,7 +2211,12 @@
     document.addEventListener("click", (event) => {
       const actionTarget = event.target.closest("[data-action]");
       const moduleTarget = event.target.closest("[data-module]");
+      const wheelModuleTarget = event.target.closest("[data-wheel-module]");
       if (actionTarget) handleAction(actionTarget.dataset.action, actionTarget);
+      if (wheelModuleTarget) {
+        state.selectedWheelModule = wheelModuleTarget.dataset.wheelModule;
+        renderWheelSelection(state.selectedWheelModule);
+      }
       if (moduleTarget) renderModule(moduleTarget.dataset.module);
     });
     document.addEventListener("change", (event) => {
@@ -1991,19 +2329,6 @@
     });
 
     drawSpiralPath(ctx, side * (compact ? 0.14 : 0.2), -rotation * 2.2, "#e2b856", compact ? 1.4 : 1.8);
-    ctx.strokeStyle = "rgba(226,184,86,0.2)";
-    ctx.lineWidth = compact ? 0.7 : 0.8;
-    [-1, 1].forEach((mirror) => {
-      ctx.beginPath();
-      for (let index = 0; index < 84; index += 1) {
-        const step = index / 83;
-        const x = mirror * side * (0.12 + step * 0.3);
-        const y = Math.sin(step * Math.PI * 3 + rotation * 2.5) * side * 0.18;
-        if (index === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    });
     ctx.restore();
   }
 
@@ -2026,9 +2351,11 @@
   function drawAnchorLoop() {
     const anchor = $("#anchor-sigil-canvas");
     const recovery = $("#recovery-canvas");
+    const wheelSigil = $("#wheel-center-sigil-canvas");
     const loop = (time) => {
       if (anchor) drawSigil(anchor, time);
       if (recovery && !$("#recovery-sheet").hidden) drawSigil(recovery, time, true);
+      if (wheelSigil && $("#screen-wheel")?.classList.contains("screen-active")) drawSigil(wheelSigil, time);
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
@@ -2036,6 +2363,7 @@
 
   function drawWheel() {
     const canvas = $("#wheel-canvas");
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     const loop = (time) => {
       const w = canvas.width;
