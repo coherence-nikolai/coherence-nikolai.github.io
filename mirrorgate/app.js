@@ -2269,6 +2269,10 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   function handleAction(action, target) {
     if (action === "open-anchor") showScreen("anchor");
     if (action === "open-about") showScreen("about");
+    if (action === "open-about-audio") {
+      showScreen("about");
+      playAsset("AboutHarmonicNavigatorVoice.mp3");
+    }
     if (action === "open-wheel") showScreen("wheel");
     if (action === "open-invocation") renderPathInvocation(target.dataset.invocation);
     if (action === "open-codex") showScreen("codex");
@@ -2887,10 +2891,6 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     drawWheel();
     renderWheel();
     renderCodex();
-    $("#screen-anchor .intro-panel")?.insertAdjacentHTML(
-      "beforeend",
-      renderTranscript(voiceScripts.about, "Read introduction transcript")
-    );
     $("#screen-wheel .wheel-orientation-panel")?.insertAdjacentHTML(
       "beforeend",
       renderTranscript(voiceScripts.wheelOrientation, "Read wheel transcript")
@@ -2901,10 +2901,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     );
     $("#screen-about .panel.prose")?.insertAdjacentHTML("afterend", `
       <div class="control-row">
-        <button class="button button-primary" data-action="play-about">Play Introduction</button>
+        <button class="button button-primary" data-action="play-about">Replay Introduction</button>
         <button class="button button-muted" data-action="stop-audio">Stop</button>
       </div>
-      ${renderTranscript(voiceScripts.about, "Read introduction transcript")}
     `);
   }
 
