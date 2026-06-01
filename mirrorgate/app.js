@@ -507,6 +507,25 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       force: "Do not chase certainty during Mirror Phase. Let the reflection complete in its own time.",
       defaultTone: 528,
       guidanceAsset: "SymbolicMirrorModuleGuidance.wav"
+    },
+    guided: {
+      title: "Full Harmonic Contact Interface Sequence",
+      actionLabel: "Guided Session",
+      sequenceLabel: "Guided",
+      wheelVerb: "Guide",
+      icon: "◈",
+      accent: "#dfe6ff",
+      subtitle: "Run the complete path from calibration to save.",
+      modality: "Full Sequence",
+      phrase: "Move through the whole path with coherence.",
+      purpose: "Guided Session carries the full Harmonic Contact Interface route rather than one single module.",
+      wheelGuidance: "Run the full Harmonic Contact Interface sequence from calibration to save.",
+      guidanceScript: voiceScripts.generalSequence,
+      now: [],
+      notice: "",
+      force: "",
+      defaultTone: 144,
+      guidanceAsset: "GeneralSequencePathVoice.mp3"
     }
   };
 
@@ -629,7 +648,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     {
       title: "Guide me through everything",
       subtitle: "Run the full Harmonic Contact Interface sequence from calibration to save.",
-      module: "mirror",
+      module: "guided",
       invocation: "generalSequence"
     }
   ];
