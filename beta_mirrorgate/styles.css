@@ -902,6 +902,36 @@ h3 {
   margin-top: 16px;
 }
 
+.action-panel {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--module-accent, var(--gold)) 25%, transparent);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--module-accent, var(--gold)) 14%, transparent), transparent 58%),
+    rgba(0, 0, 0, 0.2);
+}
+
+.module-details {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.module-details summary {
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.module-details[open] summary {
+  color: var(--module-accent, var(--gold));
+}
+
 .module-canvas-card {
   display: grid;
   place-items: center;

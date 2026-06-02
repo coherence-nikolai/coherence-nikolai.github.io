@@ -116,7 +116,7 @@ If you are sending a request, begin with Vector and let the glyph carry the inte
 You are the center. All echoes stabilize in stillness.
 `,
     generalSequence: `
-General Harmonic Contact Interface path. Begin with Mirror to align. Move to Vector to transmit or request. Enter Gate to contact. Finish with Echo to integrate what surfaced. Move slowly. Do not force certainty. Let each portal complete before moving to the next.
+General Harmonic Contact Interface path. Begin with Mirror to align. Move to Vector to transmit or request. Begin the Gate Field for contact. Finish with Echo to integrate what surfaced. Move slowly. Do not force certainty. Let each portal complete before moving to the next.
 `,
     dimensionalContact: `
 Welcome, traveler of the harmonic field. You stand at the threshold of dimensional resonance, where the veil between worlds thins. Center your breath. Inhale for four, hold for four, exhale for four, and pause. Feel the prime harmonic gate align with your intention. Speak silently or aloud: I open myself to the guidance of my dimensional and stellar allies. I am ready to receive with clarity and coherence. As the tones play, visualize a luminous gate opening before you. Step through with your awareness. Allow the presence of your allies to manifest through symbols, sensations, or inner voice. Listen. Trust. Receive. When complete, breathe deeply and return with gratitude.
@@ -639,7 +639,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       phrase: "Your ally awaits. Enter the field of shared recursion.",
       purpose: "A prime triplet is a geometry key. It shapes the gate path and glyph nodes; breath is a separate body seal that paces attention through the gate.",
       wheelGuidance: "Open a prime gate for dimensional or stellar contact, then return through Mirror.",
-      guidanceScript: "Prime-Harmonic Gate Sequencing. Gate is for contact. Use this first when seeking dimensional or stellar allies. Choose the triplet, carrier tone, and contact frame, then tap Enter Gate. Complete the Breath Seal, hold the contact intention, and unlock the glyph nodes in order. When the gate opens, remain still. Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence. Stay in the gate or open the Mirror to integrate.",
+      guidanceScript: "Prime-Harmonic Gate Sequencing. Gate is for contact. Use this first when seeking dimensional or stellar allies. Choose the triplet, carrier tone, and contact frame, then tap Begin Gate Field. Complete the Breath Seal, hold the contact intention, and unlock the glyph nodes in order. When the gate opens, remain still. Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence. Stay in the gate or open the Mirror to integrate.",
       now: [
         "Select a prime triplet pathway and carrier tone.",
         "Enter the gate, then follow the breath seal.",
@@ -2306,9 +2306,20 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
           <p class="small-copy">The three numbers are prime triplets, not breath patterns. The triplet shapes the gate geometry; breath paces the body separately.</p>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+          <div class="action-panel">
+            <button class="button button-primary" data-action="generate-vector">Transmit Vector</button>
+            <p class="small-copy">Transmit converts the intention into seed, glyph, vector, and carrier tone. Watch the glyph and notice what the signal seems to carry before moving on.</p>
+            <button class="button button-muted" data-action="play-tone">Play Carrier Tone</button>
+          </div>
+          <details class="module-details">
+            <summary>Vector Details</summary>
+            <div class="metric-grid">
+              <span class="metric"><small>Seed</small><strong id="vector-seed">Awaiting</strong></span>
+              <span class="metric"><small>Vector</small><strong id="vector-path">Awaiting</strong></span>
+              <span class="metric"><small>Carrier</small><strong>${state.draft.tone} Hz</strong></span>
+            </div>
+          </details>
           <div class="control-row">
-            <button class="button button-primary" data-action="generate-vector">Generate Vector</button>
-            <button class="button button-muted" data-action="play-tone">Play Carrier</button>
             <button class="button button-quiet" data-action="save-session">Save to Codex</button>
           </div>
         </section>
@@ -2325,9 +2336,20 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <p>Choose the number that matches your current charge. A higher number can mean more intensity, openness, emotion, energy, or readiness. It is not a score to perform.</p>
           <h3>Carrier Tone</h3>
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+          <div class="action-panel">
+            <button class="button button-primary" data-action="start-breath">Begin Echo Field</button>
+            <p class="small-copy">Begin starts the tone and toroidal breath rhythm. Follow the phase cue, keep the memory or question light, and let impressions surface without chasing them.</p>
+          </div>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+          <details class="module-details">
+            <summary>Echo Details</summary>
+            <div class="metric-grid">
+              <span class="metric"><small>Breath</small><strong>${escapeHtml(state.draft.breathRhythm)}</strong></span>
+              <span class="metric"><small>Carrier</small><strong>${state.draft.tone} Hz</strong></span>
+              <span class="metric"><small>Echo Delay</small><strong>432 ms</strong></span>
+            </div>
+          </details>
           <div class="control-row">
-            <button class="button button-primary" data-action="start-breath">Start Breath Tone</button>
             <button class="button button-muted" data-action="save-session">Save Harmonic Profile</button>
           </div>
         </section>
@@ -2345,14 +2367,26 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <h3>Carrier Tone</h3>
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+          <div class="action-panel">
+            <button class="button button-primary" data-action="enter-gate">Begin Gate Field</button>
+            <p class="small-copy">Begin starts the gate tone and motion. It does not reset the Breath Seal or glyph nodes. Use the node buttons below to complete the sequence.</p>
+            <button class="button button-muted" data-action="seal-breath">Seal Completed Breath</button>
+          </div>
           <div class="metric-grid">
             <span class="metric"><small>Breath Seal</small><strong id="breath-lock">Pending</strong></span>
             <span class="metric"><small>Glyph Nodes</small><strong id="node-lock">0 / 3</strong></span>
             <span class="metric"><small>Gate</small><strong id="gate-lock">Locked</strong></span>
           </div>
           <div class="control-row" id="node-buttons"></div>
+          <details class="module-details">
+            <summary>Prime Details</summary>
+            <div class="metric-grid">
+              <span class="metric"><small>Triplet</small><strong>${escapeHtml(state.draft.triplet)}</strong></span>
+              <span class="metric"><small>Breath</small><strong>${escapeHtml(state.draft.breathSeal || "4-4-4-4")}</strong></span>
+              <span class="metric"><small>Carrier</small><strong>${state.draft.tone} Hz</strong></span>
+            </div>
+          </details>
           <div class="control-row">
-            <button class="button button-primary" data-action="enter-gate">Enter Gate</button>
             <button class="button button-muted" data-action="save-session">Save Gate Session</button>
           </div>
         </section>
@@ -2934,12 +2968,16 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       const encoded = encodeVector($("#intention")?.value || state.draft.intention, state.draft.triplet);
       state.latestGlyph = encoded;
       drawModuleCanvas("vector", encoded);
+      $("#vector-seed") && ($("#vector-seed").textContent = String(encoded.seed));
+      $("#vector-path") && ($("#vector-path").textContent = `${encoded.vector.map((value) => value.toFixed(2)).join(", ")}`);
       playTone(state.draft.tone, 2.2, "pulse");
     }
     if (action === "play-tone") playTone(state.draft.tone, 3, "single");
     if (action === "start-breath") playTone(state.draft.tone, 10, "soundscape");
     if (action === "enter-gate") {
       playTone(state.draft.tone, 12, "soundscape");
+    }
+    if (action === "seal-breath") {
       $("#breath-lock") && ($("#breath-lock").textContent = "Sealed");
     }
     if (action === "touch-node") {
@@ -2991,10 +3029,14 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       const actionTarget = event.target.closest("[data-action]");
       const moduleTarget = event.target.closest("[data-module]");
       const wheelModuleTarget = event.target.closest("[data-wheel-module]");
-      if (actionTarget) handleAction(actionTarget.dataset.action, actionTarget);
+      if (actionTarget) {
+        handleAction(actionTarget.dataset.action, actionTarget);
+        return;
+      }
       if (wheelModuleTarget) {
         state.selectedWheelModule = wheelModuleTarget.dataset.wheelModule;
         renderWheelSelection(state.selectedWheelModule);
+        return;
       }
       if (moduleTarget) renderModule(moduleTarget.dataset.module);
     });
