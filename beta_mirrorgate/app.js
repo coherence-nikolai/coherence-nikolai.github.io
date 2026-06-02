@@ -159,6 +159,11 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     activeSessionDetail: null,
     alignmentStart: 0,
     currentFlowStep: "mode",
+    moduleSteps: {},
+    advancedModules: {},
+    gateBreathSealed: false,
+    gateHeldIntention: false,
+    gateTouchedNodes: [],
     latestGlyph: null,
     draft: loadDraft(),
     glyphDesigner: loadGlyphProfile()
@@ -1604,6 +1609,19 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     `;
   }
 
+  function activeGlyphInline(moduleKey) {
+    const profile = state.glyphDesigner;
+    const active = activeGlyphEnabled();
+    const sealed = !!profile.activeGlyphSealedAt;
+    return `
+      <div class="active-glyph-inline">
+        <strong>${escapeHtml(active ? activeGlyphDisplayName() : sealed ? "Active Glyph Paused" : "No Active Glyph")}</strong>
+        <span>${escapeHtml(active ? activeGlyphContext(moduleKey) : sealed ? "Enable it in Glyph Studio when you want modules to use it again." : "Create one in Glyph Studio when you want a reusable personal seal.")}</span>
+        <button class="button button-quiet" data-action="open-glyph-designer">Glyph Studio</button>
+      </div>
+    `;
+  }
+
   function stageCard(stageID) {
     const stage = stages[stageID];
     return `
@@ -2240,6 +2258,327 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     };
   }
 
+  function moduleStepDefinitions(name) {
+    const module = modules[name] || modules.mirror;
+    if (name === "vector") {
+      return [
+        { title: "Orient the Vector", instruction: "Use this module when you want to transmit a request, encode a signal, or form a glyph from intention.", notice: "Notice the exact words that feel alive before you type anything." },
+        { title: "Enter Intention", instruction: "Write one clear phrase. Keep it short enough that the glyph can feel like one signal.", notice: "Watch for resistance, clarity, heat, pressure, or a phrase that suddenly feels more accurate." },
+        { title: "Choose Prime Path", instruction: "Choose the prime triplet as the geometry key. It shapes the vector and glyph; it is not a breath pattern.", notice: "A smaller triplet feels foundational. Wider triplets feel more exploratory." },
+        { title: "Transmit", instruction: "Tap Transmit Vector. Let the tone and glyph carry the request without trying to answer it yet.", notice: "Notice what the glyph seems to carry: direction, weight, mood, or symbolic charge." },
+        { title: "Reflect or Save", instruction: "If the signal feels complete, save it to the Personal Codex or move to another portal.", notice: "The vector is the sent signal. Integration can happen later through Mirror or Echo." }
+      ];
+    }
+    if (name === "breath") {
+      return [
+        { title: "Orient the Echo", instruction: "Use Echo when the work is integration: future echoes, dreamtime, collective resonance, or subconscious retrieval.", notice: "Begin with breath. Keep the question light rather than gripping it." },
+        { title: "Choose Breath and Tone", instruction: "Choose a rhythm and carrier tone. Breath paces the body while the toroidal field gives the echo a shape.", notice: "A higher resonance number means more current charge, not better performance." },
+        { title: "Begin Echo Field", instruction: "Start the tone and watch the toroidal motion. Let the active glyph breathe with the pattern if one is sealed.", notice: "Look for image, memory, body sensation, emotion, inner words, or silence." },
+        { title: "Integrate", instruction: "Name one thing that returned. If nothing obvious returned, record the stillness honestly.", notice: "Echo work can be subtle. Quiet is still valid." }
+      ];
+    }
+    if (name === "gate") {
+      return [
+        { title: "Orient the Gate", instruction: "Use Gate when the intention is dimensional or stellar ally contact. This is the contact portal.", notice: "Start only when the intention is clear enough to hold without forcing." },
+        { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate; the Breath Seal paces your body.", notice: "The Breath Seal does not need to match the triplet." },
+        { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone and geometry establish the threshold.", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
+        { title: "Seal the Breath", instruction: "Complete one full Breath Seal and mark it sealed when the body feels steady enough.", notice: "The breath seal is a body anchor, not a race." },
+        { title: "Hold Intention", instruction: "Name the contact intention silently, then mark it held. Keep it simple.", notice: "The intention should feel like a clear beacon, not a demand." },
+        { title: "Unlock Glyph Nodes", instruction: "Tap the glyph nodes in order. This completes the gate sequence.", notice: "When the gate opens, remain still. Let contact unfold naturally." },
+        { title: "Integrate Through Mirror", instruction: "After the gate, open Mirror to reflect and integrate what came through.", notice: "Do not chase certainty. Return through Mirror even if the gate was quiet." }
+      ];
+    }
+    return [
+      { title: "Orient the Mirror", instruction: "Use Mirror for Oversoul, Monad, self-harmonic alignment, or integration after contact work.", notice: "The camera is optional. Attention, breath, and inner imagery are the deeper mirror." },
+      { title: "Set the Intention", instruction: "Read or type one intention. Speak it once if using voice, then stop trying to force an answer.", notice: "Notice breath, body pressure, emotion, inner words, memory, symbols, image, or stillness." },
+      { title: "Enter Mirror", instruction: "Activate the camera or simply gaze at the symbolic surface. Hold the intention lightly.", notice: "Nothing obvious is still a valid Mirror session." },
+      { title: "Reflect or Save", instruction: "Record what remains after the mirror phase. Save only what feels worth keeping.", notice: "The Mirror reflects and integrates; it does not need to prove anything." }
+    ];
+  }
+
+  function currentModuleStep(name) {
+    const steps = moduleStepDefinitions(name);
+    const raw = Number(state.moduleSteps[name] || 0);
+    return Math.min(steps.length - 1, Math.max(0, raw));
+  }
+
+  function renderModuleStepProgress(name, steps, currentIndex) {
+    return `
+      <div class="module-step-progress" aria-label="Module progress">
+        ${steps.map((step, index) => `
+          <span class="${index === currentIndex ? "active" : index < currentIndex ? "done" : ""}">
+            <b>${index + 1}</b>
+            <small>${escapeHtml(step.title)}</small>
+          </span>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderGuidedModule(name) {
+    const module = modules[name] || modules.mirror;
+    const steps = moduleStepDefinitions(name);
+    const stepIndex = currentModuleStep(name);
+    const step = steps[stepIndex];
+    return `
+      <header class="module-header guided-module-header">
+        <p class="path-label" style="color: var(--module-accent)">${escapeHtml(module.actionLabel)}</p>
+        <h2>${escapeHtml(step.title)}</h2>
+        <p>${escapeHtml(step.instruction)}</p>
+        ${renderModuleStepProgress(name, steps, stepIndex)}
+      </header>
+
+      <section class="panel guided-module-card">
+        <p class="path-label">${escapeHtml(module.title)}</p>
+        ${renderGuidedModuleStepBody(name, stepIndex)}
+        <div class="notice-strip">
+          <strong>What to notice</strong>
+          <span>${escapeHtml(step.notice)}</span>
+        </div>
+      </section>
+
+      ${moduleStepFooter(name, stepIndex, steps.length)}
+    `;
+  }
+
+  function moduleStepFooter(name, stepIndex, count) {
+    const back = stepIndex > 0
+      ? `<button class="button button-quiet" data-action="module-prev-step" data-module-name="${escapeHtml(name)}">Back</button>`
+      : `<button class="button button-quiet" data-action="open-wheel">Return to Wheel</button>`;
+    const next = stepIndex < count - 1
+      ? `<button class="button button-primary" data-action="module-next-step" data-module-name="${escapeHtml(name)}">Next Step</button>`
+      : `<button class="button button-primary" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Open Advanced View</button>`;
+    const advanced = stepIndex < count - 1
+      ? `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Advanced View</button>`
+      : "";
+    return `
+      <div class="control-row flow-actions module-step-actions">
+        ${back}
+        ${next}
+        ${advanced}
+      </div>
+    `;
+  }
+
+  function renderGuidedModuleStepBody(name, stepIndex) {
+    if (name === "vector") return renderVectorGuidedStep(stepIndex);
+    if (name === "breath") return renderEchoGuidedStep(stepIndex);
+    if (name === "gate") return renderGateGuidedStep(stepIndex);
+    return renderMirrorGuidedStep(stepIndex);
+  }
+
+  function renderVectorGuidedStep(stepIndex) {
+    if (stepIndex === 0) {
+      return `
+        <h3>Harmonic Vector Transmission</h3>
+        <p>${escapeHtml(modules.vector.purpose)}</p>
+        ${activeGlyphInline("vector")}
+        <div class="control-row">
+          <button class="button button-muted" data-action="play-module-guidance" data-module-name="vector">Play Vector Guidance</button>
+        </div>
+        ${renderTranscript(modules.vector.guidanceScript, "Read Vector transcript")}
+      `;
+    }
+    if (stepIndex === 1) {
+      return `
+        <label for="intention">Intention</label>
+        <textarea id="intention" class="textarea" placeholder="I am entering this session to...">${escapeHtml(state.draft.intention)}</textarea>
+        <h3>Carrier Tone</h3>
+        <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+      `;
+    }
+    if (stepIndex === 2) {
+      return `
+        <h3>Prime Triplet Pathway</h3>
+        <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
+        <p class="small-copy">The three numbers are geometry keys written as p1-p2-p3. They shape the vector axes and glyph behavior.</p>
+      `;
+    }
+    if (stepIndex === 3) {
+      return `
+        <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+        <div class="action-panel">
+          <button class="button button-primary" data-action="generate-vector">Transmit Vector</button>
+          <button class="button button-muted" data-action="play-tone">Play Carrier Tone</button>
+        </div>
+        <div class="metric-grid">
+          <span class="metric"><small>Seed</small><strong id="vector-seed">Awaiting</strong></span>
+          <span class="metric"><small>Vector</small><strong id="vector-path">Awaiting</strong></span>
+          <span class="metric"><small>Carrier</small><strong>${escapeHtml(getTone(state.draft.tone).label)}</strong></span>
+        </div>
+      `;
+    }
+    return `
+      <label for="reflection">Reflection</label>
+      <textarea id="reflection" class="textarea" placeholder="What did the vector seem to carry?">${escapeHtml(state.draft.reflection)}</textarea>
+      <div class="control-row">
+        <button class="button button-primary" data-action="save-session">Save Vector to Codex</button>
+        <button class="button button-muted" data-module="gate">Continue to Gate</button>
+      </div>
+    `;
+  }
+
+  function renderEchoGuidedStep(stepIndex) {
+    if (stepIndex === 0) {
+      return `
+        <h3>Toroidal Phase Echoing</h3>
+        <p>${escapeHtml(modules.breath.purpose)}</p>
+        ${activeGlyphInline("breath")}
+        <div class="control-row">
+          <button class="button button-muted" data-action="play-module-guidance" data-module-name="breath">Play Echo Guidance</button>
+        </div>
+        ${renderTranscript(modules.breath.guidanceScript, "Read Echo transcript")}
+      `;
+    }
+    if (stepIndex === 1) {
+      return `
+        <h3>Breath Rhythm</h3>
+        <div class="choice-grid">${renderChoiceGroup(calibrationBreathChoices, state.draft.breathRhythm, "choice", "breath")}</div>
+        <label for="resonance">Self-rated resonance: <strong id="resonance-value">${state.draft.resonance}</strong></label>
+        <input id="resonance" type="range" min="1" max="10" value="${state.draft.resonance}">
+        <p>A higher number can mean more intensity, openness, emotion, energy, or readiness. It is not a score to perform.</p>
+        <h3>Carrier Tone</h3>
+        <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+      `;
+    }
+    if (stepIndex === 2) {
+      return `
+        <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+        <div class="action-panel">
+          <button class="button button-primary" data-action="start-breath">Begin Echo Field</button>
+          <p class="small-copy">Follow the toroidal pulse. Let time-feelings, symbols, collective impressions, or future-self echoes surface without forcing them.</p>
+        </div>
+      `;
+    }
+    return `
+      <label for="reflection">Echo Reflection</label>
+      <textarea id="reflection" class="textarea" placeholder="What surfaced through the echo field?">${escapeHtml(state.draft.reflection)}</textarea>
+      <div class="control-row">
+        <button class="button button-primary" data-action="save-session">Save Echo to Codex</button>
+        <button class="button button-muted" data-module="vector">Encode Insight in Vector</button>
+      </div>
+    `;
+  }
+
+  function renderGateGuidedStep(stepIndex) {
+    if (stepIndex === 0) {
+      return `
+        <h3>Prime-Harmonic Gate Sequencing</h3>
+        <p>${escapeHtml(modules.gate.purpose)}</p>
+        ${activeGlyphInline("gate")}
+        <div class="control-row">
+          <button class="button button-muted" data-action="play-module-guidance" data-module-name="gate">Play Gate Guidance</button>
+        </div>
+        ${renderTranscript(modules.gate.guidanceScript, "Read Gate transcript")}
+      `;
+    }
+    if (stepIndex === 1) {
+      return `
+        <h3>Prime Triplet Pathway</h3>
+        <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
+        <h3>Breath Seal</h3>
+        <div class="choice-grid">${renderChoiceGroup(gateBreathSeals.map((cycle) => ({ id: cycle, title: cycle, why: cycle === state.draft.triplet ? "This breath can mirror the selected triplet, but does not need to." : "Breath paces the body separately from the prime triplet." })), state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
+        <h3>Carrier Tone</h3>
+        <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+      `;
+    }
+    if (stepIndex === 2) {
+      return `
+        <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+        <div class="action-panel">
+          <button class="button button-primary" data-action="enter-gate">Begin Gate Field</button>
+          <p class="small-copy">Begin starts the gate tone and motion. It does not reset the Breath Seal, intention, or glyph nodes.</p>
+        </div>
+      `;
+    }
+    if (stepIndex === 3) {
+      return `
+        <h3>Breath Seal</h3>
+        <p>Complete one full ${escapeHtml(state.draft.breathSeal || "4-4-4-4")} breath cycle. Tap the seal only after the body feels steady enough.</p>
+        <button class="button button-primary button-wide" data-action="seal-breath">Seal Completed Breath</button>
+        <div class="metric-grid">
+          <span class="metric"><small>Breath Cycle</small><strong id="breath-lock">${state.gateBreathSealed ? "Sealed" : "Pending"}</strong></span>
+          <span class="metric"><small>Carrier</small><strong>${escapeHtml(getTone(state.draft.tone).label)}</strong></span>
+        </div>
+      `;
+    }
+    if (stepIndex === 4) {
+      return `
+        <h3>Hold Intention</h3>
+        <p>Name the contact intention silently or aloud. When the intention feels steady, mark it held.</p>
+        <label class="toggle-row">
+          <input id="held-intention-toggle" type="checkbox" ${state.gateHeldIntention ? "checked" : ""}>
+          <span>Intention held</span>
+        </label>
+        <p class="small-copy">This is the beacon. Keep it simple and clear.</p>
+      `;
+    }
+    if (stepIndex === 5) {
+      const nodes = state.draft.triplet.split("-");
+      return `
+        <h3>Glyph Nodes</h3>
+        <p>Tap in order: ${escapeHtml(nodes.join(" -> "))}. The selected module color marks each node as it opens.</p>
+        <div class="control-row" id="node-buttons"></div>
+        <div class="metric-grid">
+          <span class="metric"><small>Glyph Sequence</small><strong id="node-lock">${state.gateTouchedNodes.length} / 3</strong></span>
+          <span class="metric"><small>Gate</small><strong id="gate-lock">${state.gateTouchedNodes.length >= 3 ? "Open" : "Locked"}</strong></span>
+        </div>
+      `;
+    }
+    return `
+      <h3>Integrate Through Mirror</h3>
+      <p>After contact, return through Mirror so the experience can be reflected back through your own center.</p>
+      <label for="notes">Gate Notes</label>
+      <textarea id="notes" class="textarea" placeholder="Presence, symbols, body sensations, inner words, or stillness...">${escapeHtml(state.draft.notes)}</textarea>
+      <div class="control-row">
+        <button class="button button-primary" data-module="mirror">Open Mirror</button>
+        <button class="button button-muted" data-action="save-session">Save Gate Session</button>
+      </div>
+    `;
+  }
+
+  function renderMirrorGuidedStep(stepIndex) {
+    if (stepIndex === 0) {
+      return `
+        <h3>Symbolic Mirror Interface</h3>
+        <p>${escapeHtml(modules.mirror.purpose)}</p>
+        ${activeGlyphInline("mirror")}
+        <div class="control-row">
+          <button class="button button-muted" data-action="play-module-guidance" data-module-name="mirror">Play Mirror Guidance</button>
+        </div>
+        ${renderTranscript(modules.mirror.guidanceScript, "Read Mirror transcript")}
+      `;
+    }
+    if (stepIndex === 1) {
+      return `
+        <label for="mirror-intention">Current intention</label>
+        <textarea id="mirror-intention" class="textarea" placeholder="Read the intention back to yourself.">${escapeHtml(state.draft.intention)}</textarea>
+        <h3>Carrier Tone</h3>
+        <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+      `;
+    }
+    if (stepIndex === 2) {
+      return `
+        <div class="module-canvas-card mirror-stage">
+          <video id="mirror-video" playsinline muted></video>
+          <canvas id="module-canvas" width="620" height="620"></canvas>
+        </div>
+        <div class="control-row">
+          <button class="button button-primary" data-action="start-camera">Activate Camera Mirror</button>
+          <button class="button button-muted" data-action="play-tone">Play Mirror Tone</button>
+        </div>
+      `;
+    }
+    return `
+      <label for="reflection">Mirror Reflection</label>
+      <textarea id="reflection" class="textarea" placeholder="What remained after the mirror phase?">${escapeHtml(state.draft.reflection)}</textarea>
+      <div class="control-row">
+        <button class="button button-primary" data-action="save-session">Save Reflection</button>
+        <button class="button button-muted" data-module="breath">Continue to Echo</button>
+      </div>
+    `;
+  }
+
   function renderModule(name, options = {}) {
     const { resetScroll = true } = options;
     const module = modules[name];
@@ -2261,7 +2600,21 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       moduleScreen.style.setProperty("--module-accent", module.accent);
     }
     if (isNewModule) state.draft.tone = module.defaultTone;
+    if (isNewModule) {
+      state.moduleSteps[name] = 0;
+      state.advancedModules[name] = false;
+      state.gateBreathSealed = false;
+      state.gateHeldIntention = false;
+      state.gateTouchedNodes = [];
+    }
     const root = $("#module-root");
+    if (!state.advancedModules[name]) {
+      root.innerHTML = renderGuidedModule(name);
+      bindModule(root, name);
+      drawModuleCanvas(name);
+      showScreen("module", { resetScroll });
+      return;
+    }
     root.innerHTML = `
       <header class="module-header">
         <p class="path-label" style="color: var(--module-accent)">${escapeHtml(module.actionLabel)}</p>
@@ -2288,6 +2641,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       </section>
 
       ${renderModuleBody(name)}
+
+      <div class="control-row flow-actions module-step-actions">
+        <button class="button button-muted" data-action="module-guided" data-module-name="${escapeHtml(name)}">Return to Guided Steps</button>
+      </div>
     `;
     bindModule(root, name);
     drawModuleCanvas(name);
@@ -2422,7 +2779,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     });
     $$(".choice", root).forEach((button) => {
       button.addEventListener("click", () => {
-        if (button.dataset.triplet) state.draft.triplet = button.dataset.triplet;
+        if (button.dataset.triplet) {
+          if (state.draft.triplet !== button.dataset.triplet) state.gateTouchedNodes = [];
+          state.draft.triplet = button.dataset.triplet;
+        }
         if (button.dataset.breath) state.draft.breathRhythm = button.dataset.breath;
         if (button.dataset.breathSeal) state.draft.breathSeal = button.dataset.breathSeal;
         persistDraft();
@@ -2442,6 +2802,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       $("#resonance-value").textContent = event.target.value;
       persistDraft();
     });
+    $("#held-intention-toggle", root)?.addEventListener("change", (event) => {
+      state.gateHeldIntention = !!event.target.checked;
+      showStatus(state.gateHeldIntention ? "Contact intention marked as held." : "Contact intention released.", "success");
+    });
     if (name === "gate") renderNodeButtons();
   }
 
@@ -2449,7 +2813,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const holder = $("#node-buttons");
     if (!holder) return;
     holder.innerHTML = state.draft.triplet.split("-").map((node) => (
-      `<button class="button button-muted" data-action="touch-node" data-node="${node}">${node}</button>`
+      `<button class="button button-muted ${state.gateTouchedNodes.includes(node) ? "selected" : ""}" data-action="touch-node" data-node="${node}">${node}</button>`
     )).join("");
   }
 
@@ -2548,7 +2912,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       state.draft.originalAudioDataUrl = reader.result;
       state.draft.originalAudioType = mimeType;
       persistDraft();
-      if (state.screen === "module") renderFlowStep(state.currentFlowStep, { resetScroll: false });
+      if (state.screen === "module" && state.module === "guided") {
+        renderFlowStep(state.currentFlowStep, { resetScroll: false });
+      } else if (state.screen === "module" && state.module) {
+        renderModule(state.module, { resetScroll: false });
+      }
     };
     reader.onerror = () => showStatus("Recording could not be prepared for Echo Playback.", "error");
     reader.readAsDataURL(blob);
@@ -2913,6 +3281,23 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       const invocation = pathInvocations[target.dataset.invocation];
       if (invocation) playAsset(invocation.asset);
     }
+    if (action === "module-next-step" || action === "module-prev-step") {
+      const moduleName = target.dataset.moduleName || state.module;
+      const steps = moduleStepDefinitions(moduleName);
+      const offset = action === "module-next-step" ? 1 : -1;
+      state.moduleSteps[moduleName] = Math.min(steps.length - 1, Math.max(0, currentModuleStep(moduleName) + offset));
+      renderModule(moduleName, { resetScroll: true });
+    }
+    if (action === "module-advanced") {
+      const moduleName = target.dataset.moduleName || state.module;
+      state.advancedModules[moduleName] = true;
+      renderModule(moduleName, { resetScroll: true });
+    }
+    if (action === "module-guided") {
+      const moduleName = target.dataset.moduleName || state.module;
+      state.advancedModules[moduleName] = false;
+      renderModule(moduleName, { resetScroll: true });
+    }
     if (action === "begin-invocation") {
       const invocation = pathInvocations[target.dataset.invocation];
       if (invocation?.startsFullSequence) {
@@ -2976,16 +3361,27 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "start-breath") playTone(state.draft.tone, 10, "soundscape");
     if (action === "enter-gate") {
       playTone(state.draft.tone, 12, "soundscape");
+      showStatus("Gate field started. Continue with breath, intention, and glyph nodes.", "success");
     }
     if (action === "seal-breath") {
+      state.gateBreathSealed = true;
       $("#breath-lock") && ($("#breath-lock").textContent = "Sealed");
+      showStatus("Breath Seal marked complete.", "success");
     }
     if (action === "touch-node") {
+      const node = target.dataset.node || "";
+      const expected = state.draft.triplet.split("-")[state.gateTouchedNodes.length];
+      if (node !== expected) {
+        showStatus(`Next glyph node is ${expected}.`, "error");
+        return;
+      }
+      state.gateTouchedNodes.push(node);
       target.classList.add("selected");
-      const touched = $$("#node-buttons .selected").length;
+      const touched = state.gateTouchedNodes.length;
       $("#node-lock") && ($("#node-lock").textContent = `${touched} / 3`);
       if (touched >= 3 && $("#gate-lock")) $("#gate-lock").textContent = "Open";
       playTone(state.draft.tone + Number(target.dataset.node || 0) * 2, 0.42, "single");
+      if (touched >= 3) showStatus("Glyph sequence unlocked. Gate is open.", "success");
     }
     if (action === "start-camera") startCamera();
     if (action === "save-session") saveManualSession();

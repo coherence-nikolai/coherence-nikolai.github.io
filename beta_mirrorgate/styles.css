@@ -269,6 +269,12 @@ h3 {
   transform: translateY(1px);
 }
 
+.button.selected {
+  color: #11131a;
+  background: var(--module-accent, var(--gold));
+  box-shadow: 0 0 22px color-mix(in srgb, var(--module-accent, var(--gold)) 22%, transparent);
+}
+
 .button-wide {
   width: 100%;
   max-width: 760px;
@@ -912,6 +918,123 @@ h3 {
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--module-accent, var(--gold)) 14%, transparent), transparent 58%),
     rgba(0, 0, 0, 0.2);
+}
+
+.guided-module-header h2 {
+  color: var(--silver);
+}
+
+.module-step-progress {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0 2px;
+  scrollbar-width: none;
+}
+
+.module-step-progress::-webkit-scrollbar {
+  display: none;
+}
+
+.module-step-progress span {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  max-width: 190px;
+  border: 1px solid color-mix(in srgb, var(--module-accent, var(--gold)) 16%, transparent);
+  border-radius: 999px;
+  padding: 7px 10px 7px 8px;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.module-step-progress b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #11131a;
+  background: color-mix(in srgb, var(--module-accent, var(--gold)) 34%, var(--silver));
+  font-size: 0.8rem;
+}
+
+.module-step-progress small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 800;
+}
+
+.module-step-progress span.done,
+.module-step-progress span.active {
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 48%, transparent);
+  color: var(--silver);
+}
+
+.module-step-progress span.active {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--module-accent, var(--gold)) 18%, transparent), rgba(0, 0, 0, 0.22));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--module-accent, var(--gold)) 16%, transparent);
+}
+
+.guided-module-card {
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 32%, transparent);
+  background:
+    radial-gradient(circle at 50% 10%, color-mix(in srgb, var(--module-accent, var(--gold)) 16%, transparent), transparent 46%),
+    linear-gradient(180deg, rgba(23, 24, 36, 0.96), rgba(10, 11, 18, 0.96));
+}
+
+.guided-module-card > p {
+  line-height: 1.5;
+}
+
+.active-glyph-inline {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  border: 1px solid color-mix(in srgb, var(--module-accent, var(--gold)) 24%, transparent);
+  border-radius: var(--radius);
+  padding: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--module-accent, var(--gold)) 12%, transparent), rgba(0, 0, 0, 0.16));
+}
+
+.active-glyph-inline strong {
+  color: var(--module-accent, var(--gold));
+}
+
+.active-glyph-inline span {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.active-glyph-inline .button {
+  justify-self: start;
+  min-height: 42px;
+  padding: 9px 14px;
+}
+
+.notice-strip {
+  display: grid;
+  gap: 5px;
+  margin-top: 16px;
+  border-left: 3px solid var(--module-accent, var(--gold));
+  padding: 10px 12px;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.notice-strip strong {
+  color: var(--module-accent, var(--gold));
+}
+
+.module-step-actions {
+  max-width: 760px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .module-details {
