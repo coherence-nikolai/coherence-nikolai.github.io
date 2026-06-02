@@ -438,7 +438,13 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     lunarBlue: { title: "Lunar Blue", primary: "#7fb7ff", secondary: "#ddeaff" },
     emeraldTeal: { title: "Emerald Teal", primary: "#34eab1", secondary: "#7dffd9" },
     emberCopper: { title: "Ember Copper", primary: "#ff5a20", secondary: "#8f2a18" },
-    roseQuartz: { title: "Rose Quartz", primary: "#ff7ab6", secondary: "#ffd2df" }
+    roseQuartz: { title: "Rose Quartz", primary: "#ff7ab6", secondary: "#ffd2df" },
+    solarAmber: { title: "Solar Amber", primary: "#ffb838", secondary: "#ffe68a" },
+    deepCrimson: { title: "Deep Crimson", primary: "#e21b3c", secondary: "#ff7870" },
+    amethystCyan: { title: "Amethyst Cyan", primary: "#b66cff", secondary: "#42e8ff" },
+    obsidianGold: { title: "Obsidian Gold", primary: "#f5ad2e", secondary: "#17120b" },
+    auroraGreen: { title: "Aurora Green", primary: "#48ff6c", secondary: "#b8ffb8" },
+    starWhite: { title: "Star White", primary: "#f4f6ff", secondary: "#b9d4ff" }
   };
 
   const glyphModuleImprints = {
@@ -475,6 +481,95 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     orbit: "Orbiting gate mark",
     spiral: "Spiral recursion"
   };
+
+  const glyphEmotionalTones = {
+    calm: { title: "Calm", guidance: "Steady the body and soften attention.", bias: 0.72 },
+    grief: { title: "Grief", guidance: "Hold tenderness, loss, or emotional honesty.", bias: 0.58 },
+    clarity: { title: "Clarity", guidance: "Sharpen the request and reduce noise.", bias: 1.06 },
+    courage: { title: "Courage", guidance: "Support direct contact, action, or truth.", bias: 1.16 },
+    longing: { title: "Longing", guidance: "Carry desire, searching, or a call across distance.", bias: 0.88 },
+    protection: { title: "Protection", guidance: "Guard the threshold and stabilize the field.", bias: 1 },
+    release: { title: "Release", guidance: "Let old charge or attachment move out.", bias: 0.78 },
+    awe: { title: "Awe", guidance: "Open toward reverence, mystery, or vastness.", bias: 1.22 },
+    trust: { title: "Trust", guidance: "Reinforce receptivity and inner steadiness.", bias: 0.9 },
+    wonder: { title: "Wonder", guidance: "Stay curious, exploratory, and receptive.", bias: 1.1 }
+  };
+
+  const glyphPurposes = {
+    grounding: { title: "Grounding", guidance: "Return attention to the body." },
+    contact: { title: "Contact", guidance: "Use as a threshold key for ally, Oversoul, Monad, or collective work." },
+    healing: { title: "Healing", guidance: "Hold emotional processing and repair." },
+    transmission: { title: "Transmission", guidance: "Carry an encoded request or signal." },
+    integration: { title: "Integration", guidance: "Organize what surfaced after contact." },
+    protection: { title: "Protection", guidance: "Mark the boundary and stabilize the space." },
+    reflection: { title: "Reflection", guidance: "Use in the Mirror or Codex as a contemplative mark." }
+  };
+
+  const glyphStudioTranscript = `Welcome to Glyph Studio.
+
+This is where your personal glyph is created, shaped, and sealed.
+
+There are two kinds of glyphs in MirrorGate.
+
+A Session Glyph is created from one specific session. It belongs to that moment.
+
+An Active Glyph is different. It is your reusable personal seal. Once activated, it can appear across the Harmonic Contact Interface as a breath anchor, mirror overlay, vector signal, gate key, Codex imprint, and capsule seal.
+
+Begin by naming the glyph.
+
+Choose an emotional tone that reflects your current field. This may be calm, grief, clarity, courage, longing, protection, release, awe, trust, or wonder.
+
+This is not a judgment. It is a way of giving shape to what is present.
+
+Set the intensity honestly. A higher number means the emotion or charge feels stronger. It is not better or worse. It simply tells the glyph how strongly to express itself through glow, pulse, density, movement, and color.
+
+Next, choose the purpose of the glyph.
+
+You may create it for grounding, contact, healing, transmission, integration, protection, or reflection.
+
+Choose a prime triplet pathway. The triplet shapes the geometry of the glyph. It changes the way the nodes connect, how the spiral turns, and how the glyph behaves in Vector and Gate work.
+
+Choose a carrier tone.
+
+The four core tones remain the primary harmonic carriers: one forty four hertz, four thirty two hertz, five twenty eight hertz, and eight eighty eight point two five hertz.
+
+If you use Custom Frequency, move slowly. Preview the tone first. When it feels correct, bind it to the glyph. The custom frequency becomes your personal carrier, while the emotion shapes the visual field.
+
+Choose a module imprint.
+
+Mirror Imprint prepares the glyph for reflection and Oversoul or Monad alignment.
+
+Vector Imprint prepares it for intention, request, and transmission.
+
+Gate Imprint prepares it as a personal key for Prime-Harmonic Gate Sequencing.
+
+Echo Imprint prepares it for breath, timeline, dream, and collective resonance work.
+
+Balanced Seal keeps the glyph open across all modules.
+
+When the glyph feels complete, seal it as your Active Glyph.
+
+Once sealed, it can be used as a breathing orb. During inhale, it expands. During hold, it stabilizes. During exhale, it contracts. During pause, it rests.
+
+In Harmonic Vector Transmission, it becomes the base signal for your intention.
+
+In Prime-Harmonic Gate Sequencing, it becomes the personal key that opens the gate sequence.
+
+In the Symbolic Mirror Interface, it can appear as a reflection overlay.
+
+In the Personal Codex, it becomes part of your symbolic timeline.
+
+You can deactivate the Active Glyph at any time. Deactivation does not delete it. It simply stops the glyph from appearing in modules until you choose to activate it again.
+
+Create slowly.
+
+Choose honestly.
+
+Seal only when the glyph feels aligned.
+
+This is your glyph.
+
+Let it become a clear symbol of what you are carrying, what you are opening, and what you are ready to integrate.`;
 
   const modules = {
     vector: {
@@ -816,6 +911,13 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       colorMode: "goldSilver",
       moduleImprint: "balanced",
       animationStyle: "pulse",
+      emotionalTone: "clarity",
+      emotionalIntensity: 5,
+      purpose: "reflection",
+      toneBindingMode: "canonical",
+      customFrequencyHz: 432,
+      usesActiveGlyph: true,
+      bindsPrimeTripletVariant: true,
       activeGlyphName: "",
       activeGlyphSealedAt: ""
     };
@@ -842,7 +944,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   function activeGlyphSummary() {
     const profile = state.glyphDesigner;
     const imprint = glyphModuleImprints[profile.moduleImprint] || glyphModuleImprints.balanced;
-    return `${activeGlyphDisplayName()} • ${imprint.moduleName} • ${profile.primeTripletText} • ${getTone(profile.carrierToneID).label}`;
+    const emotion = glyphEmotionalTones[profile.emotionalTone] || glyphEmotionalTones.clarity;
+    const purpose = glyphPurposes[profile.purpose] || glyphPurposes.reflection;
+    return `${activeGlyphDisplayName()} • ${purpose.title} • ${emotion.title} ${normalizedGlyphIntensity(profile)} • ${imprint.moduleName} • ${profile.primeTripletText} • ${activeGlyphFrequencyLabel(profile)}`;
   }
 
   function activeGlyphSnapshot() {
@@ -854,11 +958,38 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       moduleImprint: profile.moduleImprint,
       moduleName: imprint.moduleName,
       primeTripletText: profile.primeTripletText,
-      carrierTone: getTone(profile.carrierToneID).label,
+      carrierTone: activeGlyphFrequencyLabel(profile),
       colorMode: glyphColorModes[profile.colorMode]?.title || profile.colorMode,
+      emotionalTone: glyphEmotionalTones[profile.emotionalTone]?.title || profile.emotionalTone,
+      emotionalIntensity: normalizedGlyphIntensity(profile),
+      purpose: glyphPurposes[profile.purpose]?.title || profile.purpose,
       animationStyle: glyphAnimationStyles[profile.animationStyle] || profile.animationStyle,
+      usesActiveGlyph: !!profile.usesActiveGlyph,
       sealedAt: profile.activeGlyphSealedAt || ""
     };
+  }
+
+  function normalizedGlyphIntensity(profile = state.glyphDesigner) {
+    return Math.min(10, Math.max(1, Number(profile.emotionalIntensity) || 5));
+  }
+
+  function activeGlyphFrequency(profile = state.glyphDesigner) {
+    if (profile.toneBindingMode === "custom") {
+      return Math.min(4000, Math.max(20, Number(profile.customFrequencyHz) || 432));
+    }
+    return getTone(profile.carrierToneID).value;
+  }
+
+  function activeGlyphFrequencyLabel(profile = state.glyphDesigner) {
+    if (profile.toneBindingMode === "custom") {
+      return `${activeGlyphFrequency(profile).toFixed(1)} Hz custom`;
+    }
+    return getTone(profile.carrierToneID).label;
+  }
+
+  function activeGlyphEnabled() {
+    const profile = state.glyphDesigner;
+    return !!profile.usesActiveGlyph && !!profile.activeGlyphSealedAt;
   }
 
   function sealActiveGlyphProfile() {
@@ -867,7 +998,13 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     if (!String(profile.activeGlyphName || "").trim()) {
       profile.activeGlyphName = `${imprint.title} ${profile.primeTripletText}`;
     }
+    profile.usesActiveGlyph = true;
     profile.activeGlyphSealedAt = new Date().toISOString();
+    saveGlyphProfile();
+  }
+
+  function deactivateGlyphProfile() {
+    state.glyphDesigner.usesActiveGlyph = false;
     saveGlyphProfile();
   }
 
@@ -1377,7 +1514,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     if (!script) return "";
     return `
       <details class="transcript-disclosure">
-        <summary>${escapeHtml(title)}</summary>
+        <summary role="button" tabindex="0" aria-label="${escapeHtml(title)}">${escapeHtml(title)}</summary>
         <pre>${escapeHtml(cleanTranscript(script))}</pre>
       </details>
     `;
@@ -1438,16 +1575,22 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     const snapshot = activeGlyphSnapshot();
     const profile = state.glyphDesigner;
     const imprint = glyphModuleImprints[profile.moduleImprint] || glyphModuleImprints.balanced;
+    const emotion = glyphEmotionalTones[profile.emotionalTone] || glyphEmotionalTones.clarity;
+    const purpose = glyphPurposes[profile.purpose] || glyphPurposes.reflection;
+    const sealed = !!profile.activeGlyphSealedAt;
+    const active = activeGlyphEnabled();
     return `
       <section class="panel active-glyph-card">
-        <h3>Active Glyph</h3>
-        <p class="gold">${escapeHtml(profile.activeGlyphSealedAt ? snapshot.name : "No active glyph sealed yet")}</p>
-        <p>${escapeHtml(activeGlyphContext(moduleKey))}</p>
+        <h3>${active ? "Active Glyph" : sealed ? "Glyph Profile Paused" : "Active Glyph"}</h3>
+        <p class="gold">${escapeHtml(sealed ? snapshot.name : "No active glyph sealed yet")}</p>
+        <p>${escapeHtml(active ? activeGlyphContext(moduleKey) : sealed ? "The glyph design is preserved, but modules will not use it until you enable it again in Glyph Studio." : "Open Glyph Studio to create and seal a reusable glyph for this module.")}</p>
         <div class="metric-grid">
           <span class="metric"><small>Imprint</small><strong>${escapeHtml(imprint.title)}</strong></span>
           <span class="metric"><small>Original Module</small><strong>${escapeHtml(imprint.moduleName)}</strong></span>
+          <span class="metric"><small>Purpose</small><strong>${escapeHtml(purpose.title)}</strong></span>
+          <span class="metric"><small>Emotion</small><strong>${escapeHtml(`${emotion.title} ${normalizedGlyphIntensity(profile)}`)}</strong></span>
           <span class="metric"><small>Prime</small><strong>${escapeHtml(profile.primeTripletText)}</strong></span>
-          <span class="metric"><small>Tone</small><strong>${escapeHtml(getTone(profile.carrierToneID).label)}</strong></span>
+          <span class="metric"><small>Tone</small><strong>${escapeHtml(activeGlyphFrequencyLabel(profile))}</strong></span>
           <span class="metric"><small>Motion</small><strong>${escapeHtml(glyphAnimationStyles[profile.animationStyle] || profile.animationStyle)}</strong></span>
         </div>
         <div class="control-row">
@@ -1497,6 +1640,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     const selectedKey = modules[state.selectedWheelModule] ? state.selectedWheelModule : "mirror";
     state.selectedWheelModule = selectedKey;
     renderWheelSelection(selectedKey);
+    renderGlyphWheelPanel();
     renderIntentionOptions();
     renderContactPaths();
   }
@@ -1517,6 +1661,22 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       <p class="path-label">${escapeHtml(module.title)}</p>
       <p>${escapeHtml(module.wheelGuidance)}</p>
       <button class="button button-primary button-wide module-button" data-module="${escapeHtml(moduleKey)}">Enter ${escapeHtml(module.sequenceLabel)}</button>
+    `;
+  }
+
+  function renderGlyphWheelPanel() {
+    const panel = $("#glyph-wheel-panel");
+    if (!panel) return;
+    const profile = state.glyphDesigner;
+    const sealed = !!profile.activeGlyphSealedAt;
+    const active = activeGlyphEnabled();
+    panel.innerHTML = `
+      <h3>Personal Glyph Profile</h3>
+      <p class="gold">${escapeHtml(active ? "Active glyph is carrying into modules." : sealed ? "Glyph is sealed, but paused." : "Create or activate a glyph before choosing a path.")}</p>
+      <p>${escapeHtml(active ? activeGlyphSummary() : "Glyph Studio shapes the premium sigil layer: emotion, purpose, prime triplet, tone, color, motion, and module imprint.")}</p>
+      <div class="control-row">
+        <button class="button button-primary button-wide" data-action="open-glyph-designer">Open Glyph Studio</button>
+      </div>
     `;
   }
 
@@ -2418,37 +2578,73 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     state.module = "glyph-designer";
     const root = $("#module-root");
     const profile = state.glyphDesigner;
+    const sealed = !!profile.activeGlyphSealedAt;
+    const active = activeGlyphEnabled();
     root.innerHTML = `
       <header class="module-header">
         <p class="path-label">MirrorGate Initiation Feature</p>
         <h2>Glyph Studio</h2>
         <p>A personal sigil forge for nodes, spiral, prime triplet, tone, colors, and the Personal Glyph Profile.</p>
       </header>
+      <section class="panel guidance-card">
+        <h3>Glyph Studio Guidance</h3>
+        <p>Use this recording when you want the full orientation for creating, sealing, using, or pausing an Active Glyph.</p>
+        <button class="button button-muted button-wide" data-action="play-glyph-guidance">Play Glyph Guidance</button>
+        ${renderTranscript(glyphStudioTranscript, "Read glyph transcript")}
+      </section>
       <section class="panel initiation-note">
         <h3>Custom Glyph Mapping</h3>
         <p>Glyph Studio creates reusable personal imprints rather than one-off session marks. Treat it as the place where your prime pathway, carrier tone, module imprint, motion, and sigil structure are deliberately bound.</p>
         <div class="metric-grid">
           <span class="metric"><small>Active Glyph</small><strong>${escapeHtml(profile.activeGlyphSealedAt ? activeGlyphDisplayName() : "Unset")}</strong></span>
           <span class="metric"><small>Prime Binding</small><strong>${escapeHtml(profile.primeTripletText)}</strong></span>
-          <span class="metric"><small>Tone Binding</small><strong>${escapeHtml(getTone(profile.carrierToneID).label)}</strong></span>
+          <span class="metric"><small>Tone Binding</small><strong>${escapeHtml(activeGlyphFrequencyLabel(profile))}</strong></span>
           <span class="metric"><small>Imprint</small><strong>${escapeHtml(glyphModuleImprints[profile.moduleImprint]?.title || "Balanced Seal")}</strong></span>
+          <span class="metric"><small>State</small><strong>${escapeHtml(active ? "Active in modules" : sealed ? "Paused" : "Not sealed")}</strong></span>
         </div>
       </section>
       <section class="panel">
         <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
         <label for="designer-glyph-name">Glyph Name</label>
         <input class="input" id="designer-glyph-name" value="${escapeHtml(profile.activeGlyphName || "")}" placeholder="Example: Dimensional Gate Seal">
+        <div class="control-row">
+          <label class="toggle-row">
+            <input id="designer-use-active" type="checkbox" ${profile.usesActiveGlyph ? "checked" : ""}>
+            <span>Use Active Glyph in modules</span>
+          </label>
+        </div>
         <label>Node Count: <strong id="node-count-value">${profile.nodeCount}</strong></label>
         <input id="designer-node-count" type="range" min="3" max="12" value="${profile.nodeCount}">
         <label>Spiral Strength: <strong id="spiral-value">${Math.round(profile.spiralStrength * 100)}%</strong></label>
         <input id="designer-spiral" type="range" min="0" max="100" value="${Math.round(profile.spiralStrength * 100)}">
         <label for="designer-triplet">Prime Triplet</label>
         <input class="input" id="designer-triplet" value="${escapeHtml(profile.primeTripletText)}">
+        <label class="toggle-row">
+          <input id="designer-vary-triplet" type="checkbox" ${profile.bindsPrimeTripletVariant ? "checked" : ""}>
+          <span>Let modules vary the glyph by selected prime triplet</span>
+        </label>
+        <h3>Emotion</h3>
+        <div class="choice-grid">${Object.entries(glyphEmotionalTones).map(([id, item]) => `<button class="choice ${profile.emotionalTone === id ? "selected" : ""}" data-emotional-tone="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.guidance)}</span></button>`).join("")}</div>
+        <label>Intensity: <strong id="emotion-intensity-value">${normalizedGlyphIntensity(profile)}</strong></label>
+        <input id="designer-emotion-intensity" type="range" min="1" max="10" value="${normalizedGlyphIntensity(profile)}">
+        <p class="small-copy">A higher number means stronger charge, glow, pulse, density, movement, or color expression. It is not better or worse.</p>
+        <h3>Purpose</h3>
+        <div class="choice-grid">${Object.entries(glyphPurposes).map(([id, item]) => `<button class="choice ${profile.purpose === id ? "selected" : ""}" data-glyph-purpose="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.guidance)}</span></button>`).join("")}</div>
         <h3>Module Imprint</h3>
         <div class="choice-grid">${Object.entries(glyphModuleImprints).map(([id, item]) => `<button class="choice ${profile.moduleImprint === id ? "selected" : ""}" data-module-imprint="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.moduleName)}</span></button>`).join("")}</div>
         <p class="small-copy">${escapeHtml(glyphModuleImprints[profile.moduleImprint]?.use || glyphModuleImprints.balanced.use)}</p>
-        <h3>Carrier Tone</h3>
-        <div class="choice-grid">${renderChoiceGroup(tones, getTone(profile.carrierToneID).value, "tone-choice", "tone")}</div>
+        <h3>Tone Binding</h3>
+        <div class="choice-grid">
+          <button class="choice ${profile.toneBindingMode !== "custom" ? "selected" : ""}" data-tone-binding-mode="canonical">Core Tones<span>Bind to one of the four MirrorGate carriers.</span></button>
+          <button class="choice ${profile.toneBindingMode === "custom" ? "selected" : ""}" data-tone-binding-mode="custom">Custom Frequency<span>Bind to a personal carrier after previewing it.</span></button>
+        </div>
+        ${profile.toneBindingMode === "custom" ? `
+          <label>Custom Frequency: <strong id="custom-frequency-value">${activeGlyphFrequency(profile).toFixed(1)} Hz</strong></label>
+          <input id="designer-custom-frequency" type="range" min="20" max="4000" step="1" value="${activeGlyphFrequency(profile)}">
+          <button class="button button-muted" data-action="preview-glyph-frequency">Preview Custom Tone</button>
+        ` : `
+          <div class="choice-grid">${renderChoiceGroup(tones, getTone(profile.carrierToneID).value, "tone-choice", "tone")}</div>
+        `}
         <h3>Color Mode</h3>
         <div class="choice-grid">${Object.entries(glyphColorModes).map(([id, item]) => `<button class="choice ${profile.colorMode === id ? "selected" : ""}" data-color-mode="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.primary)} / ${escapeHtml(item.secondary)}</span></button>`).join("")}</div>
         <h3>Motion</h3>
@@ -2457,6 +2653,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         <div class="control-row">
           <button class="button button-primary" data-action="seal-glyph-profile">Seal as Active Glyph</button>
           <button class="button button-muted" data-action="capture-glyph">Use In Current Session</button>
+          ${sealed ? `<button class="button button-quiet" data-action="deactivate-glyph-profile">Deactivate Active Glyph</button>` : ""}
         </div>
       </section>
       <section class="panel">
@@ -2493,6 +2690,27 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       saveGlyphProfile();
       drawModuleCanvas("glyph-designer");
     });
+    $("#designer-use-active", root)?.addEventListener("change", (event) => {
+      state.glyphDesigner.usesActiveGlyph = !!event.target.checked;
+      saveGlyphProfile();
+      renderGlyphDesigner({ resetScroll: false });
+    });
+    $("#designer-vary-triplet", root)?.addEventListener("change", (event) => {
+      state.glyphDesigner.bindsPrimeTripletVariant = !!event.target.checked;
+      saveGlyphProfile();
+      renderGlyphDesigner({ resetScroll: false });
+    });
+    $("#designer-emotion-intensity", root)?.addEventListener("input", (event) => {
+      state.glyphDesigner.emotionalIntensity = Number(event.target.value);
+      $("#emotion-intensity-value").textContent = event.target.value;
+      saveGlyphProfile();
+      drawModuleCanvas("glyph-designer");
+    });
+    $("#designer-custom-frequency", root)?.addEventListener("input", (event) => {
+      state.glyphDesigner.customFrequencyHz = Number(event.target.value);
+      $("#custom-frequency-value").textContent = `${Number(event.target.value).toFixed(1)} Hz`;
+      saveGlyphProfile();
+    });
     $("#designer-glyph-name", root)?.addEventListener("input", (event) => {
       state.glyphDesigner.activeGlyphName = event.target.value;
       saveGlyphProfile();
@@ -2509,6 +2727,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         if (button.dataset.colorMode) state.glyphDesigner.colorMode = button.dataset.colorMode;
         if (button.dataset.moduleImprint) state.glyphDesigner.moduleImprint = button.dataset.moduleImprint;
         if (button.dataset.animationStyle) state.glyphDesigner.animationStyle = button.dataset.animationStyle;
+        if (button.dataset.emotionalTone) state.glyphDesigner.emotionalTone = button.dataset.emotionalTone;
+        if (button.dataset.glyphPurpose) state.glyphDesigner.purpose = button.dataset.glyphPurpose;
+        if (button.dataset.toneBindingMode) state.glyphDesigner.toneBindingMode = button.dataset.toneBindingMode;
         saveGlyphProfile();
         renderGlyphDesigner({ resetScroll: false });
       });
@@ -2649,6 +2870,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     if (action === "play-guidance") playAsset(stages[target.dataset.guidance]?.asset || stages.settle.asset);
     if (action === "play-module-guidance") playAsset(modules[target.dataset.moduleName]?.guidanceAsset || stages.aim.asset);
     if (action === "play-wheel-guidance") playAsset("HarmonicWheelOrientationVoice.mp3");
+    if (action === "play-glyph-guidance") playAsset("GlyphStudioGuidance.mp3");
     if (action === "play-path-invocation") {
       const invocation = pathInvocations[target.dataset.invocation];
       if (invocation) playAsset(invocation.asset);
@@ -2682,6 +2904,14 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       sealActiveGlyphProfile();
       showStatus("Active glyph sealed into the Personal Glyph Profile.", "success");
       renderGlyphDesigner({ resetScroll: false });
+    }
+    if (action === "deactivate-glyph-profile") {
+      deactivateGlyphProfile();
+      showStatus("Active glyph paused. The design is preserved.", "success");
+      renderGlyphDesigner({ resetScroll: false });
+    }
+    if (action === "preview-glyph-frequency") {
+      playTone(activeGlyphFrequency(), 2.4, "single");
     }
     if (action === "open-simulated-initiation") openSimulatedInitiation();
     if (action === "toggle-premium") {
@@ -2980,10 +3210,42 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       } else {
         drawGlyph(ctx, base * 0.78, encoded || encodeVector(state.draft.intention || "mirrorgate", state.draft.triplet), t);
       }
+      if (activeGlyphEnabled() && ["breath", "vector", "gate", "mirror"].includes(name)) {
+        ctx.save();
+        ctx.globalAlpha = name === "breath" ? 0.92 : 0.58;
+        if (name === "breath") {
+          const scale = activeGlyphBreathScale(t);
+          ctx.scale(scale, scale);
+          drawDesignerGlyph(ctx, base * 0.78, t);
+        } else {
+          drawDesignerGlyph(ctx, base * (name === "gate" ? 0.48 : 0.54), t + 0.3);
+        }
+        ctx.restore();
+      }
       ctx.restore();
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
+  }
+
+  function activeGlyphBreathScale(t) {
+    const rhythm = breathRhythms[state.draft.breathRhythm]?.cycle || state.draft.breathSeal || "4-4-4-4";
+    const parts = rhythm.split("-").map((value) => Number(value)).filter(Boolean);
+    const cycle = parts.length ? parts : [4, 4, 4, 4];
+    const total = cycle.reduce((sum, value) => sum + value, 0);
+    let cursor = t % total;
+    for (let index = 0; index < cycle.length; index += 1) {
+      const duration = cycle[index];
+      if (cursor <= duration) {
+        const p = duration ? cursor / duration : 0;
+        if (index === 0) return 0.88 + p * 0.22;
+        if (index === 1) return 1.1;
+        if (index === 2) return 1.1 - p * 0.2;
+        return 0.9;
+      }
+      cursor -= duration;
+    }
+    return 1;
   }
 
   function drawToroid(ctx, base, t) {
@@ -3066,34 +3328,42 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   function drawDesignerGlyph(ctx, base, t) {
     const profile = state.glyphDesigner;
     const colors = glyphColorModes[profile.colorMode] || glyphColorModes.goldSilver;
+    const intensity = normalizedGlyphIntensity(profile) / 10;
+    const emotionalBias = glyphEmotionalTones[profile.emotionalTone]?.bias || 1;
+    const tripletText = profile.bindsPrimeTripletVariant && ["vector", "gate"].includes(state.module)
+      ? state.draft.triplet
+      : profile.primeTripletText;
+    const trip = String(tripletText || "3-7-11").split("-").map((value) => Math.max(2, Number(value) || 3));
     const count = Math.min(12, Math.max(3, Number(profile.nodeCount) || 6));
     const motion = profile.animationStyle || "pulse";
-    const pulse = motion === "pulse" ? 1 + Math.sin(t * 2.2) * 0.025 : 1;
-    const orbit = motion === "orbit" ? t * 0.22 : 0;
-    const spiralPhase = motion === "spiral" ? t * 0.9 : t * 0.18;
+    const pulse = motion === "pulse" ? 1 + Math.sin(t * (1.3 + emotionalBias)) * (0.018 + intensity * 0.035) : 1;
+    const orbit = motion === "orbit" ? t * (0.16 + emotionalBias * 0.08) : 0;
+    const spiralPhase = motion === "spiral" ? t * (0.55 + emotionalBias * 0.42) : t * 0.18;
     const points = [];
     for (let i = 0; i < count; i += 1) {
-      const angle = -Math.PI / 2 + i * Math.PI * 2 / count + orbit + (motion === "still" ? 0 : t * 0.025);
-      const radius = base * pulse * (0.48 + (i % 3) * 0.08 + profile.spiralStrength * i / count * 0.12);
+      const prime = trip[i % trip.length] || 3;
+      const angle = -Math.PI / 2 + i * Math.PI * 2 / count + orbit + (motion === "still" ? 0 : t * 0.025 / prime);
+      const radius = base * pulse * (0.42 + (prime % 7) * 0.025 + (i % 3) * 0.06 + profile.spiralStrength * i / count * 0.12);
       points.push([Math.cos(angle) * radius, Math.sin(angle) * radius]);
     }
     ctx.save();
     ctx.shadowColor = colors.primary;
-    ctx.shadowBlur = motion === "still" ? 6 : 14;
+    ctx.shadowBlur = motion === "still" ? 6 + intensity * 8 : 11 + intensity * 16;
     ctx.strokeStyle = colors.secondary;
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1 + intensity * 0.8;
     points.forEach(([x, y], i) => {
-      const [x2, y2] = points[(i + 2) % points.length];
+      const step = 1 + (trip[i % trip.length] % Math.max(2, Math.min(5, points.length - 1)));
+      const [x2, y2] = points[(i + step) % points.length];
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x2, y2);
       ctx.stroke();
     });
-    drawSpiralPath(ctx, base * pulse * (0.18 + profile.spiralStrength * 0.5), spiralPhase, colors.primary, 2.4);
+    drawSpiralPath(ctx, base * pulse * (0.18 + profile.spiralStrength * 0.5), spiralPhase, colors.primary, 2.1 + intensity * 1.1);
     points.forEach(([x, y]) => {
       ctx.fillStyle = colors.primary;
       ctx.beginPath();
-      ctx.arc(x, y, motion === "orbit" ? 7 : 6, 0, Math.PI * 2);
+      ctx.arc(x, y, (motion === "orbit" ? 6.5 : 5.2) + intensity * 2.2, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();

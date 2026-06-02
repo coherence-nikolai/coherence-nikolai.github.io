@@ -587,8 +587,35 @@ h3 {
 
 .intention-panel h3,
 .contact-paths-panel h3,
-.wheel-orientation-panel h3 {
+.wheel-orientation-panel h3,
+.glyph-wheel-panel h3 {
   color: var(--gold);
+}
+
+.glyph-wheel-panel {
+  border-color: color-mix(in srgb, var(--gold) 28%, transparent);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(226, 184, 86, 0.13), transparent 40%),
+    rgba(14, 15, 26, 0.92);
+}
+
+.glyph-wheel-panel .control-row {
+  margin-top: 12px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: var(--silver);
+  font-weight: 700;
+}
+
+.toggle-row input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--gold);
 }
 
 .intention-options,
