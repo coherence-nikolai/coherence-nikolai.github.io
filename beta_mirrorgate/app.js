@@ -515,7 +515,7 @@ This is where your personal glyph is created, shaped, and sealed.
 
 There are two kinds of glyphs in MirrorGate.
 
-A Session Glyph is created from one specific session. It belongs to that moment.
+A Session Glyph is created from one specific session. It is tied to that moment.
 
 An Active Glyph is different. It is your reusable personal seal. Once activated, it can appear across the Harmonic Contact Interface as a breath anchor, mirror overlay, vector signal, gate key, Codex imprint, and capsule seal.
 
@@ -2860,7 +2860,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "open-about") showScreen("about");
     if (action === "open-about-audio") {
       showScreen("about");
-      playAsset("AboutHarmonicNavigatorVoice.mp3");
+      playAsset("AboutMirrorGateVoice.mp3");
     }
     if (action === "open-wheel") showScreen("wheel");
     if (action === "open-invocation") renderPathInvocation(target.dataset.invocation);
@@ -2887,7 +2887,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         renderModule(invocation.sequence[0]);
       }
     }
-    if (action === "play-about") playAsset("AboutHarmonicNavigatorVoice.mp3");
+    if (action === "play-about") playAsset("AboutMirrorGateVoice.mp3");
     if (action === "stop-audio") { stopActiveAudio(); stopTone(); }
     if (action === "play-soundscape") playAsset(getProfile().asset, true);
     if (action === "play-grounding-tone") playTone(144, 8, "soundscape");
