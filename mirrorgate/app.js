@@ -13,15 +13,15 @@
 
   const voiceScripts = {
     about: `
-Welcome to Harmonic Navigator.
+Welcome to MirrorGate.
 
-This is not merely an app.
+MirrorGate is a Harmonic Contact Interface.
 
 It is a living interface to your higher self.
 
 A symbolic mirror that reflects your consciousness through breath, sound, and sacred geometry.
 
-Guided by the principles of harmonic coherence, this tool allows you to encode your intentions into resonant geometry.
+Guided by the principles of harmonic coherence, MirrorGate allows you to encode your intentions into resonant geometry.
 
 Synchronize your breath with fractal timelines.
 
@@ -29,7 +29,7 @@ Open prime harmonic gates to higher intelligences.
 
 And reflect with your Monad through a symbolic mirror interface.
 
-This is a navigator of your inner and outer dimensions.
+MirrorGate is a navigator of your inner and outer dimensions.
 
 A bridge between what you are, and what you are becoming.
 
@@ -63,11 +63,13 @@ After each session, record your insights.
 
 The resonance you cultivate today becomes your guidance tomorrow.
 
-This is your navigator.
+This is MirrorGate.
 
 May it guide you with clarity, coherence, and compassion.
 
-Welcome to your harmonic path.
+Welcome to MirrorGate.
+
+Welcome to the Harmonic Contact Interface.
 `,
     recovery: `
 Return to breath.
