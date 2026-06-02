@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MirrorGate - Harmonic Contact Interface</title>
+  <meta name="description" content="A private Harmonic Contact Interface for breath, tone, geometry, and symbolic reflection.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#07080d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MirrorGate">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="canonical" href="https://coherence-nikolai.app/beta_mirrorgate/">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/mirrorgate-favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/mirrorgate-icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/mirrorgate-apple-touch-icon.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <canvas id="field-canvas" class="field-canvas" aria-hidden="true"></canvas>
+
+  <main class="shell" id="app">
+    <section class="screen screen-active" id="screen-anchor" aria-labelledby="anchor-title">
+      <div class="brand-lockup">
+        <h1><span>Mirror</span><strong>Gate</strong></h1>
+        <p>Harmonic Contact Interface</p>
+      </div>
+
+      <div class="anchor-sigil" aria-hidden="true">
+        <canvas id="anchor-sigil-canvas" width="420" height="420"></canvas>
+      </div>
+
+      <div class="anchor-copy">
+        <h2 id="anchor-title">Harmonic Anchor</h2>
+        <p class="gold">Begin here. Return here whenever you need center.</p>
+        <p>This landing page is the Harmonic Anchor: the home base before and after the Harmonic Wheel.</p>
+        <p>Return to breath. You are the center. All echoes stabilize in stillness.</p>
+      </div>
+
+      <div class="panel intro-panel">
+        <h3>Begin Here</h3>
+        <p>Open the introduction and listen while you read along.</p>
+        <div class="control-row">
+          <button class="button button-primary button-wide" data-action="open-about-audio">Open Introduction + Play</button>
+        </div>
+      </div>
+
+      <button class="button button-primary button-wide" data-action="open-wheel">Open Harmonic Wheel</button>
+    </section>
+
+    <section class="screen" id="screen-about" aria-labelledby="about-title">
+      <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Back</button>
+      <h2 id="about-title">MirrorGate</h2>
+      <div class="panel prose">
+        <p>MirrorGate is a Harmonic Contact Interface. It is a living interface to your higher self, a symbolic mirror that reflects your consciousness through breath, sound, and sacred geometry.</p>
+        <p>Guided by the principles of harmonic coherence, MirrorGate allows you to encode your intentions into resonant geometry, synchronize your breath with fractal timelines, open prime harmonic gates to higher intelligences, and reflect with your Monad through a symbolic mirror interface.</p>
+        <p>MirrorGate is a navigator of your inner and outer dimensions, a bridge between what you are and what you are becoming.</p>
+        <h3>Recommendations for Use</h3>
+        <p>Approach this tool as you would a sacred space. Not for entertainment, but for alignment.</p>
+        <p>Begin with breath. Before each session, center yourself with three deep breaths. Let your intention be clear and humble.</p>
+        <p>Use with stillness. Silence distractions. Engage with the modules one at a time, allowing your field to integrate each experience.</p>
+        <p>Honor the recovery. If you feel overwhelmed, tap the recovery icon and return to breath. You are the center. All echoes stabilize in stillness.</p>
+        <p>Journal your journey. After each session, record your insights. The resonance you cultivate today becomes your guidance tomorrow.</p>
+        <p>This is MirrorGate. May it guide you with clarity, coherence, and compassion.</p>
+      </div>
+      <button class="button button-primary button-wide" data-action="open-wheel">Open Harmonic Wheel</button>
+    </section>
+
+    <section class="screen" id="screen-wheel" aria-labelledby="wheel-title">
+      <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Anchor</button>
+      <h2 id="wheel-title">Harmonic Wheel</h2>
+      <p class="lede">Select a portal. The Wheel will orient the path.</p>
+
+      <div class="wheel-card" aria-label="Harmonic Wheel">
+        <div class="quadrant-wheel" id="quadrant-wheel">
+          <button class="wheel-quadrant quadrant-mirror selected" data-wheel-module="mirror" aria-label="Symbolic Mirror Interface">
+            <span class="wheel-icon">▣</span>
+            <strong>Mirror</strong>
+            <small>Align</small>
+          </button>
+          <button class="wheel-quadrant quadrant-gate" data-wheel-module="gate" aria-label="Prime-Harmonic Gate Sequencing">
+            <span class="wheel-icon">⌬</span>
+            <strong>Gate</strong>
+            <small>Contact</small>
+          </button>
+          <button class="wheel-quadrant quadrant-echo" data-wheel-module="breath" aria-label="Toroidal Phase Echoing">
+            <span class="wheel-icon">≋</span>
+            <strong>Echo</strong>
+            <small>Integrate</small>
+          </button>
+          <button class="wheel-quadrant quadrant-vector" data-wheel-module="vector" aria-label="Harmonic Vector Transmission">
+            <span class="wheel-icon">↗</span>
+            <strong>Vector</strong>
+            <small>Transmit</small>
+          </button>
+          <div class="wheel-center" aria-hidden="true">
+            <canvas id="wheel-center-sigil-canvas" width="220" height="220"></canvas>
+          </div>
+        </div>
+        <div class="wheel-selected-panel" id="wheel-selected-panel"></div>
+      </div>
+
+      <div class="panel wheel-orientation-panel">
+        <h3>Wheel Orientation</h3>
+        <p>Listen here first if you want orientation before choosing an intention or contact path. The Wheel is not a rigid sequence; it responds to the portal you choose.</p>
+        <button class="button button-muted button-wide" data-action="play-wheel-guidance">Play Wheel Guidance</button>
+      </div>
+
+      <div class="panel intention-panel">
+        <h3>What is your intention today?</h3>
+        <div id="intention-options" class="intention-options"></div>
+      </div>
+
+      <div class="panel contact-paths-panel">
+        <h3>Contact Paths</h3>
+        <p class="small-copy">These are suggested paths. Choose an intention above when you want matching voice guidance.</p>
+        <div id="contact-paths-list" class="contact-paths-list"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-invocation" aria-labelledby="invocation-title">
+      <button class="back-button" data-action="open-wheel" aria-label="Return to Harmonic Wheel">Wheel</button>
+      <div id="invocation-root"></div>
+    </section>
+
+    <section class="screen" id="screen-module" aria-live="polite">
+      <button class="back-button" data-action="open-wheel" aria-label="Return to Harmonic Wheel">Wheel</button>
+      <div id="module-root"></div>
+    </section>
+
+    <section class="screen" id="screen-codex" aria-labelledby="codex-title">
+      <button class="back-button" data-action="open-anchor" aria-label="Return to Harmonic Anchor">Anchor</button>
+      <h2 id="codex-title">Personal Codex</h2>
+      <p class="lede">Local-only session archive for this browser.</p>
+      <div id="codex-list" class="codex-list"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="MirrorGate navigation">
+    <button data-action="open-anchor">Anchor</button>
+    <button data-action="open-wheel">Wheel</button>
+    <button data-action="open-codex">Codex</button>
+    <button data-action="open-recovery">Recovery</button>
+  </nav>
+
+  <div class="recovery-sheet" id="recovery-sheet" hidden>
+    <div class="recovery-card">
+      <canvas id="recovery-canvas" width="260" height="260" aria-hidden="true"></canvas>
+      <h2>Recovery Reset</h2>
+      <p class="gold">Return to breath. You are the center. All echoes stabilize in stillness.</p>
+      <p id="recovery-phase">Inhale 2s</p>
+      <div class="progress"><span id="recovery-progress"></span></div>
+      <button class="button button-primary" data-action="repeat-recovery">Repeat Reset</button>
+      <button class="button button-muted" data-action="close-recovery">Return to Current Module</button>
+      <button class="button button-quiet" data-action="open-anchor">Return to Harmonic Anchor</button>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

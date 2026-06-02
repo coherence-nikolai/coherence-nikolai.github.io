@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /mirrorgate/
+Disallow: /beta_mirrorgate/
 
 Sitemap: https://coherence-nikolai.app/sitemap.xml
