@@ -164,6 +164,32 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     glyphDesigner: loadGlyphProfile()
   };
 
+  const features = {
+    harmonicAnchor: "harmonicAnchor",
+    aboutIntroduction: "aboutIntroduction",
+    recoveryReset: "recoveryReset",
+    basicBreath: "basicBreath",
+    basicSymbolicMirror: "basicSymbolicMirror",
+    fullGuidedSequence: "fullGuidedSequence",
+    harmonicVectorTransmission: "harmonicVectorTransmission",
+    primeHarmonicGateSequencing: "primeHarmonicGateSequencing",
+    toroidalPhaseEchoing: "toroidalPhaseEchoing",
+    contactPathInvocation: "contactPathInvocation",
+    personalCodex: "personalCodex",
+    glyphVault: "glyphVault",
+    glyphStudio: "glyphStudio",
+    codexCapsules: "codexCapsules",
+    advancedEchoPlayback: "advancedEchoPlayback"
+  };
+
+  const freeFeatures = new Set([
+    features.harmonicAnchor,
+    features.aboutIntroduction,
+    features.recoveryReset,
+    features.basicBreath,
+    features.basicSymbolicMirror
+  ]);
+
   const capabilities = {
     mediaRecorder: "MediaRecorder" in window,
     mediaDevices: !!navigator.mediaDevices?.getUserMedia,
@@ -416,6 +442,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   const modules = {
     vector: {
       title: "Harmonic Vector Transmission",
+      feature: features.harmonicVectorTransmission,
       actionLabel: "Vector: Transmit",
       sequenceLabel: "Vector",
       wheelVerb: "Transmit",
@@ -440,6 +467,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     breath: {
       title: "Toroidal Phase Echoing",
+      feature: features.toroidalPhaseEchoing,
       actionLabel: "Echo: Integrate",
       sequenceLabel: "Echo",
       wheelVerb: "Integrate",
@@ -464,6 +492,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     gate: {
       title: "Prime-Harmonic Gate Sequencing",
+      feature: features.primeHarmonicGateSequencing,
       actionLabel: "Gate: Contact",
       sequenceLabel: "Gate",
       wheelVerb: "Contact",
@@ -488,6 +517,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     mirror: {
       title: "Symbolic Mirror Interface",
+      feature: features.basicSymbolicMirror,
       actionLabel: "Mirror: Align",
       sequenceLabel: "Mirror",
       wheelVerb: "Align",
@@ -512,6 +542,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     guided: {
       title: "Full Harmonic Contact Interface Sequence",
+      feature: features.fullGuidedSequence,
       actionLabel: "Guided Session",
       sequenceLabel: "Guided",
       wheelVerb: "Guide",
@@ -536,6 +567,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   const pathInvocations = {
     dimensionalContact: {
       id: "dimensionalContact",
+      feature: features.contactPathInvocation,
       title: "Dimensional Contact Initiation",
       subtitle: "Listen first, then continue to Prime-Harmonic Gate Sequencing.",
       intention: "Contact dimensional or stellar allies.",
@@ -552,6 +584,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     oversoulMonad: {
       id: "oversoulMonad",
+      feature: features.contactPathInvocation,
       title: "Oversoul / Monad Alignment",
       subtitle: "Listen first, then continue to the Symbolic Mirror Interface.",
       intention: "Meet Oversoul, Monad, or higher-self reflection.",
@@ -568,6 +601,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     futureEchoes: {
       id: "futureEchoes",
+      feature: features.contactPathInvocation,
       title: "Future Echo Retrieval",
       subtitle: "Listen first, then continue to Toroidal Phase Echoing.",
       intention: "Retrieve future-self signal or timeline insight.",
@@ -584,6 +618,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     collectiveResonance: {
       id: "collectiveResonance",
+      feature: features.contactPathInvocation,
       title: "Collective Resonance Connection",
       subtitle: "Listen first, then continue to Toroidal Phase Echoing.",
       intention: "Open to collective intelligence and shared knowing.",
@@ -600,6 +635,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     },
     generalSequence: {
       id: "generalSequence",
+      feature: features.fullGuidedSequence,
       title: "Full Harmonic Contact Interface Path",
       subtitle: "Listen first, then continue to the guided sequence.",
       intention: "Move through the whole path from alignment to integration.",
@@ -751,6 +787,77 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
 
   function saveGlyphProfile() {
     localStorage.setItem(glyphProfileKey, JSON.stringify(state.glyphDesigner));
+  }
+
+  function hasInitiationAccess() {
+    return state.premiumUnlocked;
+  }
+
+  function accessLevelTitle() {
+    return hasInitiationAccess() ? "Founder / Beta Access" : "Free Orientation";
+  }
+
+  function accessLevelSummary() {
+    return hasInitiationAccess()
+      ? "All contact protocols are open for private Orion beta testing and refinement."
+      : "Anchor, Recovery, About, basic breath, and basic Symbolic Mirror remain open.";
+  }
+
+  function hasFeatureAccess(feature) {
+    return freeFeatures.has(feature) || hasInitiationAccess();
+  }
+
+  function openSimulatedInitiation() {
+    state.premiumUnlocked = true;
+    localStorage.setItem(unlockKey, "true");
+    showStatus("MirrorGate Initiation opened for this browser.", "success");
+    showScreen("wheel");
+  }
+
+  function openCodex() {
+    if (!hasFeatureAccess(features.personalCodex)) {
+      renderInitiationThreshold({
+        title: "Personal Codex",
+        icon: "▣",
+        summary: "The Personal Codex opens through MirrorGate Initiation because saved contact records, capsules, glyphs, notes, and audio references should be handled as committed private work.",
+        accent: "#e2b856"
+      });
+      return;
+    }
+    showScreen("codex");
+  }
+
+  function renderInitiationThreshold({ title, icon = "◈", summary, accent = "#e2b856" }) {
+    state.module = "initiation-threshold";
+    const moduleScreen = $("#screen-module");
+    if (moduleScreen) {
+      moduleScreen.dataset.module = "initiation-threshold";
+      moduleScreen.style.setProperty("--module-accent", accent);
+    }
+    const root = $("#module-root");
+    if (!root) return;
+    root.innerHTML = `
+      <header class="module-header initiation-threshold-header">
+        <p class="path-label" style="color: ${escapeHtml(accent)}">MirrorGate Initiation</p>
+        <h2>${escapeHtml(title)}</h2>
+        <p>${escapeHtml(summary)}</p>
+      </header>
+
+      <section class="panel initiation-threshold">
+        <div class="threshold-mark" style="--module-accent: ${escapeHtml(accent)}">${escapeHtml(icon)}</div>
+        <h3>$11 MirrorGate Initiation</h3>
+        <p>MirrorGate's core orientation remains open. The full Harmonic Contact Interface opens through a one-time $11 threshold of commitment.</p>
+        <p>This is not a paywall inside the practice. It is a deliberate entry into contact protocols, advanced glyph work, Codex capsules, and deeper archive tools.</p>
+        <div class="metric-grid">
+          <span class="metric"><small>Current Access</small><strong>${escapeHtml(accessLevelTitle())}</strong></span>
+          <span class="metric"><small>Beta Circle</small><strong>${hasInitiationAccess() ? "Open" : "Threshold"}</strong></span>
+        </div>
+        <p class="small-copy">${escapeHtml(accessLevelSummary())}</p>
+        <p class="threshold-phrase">I enter with clarity, humility, and responsibility.</p>
+        <button class="button button-primary button-wide" data-action="open-simulated-initiation">Open Simulated Initiation</button>
+      </section>
+    `;
+    showScreen("module");
   }
 
   function showScreen(name) {
@@ -1027,6 +1134,15 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   }
 
   function renderCodex() {
+    if (!hasFeatureAccess(features.personalCodex)) {
+      renderInitiationThreshold({
+        title: "Personal Codex",
+        icon: "▣",
+        summary: "The Personal Codex opens through MirrorGate Initiation because saved contact records, capsules, glyphs, notes, and audio references should be handled as committed private work.",
+        accent: "#e2b856"
+      });
+      return;
+    }
     const list = $("#codex-list");
     if (!list) return;
     const privacy = getPrivacySettings();
@@ -1051,7 +1167,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         <h3>Personal Codex</h3>
         <p>Local-only V1 archive. Session entries remain in this browser unless you export a capsule.</p>
         <div class="control-row">
-          <button class="button button-muted" data-action="open-glyph-designer">Open Glyph Designer</button>
+          <button class="button button-muted" data-action="open-glyph-designer">Open Glyph Studio</button>
           <button class="button button-muted" data-action="import-capsule">Import Capsule</button>
           <button class="button button-quiet" data-action="toggle-privacy">${privacy.enabled ? "Disable Privacy Lock" : "Enable Privacy Lock"}</button>
           <input id="capsule-file" class="hidden" type="file" accept=".json,.mgcapsule,application/json">
@@ -1236,15 +1352,15 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     `;
   }
 
-  function premiumPanel() {
+  function initiationPanel() {
     return `
-      <section class="panel paywall-note">
-        <h3>${state.premiumUnlocked ? "Founder Access" : "$11 MirrorGate Initiation"}</h3>
-        <p><strong>Free Layer:</strong> Basic calibration, one archetype, text reflection.</p>
-        <p><strong>MirrorGate Initiation:</strong> Full Mirror Phase, archetype library, audio integration, Personal Codex, and glyph generation.</p>
+      <section class="panel initiation-note">
+        <h3>${hasInitiationAccess() ? "Founder / Beta Access" : "$11 MirrorGate Initiation"}</h3>
+        <p><strong>Free Orientation:</strong> Harmonic Anchor, About, Recovery, basic breath, and basic Symbolic Mirror remain open.</p>
+        <p><strong>MirrorGate Initiation:</strong> Contact paths, Gate Sequencing, Vector Transmission, Toroidal Echoing, Glyph Studio, Codex archive, capsules, and advanced Echo tools.</p>
         <div class="control-row">
-          <button class="button ${state.premiumUnlocked ? "button-muted" : "button-primary"}" data-action="toggle-premium">
-            ${state.premiumUnlocked ? "Reset Simulated Initiation" : "Simulate $11 MirrorGate Initiation"}
+          <button class="button ${hasInitiationAccess() ? "button-muted" : "button-primary"}" data-action="toggle-premium">
+            ${hasInitiationAccess() ? "Reset Simulated Initiation" : "Open Simulated Initiation"}
           </button>
         </div>
       </section>
@@ -1325,9 +1441,47 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     `).join("");
   }
 
+  function moduleInitiationSummary(module) {
+    if (!module) return "This protocol opens through MirrorGate Initiation.";
+    if (module.feature === features.harmonicVectorTransmission) {
+      return "Harmonic Vector Transmission opens through MirrorGate Initiation because encoded requests, prime vectors, carrier tones, and personal sigils are part of the committed contact layer.";
+    }
+    if (module.feature === features.primeHarmonicGateSequencing) {
+      return "Prime-Harmonic Gate Sequencing opens through MirrorGate Initiation because dimensional and stellar contact protocols should be entered deliberately, with breath, intention, and grounding.";
+    }
+    if (module.feature === features.toroidalPhaseEchoing) {
+      return "Toroidal Phase Echoing opens through MirrorGate Initiation because temporal, subconscious, and collective echo work belongs in the committed contact layer.";
+    }
+    if (module.feature === features.fullGuidedSequence) {
+      return "The full Harmonic Contact Interface sequence opens through MirrorGate Initiation so the complete path from alignment to integration is entered as a deliberate commitment.";
+    }
+    return `${module.title} opens through MirrorGate Initiation.`;
+  }
+
+  function invocationInitiationSummary(invocation) {
+    if (!invocation) return "This path opens through MirrorGate Initiation.";
+    if (invocation.id === "dimensionalContact") {
+      return "Dimensional and stellar contact paths open through MirrorGate Initiation. The $11 threshold acts as a commitment seal before entering Gate contact and integration.";
+    }
+    if (invocation.id === "generalSequence") {
+      return "The complete Harmonic Contact Interface route opens through MirrorGate Initiation so the whole path is entered with intention rather than casual sampling.";
+    }
+    return `${invocation.title} opens through MirrorGate Initiation because path invocations are part of the committed contact layer.`;
+  }
+
   function renderPathInvocation(invocationID) {
     const invocation = pathInvocations[invocationID];
     if (!invocation) return;
+    if (!hasFeatureAccess(invocation.feature || features.contactPathInvocation)) {
+      const accentModule = modules[invocation.accentModule] || modules.mirror;
+      renderInitiationThreshold({
+        title: invocation.title,
+        icon: accentModule.icon,
+        summary: invocationInitiationSummary(invocation),
+        accent: accentModule.accent
+      });
+      return;
+    }
     state.activeInvocation = invocationID;
     const root = $("#invocation-root");
     if (!root) return;
@@ -1388,6 +1542,15 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   }
 
   function startFullSequence() {
+    if (!hasFeatureAccess(features.fullGuidedSequence)) {
+      renderInitiationThreshold({
+        title: "Full Harmonic Contact Interface Sequence",
+        icon: modules.guided.icon,
+        summary: moduleInitiationSummary(modules.guided),
+        accent: modules.guided.accent
+      });
+      return;
+    }
     resetDraft();
     state.currentFlowStep = "mode";
     renderFlowStep("mode");
@@ -1607,7 +1770,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
           <div class="control-row">
             <button class="button button-primary" data-action="capture-glyph">Anchor Glyph</button>
-            <button class="button button-muted" data-action="open-glyph-designer">Open Custom Glyph Designer</button>
+            <button class="button button-muted" data-action="open-glyph-designer">Open Glyph Studio</button>
           </div>
           ${state.draft.glyphDataUrl ? `<img class="glyph-thumb" src="${state.draft.glyphDataUrl}" alt="Captured glyph">` : ""}
         </section>
@@ -1793,6 +1956,15 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   function renderModule(name) {
     const module = modules[name];
     if (!module) return;
+    if (!hasFeatureAccess(module.feature || features.fullGuidedSequence)) {
+      renderInitiationThreshold({
+        title: module.title,
+        icon: module.icon,
+        summary: moduleInitiationSummary(module),
+        accent: module.accent
+      });
+      return;
+    }
     const isNewModule = state.module !== name;
     state.module = name;
     const moduleScreen = $("#screen-module");
@@ -2107,14 +2279,33 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   }
 
   function renderGlyphDesigner() {
+    if (!hasFeatureAccess(features.glyphStudio)) {
+      renderInitiationThreshold({
+        title: "Glyph Studio",
+        icon: "◈",
+        summary: "The Glyph Studio opens through MirrorGate Initiation so personal sigils, prime bindings, tone bindings, and Codex imprinting remain intentional.",
+        accent: "#e2b856"
+      });
+      return;
+    }
     state.module = "glyph-designer";
     const root = $("#module-root");
     const profile = state.glyphDesigner;
     root.innerHTML = `
       <header class="module-header">
-        <h2>Custom Glyph Designer</h2>
-        <p>User-controlled glyph editing: nodes, spiral, prime triplet, tone, colors, and personal glyph profile.</p>
+        <p class="path-label">MirrorGate Initiation Feature</p>
+        <h2>Glyph Studio</h2>
+        <p>A personal sigil forge for nodes, spiral, prime triplet, tone, colors, and the Personal Glyph Profile.</p>
       </header>
+      <section class="panel initiation-note">
+        <h3>Why this belongs to Initiation</h3>
+        <p>Glyph Studio creates reusable personal imprints rather than one-off session marks. Treat it as the place where your prime pathway, carrier tone, color field, and sigil structure are deliberately bound.</p>
+        <div class="metric-grid">
+          <span class="metric"><small>Personal Sigil</small><strong>Editable</strong></span>
+          <span class="metric"><small>Prime Binding</small><strong>${escapeHtml(profile.primeTripletText)}</strong></span>
+          <span class="metric"><small>Tone Binding</small><strong>${escapeHtml(getTone(profile.carrierToneID).label)}</strong></span>
+        </div>
+      </section>
       <section class="panel">
         <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
         <label>Node Count: <strong id="node-count-value">${profile.nodeCount}</strong></label>
@@ -2127,8 +2318,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         <div class="choice-grid">${renderChoiceGroup(tones, getTone(profile.carrierToneID).value, "tone-choice", "tone")}</div>
         <h3>Color Mode</h3>
         <div class="choice-grid">${Object.entries(glyphColorModes).map(([id, item]) => `<button class="choice ${profile.colorMode === id ? "selected" : ""}" data-color-mode="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.primary)} / ${escapeHtml(item.secondary)}</span></button>`).join("")}</div>
+        <p class="small-copy">Module imprinting: the saved profile influences future generated glyphs, Codex capsules, and session visuals.</p>
         <div class="control-row">
-          <button class="button button-primary" data-action="save-glyph-profile">Save Glyph Profile</button>
+          <button class="button button-primary" data-action="seal-glyph-profile">Seal Glyph Profile</button>
           <button class="button button-muted" data-action="capture-glyph">Use In Current Session</button>
         </div>
       </section>
@@ -2296,7 +2488,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     }
     if (action === "open-wheel") showScreen("wheel");
     if (action === "open-invocation") renderPathInvocation(target.dataset.invocation);
-    if (action === "open-codex") showScreen("codex");
+    if (action === "open-codex") openCodex();
     if (action === "open-recovery") openRecovery();
     if (action === "close-recovery") closeRecovery();
     if (action === "repeat-recovery") openRecovery(true);
@@ -2335,6 +2527,13 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     if (action === "save-guided-session") saveGuidedSession();
     if (action === "open-glyph-designer") renderGlyphDesigner();
     if (action === "save-glyph-profile") { saveGlyphProfile(); showStatus("Glyph profile saved.", "success"); }
+    if (action === "seal-glyph-profile") {
+      state.glyphDesigner.sealedAt = new Date().toISOString();
+      saveGlyphProfile();
+      showStatus("Glyph profile sealed into the Personal Glyph Profile.", "success");
+      renderGlyphDesigner();
+    }
+    if (action === "open-simulated-initiation") openSimulatedInitiation();
     if (action === "toggle-premium") {
       state.premiumUnlocked = !state.premiumUnlocked;
       localStorage.setItem(unlockKey, String(state.premiumUnlocked));
