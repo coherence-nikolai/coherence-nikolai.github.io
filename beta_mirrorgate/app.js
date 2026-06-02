@@ -484,10 +484,14 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
 
   const glyphEmotionalTones = {
     calm: { title: "Calm", guidance: "Steady the body and soften attention.", bias: 0.72 },
+    fear: { title: "Fear", guidance: "Hold anxiety, caution, or threshold sensitivity without collapse.", bias: 0.82 },
+    anger: { title: "Anger", guidance: "Carry boundary, heat, or charged truth into form.", bias: 1.18 },
     grief: { title: "Grief", guidance: "Hold tenderness, loss, or emotional honesty.", bias: 0.58 },
     clarity: { title: "Clarity", guidance: "Sharpen the request and reduce noise.", bias: 1.06 },
     courage: { title: "Courage", guidance: "Support direct contact, action, or truth.", bias: 1.16 },
     longing: { title: "Longing", guidance: "Carry desire, searching, or a call across distance.", bias: 0.88 },
+    joy: { title: "Joy", guidance: "Carry gratitude, vitality, or bright expansion.", bias: 1.14 },
+    compassion: { title: "Compassion", guidance: "Soften contact with care, mercy, or repair.", bias: 0.94 },
     protection: { title: "Protection", guidance: "Guard the threshold and stabilize the field.", bias: 1 },
     release: { title: "Release", guidance: "Let old charge or attachment move out.", bias: 0.78 },
     awe: { title: "Awe", guidance: "Open toward reverence, mystery, or vastness.", bias: 1.22 },
@@ -517,7 +521,7 @@ An Active Glyph is different. It is your reusable personal seal. Once activated,
 
 Begin by naming the glyph.
 
-Choose an emotional tone that reflects your current field. This may be calm, grief, clarity, courage, longing, protection, release, awe, trust, or wonder.
+Choose an emotional tone that reflects your current field. This may be calm, fear, anger, grief, clarity, courage, longing, joy, compassion, protection, release, awe, trust, or wonder.
 
 This is not a judgment. It is a way of giving shape to what is present.
 
@@ -2624,12 +2628,12 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <span>Let modules vary the glyph by selected prime triplet</span>
         </label>
         <h3>Emotion</h3>
-        <div class="choice-grid">${Object.entries(glyphEmotionalTones).map(([id, item]) => `<button class="choice ${profile.emotionalTone === id ? "selected" : ""}" data-emotional-tone="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.guidance)}</span></button>`).join("")}</div>
+        <div class="choice-grid readable-choice-grid">${Object.entries(glyphEmotionalTones).map(([id, item]) => `<button class="choice ${profile.emotionalTone === id ? "selected" : ""}" data-emotional-tone="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.guidance)}</span></button>`).join("")}</div>
         <label>Intensity: <strong id="emotion-intensity-value">${normalizedGlyphIntensity(profile)}</strong></label>
         <input id="designer-emotion-intensity" type="range" min="1" max="10" value="${normalizedGlyphIntensity(profile)}">
         <p class="small-copy">A higher number means stronger charge, glow, pulse, density, movement, or color expression. It is not better or worse.</p>
         <h3>Purpose</h3>
-        <div class="choice-grid">${Object.entries(glyphPurposes).map(([id, item]) => `<button class="choice ${profile.purpose === id ? "selected" : ""}" data-glyph-purpose="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.guidance)}</span></button>`).join("")}</div>
+        <div class="choice-grid readable-choice-grid">${Object.entries(glyphPurposes).map(([id, item]) => `<button class="choice ${profile.purpose === id ? "selected" : ""}" data-glyph-purpose="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.guidance)}</span></button>`).join("")}</div>
         <h3>Module Imprint</h3>
         <div class="choice-grid">${Object.entries(glyphModuleImprints).map(([id, item]) => `<button class="choice ${profile.moduleImprint === id ? "selected" : ""}" data-module-imprint="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.moduleName)}</span></button>`).join("")}</div>
         <p class="small-copy">${escapeHtml(glyphModuleImprints[profile.moduleImprint]?.use || glyphModuleImprints.balanced.use)}</p>

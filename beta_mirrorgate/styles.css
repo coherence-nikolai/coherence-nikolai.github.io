@@ -844,6 +844,10 @@ h3 {
   gap: 10px;
 }
 
+.readable-choice-grid {
+  grid-template-columns: 1fr;
+}
+
 .choice,
 .tone-choice,
 .phase-choice {
