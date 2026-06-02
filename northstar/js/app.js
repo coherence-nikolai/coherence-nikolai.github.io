@@ -7,7 +7,7 @@ import {
   ROUTE_LIBRARY,
   STUDY_STATES,
   TASK_VERBS
-} from "./data/content.js?v=20260528b";
+} from "./data/content.js?v=20260602a";
 import {
   clearNamespace,
   copyText,
@@ -16,7 +16,7 @@ import {
   loadState,
   saveState,
   stampNow
-} from "./state.js?v=20260528b";
+} from "./state.js?v=20260602a";
 
 const $ = (selector, context = document) => context.querySelector(selector);
 const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
@@ -36,17 +36,17 @@ const PANEL_LABELS = {
 };
 
 const PANEL_THEME_COLORS = {
-  dashboard: "#dfece8",
-  "dashboard-options": "#dfece8",
-  regulate: "#e8edd9",
-  planner: "#f2e1d8",
-  calendar: "#e9e7f2",
-  focus: "#f3ead5",
-  unpack: "#deedf0",
-  notes: "#e3ebf4",
-  profile: "#f1dfe3",
-  finish: "#e9e2ef",
-  "mobile-result": "#dfece8"
+  dashboard: "#eef5f6",
+  "dashboard-options": "#eef5f6",
+  regulate: "#edf6f4",
+  planner: "#fbf1ee",
+  calendar: "#eef4fb",
+  focus: "#f7f0dd",
+  unpack: "#edf6f9",
+  notes: "#eff3f6",
+  profile: "#f4eef7",
+  finish: "#eff1f4",
+  "mobile-result": "#eef5f6"
 };
 
 const PRIMARY_PANELS = new Set(["dashboard", "regulate", "planner", "calendar", "focus", "unpack", "notes", "profile", "finish"]);
