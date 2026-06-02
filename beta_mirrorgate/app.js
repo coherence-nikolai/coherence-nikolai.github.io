@@ -860,7 +860,8 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     showScreen("module");
   }
 
-  function showScreen(name) {
+  function showScreen(name, options = {}) {
+    const { resetScroll = true } = options;
     state.screen = name;
     $$(".screen").forEach((screen) => screen.classList.remove("screen-active"));
     $(`#screen-${name}`)?.classList.add("screen-active");
@@ -871,7 +872,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     }
     if (name === "wheel") renderWheelUI();
     if (name === "codex") renderCodex();
-    window.scrollTo(0, 0);
+    if (resetScroll) window.scrollTo(0, 0);
   }
 
   function ensureAudio() {
@@ -1556,7 +1557,8 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     renderFlowStep("mode");
   }
 
-  function renderFlowStep(stepID) {
+  function renderFlowStep(stepID, options = {}) {
+    const { resetScroll = true } = options;
     state.currentFlowStep = stepID;
     const step = flowSteps.find((item) => item.id === stepID) || flowSteps[0];
     state.module = "guided";
@@ -1571,7 +1573,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       ${renderStepBody(step)}
     `;
     bindFlow(root);
-    showScreen("module");
+    showScreen("module", { resetScroll });
     drawCurrentCanvases();
   }
 
@@ -1852,21 +1854,21 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
           if (profile.breath !== "selected") state.draft.breathRhythm = profile.breath;
         }
         persistDraft();
-        renderFlowStep(state.currentFlowStep);
+        renderFlowStep(state.currentFlowStep, { resetScroll: false });
       });
     });
     $$(".tone-choice", root).forEach((button) => {
       button.addEventListener("click", () => {
         state.draft.tone = Number(button.dataset.tone);
         persistDraft();
-        renderFlowStep(state.currentFlowStep);
+        renderFlowStep(state.currentFlowStep, { resetScroll: false });
       });
     });
     $$(".phase-choice", root).forEach((button) => {
       button.addEventListener("click", () => {
         state.draft.echoPreset = button.dataset.phase;
         persistDraft();
-        renderFlowStep(state.currentFlowStep);
+        renderFlowStep(state.currentFlowStep, { resetScroll: false });
       });
     });
     $("#camera-toggle", root)?.addEventListener("change", (event) => {
@@ -1953,7 +1955,8 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     };
   }
 
-  function renderModule(name) {
+  function renderModule(name, options = {}) {
+    const { resetScroll = true } = options;
     const module = modules[name];
     if (!module) return;
     if (!hasFeatureAccess(module.feature || features.fullGuidedSequence)) {
@@ -2001,7 +2004,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     `;
     bindModule(root, name);
     drawModuleCanvas(name);
-    showScreen("module");
+    showScreen("module", { resetScroll });
   }
 
   function renderModuleBody(name) {
@@ -2093,7 +2096,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       button.addEventListener("click", () => {
         state.draft.tone = Number(button.dataset.tone);
         persistDraft();
-        renderModule(name);
+        renderModule(name, { resetScroll: false });
       });
     });
     $$(".choice", root).forEach((button) => {
@@ -2102,7 +2105,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         if (button.dataset.breath) state.draft.breathRhythm = button.dataset.breath;
         if (button.dataset.breathSeal) state.draft.breathSeal = button.dataset.breathSeal;
         persistDraft();
-        renderModule(name);
+        renderModule(name, { resetScroll: false });
       });
     });
     $("#intention", root)?.addEventListener("input", (event) => {
@@ -2224,7 +2227,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       state.draft.originalAudioDataUrl = reader.result;
       state.draft.originalAudioType = mimeType;
       persistDraft();
-      if (state.screen === "module") renderFlowStep(state.currentFlowStep);
+      if (state.screen === "module") renderFlowStep(state.currentFlowStep, { resetScroll: false });
     };
     reader.onerror = () => showStatus("Recording could not be prepared for Echo Playback.", "error");
     reader.readAsDataURL(blob);
@@ -2278,7 +2281,8 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     }
   }
 
-  function renderGlyphDesigner() {
+  function renderGlyphDesigner(options = {}) {
+    const { resetScroll = true } = options;
     if (!hasFeatureAccess(features.glyphStudio)) {
       renderInitiationThreshold({
         title: "Glyph Studio",
@@ -2326,7 +2330,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       </section>
     `;
     bindGlyphDesigner(root);
-    showScreen("module");
+    showScreen("module", { resetScroll });
     drawModuleCanvas("glyph-designer");
   }
 
@@ -2352,14 +2356,14 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       button.addEventListener("click", () => {
         state.glyphDesigner.carrierToneID = getTone(Number(button.dataset.tone)).id;
         saveGlyphProfile();
-        renderGlyphDesigner();
+        renderGlyphDesigner({ resetScroll: false });
       });
     });
     $$(".choice", root).forEach((button) => {
       button.addEventListener("click", () => {
         if (button.dataset.colorMode) state.glyphDesigner.colorMode = button.dataset.colorMode;
         saveGlyphProfile();
-        renderGlyphDesigner();
+        renderGlyphDesigner({ resetScroll: false });
       });
     });
   }
@@ -2522,7 +2526,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       state.draft.glyphDataUrl = captureCanvasDataUrl();
       persistDraft();
       showStatus("Glyph anchored to current session.", "success");
-      if (state.currentFlowStep === "glyph") renderFlowStep("glyph");
+      if (state.currentFlowStep === "glyph") renderFlowStep("glyph", { resetScroll: false });
     }
     if (action === "save-guided-session") saveGuidedSession();
     if (action === "open-glyph-designer") renderGlyphDesigner();
@@ -2531,7 +2535,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       state.glyphDesigner.sealedAt = new Date().toISOString();
       saveGlyphProfile();
       showStatus("Glyph profile sealed into the Personal Glyph Profile.", "success");
-      renderGlyphDesigner();
+      renderGlyphDesigner({ resetScroll: false });
     }
     if (action === "open-simulated-initiation") openSimulatedInitiation();
     if (action === "toggle-premium") {
