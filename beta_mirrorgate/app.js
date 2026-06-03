@@ -1143,13 +1143,15 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const audio = new Audio(audioPath + fileName);
     audio.loop = loop;
     audio.preload = "auto";
+    audio.playsInline = true;
     audio.addEventListener("error", () => {
       if (state.activeAudio === audio) state.activeAudio = null;
       showStatus(`Audio file could not start: ${fileName}`, "error");
     });
-    audio.play().catch(() => {
+    audio.play().catch((error) => {
       if (state.activeAudio === audio) state.activeAudio = null;
-      showStatus(`Audio file could not start: ${fileName}`, "error");
+      const blocked = error?.name === "NotAllowedError" || error?.name === "AbortError";
+      showStatus(blocked ? "Tap the play button once more to start this recording." : `Audio playback could not start: ${fileName}`, blocked ? "success" : "error");
     });
     state.activeAudio = audio;
     return audio;
@@ -1705,9 +1707,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (!panel) return;
     panel.style.setProperty("--module-accent", module.accent);
     panel.innerHTML = `
+      <p class="path-label">${escapeHtml(module.sequenceLabel)}</p>
       <h3><span>${escapeHtml(module.icon)}</span>${escapeHtml(module.actionLabel)}</h3>
-      <p class="path-label">${escapeHtml(module.title)}</p>
+      <p class="path-label original-module-name">${escapeHtml(module.title)}</p>
       <p>${escapeHtml(module.wheelGuidance)}</p>
+      <p class="small-copy">${escapeHtml(module.modality)}</p>
       <button class="button button-primary button-wide module-button" data-module="${escapeHtml(moduleKey)}">Enter ${escapeHtml(module.sequenceLabel)}</button>
     `;
   }
@@ -2652,6 +2656,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       state.gateTouchedNodes = [];
     }
     const root = $("#module-root");
+    root.className = `module-root guided-module-root module-root-${name}`;
     if (!state.advancedModules[name]) {
       root.innerHTML = renderGuidedModule(name);
       bindModule(root, name);
@@ -3031,6 +3036,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     state.module = "glyph-designer";
     const root = $("#module-root");
+    root.className = "module-root glyph-studio-root";
     const profile = state.glyphDesigner;
     const sealed = !!profile.activeGlyphSealedAt;
     const active = activeGlyphEnabled();
@@ -3057,8 +3063,16 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <span class="metric"><small>State</small><strong>${escapeHtml(active ? "Active in modules" : sealed ? "Paused" : "Not sealed")}</strong></span>
         </div>
       </section>
-      <section class="panel">
+      <section class="panel glyph-preview-panel">
         <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+        <div class="glyph-preview-meta">
+          <span class="metric"><small>Name</small><strong>${escapeHtml(profile.activeGlyphName || "Unnamed glyph")}</strong></span>
+          <span class="metric"><small>Prime</small><strong>${escapeHtml(profile.primeTripletText)}</strong></span>
+          <span class="metric"><small>Tone</small><strong>${escapeHtml(activeGlyphFrequencyLabel(profile))}</strong></span>
+          <span class="metric"><small>Status</small><strong>${escapeHtml(active ? "Active" : sealed ? "Paused" : "Draft")}</strong></span>
+        </div>
+      </section>
+      <section class="panel glyph-options-panel">
         <label for="designer-glyph-name">Glyph Name</label>
         <input class="input" id="designer-glyph-name" value="${escapeHtml(profile.activeGlyphName || "")}" placeholder="Example: Dimensional Gate Seal">
         <div class="control-row">
@@ -3309,7 +3323,12 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   }
 
   function handleAction(action, target) {
-    if (action === "open-anchor") { stopActiveAudio(); stopTone(); showScreen("anchor"); }
+    if (action === "open-anchor") {
+      closeRecovery();
+      stopActiveAudio();
+      stopTone();
+      showScreen("anchor");
+    }
     if (action === "open-about") { stopActiveAudio(); stopTone(); showScreen("about"); }
     if (action === "open-about-audio") {
       showScreen("about");
@@ -3563,6 +3582,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const r = side * (compact ? 0.28 : 0.38);
     const t = time / 1000;
     const rotation = t * 0.16;
+    const accentSource = canvas.closest(".wheel-card, .wheel-center, .anchor-sigil, .recovery-card") || document.documentElement;
+    const accent = getComputedStyle(accentSource).getPropertyValue("--selected-accent").trim()
+      || getComputedStyle(document.documentElement).getPropertyValue("--gold").trim()
+      || "#e2b856";
     ctx.clearRect(0, 0, w, h);
     ctx.save();
 
@@ -3576,50 +3599,77 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(226,184,86,0.62)";
-    ctx.lineWidth = compact ? 2 : 2.5;
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 1.08, 0, Math.PI * 2);
-    ctx.stroke();
-
     const point = (radius, angle) => [Math.cos(angle) * radius, Math.sin(angle) * radius];
     const top = point(r, -Math.PI / 2 + rotation);
     const left = point(r, Math.PI * 0.82 + rotation);
     const right = point(r, Math.PI * 0.18 + rotation);
     const bottom = point(r, Math.PI / 2 + rotation);
 
-    ctx.strokeStyle = "rgba(226,184,86,0.72)";
-    ctx.lineWidth = compact ? 1.1 : 1.3;
-    ctx.beginPath();
-    ctx.moveTo(top[0], top[1]);
-    ctx.lineTo(right[0], right[1]);
-    ctx.lineTo(bottom[0], bottom[1]);
-    ctx.lineTo(left[0], left[1]);
-    ctx.closePath();
-    ctx.stroke();
+    const strokeOuterRing = () => {
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 1.08, 0, Math.PI * 2);
+      ctx.stroke();
+    };
+    const strokeDiamond = () => {
+      ctx.beginPath();
+      ctx.moveTo(top[0], top[1]);
+      ctx.lineTo(right[0], right[1]);
+      ctx.lineTo(bottom[0], bottom[1]);
+      ctx.lineTo(left[0], left[1]);
+      ctx.closePath();
+      ctx.stroke();
+    };
+    const strokeInnerLattice = () => {
+      ctx.beginPath();
+      ctx.moveTo(top[0], top[1]);
+      ctx.lineTo(left[0], left[1]);
+      ctx.lineTo(right[0], right[1]);
+      ctx.closePath();
+      ctx.moveTo(top[0], top[1]);
+      ctx.lineTo(bottom[0], bottom[1]);
+      ctx.moveTo(left[0], left[1]);
+      ctx.lineTo(bottom[0], bottom[1]);
+      ctx.moveTo(right[0], right[1]);
+      ctx.lineTo(bottom[0], bottom[1]);
+      ctx.stroke();
+    };
 
-    ctx.strokeStyle = "rgba(225,230,248,0.7)";
+    ctx.save();
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = compact ? 10 : 18;
+    ctx.globalAlpha = 0.58;
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = compact ? 3.2 : 4.2;
+    strokeOuterRing();
+    ctx.lineWidth = compact ? 2.1 : 2.8;
+    strokeDiamond();
+    ctx.strokeStyle = "rgba(225,230,248,0.78)";
+    ctx.lineWidth = compact ? 1.5 : 1.9;
+    strokeInnerLattice();
+    ctx.restore();
+
+    ctx.strokeStyle = "rgba(226,184,86,0.68)";
+    ctx.lineWidth = compact ? 2 : 2.5;
+    strokeOuterRing();
+
+    ctx.strokeStyle = "rgba(226,184,86,0.82)";
+    ctx.lineWidth = compact ? 1.1 : 1.3;
+    strokeDiamond();
+
+    ctx.strokeStyle = "rgba(225,230,248,0.72)";
     ctx.lineWidth = compact ? 0.9 : 1;
-    ctx.beginPath();
-    ctx.moveTo(top[0], top[1]);
-    ctx.lineTo(left[0], left[1]);
-    ctx.lineTo(right[0], right[1]);
-    ctx.closePath();
-    ctx.moveTo(top[0], top[1]);
-    ctx.lineTo(bottom[0], bottom[1]);
-    ctx.moveTo(left[0], left[1]);
-    ctx.lineTo(bottom[0], bottom[1]);
-    ctx.moveTo(right[0], right[1]);
-    ctx.lineTo(bottom[0], bottom[1]);
-    ctx.stroke();
+    strokeInnerLattice();
 
     ctx.fillStyle = "#e2b856";
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = compact ? 7 : 12;
     [top, left, right, bottom, [0, 0]].forEach(([x, y], index) => {
       const nodeRadius = index === 4 ? side * (compact ? 0.024 : 0.028) : side * (compact ? 0.019 : 0.022);
       ctx.beginPath();
       ctx.arc(x, y, nodeRadius, 0, Math.PI * 2);
       ctx.fill();
     });
+    ctx.shadowBlur = 0;
 
     drawSpiralPath(ctx, side * (compact ? 0.14 : 0.2), -rotation * 2.2, "#e2b856", compact ? 1.4 : 1.8);
     ctx.restore();
@@ -3648,7 +3698,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const loop = (time) => {
       if (anchor) drawSigil(anchor, time);
       if (recovery && !$("#recovery-sheet").hidden) drawSigil(recovery, time, true);
-      if (wheelSigil && $("#screen-wheel")?.classList.contains("screen-active")) drawSigil(wheelSigil, time);
+      if (wheelSigil && $("#screen-wheel")?.classList.contains("screen-active")) drawSigil(wheelSigil, time, true);
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
@@ -3857,31 +3907,81 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const pulse = motion === "pulse" ? 1 + Math.sin(t * (1.3 + emotionalBias)) * (0.018 + intensity * 0.035) : 1;
     const orbit = motion === "orbit" ? t * (0.16 + emotionalBias * 0.08) : 0;
     const spiralPhase = motion === "spiral" ? t * (0.55 + emotionalBias * 0.42) : t * 0.18;
+    const outerRadius = base * pulse * (0.62 + profile.spiralStrength * 0.12);
+    const innerRadius = outerRadius * (0.44 + Math.min(0.18, profile.spiralStrength * 0.18));
     const points = [];
+    const innerPoints = [];
     for (let i = 0; i < count; i += 1) {
       const prime = trip[i % trip.length] || 3;
-      const angle = -Math.PI / 2 + i * Math.PI * 2 / count + orbit + (motion === "still" ? 0 : t * 0.025 / prime);
-      const radius = base * pulse * (0.42 + (prime % 7) * 0.025 + (i % 3) * 0.06 + profile.spiralStrength * i / count * 0.12);
+      const angle = -Math.PI / 2 + i * Math.PI * 2 / count + orbit + (motion === "still" ? 0 : t * 0.014 / prime);
+      const radius = outerRadius * (0.94 + (prime % 7) * 0.012 + Math.sin(i * 1.7 + trip[0]) * 0.018);
       points.push([Math.cos(angle) * radius, Math.sin(angle) * radius]);
+      innerPoints.push([Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius]);
     }
+
+    const traceClosed = (shape) => {
+      ctx.beginPath();
+      shape.forEach(([x, y], index) => {
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+    };
+
     ctx.save();
     ctx.shadowColor = colors.primary;
-    ctx.shadowBlur = motion === "still" ? 6 + intensity * 8 : 11 + intensity * 16;
+    ctx.shadowBlur = motion === "still" ? 8 + intensity * 8 : 14 + intensity * 18;
+
+    const fillGradient = ctx.createRadialGradient(0, 0, innerRadius * 0.2, 0, 0, outerRadius * 1.08);
+    fillGradient.addColorStop(0, `${colors.primary}26`);
+    fillGradient.addColorStop(0.58, `${colors.secondary}14`);
+    fillGradient.addColorStop(1, "rgba(0,0,0,0)");
+    traceClosed(points);
+    ctx.fillStyle = fillGradient;
+    ctx.fill();
+
+    ctx.strokeStyle = colors.primary;
+    ctx.lineWidth = 2.1 + intensity * 1.2;
+    traceClosed(points);
+    ctx.stroke();
+
+    ctx.shadowBlur = 8 + intensity * 8;
     ctx.strokeStyle = colors.secondary;
-    ctx.lineWidth = 1 + intensity * 0.8;
+    ctx.lineWidth = 1.05 + intensity * 0.55;
+    traceClosed(innerPoints);
+    ctx.stroke();
+
+    ctx.globalAlpha = 0.78;
     points.forEach(([x, y], i) => {
-      const step = 1 + (trip[i % trip.length] % Math.max(2, Math.min(5, points.length - 1)));
-      const [x2, y2] = points[(i + step) % points.length];
+      const [ix, iy] = innerPoints[i];
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(ix, iy);
+      ctx.stroke();
+    });
+
+    const harmonicStep = Math.max(2, trip[1] % count || 2);
+    for (let i = 0; i < count; i += Math.max(1, Math.floor(count / 6))) {
+      const [x, y] = innerPoints[i];
+      const [x2, y2] = innerPoints[(i + harmonicStep) % count];
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x2, y2);
       ctx.stroke();
-    });
-    drawSpiralPath(ctx, base * pulse * (0.18 + profile.spiralStrength * 0.5), spiralPhase, colors.primary, 2.1 + intensity * 1.1);
-    points.forEach(([x, y]) => {
+    }
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = colors.primary;
+    ctx.lineWidth = 1.2 + intensity * 0.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, innerRadius * 0.42, 0, Math.PI * 2);
+    ctx.stroke();
+
+    drawSpiralPath(ctx, innerRadius * (0.68 + profile.spiralStrength * 0.72), spiralPhase, colors.primary, 2.1 + intensity * 1.1);
+    points.forEach(([x, y], index) => {
       ctx.fillStyle = colors.primary;
       ctx.beginPath();
-      ctx.arc(x, y, (motion === "orbit" ? 6.5 : 5.2) + intensity * 2.2, 0, Math.PI * 2);
+      ctx.arc(x, y, (index % 3 === 0 ? 6.3 : 5.1) + intensity * 2.2, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();

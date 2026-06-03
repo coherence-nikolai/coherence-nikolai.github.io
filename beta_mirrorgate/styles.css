@@ -184,6 +184,7 @@ h3 {
 }
 
 .anchor-sigil {
+  position: relative;
   display: grid;
   place-items: center;
   width: min(64vw, 360px);
@@ -191,10 +192,36 @@ h3 {
   aspect-ratio: 1;
 }
 
+.anchor-sigil::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(226, 184, 86, 0.14), transparent 38%),
+    conic-gradient(from 120deg, transparent, rgba(226, 184, 86, 0.22), transparent 32%, rgba(158, 209, 255, 0.14), transparent 68%);
+  filter: blur(18px);
+  opacity: 0.76;
+  animation: anchorHalo 8s ease-in-out infinite;
+}
+
 .anchor-sigil canvas {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 32px rgba(69, 82, 144, 0.28));
+  filter: drop-shadow(0 0 28px rgba(226, 184, 86, 0.16)) drop-shadow(0 0 42px rgba(69, 82, 144, 0.28));
+}
+
+@keyframes anchorHalo {
+  0%, 100% {
+    opacity: 0.58;
+    transform: scale(0.98) rotate(0deg);
+  }
+  50% {
+    opacity: 0.86;
+    transform: scale(1.03) rotate(7deg);
+  }
 }
 
 .anchor-copy {
@@ -448,6 +475,15 @@ h3 {
   animation: wheelAura 5.4s ease-in-out infinite;
 }
 
+.quadrant-wheel {
+  isolation: isolate;
+}
+
+.quadrant-wheel > * {
+  position: relative;
+  z-index: 2;
+}
+
 .quadrant-wheel::before,
 .quadrant-wheel::after {
   content: "";
@@ -470,6 +506,10 @@ h3 {
   left: 50%;
   width: 1px;
   transform: translateX(-50%);
+}
+
+.quadrant-wheel .wheel-orbit {
+  display: none;
 }
 
 @keyframes wheelAura {
@@ -501,7 +541,7 @@ h3 {
   color: var(--text);
   background:
     radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 18%, transparent), transparent 58%),
-    rgba(8, 9, 16, 0.62);
+    rgba(8, 9, 16, 0.5);
   cursor: pointer;
   transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
@@ -509,9 +549,12 @@ h3 {
 .wheel-quadrant:hover,
 .wheel-quadrant.selected {
   background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 34%, transparent), transparent 62%),
-    rgba(12, 13, 22, 0.82);
-  box-shadow: inset 0 0 40px color-mix(in srgb, var(--module-accent) 22%, transparent);
+    radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 38%, transparent), transparent 62%),
+    rgba(12, 13, 22, 0.7);
+  box-shadow:
+    inset 0 0 48px color-mix(in srgb, var(--module-accent) 24%, transparent),
+    0 0 34px color-mix(in srgb, var(--module-accent) 18%, transparent);
+  transform: scale(1.012);
 }
 
 .quadrant-mirror { --module-accent: var(--mirror); }
@@ -556,11 +599,37 @@ h3 {
   pointer-events: none;
 }
 
+.wheel-center::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 90deg,
+    transparent,
+    color-mix(in srgb, var(--selected-accent) 48%, transparent),
+    transparent 38%,
+    rgba(226, 184, 86, 0.16),
+    transparent 72%
+  );
+  opacity: 0.58;
+  filter: blur(9px);
+  animation: wheelCenterHalo 8.8s linear infinite;
+}
+
 .wheel-center canvas {
+  position: relative;
+  z-index: 1;
   width: 94%;
   height: 94%;
   display: block;
   filter: drop-shadow(0 0 12px color-mix(in srgb, var(--selected-accent) 42%, transparent));
+}
+
+@keyframes wheelCenterHalo {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .wheel-selected-panel {
@@ -580,6 +649,11 @@ h3 {
   justify-content: center;
   gap: 9px;
   color: var(--module-accent);
+}
+
+.wheel-selected-panel .original-module-name {
+  color: var(--module-accent);
+  letter-spacing: 0.08em;
 }
 
 .wheel-selected-panel p:not(.path-label) {
@@ -603,6 +677,13 @@ h3 {
   background:
     radial-gradient(circle at 18% 12%, rgba(226, 184, 86, 0.13), transparent 40%),
     rgba(14, 15, 26, 0.92);
+}
+
+.wheel-orientation-panel {
+  border-color: color-mix(in srgb, var(--gold) 26%, transparent);
+  background:
+    linear-gradient(135deg, rgba(226, 184, 86, 0.1), transparent 58%),
+    rgba(14, 15, 26, 0.9);
 }
 
 .glyph-wheel-panel .control-row {
@@ -987,6 +1068,49 @@ h3 {
     linear-gradient(180deg, rgba(23, 24, 36, 0.96), rgba(10, 11, 18, 0.96));
 }
 
+.module-root {
+  width: 100%;
+}
+
+.guided-module-root .module-header {
+  border-left: 3px solid var(--module-accent, var(--gold));
+  padding-left: 18px;
+}
+
+.glyph-studio-root .module-header h2 {
+  text-shadow: 0 0 40px rgba(226, 184, 86, 0.18);
+}
+
+.glyph-studio-root .module-canvas-card {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(226, 184, 86, 0.12), transparent 46%),
+    radial-gradient(circle at 50% 50%, rgba(63, 71, 138, 0.2), transparent 62%),
+    rgba(0, 0, 0, 0.3);
+}
+
+.glyph-preview-panel {
+  border-color: color-mix(in srgb, var(--gold) 28%, transparent);
+  background:
+    radial-gradient(circle at 50% 34%, rgba(226, 184, 86, 0.12), transparent 48%),
+    rgba(11, 12, 20, 0.9);
+}
+
+.glyph-preview-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.glyph-preview-meta .metric {
+  min-height: 74px;
+}
+
+.glyph-options-panel {
+  display: grid;
+  gap: 12px;
+}
+
 .guided-module-card > p {
   line-height: 1.5;
 }
@@ -1369,6 +1493,305 @@ h3 {
   pointer-events: none;
 }
 
+@media (max-width: 430px), (max-height: 740px) and (max-width: 520px) {
+  .shell {
+    padding: max(12px, env(safe-area-inset-top)) 12px calc(104px + env(safe-area-inset-bottom));
+  }
+
+  .screen {
+    min-height: auto;
+  }
+
+  h2 {
+    margin-top: 18px;
+    font-size: clamp(2rem, 10vw, 2.9rem);
+    line-height: 1;
+  }
+
+  .brand-lockup {
+    margin-top: 10px;
+  }
+
+  .brand-lockup h1 {
+    font-size: clamp(2.65rem, 12.5vw, 3.35rem);
+  }
+
+  .anchor-sigil {
+    width: min(54vw, 226px);
+    margin-top: 4px;
+  }
+
+  .panel {
+    margin: 12px auto;
+    padding: 14px;
+  }
+
+  .button {
+    min-height: 46px;
+    padding: 10px 16px;
+  }
+
+  .bottom-nav {
+    right: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    padding: 5px;
+  }
+
+  .bottom-nav button {
+    min-width: 0;
+    min-height: 38px;
+    padding: 0 4px;
+    font-size: clamp(0.72rem, 2.8vw, 0.84rem);
+    white-space: nowrap;
+  }
+
+  .quadrant-wheel {
+    width: min(72vw, 292px);
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1099px) {
+  .shell {
+    width: min(calc(100% - 48px), 980px);
+    padding-inline: 0;
+  }
+
+  .panel,
+  .button-wide,
+  .wheel-card,
+  .invocation-hero,
+  .module-step-actions {
+    max-width: none;
+  }
+
+  .wheel-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    align-items: center;
+    justify-items: center;
+  }
+
+  .quadrant-wheel {
+    width: min(48vw, 460px);
+  }
+
+  .wheel-selected-panel {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .wheel-selected-panel h3 {
+    justify-content: center;
+  }
+
+  .intention-options,
+  .contact-paths-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .shell {
+    width: min(calc(100% - 96px), 1240px);
+    padding: 72px 0 72px;
+  }
+
+  .panel,
+  .button-wide,
+  .wheel-card,
+  .module-step-actions {
+    max-width: none;
+  }
+
+  #screen-anchor.screen-active {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(380px, 0.78fr);
+    grid-template-areas:
+      "brand sigil"
+      "copy sigil"
+      "intro cta";
+    gap: 18px 56px;
+    align-items: center;
+    min-height: calc(100vh - 168px);
+  }
+
+  #screen-anchor .brand-lockup {
+    grid-area: brand;
+    margin-top: 0;
+    text-align: left;
+  }
+
+  #screen-anchor .brand-lockup h1 {
+    font-size: clamp(5.2rem, 7vw, 7.4rem);
+  }
+
+  #screen-anchor .anchor-sigil {
+    grid-area: sigil;
+    width: min(35vw, 520px);
+    margin: 0 auto;
+  }
+
+  #screen-anchor .anchor-copy {
+    grid-area: copy;
+    text-align: left;
+  }
+
+  #screen-anchor .anchor-copy h2 {
+    font-size: clamp(4rem, 5.6vw, 6.4rem);
+  }
+
+  #screen-anchor .anchor-copy p {
+    margin-inline: 0;
+  }
+
+  #screen-anchor .intro-panel {
+    grid-area: intro;
+    margin: 0;
+  }
+
+  #screen-anchor > .button-wide {
+    grid-area: cta;
+    align-self: start;
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  #screen-wheel.screen-active {
+    display: grid;
+    grid-template-columns: minmax(520px, 640px) minmax(360px, 1fr);
+    gap: 18px 30px;
+    align-items: start;
+  }
+
+  #screen-wheel > .back-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  #screen-wheel > h2,
+  #screen-wheel > .lede,
+  #screen-wheel > .wheel-card {
+    grid-column: 1;
+  }
+
+  #screen-wheel > .wheel-selected-panel,
+  #screen-wheel > .glyph-wheel-panel,
+  #screen-wheel > .wheel-orientation-panel,
+  #screen-wheel > .intention-panel,
+  #screen-wheel > .contact-paths-panel {
+    grid-column: 2;
+    margin: 0;
+  }
+
+  #screen-wheel > .wheel-card {
+    position: sticky;
+    top: 108px;
+    margin: 0;
+    padding: 24px;
+  }
+
+  #screen-wheel > h2 {
+    margin-bottom: 4px;
+    font-size: clamp(4.2rem, 6vw, 6.8rem);
+  }
+
+  .wheel-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .quadrant-wheel {
+    width: min(38vw, 500px);
+  }
+
+  .wheel-selected-panel {
+    margin-top: 0;
+    padding: 20px 22px;
+    align-self: start;
+    box-shadow: 0 0 42px color-mix(in srgb, var(--module-accent) 18%, transparent);
+  }
+
+  .wheel-orientation-panel,
+  .glyph-wheel-panel,
+  .intention-panel,
+  .contact-paths-panel {
+    box-shadow: none;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 54%),
+      rgba(12, 13, 22, 0.72);
+  }
+
+  .intention-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contact-paths-list {
+    grid-template-columns: 1fr;
+  }
+
+  #screen-module #module-root {
+    display: grid;
+    grid-template-columns: minmax(340px, 0.72fr) minmax(520px, 1fr);
+    gap: 18px 30px;
+    align-items: start;
+  }
+
+  #screen-module .module-header {
+    grid-column: 1;
+    position: sticky;
+    top: 108px;
+    margin-bottom: 0;
+  }
+
+  #screen-module .module-header h2 {
+    font-size: clamp(2.4rem, 3.2vw, 3.8rem);
+  }
+
+  #screen-module #module-root > .panel,
+  #screen-module #module-root > .module-step-actions {
+    grid-column: 2;
+    margin-top: 0;
+  }
+
+  #screen-module #module-root.glyph-studio-root {
+    grid-template-columns: minmax(420px, 0.82fr) minmax(560px, 1fr);
+  }
+
+  #screen-module #module-root.glyph-studio-root > .module-header,
+  #screen-module #module-root.glyph-studio-root > .panel {
+    grid-column: 2;
+  }
+
+  #screen-module #module-root.glyph-studio-root > .module-header {
+    position: static;
+  }
+
+  #screen-module #module-root.glyph-studio-root > .glyph-preview-panel {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+    position: sticky;
+    top: 108px;
+    align-self: start;
+    margin-top: 0;
+  }
+
+  #screen-module #module-root.glyph-studio-root .module-canvas-card {
+    min-height: min(62vh, 620px);
+  }
+
+  #screen-module #module-root.glyph-studio-root .module-canvas-card canvas {
+    max-height: min(62vh, 620px);
+  }
+
+  .guided-module-card .module-canvas-card,
+  .module-canvas-card {
+    min-height: 460px;
+  }
+}
+
 @media print {
   body {
     background: #fff;
@@ -1522,7 +1945,29 @@ h3 {
   }
 
   .wheel-selected-panel {
-    padding: 14px;
+    margin-bottom: 18px;
+    padding: 12px;
+  }
+
+  .wheel-selected-panel h3 {
+    margin-bottom: 8px;
+  }
+
+  .wheel-selected-panel .path-label {
+    margin-bottom: 6px;
+  }
+
+  .wheel-selected-panel p:not(.path-label) {
+    margin-bottom: 8px;
+    line-height: 1.32;
+  }
+
+  .wheel-selected-panel .small-copy {
+    display: none;
+  }
+
+  .wheel-selected-panel .button {
+    min-height: 44px;
   }
 
   .bottom-nav button {
