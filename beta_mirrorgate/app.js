@@ -3572,22 +3572,55 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     requestAnimationFrame(loop);
   }
 
+  const sigilMotion = new WeakMap();
+
+  function prepareCanvasPixels(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const width = Math.max(1, Math.round((rect.width || canvas.width) * dpr));
+    const height = Math.max(1, Math.round((rect.height || canvas.height) * dpr));
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    return {
+      dpr,
+      width: width / dpr,
+      height: height / dpr
+    };
+  }
+
+  function smoothSigilRotation(canvas, time, compact) {
+    const speed = compact ? 0.14 : 0.105;
+    const currentTime = Number.isFinite(time) ? time : performance.now();
+    const previous = sigilMotion.get(canvas) || {
+      lastTime: currentTime,
+      rotation: (currentTime / 1000) * speed
+    };
+    const rawDelta = Math.max(0, (currentTime - previous.lastTime) / 1000);
+    const delta = Math.min(rawDelta, 1 / 24);
+    const rotation = (previous.rotation + delta * speed) % (Math.PI * 2);
+    sigilMotion.set(canvas, { lastTime: currentTime, rotation });
+    return rotation;
+  }
+
   function drawSigil(canvas, time = performance.now(), compact = false) {
     const ctx = canvas.getContext("2d");
-    const w = canvas.width;
-    const h = canvas.height;
+    const { dpr, width: w, height: h } = prepareCanvasPixels(canvas);
     const cx = w / 2;
     const cy = h / 2;
     const side = Math.min(w, h);
     const r = side * (compact ? 0.28 : 0.38);
-    const t = time / 1000;
-    const rotation = t * 0.16;
+    const rotation = smoothSigilRotation(canvas, time, compact);
     const accentSource = canvas.closest(".wheel-card, .wheel-center, .anchor-sigil, .recovery-card") || document.documentElement;
     const accent = getComputedStyle(accentSource).getPropertyValue("--selected-accent").trim()
       || getComputedStyle(document.documentElement).getPropertyValue("--gold").trim()
       || "#e2b856";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
     const gradient = ctx.createRadialGradient(0, 0, 10, 0, 0, r * 1.6);
     gradient.addColorStop(0, "rgba(226,184,86,0.24)");
