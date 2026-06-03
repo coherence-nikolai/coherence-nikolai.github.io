@@ -1,0 +1,29 @@
+{
+  "name": "Catastic!",
+  "short_name": "Catastic",
+  "description": "A playful cat creation studio for magical custom cats.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#fff7e8",
+  "theme_color": "#ff7d73",
+  "orientation": "portrait-primary",
+  "categories": ["kids", "creativity", "games"],
+  "icons": [
+    {
+      "src": "catastic-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open Studio",
+      "short_name": "Studio",
+      "url": ".",
+      "icons": [{ "src": "catastic-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
