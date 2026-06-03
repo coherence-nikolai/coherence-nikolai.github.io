@@ -139,7 +139,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     activeInvocation: null,
     audio: null,
     toneOscillators: [],
+    toneStopTimer: null,
     activeAudio: null,
+    statusTimer: null,
     cameraStream: null,
     mediaStream: null,
     mediaRecorder: null,
@@ -226,6 +228,12 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
 
   const calibrationBreathChoices = ["prime2357", "prime3711", "symmetricalFour", "receptiveFourSix"];
   const gateBreathSeals = ["2-3-5-7", "3-7-11", "4-4-4-4", "4-6-4-6"];
+  const gateBreathSealChoices = [
+    { id: "2-3-5-7", title: "2-3-5-7", why: "Quick opening, widening hold, and long release." },
+    { id: "3-7-11", title: "3-7-11", why: "Deeper seal with fewer transitions and a long settling exhale." },
+    { id: "4-4-4-4", title: "4-4-4-4", why: "Stable, balanced pacing when you want grounding." },
+    { id: "4-6-4-6", title: "4-6-4-6", why: "Slower, more receptive attention with longer holds." }
+  ];
 
   const triplets = {
     "3-7-11": "Balanced, recursive, classic gate.",
@@ -399,7 +407,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
         "Let the glyph represent the session's essence."
       ],
       notice: "Shape, symmetry, tension, color, memory, recognition, or rejection.",
-      force: "The glyph does not need to be pretty. It needs to feel true enough."
+      force: "The glyph can be rough. It only needs to feel true enough."
     },
     ground: {
       title: "Ground",
@@ -1027,7 +1035,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
 
   function accessLevelSummary() {
     return hasInitiationAccess()
-      ? "All contact protocols are open for private Orion beta testing and refinement."
+      ? "All contact protocols are open for this MirrorGate circle."
       : "Anchor, Recovery, About, basic breath, and basic Symbolic Mirror remain open.";
   }
 
@@ -1082,7 +1090,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         </div>
         <p class="small-copy">${escapeHtml(accessLevelSummary())}</p>
         <p class="threshold-phrase">I enter with clarity, humility, and responsibility.</p>
-        <button class="button button-primary button-wide" data-action="open-simulated-initiation">Open Simulated Initiation</button>
+        <button class="button button-primary button-wide" data-action="open-simulated-initiation">Open MirrorGate Initiation</button>
       </section>
     `;
     showScreen("module");
@@ -1101,6 +1109,16 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (name === "wheel") renderWheelUI();
     if (name === "codex") renderCodex();
     if (resetScroll) window.scrollTo(0, 0);
+  }
+
+  function withPreservedScroll(callback) {
+    const x = window.scrollX;
+    const y = window.scrollY;
+    callback();
+    const restore = () => window.scrollTo(x, y);
+    requestAnimationFrame(restore);
+    window.setTimeout(restore, 30);
+    window.setTimeout(restore, 120);
   }
 
   function ensureAudio() {
@@ -1138,6 +1156,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   }
 
   function stopTone() {
+    if (state.toneStopTimer) {
+      window.clearTimeout(state.toneStopTimer);
+      state.toneStopTimer = null;
+    }
     state.toneOscillators.forEach(({ osc, gain, source }) => {
       try {
         const ctx = state.audio;
@@ -1158,11 +1180,15 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   function playTone(frequency = state.draft.tone || 144, seconds = 2.4, mode = "single") {
     const ctx = ensureAudio();
     stopTone();
+    const isContinuous = !Number.isFinite(seconds);
+    const toneSeconds = isContinuous ? 24 : Math.max(0.4, seconds);
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, ctx.currentTime);
     master.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.12);
-    master.gain.setValueAtTime(0.16, ctx.currentTime + Math.max(0.18, seconds - 0.18));
-    master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + seconds);
+    if (!isContinuous) {
+      master.gain.setValueAtTime(0.16, ctx.currentTime + Math.max(0.18, toneSeconds - 0.18));
+      master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + toneSeconds);
+    }
     master.connect(ctx.destination);
 
     const freqs = mode === "soundscape"
@@ -1176,8 +1202,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       osc.type = index === 0 ? "sine" : "triangle";
       osc.frequency.setValueAtTime(freq, ctx.currentTime);
       if (mode === "pulse") {
-        osc.frequency.linearRampToValueAtTime(freq * 1.01, ctx.currentTime + seconds / 2);
-        osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + seconds);
+        osc.frequency.linearRampToValueAtTime(freq * 1.01, ctx.currentTime + toneSeconds / 2);
+        osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + toneSeconds);
       }
       gain.gain.value = index === 0 ? 0.75 : 0.18;
       filter.type = "lowpass";
@@ -1186,11 +1212,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       gain.connect(filter);
       filter.connect(master);
       osc.start();
-      osc.stop(ctx.currentTime + seconds + 0.02);
+      if (!isContinuous) osc.stop(ctx.currentTime + toneSeconds + 0.02);
       return { osc, gain: master };
     });
 
-    window.setTimeout(stopTone, (seconds + 0.08) * 1000);
+    if (!isContinuous) state.toneStopTimer = window.setTimeout(stopTone, (toneSeconds + 0.08) * 1000);
   }
 
   function seedFromText(text) {
@@ -1395,7 +1421,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     list.innerHTML = `
       <div class="panel codex-toolbar">
         <h3>Personal Codex</h3>
-        <p>Local-only V1 archive. Session entries remain in this browser unless you export a capsule.</p>
+        <p>Your Codex entries stay in this browser unless you export a capsule.</p>
         <div class="control-row">
           <button class="button button-muted" data-action="open-glyph-designer">Open Glyph Studio</button>
           <button class="button button-muted" data-action="import-capsule">Import Capsule</button>
@@ -1647,7 +1673,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <p><strong>MirrorGate Initiation:</strong> Contact paths, Gate Sequencing, Vector Transmission, Toroidal Echoing, Glyph Studio, Codex archive, capsules, and advanced Echo tools.</p>
         <div class="control-row">
           <button class="button ${hasInitiationAccess() ? "button-muted" : "button-primary"}" data-action="toggle-premium">
-            ${hasInitiationAccess() ? "Reset Simulated Initiation" : "Open Simulated Initiation"}
+            ${hasInitiationAccess() ? "Reset MirrorGate Initiation" : "Open MirrorGate Initiation"}
           </button>
         </div>
       </section>
@@ -1937,7 +1963,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <h3>Carrier Tone</h3>
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
-          <button class="button button-muted" data-action="play-tone">Play Tone</button>
+          <div class="control-row">
+            <button class="button button-muted" data-action="play-tone">Play Tone</button>
+            <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
+          </div>
         </section>
         ${flowFooter("Continue to Ritual")}
       `;
@@ -2035,6 +2064,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <div class="control-row">
             <button class="button button-primary" data-action="start-camera">Activate Camera Mirror</button>
             <button class="button button-muted" data-action="play-tone">Play Mirror Tone</button>
+            <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
           </div>
         </section>
         ${flowFooter("Continue to Echo Playback")}
@@ -2095,6 +2125,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <textarea id="notes" class="textarea" placeholder="Numbers, shapes, feelings, light, words, body shifts...">${escapeHtml(state.draft.notes)}</textarea>
           <div class="control-row">
             <button class="button button-muted" data-action="play-grounding-tone">Play Grounding Tone</button>
+            <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
             <button class="button button-quiet" data-action="open-recovery">Open Recovery Reset</button>
           </div>
         </section>
@@ -2157,21 +2188,21 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           if (profile.breath !== "selected") state.draft.breathRhythm = profile.breath;
         }
         persistDraft();
-        renderFlowStep(state.currentFlowStep, { resetScroll: false });
+        withPreservedScroll(() => renderFlowStep(state.currentFlowStep, { resetScroll: false }));
       });
     });
     $$(".tone-choice", root).forEach((button) => {
       button.addEventListener("click", () => {
         state.draft.tone = Number(button.dataset.tone);
         persistDraft();
-        renderFlowStep(state.currentFlowStep, { resetScroll: false });
+        withPreservedScroll(() => renderFlowStep(state.currentFlowStep, { resetScroll: false }));
       });
     });
     $$(".phase-choice", root).forEach((button) => {
       button.addEventListener("click", () => {
         state.draft.echoPreset = button.dataset.phase;
         persistDraft();
-        renderFlowStep(state.currentFlowStep, { resetScroll: false });
+        withPreservedScroll(() => renderFlowStep(state.currentFlowStep, { resetScroll: false }));
       });
     });
     $("#camera-toggle", root)?.addEventListener("change", (event) => {
@@ -2204,7 +2235,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   function stepOffset(delta) {
     const index = flowSteps.findIndex((step) => step.id === state.currentFlowStep);
     const next = flowSteps[Math.min(flowSteps.length - 1, Math.max(0, index + delta))];
-    if (state.currentFlowStep === "alignment") stopActiveAudio();
+    stopActiveAudio();
+    stopTone();
     if (state.currentFlowStep === "mirror" && next.id !== "mirror") stopCamera();
     state.currentFlowStep = next.id;
     renderFlowStep(next.id);
@@ -2280,7 +2312,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (name === "gate") {
       return [
         { title: "Orient the Gate", instruction: "Use Gate when the intention is dimensional or stellar ally contact. This is the contact portal.", notice: "Start only when the intention is clear enough to hold without forcing." },
-        { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate; the Breath Seal paces your body.", notice: "The Breath Seal does not need to match the triplet." },
+        { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate geometry; the Breath Seal sets the body rhythm.", notice: "Choose the Breath Seal by the pace your body needs for this contact." },
         { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone and geometry establish the threshold.", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
         { title: "Seal the Breath", instruction: "Complete one full Breath Seal and mark it sealed when the body feels steady enough.", notice: "The breath seal is a body anchor, not a race." },
         { title: "Hold Intention", instruction: "Name the contact intention silently, then mark it held. Keep it simple.", notice: "The intention should feel like a clear beacon, not a demand." },
@@ -2347,10 +2379,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       : `<button class="button button-quiet" data-action="open-wheel">Return to Wheel</button>`;
     const next = stepIndex < count - 1
       ? `<button class="button button-primary" data-action="module-next-step" data-module-name="${escapeHtml(name)}">Next Step</button>`
-      : `<button class="button button-primary" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Open Advanced View</button>`;
+      : `<button class="button button-primary" data-action="module-complete" data-module-name="${escapeHtml(name)}">${escapeHtml(moduleCompletionLabel(name))}</button>`;
     const advanced = stepIndex < count - 1
       ? `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Advanced View</button>`
-      : "";
+      : `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Advanced View</button>`;
     return `
       <div class="control-row flow-actions module-step-actions">
         ${back}
@@ -2358,6 +2390,14 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         ${advanced}
       </div>
     `;
+  }
+
+  function moduleCompletionLabel(name) {
+    if (name === "gate") return "Integrate in Mirror";
+    if (name === "mirror") return "Return to Wheel";
+    if (name === "vector") return "Return to Wheel";
+    if (name === "breath") return "Return to Wheel";
+    return "Return to Wheel";
   }
 
   function renderGuidedModuleStepBody(name, stepIndex) {
@@ -2400,10 +2440,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="action-panel">
           <button class="button button-primary" data-action="generate-vector">Transmit Vector</button>
           <button class="button button-muted" data-action="play-tone">Play Carrier Tone</button>
+          <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
         </div>
         <div class="metric-grid">
-          <span class="metric"><small>Seed</small><strong id="vector-seed">Awaiting</strong></span>
-          <span class="metric"><small>Vector</small><strong id="vector-path">Awaiting</strong></span>
+          <span class="metric"><small>Seed</small><strong id="vector-seed">Not transmitted yet</strong></span>
+          <span class="metric"><small>Vector</small><strong id="vector-path">Not transmitted yet</strong></span>
           <span class="metric"><small>Carrier</small><strong>${escapeHtml(getTone(state.draft.tone).label)}</strong></span>
         </div>
       `;
@@ -2446,6 +2487,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
         <div class="action-panel">
           <button class="button button-primary" data-action="start-breath">Begin Echo Field</button>
+          <button class="button button-muted" data-action="stop-audio">Stop Echo Tone</button>
           <p class="small-copy">Follow the toroidal pulse. Let time-feelings, symbols, collective impressions, or future-self echoes surface without forcing them.</p>
         </div>
       `;
@@ -2477,7 +2519,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <h3>Prime Triplet Pathway</h3>
         <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
         <h3>Breath Seal</h3>
-        <div class="choice-grid">${renderChoiceGroup(gateBreathSeals.map((cycle) => ({ id: cycle, title: cycle, why: cycle === state.draft.triplet ? "This breath can mirror the selected triplet, but does not need to." : "Breath paces the body separately from the prime triplet." })), state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
+        <div class="choice-grid">${renderChoiceGroup(gateBreathSealChoices, state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
         <h3>Carrier Tone</h3>
         <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
       `;
@@ -2487,7 +2529,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
         <div class="action-panel">
           <button class="button button-primary" data-action="enter-gate">Begin Gate Field</button>
-          <p class="small-copy">Begin starts the gate tone and motion. It does not reset the Breath Seal, intention, or glyph nodes.</p>
+          <button class="button button-muted" data-action="stop-audio">Stop Gate Tone</button>
+          <p class="small-copy">Begin starts the gate tone and motion. Let the field run while you move through breath, intention, and glyph nodes.</p>
         </div>
       `;
     }
@@ -2566,6 +2609,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="control-row">
           <button class="button button-primary" data-action="start-camera">Activate Camera Mirror</button>
           <button class="button button-muted" data-action="play-tone">Play Mirror Tone</button>
+          <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
         </div>
       `;
     }
@@ -2625,7 +2669,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       <section class="panel">
         <h3>Why Use This Module</h3>
         <p class="gold">${escapeHtml(module.modality)}</p>
-        <p class="small-copy">Original module name: ${escapeHtml(module.title)}</p>
+        <p class="small-copy">Module: ${escapeHtml(module.title)}</p>
         <p>${escapeHtml(module.purpose)}</p>
       </section>
 
@@ -2667,12 +2711,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
             <button class="button button-primary" data-action="generate-vector">Transmit Vector</button>
             <p class="small-copy">Transmit converts the intention into seed, glyph, vector, and carrier tone. Watch the glyph and notice what the signal seems to carry before moving on.</p>
             <button class="button button-muted" data-action="play-tone">Play Carrier Tone</button>
+            <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
           </div>
           <details class="module-details">
             <summary>Vector Details</summary>
             <div class="metric-grid">
-              <span class="metric"><small>Seed</small><strong id="vector-seed">Awaiting</strong></span>
-              <span class="metric"><small>Vector</small><strong id="vector-path">Awaiting</strong></span>
+              <span class="metric"><small>Seed</small><strong id="vector-seed">Not transmitted yet</strong></span>
+              <span class="metric"><small>Vector</small><strong id="vector-path">Not transmitted yet</strong></span>
               <span class="metric"><small>Carrier</small><strong>${state.draft.tone} Hz</strong></span>
             </div>
           </details>
@@ -2695,6 +2740,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
           <div class="action-panel">
             <button class="button button-primary" data-action="start-breath">Begin Echo Field</button>
+            <button class="button button-muted" data-action="stop-audio">Stop Echo Tone</button>
             <p class="small-copy">Begin starts the tone and toroidal breath rhythm. Follow the phase cue, keep the memory or question light, and let impressions surface without chasing them.</p>
           </div>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
@@ -2719,14 +2765,15 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <h3>Prime Triplet Pathway</h3>
           <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
           <h3>Breath Seal</h3>
-          <div class="choice-grid">${renderChoiceGroup(gateBreathSeals.map((cycle) => ({ id: cycle, title: cycle, why: cycle === state.draft.triplet ? "This breath can mirror the selected triplet, but does not need to." : "Breath paces the body separately from the prime triplet." })), state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
-          <p class="small-copy">The Breath Seal does not need to match the prime triplet. The triplet shapes the gate geometry; breath paces the body through it.</p>
+          <div class="choice-grid">${renderChoiceGroup(gateBreathSealChoices, state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
+          <p class="small-copy">Choose the Breath Seal for the rhythm you want in the body. The prime triplet shapes the gate geometry; breath shapes your attention through it.</p>
           <h3>Carrier Tone</h3>
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
           <div class="action-panel">
             <button class="button button-primary" data-action="enter-gate">Begin Gate Field</button>
-            <p class="small-copy">Begin starts the gate tone and motion. It does not reset the Breath Seal or glyph nodes. Use the node buttons below to complete the sequence.</p>
+            <button class="button button-muted" data-action="stop-audio">Stop Gate Tone</button>
+            <p class="small-copy">Begin starts the gate tone and motion. Keep it running while you seal the breath, hold the intention, and tap each glyph node in order.</p>
             <button class="button button-muted" data-action="seal-breath">Seal Completed Breath</button>
           </div>
           <div class="metric-grid">
@@ -2763,6 +2810,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="control-row">
           <button class="button button-primary" data-action="start-camera">Activate Camera Mirror</button>
           <button class="button button-muted" data-action="play-tone">Play Mirror Tone</button>
+          <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
           <button class="button button-quiet" data-action="save-session">Save Reflection</button>
         </div>
       </section>
@@ -2774,7 +2822,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       button.addEventListener("click", () => {
         state.draft.tone = Number(button.dataset.tone);
         persistDraft();
-        renderModule(name, { resetScroll: false });
+        withPreservedScroll(() => renderModule(name, { resetScroll: false }));
       });
     });
     $$(".choice", root).forEach((button) => {
@@ -2786,7 +2834,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         if (button.dataset.breath) state.draft.breathRhythm = button.dataset.breath;
         if (button.dataset.breathSeal) state.draft.breathSeal = button.dataset.breathSeal;
         persistDraft();
-        renderModule(name, { resetScroll: false });
+        withPreservedScroll(() => renderModule(name, { resetScroll: false }));
       });
     });
     $("#intention", root)?.addEventListener("input", (event) => {
@@ -2988,7 +3036,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const active = activeGlyphEnabled();
     root.innerHTML = `
       <header class="module-header">
-        <p class="path-label">MirrorGate Initiation Feature</p>
+        <p class="path-label">MirrorGate Initiation</p>
         <h2>Glyph Studio</h2>
         <p>A personal sigil forge for nodes, spiral, prime triplet, tone, colors, and the Personal Glyph Profile.</p>
       </header>
@@ -3047,7 +3095,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         ${profile.toneBindingMode === "custom" ? `
           <label>Custom Frequency: <strong id="custom-frequency-value">${activeGlyphFrequency(profile).toFixed(1)} Hz</strong></label>
           <input id="designer-custom-frequency" type="range" min="20" max="4000" step="1" value="${activeGlyphFrequency(profile)}">
-          <button class="button button-muted" data-action="preview-glyph-frequency">Preview Custom Tone</button>
+          <div class="control-row">
+            <button class="button button-muted" data-action="preview-glyph-frequency">Preview Custom Tone</button>
+            <button class="button button-quiet" data-action="stop-audio">Stop Tone</button>
+          </div>
         ` : `
           <div class="choice-grid">${renderChoiceGroup(tones, getTone(profile.carrierToneID).value, "tone-choice", "tone")}</div>
         `}
@@ -3258,15 +3309,15 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   }
 
   function handleAction(action, target) {
-    if (action === "open-anchor") showScreen("anchor");
-    if (action === "open-about") showScreen("about");
+    if (action === "open-anchor") { stopActiveAudio(); stopTone(); showScreen("anchor"); }
+    if (action === "open-about") { stopActiveAudio(); stopTone(); showScreen("about"); }
     if (action === "open-about-audio") {
       showScreen("about");
       playAsset("AboutMirrorGateVoice.mp3");
     }
-    if (action === "open-wheel") showScreen("wheel");
+    if (action === "open-wheel") { stopActiveAudio(); stopTone(); showScreen("wheel"); }
     if (action === "open-invocation") renderPathInvocation(target.dataset.invocation);
-    if (action === "open-codex") openCodex();
+    if (action === "open-codex") { stopActiveAudio(); stopTone(); openCodex(); }
     if (action === "open-recovery") openRecovery();
     if (action === "close-recovery") closeRecovery();
     if (action === "repeat-recovery") openRecovery(true);
@@ -3282,6 +3333,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       if (invocation) playAsset(invocation.asset);
     }
     if (action === "module-next-step" || action === "module-prev-step") {
+      stopActiveAudio();
+      stopTone();
       const moduleName = target.dataset.moduleName || state.module;
       const steps = moduleStepDefinitions(moduleName);
       const offset = action === "module-next-step" ? 1 : -1;
@@ -3289,16 +3342,29 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       renderModule(moduleName, { resetScroll: true });
     }
     if (action === "module-advanced") {
+      stopActiveAudio();
+      stopTone();
       const moduleName = target.dataset.moduleName || state.module;
       state.advancedModules[moduleName] = true;
       renderModule(moduleName, { resetScroll: true });
     }
     if (action === "module-guided") {
+      stopActiveAudio();
+      stopTone();
       const moduleName = target.dataset.moduleName || state.module;
       state.advancedModules[moduleName] = false;
       renderModule(moduleName, { resetScroll: true });
     }
+    if (action === "module-complete") {
+      stopActiveAudio();
+      stopTone();
+      const moduleName = target.dataset.moduleName || state.module;
+      if (moduleName === "gate") renderModule("mirror");
+      else showScreen("wheel");
+    }
     if (action === "begin-invocation") {
+      stopActiveAudio();
+      stopTone();
       const invocation = pathInvocations[target.dataset.invocation];
       if (invocation?.startsFullSequence) {
         startFullSequence();
@@ -3309,7 +3375,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "play-about") playAsset("AboutMirrorGateVoice.mp3");
     if (action === "stop-audio") { stopActiveAudio(); stopTone(); }
     if (action === "play-soundscape") playAsset(getProfile().asset, true);
-    if (action === "play-grounding-tone") playTone(144, 8, "soundscape");
+    if (action === "play-grounding-tone") playTone(144, Infinity, "soundscape");
     if (action === "start-recording") startRecording();
     if (action === "stop-recording") stopRecording();
     if (action === "play-original") playOriginal();
@@ -3334,7 +3400,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       renderGlyphDesigner({ resetScroll: false });
     }
     if (action === "preview-glyph-frequency") {
-      playTone(activeGlyphFrequency(), 2.4, "single");
+      playTone(activeGlyphFrequency(), Infinity, "single");
     }
     if (action === "open-simulated-initiation") openSimulatedInitiation();
     if (action === "toggle-premium") {
@@ -3355,12 +3421,12 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       drawModuleCanvas("vector", encoded);
       $("#vector-seed") && ($("#vector-seed").textContent = String(encoded.seed));
       $("#vector-path") && ($("#vector-path").textContent = `${encoded.vector.map((value) => value.toFixed(2)).join(", ")}`);
-      playTone(state.draft.tone, 2.2, "pulse");
+      playTone(state.draft.tone, Infinity, "pulse");
     }
-    if (action === "play-tone") playTone(state.draft.tone, 3, "single");
-    if (action === "start-breath") playTone(state.draft.tone, 10, "soundscape");
+    if (action === "play-tone") playTone(state.draft.tone, Infinity, "single");
+    if (action === "start-breath") playTone(state.draft.tone, Infinity, "soundscape");
     if (action === "enter-gate") {
-      playTone(state.draft.tone, 12, "soundscape");
+      playTone(state.draft.tone, Infinity, "soundscape");
       showStatus("Gate field started. Continue with breath, intention, and glyph nodes.", "success");
     }
     if (action === "seal-breath") {
@@ -3407,8 +3473,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       title: module.title || "MirrorGate Session",
       archetype: getArchetype().title,
       intention: $("#intention")?.value || $("#mirror-intention")?.value || state.draft.intention || module.phrase,
-      reflection: module.notice || "",
-      notes: "",
+      reflection: $("#reflection")?.value || state.draft.reflection || module.notice || "",
+      notes: $("#notes")?.value || state.draft.notes || "",
       tone: getTone(state.draft.tone).label,
       triplet: state.draft.triplet,
       breath: breathRhythms[state.draft.breathRhythm]?.cycle || state.draft.breathRhythm,
@@ -3422,19 +3488,29 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
 
   function bindGlobalActions() {
     document.addEventListener("click", (event) => {
-      const actionTarget = event.target.closest("[data-action]");
-      const moduleTarget = event.target.closest("[data-module]");
-      const wheelModuleTarget = event.target.closest("[data-wheel-module]");
+      const targetElement = event.target instanceof Element ? event.target : event.target?.parentElement;
+      if (!targetElement) return;
+      if (targetElement.closest("input, textarea, select, option, [contenteditable='true']")) return;
+      const actionTarget = targetElement.closest("[data-action]");
+      const moduleTarget = targetElement.closest("button[data-module], a[data-module], [role='button'][data-module]");
+      const wheelModuleTarget = targetElement.closest("button[data-wheel-module], a[data-wheel-module], [role='button'][data-wheel-module]");
       if (actionTarget) {
+        event.preventDefault();
         handleAction(actionTarget.dataset.action, actionTarget);
         return;
       }
       if (wheelModuleTarget) {
+        event.preventDefault();
         state.selectedWheelModule = wheelModuleTarget.dataset.wheelModule;
         renderWheelSelection(state.selectedWheelModule);
         return;
       }
-      if (moduleTarget) renderModule(moduleTarget.dataset.module);
+      if (moduleTarget) {
+        event.preventDefault();
+        stopActiveAudio();
+        stopTone();
+        renderModule(moduleTarget.dataset.module);
+      }
     });
     document.addEventListener("change", (event) => {
       if (event.target?.id === "capsule-file" && event.target.files?.[0]) {
@@ -3951,7 +4027,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     status.textContent = message;
     status.className = `status-toast status-${kind}`;
-    window.setTimeout(() => status.classList.add("status-hidden"), 3200);
+    if (state.statusTimer) window.clearTimeout(state.statusTimer);
+    state.statusTimer = window.setTimeout(() => {
+      status.classList.add("status-hidden");
+      state.statusTimer = null;
+    }, 3200);
   }
 
   function escapeHtml(value) {
