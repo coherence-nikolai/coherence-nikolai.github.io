@@ -3572,8 +3572,6 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     requestAnimationFrame(loop);
   }
 
-  const sigilMotion = new WeakMap();
-
   function prepareCanvasPixels(canvas) {
     const rect = canvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
@@ -3590,18 +3588,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     };
   }
 
-  function smoothSigilRotation(canvas, time, compact) {
-    const speed = compact ? 0.14 : 0.105;
+  function sigilRotation(time, compact) {
+    const speed = compact ? 0.18 : 0.24;
     const currentTime = Number.isFinite(time) ? time : performance.now();
-    const previous = sigilMotion.get(canvas) || {
-      lastTime: currentTime,
-      rotation: (currentTime / 1000) * speed
-    };
-    const rawDelta = Math.max(0, (currentTime - previous.lastTime) / 1000);
-    const delta = Math.min(rawDelta, 1 / 24);
-    const rotation = (previous.rotation + delta * speed) % (Math.PI * 2);
-    sigilMotion.set(canvas, { lastTime: currentTime, rotation });
-    return rotation;
+    return ((currentTime / 1000) * speed) % (Math.PI * 2);
   }
 
   function drawSigil(canvas, time = performance.now(), compact = false) {
@@ -3611,7 +3601,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const cy = h / 2;
     const side = Math.min(w, h);
     const r = side * (compact ? 0.28 : 0.38);
-    const rotation = smoothSigilRotation(canvas, time, compact);
+    const rotation = sigilRotation(time, compact);
     const accentSource = canvas.closest(".wheel-card, .wheel-center, .anchor-sigil, .recovery-card") || document.documentElement;
     const accent = getComputedStyle(accentSource).getPropertyValue("--selected-accent").trim()
       || getComputedStyle(document.documentElement).getPropertyValue("--gold").trim()
