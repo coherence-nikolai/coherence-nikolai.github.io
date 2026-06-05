@@ -121,6 +121,19 @@ General Harmonic Contact Interface path. Begin with Mirror to align. Move to Vec
     dimensionalContact: `
 Welcome, traveler of the harmonic field. You stand at the threshold of dimensional resonance, where the veil between worlds thins. Center your breath. Inhale for four, hold for four, exhale for four, and pause. Feel the prime harmonic gate align with your intention. Speak silently or aloud: I open myself to the guidance of my dimensional and stellar allies. I am ready to receive with clarity and coherence. As the tones play, visualize a luminous gate opening before you. Step through with your awareness. Allow the presence of your allies to manifest through symbols, sensations, or inner voice. Listen. Trust. Receive. When complete, breathe deeply and return with gratitude.
 `,
+    gateOpenContactWindow: `
+Gate Open: Remain Here.
+
+This is the contact window. Keep the Gate Field tone running, continue the chosen Breath Seal, and hold the intention without forcing an answer.
+
+You may visualise yourself moving through the gate.
+
+Look for presence, inner words, geometry, emotion, body sensation, image, pressure, temperature, or stillness.
+
+Do not chase certainty. Silence or nothing obvious is still a valid gate session.
+
+Move to Mirror integration only when the contact window feels complete.
+`,
     oversoulMonad: `
 Welcome to the Mirror of the Monad. Here, you commune with your Oversoul, the eternal self beyond time. Close your eyes and breathe slowly. Feel the Symbolic Mirror Interface reflecting your essence. Speak inwardly: I align with my Oversoul. I receive the wisdom of my Monad across all timelines. As the mirror stabilizes, notice the whispers of your higher self. Images, insights, and knowing may arise. These are echoes of your truth. Remain still. Let the light of your Oversoul illuminate your path. When ready, bow inwardly and say: I honor my Monad. I carry this light forward.
 `,
@@ -2643,7 +2656,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="gate-contact-window ${isOpen ? "open" : ""}">
           <h3>${isOpen ? "Gate Open: Remain Here" : "Before the Gate Opens"}</h3>
           <p>${isOpen
-            ? "This is the contact window. Keep the Gate Field tone running, continue the chosen Breath Seal, and hold the intention without forcing an answer."
+            ? "This is the contact window. Keep the Gate Field tone running, continue the chosen Breath Seal, and hold the intention without forcing an answer. You may visualise yourself moving through the gate."
             : "Complete the glyph nodes first. When the third node opens, stay on this screen before moving to Mirror integration."}</p>
           <ul>
             <li>Look for presence, inner words, geometry, emotion, body sensation, image, pressure, temperature, or stillness.</li>
@@ -2651,9 +2664,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
             <li>Move to Mirror integration only when the contact window feels complete.</li>
           </ul>
           <div class="control-row">
-            <button class="button button-muted" data-action="play-path-invocation" data-invocation="dimensional">Play Contact Guidance</button>
+            ${isOpen ? '<button class="button button-muted" data-action="play-gate-open-guidance">Play Gate Open Guidance</button>' : ""}
             <button class="button button-quiet" data-action="stop-audio">Stop Gate Tone</button>
           </div>
+          ${isOpen ? renderTranscript(voiceScripts.gateOpenContactWindow, "Read Gate Open transcript") : ""}
         </div>
       `;
     }
@@ -3432,6 +3446,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "play-module-guidance") playAsset(modules[target.dataset.moduleName]?.guidanceAsset || stages.aim.asset);
     if (action === "play-wheel-guidance") playAsset("HarmonicWheelOrientationVoice.mp3");
     if (action === "play-glyph-guidance") playAsset("GlyphStudioGuidance.mp3");
+    if (action === "play-gate-open-guidance") playAsset("GateOpenContactWindowVoice.mp3");
     if (action === "play-path-invocation") {
       const invocation = pathInvocations[target.dataset.invocation];
       if (invocation) playAsset(invocation.asset);
@@ -4021,13 +4036,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const pulse = motion === "pulse" ? 1 + Math.sin(t * (1.3 + emotionalBias)) * (0.018 + intensity * 0.035) : 1;
     const orbit = motion === "orbit" ? t * (0.16 + emotionalBias * 0.08) : 0;
     const spiralPhase = motion === "spiral" ? t * (0.55 + emotionalBias * 0.42) : t * 0.18;
-    const outerRadius = base * pulse * (0.62 + profile.spiralStrength * 0.12);
+    const outerRadius = base * (0.62 + profile.spiralStrength * 0.12);
     const innerRadius = outerRadius * (0.44 + Math.min(0.18, profile.spiralStrength * 0.18));
     const points = [];
     const innerPoints = [];
     for (let i = 0; i < count; i += 1) {
       const prime = trip[i % trip.length] || 3;
-      const angle = -Math.PI / 2 + i * Math.PI * 2 / count + orbit + (motion === "still" ? 0 : t * 0.014 / prime);
+      const angle = -Math.PI / 2 + i * Math.PI * 2 / count;
       const radius = outerRadius * (0.94 + (prime % 7) * 0.012 + Math.sin(i * 1.7 + trip[0]) * 0.018);
       points.push([Math.cos(angle) * radius, Math.sin(angle) * radius]);
       innerPoints.push([Math.cos(angle) * innerRadius, Math.sin(angle) * innerRadius]);
@@ -4043,6 +4058,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     };
 
     ctx.save();
+    ctx.scale(pulse, pulse);
     ctx.shadowColor = colors.primary;
     ctx.shadowBlur = motion === "still" ? 8 + intensity * 8 : 14 + intensity * 18;
 
@@ -4098,6 +4114,16 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       ctx.arc(x, y, (index % 3 === 0 ? 6.3 : 5.1) + intensity * 2.2, 0, Math.PI * 2);
       ctx.fill();
     });
+    if (motion === "orbit") {
+      const orbitRadius = outerRadius * 1.05;
+      const x = Math.cos(orbit - Math.PI / 2) * orbitRadius;
+      const y = Math.sin(orbit - Math.PI / 2) * orbitRadius;
+      ctx.shadowBlur = 16 + intensity * 12;
+      ctx.fillStyle = colors.secondary;
+      ctx.beginPath();
+      ctx.arc(x, y, 4.8 + intensity * 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
   }
 
