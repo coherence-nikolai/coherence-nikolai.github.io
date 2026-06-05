@@ -5,8 +5,8 @@
   "start_url": "/harmonic_compass/",
   "scope": "/harmonic_compass/",
   "display": "standalone",
-  "background_color": "#050913",
-  "theme_color": "#050913",
+  "background_color": "#02040b",
+  "theme_color": "#02040b",
   "icons": [
     {
       "src": "/assets/favicon.svg",
