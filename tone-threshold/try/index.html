@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try Tone Threshold - A free web doorway</title>
+  <meta name="description" content="Try the free web version of Tone Threshold. Stand before one contemplative question at a time, cross quietly, and save marks privately in your browser.">
+  <meta name="theme-color" content="#0b0707">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone-threshold/try/">
+  <meta property="og:title" content="Try Tone Threshold">
+  <meta property="og:description" content="One question. One doorway. A free web taste of Tone Threshold.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/tone-threshold/try/">
+  <meta property="og:image" content="https://coherence-nikolai.app/assets/tone-threshold-icon.png">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/tone-threshold/try/try.css">
+</head>
+<body class="threshold-try-page">
+  <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
+      <span>coherence</span>
+      <span>nikolai</span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/tone-threshold/">Tone Threshold</a>
+      <a href="/#apps">Apps</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </header>
+
+  <main class="threshold-try-main" data-lang="en">
+    <section class="threshold-try-hero" aria-labelledby="try-title">
+      <div class="threshold-try-copy">
+        <p class="label" data-i18n="label">Free web doorway</p>
+        <h1 id="try-title" data-i18n="heroTitle">Try Tone Threshold</h1>
+        <p class="hero-line" data-i18n="heroLine">One question. One doorway. No rush to answer.</p>
+        <p class="hero-copy" data-i18n="heroCopy">
+          This small web version gives you the free core of Tone Threshold: stand before one question, cross when ready, and keep a private mark when something has not finished with you.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#threshold-instrument" data-i18n="startCta">Start the web crossing</a>
+          <a class="button ghost" href="https://apps.apple.com/au/app/tone-threshold/id6771676288" target="_blank" rel="noopener" data-i18n="appCta">Open the iOS app</a>
+        </div>
+      </div>
+
+      <div class="threshold-hero-door" aria-hidden="true">
+        <div class="door-orb">
+          <span class="door-glow"></span>
+          <span class="door-ring"></span>
+          <span class="door-panel left"></span>
+          <span class="door-panel right"></span>
+          <span class="door-seam"></span>
+          <span class="door-ray horizontal"></span>
+          <span class="door-ray diagonal"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="threshold-map section" aria-label="Web version map">
+      <div class="section-head centered">
+        <p class="label" data-i18n="mapLabel">Map</p>
+        <h2 data-i18n="mapTitle">The web version is a simple doorway.</h2>
+        <p data-i18n="mapCopy">
+          It keeps the free Threshold experience intentionally small: choose a doorway, receive a question, cross to the next, and keep only what still has weight.
+        </p>
+      </div>
+      <div class="threshold-map-grid">
+        <article><span>01</span><h3 data-i18n="mapOneTitle">Choose</h3><p data-i18n="mapOneCopy">Select the doorway you want to stand before.</p></article>
+        <article><span>02</span><h3 data-i18n="mapTwoTitle">Stand</h3><p data-i18n="mapTwoCopy">Let one question have the whole room.</p></article>
+        <article><span>03</span><h3 data-i18n="mapThreeTitle">Cross</h3><p data-i18n="mapThreeCopy">Move only when the answer starts falling silent.</p></article>
+        <article><span>04</span><h3 data-i18n="mapFourTitle">Keep</h3><p data-i18n="mapFourCopy">Save a mark privately in this browser.</p></article>
+      </div>
+    </section>
+
+    <section class="threshold-instrument section" id="threshold-instrument" aria-label="Tone Threshold web instrument">
+      <div class="language-strip">
+        <p data-i18n="languageIntro">Language</p>
+        <div class="language-actions" role="group" aria-label="Language">
+          <button class="lang-button active" type="button" data-lang-button="en">English</button>
+          <button class="lang-button" type="button" data-lang-button="es">Español</button>
+        </div>
+      </div>
+
+      <div class="threshold-workspace">
+        <div class="door-panel-card">
+          <p class="label" data-i18n="doorLabel">Doorway</p>
+          <h2 data-i18n="doorTitle">Choose where to stand.</h2>
+          <div class="door-choice-grid" id="door-grid" role="list"></div>
+        </div>
+
+        <div class="question-panel" aria-live="polite">
+          <div class="question-orb" aria-hidden="true">
+            <span class="question-glow"></span>
+            <span class="question-ring"></span>
+            <span class="question-door left"></span>
+            <span class="question-door right"></span>
+            <span class="question-light"></span>
+          </div>
+          <p class="label" id="question-door-label">Self doorway</p>
+          <h2 id="question-text">Who is choosing before the chooser explains itself?</h2>
+          <p id="question-guidance">Stand where the answer falls silent.</p>
+          <div class="question-actions">
+            <button class="button ghost" type="button" id="save-button" data-i18n="saveButton">Keep this mark</button>
+            <button class="button primary" type="button" id="cross-button" data-i18n="crossButton">Cross the threshold</button>
+          </div>
+          <p class="question-note" data-i18n="questionNote">No completing. No optimizing. Only the next doorway.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="saved-threshold section" aria-labelledby="saved-title">
+      <div class="section-head">
+        <p class="label" data-i18n="savedLabel">Saved marks</p>
+        <h2 id="saved-title" data-i18n="savedTitle">Kept in this browser.</h2>
+        <p data-i18n="savedCopy">
+          These marks stay local to this browser. The full iOS app adds Return Field, where saved questions can return later.
+        </p>
+      </div>
+      <div class="saved-mark-grid" id="saved-grid"></div>
+    </section>
+
+    <section class="section split threshold-boundaries">
+      <div>
+        <p class="label" data-i18n="privacyLabel">Privacy</p>
+        <h2 data-i18n="privacyTitle">Local by default.</h2>
+        <p data-i18n="privacyCopy">No account, no server, no tracking. Saved marks remain in this browser unless you clear them.</p>
+      </div>
+      <div>
+        <p class="label" data-i18n="iosLabel">iOS app</p>
+        <h2 data-i18n="iosTitle">The Living Threshold lives on iPhone.</h2>
+        <p data-i18n="iosCopy">Tone Threshold for iOS adds Return Field, Tone Plus, deeper crossings, personal chambers, premium doors, and grounded soundfields.</p>
+        <a class="button primary compact-button" href="https://apps.apple.com/au/app/tone-threshold/id6771676288" target="_blank" rel="noopener" data-i18n="downloadButton">Download Tone Threshold</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footerNote">Tone Threshold is a contemplative inquiry instrument, not medical advice, therapy, diagnosis, crisis support, or an emergency service.</p>
+    <nav aria-label="Footer navigation">
+      <a href="/tone-threshold/">Tone Threshold</a>
+      <a href="/tone/">Tone Recall</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </footer>
+
+  <script src="/assets/site.js"></script>
+  <script src="/tone-threshold/try/try.js"></script>
+</body>
+</html>
