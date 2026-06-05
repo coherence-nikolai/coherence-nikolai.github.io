@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try Tone Recall - A free web instrument</title>
+  <meta name="description" content="Try the free web version of Tone Recall. Choose a mind state, shape a simple sine tone, and save it privately in your browser.">
+  <meta name="theme-color" content="#0b0707">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone/try/">
+  <meta property="og:title" content="Try Tone Recall">
+  <meta property="og:description" content="Choose a state. Shape a tone. Save it privately in your browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/tone/try/">
+  <meta property="og:image" content="https://coherence-nikolai.app/assets/tone-recall-icon.png">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/tone/try/try.css">
+</head>
+<body class="tone-try-page">
+  <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
+      <span>coherence</span>
+      <span>nikolai</span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/tone/">Tone Recall</a>
+      <a href="/#apps">Apps</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </header>
+
+  <main class="try-main" data-lang="en">
+    <section class="try-hero" aria-labelledby="try-title">
+      <div class="try-hero-copy">
+        <p class="label" data-i18n="label">Free web instrument</p>
+        <h1 id="try-title" data-i18n="heroTitle">Try Tone Recall</h1>
+        <p class="hero-line" data-i18n="heroLine">Choose a state. Shape a tone. Save it privately.</p>
+        <p class="hero-copy" data-i18n="heroCopy">
+          This small web version gives you the core idea of Tone Recall: listen to the state you want to strengthen, let a simple sine tone hold it, and return to it later.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#instrument" data-i18n="startCta">Start the web practice</a>
+          <a class="button ghost" href="https://apps.apple.com/au/app/tone-recall/id6768010699" data-i18n="appCta">Open the iOS app</a>
+        </div>
+      </div>
+      <div class="try-hero-panel" aria-hidden="true">
+        <div class="mini-orb">
+          <span class="mini-orb-core"></span>
+          <span class="mini-orb-ring"></span>
+          <svg class="mini-wave" viewBox="0 0 420 160" role="presentation" focusable="false">
+            <path d="M8 91 C 70 91, 72 26, 134 32 C 194 38, 178 132, 248 132 C 318 132, 308 67, 412 67" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="web-map section" aria-label="Web version map">
+      <div class="section-head centered">
+        <p class="label" data-i18n="mapLabel">Map</p>
+        <h2 data-i18n="mapTitle">The web version is a taste of the app.</h2>
+        <p data-i18n="mapCopy">
+          It keeps the free core simple: choose, shape, save, recall. The full iOS app adds the deeper chambers, Spiral Practice, and the polished native audio ritual.
+        </p>
+      </div>
+      <div class="web-map-grid">
+        <article><span>01</span><h3 data-i18n="mapOneTitle">Choose</h3><p data-i18n="mapOneCopy">Pick the mind state you want to become familiar with.</p></article>
+        <article><span>02</span><h3 data-i18n="mapTwoTitle">Shape</h3><p data-i18n="mapTwoCopy">Use the sliders to make the tone feel closer to the state.</p></article>
+        <article><span>03</span><h3 data-i18n="mapThreeTitle">Save</h3><p data-i18n="mapThreeCopy">Keep the tone in this browser, privately and locally.</p></article>
+        <article><span>04</span><h3 data-i18n="mapFourTitle">Return</h3><p data-i18n="mapFourCopy">Replay a saved tone when you want to remember the state.</p></article>
+      </div>
+    </section>
+
+    <section class="instrument-shell section" id="instrument" aria-label="Tone Recall web instrument">
+      <div class="language-strip">
+        <p data-i18n="languageIntro">Language</p>
+        <div class="language-actions" role="group" aria-label="Language">
+          <button class="lang-button active" type="button" data-lang-button="en">English</button>
+          <button class="lang-button" type="button" data-lang-button="es">Español</button>
+        </div>
+      </div>
+
+      <div class="instrument-grid">
+        <div class="instrument-orb-card">
+          <p class="label" data-i18n="currentLabel">Current tone</p>
+          <h2 id="selected-state">Clarity</h2>
+          <p class="tone-frequency"><span id="selected-frequency">741</span> Hz · <span data-i18n="sineTone">sine tone</span></p>
+          <div class="web-orb" aria-hidden="true">
+            <span class="web-orb-glow"></span>
+            <span class="web-orb-ring"></span>
+            <svg class="web-wave" viewBox="0 0 520 220" role="presentation" focusable="false">
+              <path d="M8 130 C 82 130, 84 38, 158 48 C 233 58, 212 188, 306 188 C 394 188, 382 92, 512 92" />
+            </svg>
+          </div>
+          <p class="instrument-note" id="tone-status" aria-live="polite" data-i18n="statusIdle">Ready when you are.</p>
+        </div>
+
+        <div class="instrument-controls">
+          <div class="control-block">
+            <div class="control-head">
+              <p class="label" data-i18n="chooseLabel">Choose</p>
+              <span data-i18n="chooseHint">one state</span>
+            </div>
+            <div class="state-grid" id="state-grid" role="list"></div>
+          </div>
+
+          <div class="control-block">
+            <div class="control-head">
+              <p class="label" data-i18n="shapeLabel">Shape</p>
+              <span data-i18n="shapeHint">gently</span>
+            </div>
+            <label class="range-control">
+              <span data-i18n="amplitudeLabel">Amplitude</span>
+              <output id="amplitude-output">36</output>
+              <input id="amplitude" type="range" min="12" max="72" value="36">
+            </label>
+            <label class="range-control">
+              <span data-i18n="brightnessLabel">Brightness</span>
+              <output id="brightness-output">44</output>
+              <input id="brightness" type="range" min="0" max="100" value="44">
+            </label>
+          </div>
+
+          <div class="instrument-actions">
+            <button class="button primary" type="button" id="play-button" data-i18n="playButton">Begin tone</button>
+            <button class="button ghost" type="button" id="save-button" data-i18n="saveButton">Save for recall</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="saved-shell section" aria-labelledby="saved-title">
+      <div class="section-head">
+        <p class="label" data-i18n="savedLabel">Recall</p>
+        <h2 id="saved-title" data-i18n="savedTitle">Saved in this browser.</h2>
+        <p data-i18n="savedCopy">
+          These tones are stored only in your browser. Clear browser storage and they disappear.
+        </p>
+      </div>
+      <div class="saved-grid" id="saved-grid"></div>
+    </section>
+
+    <section class="section split try-boundaries">
+      <div>
+        <p class="label" data-i18n="privacyLabel">Privacy</p>
+        <h2 data-i18n="privacyTitle">Local by default.</h2>
+        <p data-i18n="privacyCopy">No account, no server, no tracking. The web version uses your browser only.</p>
+      </div>
+      <div>
+        <p class="label" data-i18n="iosLabel">iOS app</p>
+        <h2 data-i18n="iosTitle">The full instrument lives on iPhone.</h2>
+        <p data-i18n="iosCopy">Tone Recall for iOS includes the native sound engine, saved tone flow, resonance chambers, and Spiral Practice.</p>
+        <a class="button primary compact-button" href="https://apps.apple.com/au/app/tone-recall/id6768010699" data-i18n="downloadButton">Download Tone Recall</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footerNote">Tone Recall is a personal reflection instrument, not medical advice, therapy, diagnosis, crisis support, or an emergency service.</p>
+    <nav aria-label="Footer navigation">
+      <a href="/tone/">Tone Recall</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </footer>
+
+  <script src="/assets/site.js"></script>
+  <script src="/tone/try/try.js"></script>
+</body>
+</html>
