@@ -498,13 +498,13 @@ blockquote {
 .center-seal text {
   fill: var(--text);
   font-family: var(--mono);
-  font-size: 19px;
-  letter-spacing: 0.04em;
+  font-size: 12px;
+  letter-spacing: 0.08em;
 }
 
 .center-seal text:last-child {
   fill: var(--gold);
-  font-size: 12px;
+  font-size: 10px;
   letter-spacing: 0.22em;
 }
 
@@ -561,7 +561,7 @@ input[type="checkbox"] {
   accent-color: var(--gold);
 }
 
-.formula-card {
+.focus-card {
   margin-top: auto;
   border-top: 1px solid rgba(217, 164, 65, 0.24);
   padding-top: 16px;
@@ -1084,7 +1084,7 @@ textarea {
   }
 
   .center-seal text {
-    font-size: 17px;
+    font-size: 11px;
   }
 
   .toast {
@@ -1250,7 +1250,7 @@ textarea {
   line-height: 1.58;
 }
 
-.loop-ladder {
+.rhythm-ladder {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
@@ -1258,7 +1258,7 @@ textarea {
   padding-top: 18px;
 }
 
-.loop-step {
+.rhythm-step {
   display: grid;
   gap: 5px;
   border: 1px solid rgba(199, 220, 244, 0.12);
@@ -1267,26 +1267,26 @@ textarea {
   background: rgba(3, 8, 16, 0.24);
 }
 
-.loop-step span {
+.rhythm-step span {
   color: var(--faint);
   font-family: var(--mono);
   font-size: 0.64rem;
 }
 
-.loop-step strong {
+.rhythm-step strong {
   color: var(--text);
   font-family: var(--display);
-  font-size: 1.5rem;
+  font-size: 1.18rem;
   font-weight: 400;
 }
 
-.loop-step small {
+.rhythm-step small {
   color: var(--muted);
   font-size: 0.72rem;
   line-height: 1.3;
 }
 
-.loop-step.active {
+.rhythm-step.active {
   border-color: rgba(217, 164, 65, 0.48);
   background: rgba(217, 164, 65, 0.10);
 }
@@ -1410,7 +1410,7 @@ textarea {
   text-transform: uppercase;
 }
 
-.wheel-segment.has-memory path {
+.wheel-segment.has-journal path {
   fill: rgba(105, 199, 255, 0.24);
 }
 
@@ -1451,7 +1451,7 @@ textarea {
 @media (max-width: 820px) {
   .practice-grid,
   .guide-layout,
-  .loop-ladder,
+  .rhythm-ladder,
   .stat-strip,
   .pattern-panel {
     grid-template-columns: 1fr;
@@ -1468,7 +1468,7 @@ textarea {
 
 @media (max-width: 430px) {
   .practice-choice,
-  .loop-step,
+  .rhythm-step,
   .stat-strip span,
   .pattern-panel span {
     padding: 9px;

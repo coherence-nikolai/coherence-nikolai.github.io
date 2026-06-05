@@ -1,7 +1,7 @@
 {
   "name": "Harmonic Compass",
   "short_name": "Compass",
-  "description": "A private codex instrument inspired by the works of Robert Edward Grant.",
+  "description": "A private compass instrument inspired by the works of Robert Edward Grant.",
   "start_url": "/harmonic_compass/",
   "scope": "/harmonic_compass/",
   "display": "standalone",

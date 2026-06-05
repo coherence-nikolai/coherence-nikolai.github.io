@@ -6,63 +6,54 @@ const DRAFT_KEY = "harmonic-compass-draft-v2";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const ROOT_SEED = Math.sqrt(3);
 
-const LOOP_STEPS = [
+const RHYTHM_STEPS = [
   {
     id: "seed",
-    symbol: "√3",
     name: "Seed",
     verb: "notice",
-    value: ROOT_SEED,
-    formula: "root = √3",
+    prompt: "Name the signal, question, intention, or inner state.",
     experience: "First spark, honest beginning, latent intent becoming visible."
   },
   {
     id: "expansion",
-    symbol: "∂",
-    name: "Expansion",
-    verb: "choose",
-    value: 5 * (ROOT_SEED - 1),
-    formula: "∂ = 5(√3 - 1)",
-    experience: "Differentiate the signal into one concrete motion."
+    name: "Motion",
+    verb: "move",
+    prompt: "Take one concrete action that moves the signal into life.",
+    experience: "The smallest embodied action that turns reflection into movement."
   },
   {
     id: "reflection",
-    symbol: "ω",
-    name: "Reflection",
+    name: "Mirror",
     verb: "observe",
-    value: ((5 * (ROOT_SEED - 1)) ** 2) / 10 + 5,
-    formula: "ω = ∂² / 10 + 5",
-    experience: "Let the action reveal pattern, feedback, and complexity."
+    prompt: "Notice what the action reveals back to you.",
+    experience: "Feedback, pattern, emotional truth, and the mirror of what happened."
   },
   {
     id: "return",
-    symbol: "ε∞",
     name: "Return",
     verb: "integrate",
-    value: 10 / (((5 * (ROOT_SEED - 1)) ** 2) / 10 + 5) - 1,
-    formula: "ε∞ = 10 / ω - 1",
-    experience: "Close the loop by turning experience into memory and practice."
+    prompt: "Save the learning, release what is complete, and carry one clean sentence forward.",
+    experience: "The moment where experience becomes memory, practice, or release."
   }
 ];
 
 const CORRIDORS = [
-  { id: "seed", name: "Seed / Information", tone: "origin", symbol: "∴", meaning: "The beginning point where a signal becomes distinguishable." },
-  { id: "light", name: "Light / Perception", tone: "clarity", symbol: "◇", meaning: "Seeing, feedback, attention, symbolic pattern recognition." },
-  { id: "ground", name: "Ground / Embodiment", tone: "body", symbol: "▣", meaning: "Capacity, pacing, boundaries, and practical form." },
-  { id: "entropy", name: "Entropy / Change", tone: "threshold", symbol: "∆", meaning: "Transition, friction, release, repair, and transformation." },
-  { id: "time", name: "Time / Memory", tone: "sequence", symbol: "⌁", meaning: "Echoes, rhythm, relationship history, and lived continuity." },
-  { id: "coherence", name: "Coherence / Power", tone: "will", symbol: "✦", meaning: "Aligned action, clean desire, voice, and integration." },
-  { id: "field", name: "Field / Expansion", tone: "mystery", symbol: "◎", meaning: "Service, spaciousness, non-local awareness, and surrender." }
+  { id: "seed", name: "Origin Lens", tone: "origin", meaning: "The beginning point where a signal becomes distinguishable." },
+  { id: "light", name: "Perception Lens", tone: "clarity", meaning: "Seeing, feedback, attention, and pattern recognition." },
+  { id: "ground", name: "Embodiment Lens", tone: "body", meaning: "Capacity, pacing, boundaries, and practical form." },
+  { id: "entropy", name: "Change Lens", tone: "threshold", meaning: "Transition, friction, release, repair, and transformation." },
+  { id: "time", name: "Memory Lens", tone: "sequence", meaning: "Echoes, rhythm, relationship history, and lived continuity." },
+  { id: "coherence", name: "Power Lens", tone: "will", meaning: "Aligned action, clean desire, voice, and integration." },
+  { id: "field", name: "Field Lens", tone: "mystery", meaning: "Service, spaciousness, awareness, and surrender." }
 ];
 
 const DEPTHS = [
-  { id: "d0", name: "0D · Point", primitive: "single mark", mode: "pure potential before the first distinction" },
-  { id: "d1", name: "1D · Line", primitive: "sequence", mode: "motion, timing, direction, and choice" },
-  { id: "d2", name: "2D · Plane", primitive: "relationship", mode: "tension, comparison, mirrors, and symbolic geometry" },
-  { id: "d3", name: "3D · Body", primitive: "form", mode: "embodiment, boundary, repair, and lived consequence" },
-  { id: "d4", name: "4D · Field", primitive: "coherence", mode: "pattern across time, meaning, and non-local awareness" }
+  { id: "d0", name: "Spark Layer", primitive: "single mark", mode: "pure potential before the first distinction" },
+  { id: "d1", name: "Path Layer", primitive: "sequence", mode: "motion, timing, direction, and choice" },
+  { id: "d2", name: "Mirror Layer", primitive: "relationship", mode: "tension, comparison, and reflection" },
+  { id: "d3", name: "Body Layer", primitive: "form", mode: "embodiment, boundary, repair, and lived consequence" },
+  { id: "d4", name: "Field Layer", primitive: "coherence", mode: "pattern across time, meaning, and awareness" }
 ];
 
 function practices(gateId, rows) {
@@ -85,7 +76,7 @@ const GATES = [
     shadow: "Waiting for certainty before starting.",
     question: "What wants one simple yes from me now?",
     themes: ["beginning", "intent", "signal"],
-    mapping: { corridor: "seed", depth: "d0", layer: "Will", step: "seed", reason: "This gate starts the loop by turning latent intent into a single visible mark." },
+    mapping: { corridor: "seed", depth: "d0", layer: "Will", step: "seed", reason: "This gate begins the rhythm by turning latent intent into a single visible mark." },
     practices: practices(1, [
       ["One True Motion", "Action", "2 min", "Do the smallest honest action that would make the next step real.", "What changed once the beginning existed outside your head?"],
       ["No Perfect Map", "Writing", "5 min", "Write three imperfect first steps and choose one.", "Which step carries the most life even if it is not complete?"],
@@ -99,7 +90,7 @@ const GATES = [
     shadow: "Over-correcting to regain control.",
     question: "Where can I pause before steering?",
     themes: ["center", "pause", "choice"],
-    mapping: { corridor: "ground", depth: "d1", layer: "Body", step: "return", reason: "The loop closes briefly through the body so reaction can settle before choice." },
+    mapping: { corridor: "ground", depth: "d1", layer: "Body", step: "return", reason: "The rhythm returns through the body so reaction can settle before choice." },
     practices: practices(2, [
       ["Axis Breath", "Body", "90 sec", "Stand still, soften the jaw, and breathe down the center line of the body.", "Where did choice return when your body slowed down?"],
       ["Before Steering", "Observation", "3 min", "Notice an urge to fix, advise, or correct, then wait three breaths.", "What did the pause reveal underneath the urge?"],
@@ -423,7 +414,7 @@ const VIEW_TITLES = {
   gates: "Gates",
   practices: "Practices",
   journal: "Journal",
-  codex: "Codex",
+  codex: "Method",
   guide: "Guide",
   export: "Export"
 };
@@ -447,8 +438,7 @@ const state = {
   wheelMode: "today",
   guideInput: "",
   guideMode: "reflect",
-  guideOutput: "",
-  calculatorSeed: ROOT_SEED
+  guideOutput: ""
 };
 
 state.selectedGateId = dailyCompass().gate.id;
@@ -566,7 +556,7 @@ function getDepth(id) {
 }
 
 function getStep(id) {
-  return LOOP_STEPS.find((step) => step.id === id) || LOOP_STEPS[0];
+  return RHYTHM_STEPS.find((step) => step.id === id) || RHYTHM_STEPS[0];
 }
 
 function currentGate() {
@@ -587,24 +577,6 @@ function dailyCompass() {
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   const day = Math.max(0, Math.floor((today - startDay) / 86400000));
   return { day, gate: GATES[day % GATES.length] };
-}
-
-function calculateLoop(seed = ROOT_SEED) {
-  const rootValue = clamp(Number(seed) || ROOT_SEED, 0.2, 5);
-  const delta = 5 * (rootValue - 1);
-  const omega = (delta ** 2) / 10 + 5;
-  const epsilon = 10 / omega - 1;
-  const chi = delta + omega;
-  const reciprocal = 1 / rootValue;
-  return {
-    root: rootValue,
-    delta,
-    omega,
-    epsilon,
-    chi,
-    reciprocal,
-    closure: Math.abs(epsilon - reciprocal)
-  };
 }
 
 function completionForPractice(practiceId) {
@@ -639,7 +611,7 @@ function render() {
     gates: renderGates,
     practices: renderPractices,
     journal: renderJournal,
-    codex: renderCodex,
+    codex: renderMethod,
     guide: renderGuide,
     export: renderExport
   };
@@ -672,7 +644,7 @@ function renderToday() {
         <div class="harmonic-strip">
           <span>${escapeHtml(corridor.name)}</span>
           <span>${escapeHtml(depth.name)}</span>
-          <span>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</span>
+          <span>${escapeHtml(step.name)}</span>
         </div>
         <div class="prompt-row">
           <div>
@@ -684,7 +656,7 @@ function renderToday() {
             <p>${escapeHtml(gate.question)}</p>
           </div>
         </div>
-        ${renderLoopLadder(gate.mapping.step)}
+        ${renderRhythmLadder(gate.mapping.step)}
       </section>
 
       <section class="wheel-panel compact-wheel">
@@ -695,7 +667,7 @@ function renderToday() {
         <div class="stat-strip">
           <span><strong>${gateEntries.length}</strong> memories</span>
           <span><strong>${completionsForGate(gate.id).length}</strong> practices</span>
-          <span><strong>${step.verb}</strong> loop verb</span>
+          <span><strong>${escapeHtml(step.name)}</strong> rhythm</span>
         </div>
         <div class="practice-switcher">
           <p class="micro-label">Practice lens</p>
@@ -706,7 +678,7 @@ function renderToday() {
             </button>
           `).join("")}
         </div>
-        <div class="formula-card practice-focus">
+        <div class="focus-card practice-focus">
           <p class="micro-label">${complete ? "Completed" : "Active practice"}</p>
           <h3>${escapeHtml(practice.title)}</h3>
           <p>${escapeHtml(practice.action)}</p>
@@ -722,14 +694,14 @@ function renderToday() {
 
     <section class="detail-band">
       <div>
-        <p class="micro-label">Why the math is here</p>
-        <h2>Math as a practice loop.</h2>
-        <p>The compass uses √3 → ∂ → ω → ε∞ as a symbolic operating rhythm: notice the seed, choose one expansion, observe the reflection, then return the result to memory. It is a contemplative grammar, not a public proof claim.</p>
+        <p class="micro-label">Compass rhythm</p>
+        <h2>Seed → Motion → Mirror → Return.</h2>
+        <p>Every session moves through the same quiet rhythm: name the signal, take one concrete action, notice what the action reflects, then save what wants to be carried forward.</p>
       </div>
       <div class="mini-matrix">
         <span><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>
         <span><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</span>
-        <span><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</span>
+        <span><strong>${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</span>
       </div>
     </section>
   `;
@@ -747,12 +719,17 @@ function renderWheelView() {
       <section class="wheel-stage">
         <div class="wheel-stage-head">
           <div>
-            <p class="micro-label">Recursive harmonic wheel</p>
+            <p class="micro-label">Harmonic wheel</p>
             <h2>24 original Compass Gates.</h2>
           </div>
           <div class="topbar-actions">
-            ${["today", "memory", "practice", "dimension"].map((mode) => `
-              <button class="ghost-button ${state.wheelMode === mode ? "selected" : ""}" type="button" data-action="set-wheel-mode" data-mode="${mode}">${mode}</button>
+            ${[
+              ["today", "Today"],
+              ["journal", "Journal"],
+              ["practice", "Practice"],
+              ["pattern", "Pattern"]
+            ].map(([mode, label]) => `
+              <button class="ghost-button ${state.wheelMode === mode ? "selected" : ""}" type="button" data-action="set-wheel-mode" data-mode="${mode}">${label}</button>
             `).join("")}
             <button class="ghost-button" type="button" data-action="spin-wheel">Spin</button>
           </div>
@@ -767,9 +744,9 @@ function renderWheelView() {
         <div class="selection-grid">
           <div><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</div>
           <div><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</div>
-          <div><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</div>
+          <div><strong>${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</div>
         </div>
-        <div class="formula-card practice-focus">
+        <div class="focus-card practice-focus">
           <p class="micro-label">Suggested practice</p>
           <h3>${escapeHtml(practice.title)}</h3>
           <p>${escapeHtml(practice.action)}</p>
@@ -792,7 +769,7 @@ function renderGates() {
       <div>
         <p class="micro-label">Paraphrased original model</p>
         <h2>The Compass Gates</h2>
-        <p>Each gate is written in Harmonic Compass's own voice: a state, a shadow pattern, a symbolic mapping, and three concrete practices.</p>
+        <p>Each gate is written in Harmonic Compass's own voice: a state, a shadow pattern, a pattern mapping, and three concrete practices.</p>
       </div>
       <input class="search-input" type="search" placeholder="Search gates" value="${escapeAttr(state.search)}" data-action="search-gates">
     </section>
@@ -805,7 +782,7 @@ function renderGates() {
           <article class="precept-card ${gate.id === state.selectedGateId ? "selected" : ""}">
             <div class="card-top">
               <span>Gate ${gate.id}</span>
-              <span>${escapeHtml(step.symbol)}</span>
+              <span>${escapeHtml(step.name)}</span>
             </div>
             <h3>${escapeHtml(gate.title)}</h3>
             <p>${escapeHtml(gate.essence)}</p>
@@ -954,51 +931,35 @@ function renderJournal() {
   `;
 }
 
-function renderCodex() {
-  const calc = calculateLoop(state.calculatorSeed);
-
+function renderMethod() {
   return `
     <div class="codex-stack">
       <article class="codex-article">
-        <p class="micro-label">Loop calculator</p>
-        <h3>√3 → ∂ → ω → ε∞</h3>
-        <p>The calculator shows the numeric loop used by the instrument. Its role here is symbolic and experiential: it gives the practice a rhythm, not a public scientific proof.</p>
-        <label>Loop seed
-          <input type="number" step="0.000001" min="0.2" max="5" value="${formatNumber(calc.root, 9)}" data-action="calculator-seed">
-        </label>
-        <code>${[
-          `root = ${formatNumber(calc.root, 9)}`,
-          `∂ = 5(root - 1) = ${formatNumber(calc.delta, 9)}`,
-          `ω = ∂² / 10 + 5 = ${formatNumber(calc.omega, 9)}`,
-          `ε∞ = 10 / ω - 1 = ${formatNumber(calc.epsilon, 9)}`,
-          `1 / root = ${formatNumber(calc.reciprocal, 9)}`,
-          `|ε∞ - 1/root| = ${formatNumber(calc.closure, 12)}`,
-          `χ lens = ∂ + ω = ${formatNumber(calc.chi, 9)}`
-        ].map(escapeHtml).join("\n")}</code>
-        <div class="panel-actions">
-          <button class="ghost-button" type="button" data-action="reset-calculator">Reset √3</button>
-        </div>
+        <p class="micro-label">Compass method</p>
+        <h3>Seed → Motion → Mirror → Return</h3>
+        <p>The app does not ask the user to interpret notation. It quietly guides each Gate through a four-part reflective rhythm: name the signal, act once, notice what is reflected, and carry the learning forward.</p>
+        ${renderRhythmLadder(currentGate().mapping.step)}
       </article>
 
       <article class="codex-article">
-        <p class="micro-label">Symbol glossary</p>
-        <h3>The four operations</h3>
+        <p class="micro-label">Four movements</p>
+        <h3>How guidance is shaped</h3>
         <div class="mini-matrix">
-          ${LOOP_STEPS.map((step) => `<span><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</strong>${escapeHtml(step.experience)}</span>`).join("")}
+          ${RHYTHM_STEPS.map((step) => `<span><strong>${escapeHtml(step.name)}</strong>${escapeHtml(step.prompt)} ${escapeHtml(step.experience)}</span>`).join("")}
         </div>
       </article>
 
       <article class="codex-article">
-        <p class="micro-label">Seven corridors</p>
-        <h3>Force as experience</h3>
+        <p class="micro-label">Seven lenses</p>
+        <h3>How a Gate is colored</h3>
         <div class="mini-matrix">
-          ${CORRIDORS.map((corridor) => `<span><strong>${escapeHtml(corridor.symbol)} · ${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>`).join("")}
+          ${CORRIDORS.map((corridor) => `<span><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>`).join("")}
         </div>
       </article>
 
       <article class="codex-article">
-        <p class="micro-label">Five depth states</p>
-        <h3>Geometry as lens</h3>
+        <p class="micro-label">Five pattern layers</p>
+        <h3>How a Gate is grounded</h3>
         <div class="mini-matrix">
           ${DEPTHS.map((depth) => `<span><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.primitive)} · ${escapeHtml(depth.mode)}</span>`).join("")}
         </div>
@@ -1008,19 +969,19 @@ function renderCodex() {
     <section class="data-table-card mapping-card">
       <div class="library-head inset">
         <div>
-          <p class="micro-label">Curated symbolic mapping</p>
-          <h2>Gate matrix</h2>
-          <p>Mappings are intentionally curated for practice coherence. They are not generated by modulo arithmetic or presented as mathematical proof.</p>
+          <p class="micro-label">Curated pattern map</p>
+          <h2>Gate method</h2>
+          <p>Mappings are intentionally curated for practice coherence. They decide which movement, lens, and layer shape the user's prompts.</p>
         </div>
       </div>
       <div class="data-table mapping-table">
-        <div class="table-head"><strong>Gate</strong><strong>Corridor</strong><strong>Depth</strong><strong>Loop</strong><strong>Reason</strong></div>
+        <div class="table-head"><strong>Gate</strong><strong>Lens</strong><strong>Layer</strong><strong>Rhythm</strong><strong>Reason</strong></div>
         ${GATES.map((gate) => `
           <div>
             <strong>${gate.id}. ${escapeHtml(gate.title)}</strong>
             <span>${escapeHtml(getCorridor(gate.mapping.corridor).name)}</span>
             <span>${escapeHtml(getDepth(gate.mapping.depth).name)}</span>
-            <span>${escapeHtml(getStep(gate.mapping.step).symbol)} · ${escapeHtml(getStep(gate.mapping.step).name)}</span>
+            <span>${escapeHtml(getStep(gate.mapping.step).name)}</span>
             <span>${escapeHtml(gate.mapping.reason)}</span>
           </div>
         `).join("")}
@@ -1045,7 +1006,7 @@ function renderGuide() {
               ${option("reflect", "Reflect", state.guideMode)}
               ${option("integrate", "Integrate", state.guideMode)}
               ${option("practice", "Choose practice", state.guideMode)}
-              ${option("calculate", "Calculate", state.guideMode)}
+              ${option("rhythm", "Rhythm", state.guideMode)}
               ${option("remember", "Remember", state.guideMode)}
             </select>
           </label>
@@ -1064,7 +1025,7 @@ function renderGuide() {
         <p class="micro-label">Response for Gate ${gate.id}</p>
         <h2>${escapeHtml(gate.title)}</h2>
         ${output}
-        <div class="formula-card practice-focus">
+        <div class="focus-card practice-focus">
           <p class="micro-label">Next embodied action</p>
           <h3>${escapeHtml(practice.title)}</h3>
           <p>${escapeHtml(practice.action)}</p>
@@ -1111,7 +1072,7 @@ function renderExport() {
         <p class="micro-label">Credit and privacy</p>
         <h2>About</h2>
         <p>${escapeHtml(ATTRIBUTION)}</p>
-        <p>This V2 uses original Compass Gate language and curated symbolic mappings. It is not affiliated with, endorsed by, or copied from any public site.</p>
+        <p>This V2 uses original Compass Gate language and curated pattern mappings. It is not affiliated with, endorsed by, or copied from any public site.</p>
         <div class="stat-strip stacked">
           <span><strong>${state.journal.length}</strong> local memories</span>
           <span><strong>${state.completions.length}</strong> completed practices</span>
@@ -1140,7 +1101,7 @@ function renderPracticeCard(practice) {
       <code>${escapeHtml(practice.prompt)}</code>
       <div class="theme-row">
         <span>${escapeHtml(practice.type)}</span>
-        <span>${escapeHtml(getStep(gate.mapping.step).symbol)} · ${escapeHtml(getStep(gate.mapping.step).name)}</span>
+        <span>${escapeHtml(getStep(gate.mapping.step).name)}</span>
       </div>
       <div class="card-actions">
         <button class="ghost-button" type="button" data-action="start-practice" data-practice="${practice.id}">Open</button>
@@ -1151,14 +1112,14 @@ function renderPracticeCard(practice) {
   `;
 }
 
-function renderLoopLadder(activeStepId) {
+function renderRhythmLadder(activeStepId) {
   return `
-    <div class="loop-ladder">
-      ${LOOP_STEPS.map((step, index) => `
-        <div class="loop-step ${step.id === activeStepId ? "active" : ""}">
+    <div class="rhythm-ladder">
+      ${RHYTHM_STEPS.map((step, index) => `
+        <div class="rhythm-step ${step.id === activeStepId ? "active" : ""}">
           <span>${index + 1}</span>
-          <strong>${escapeHtml(step.symbol)}</strong>
-          <small>${escapeHtml(step.name)} · ${escapeHtml(step.verb)}</small>
+          <strong>${escapeHtml(step.name)}</strong>
+          <small>${escapeHtml(capitalize(step.verb))}</small>
         </div>
       `).join("")}
     </div>
@@ -1181,9 +1142,9 @@ function renderWheel({ compact }) {
     const textPoint = polar(cx, cy, (radiusInner + radiusOuter) / 2, mid);
     const entries = journalForGate(gate.id).length;
     const completed = completionsForGate(gate.id).length;
-    const overlayClass = state.wheelMode === "memory" && entries ? "has-memory" :
+    const overlayClass = state.wheelMode === "journal" && entries ? "has-journal" :
       state.wheelMode === "practice" && completed ? "has-practice" :
-      state.wheelMode === "dimension" ? `depth-${gate.mapping.depth}` : "";
+      state.wheelMode === "pattern" ? `depth-${gate.mapping.depth}` : "";
     return `
       <g class="wheel-segment ${gate.id === selected.id ? "selected" : ""} ${gate.id === daily.id ? "today" : ""} ${overlayClass}"
          data-action="select-gate" data-gate="${gate.id}" tabindex="0" role="button" aria-label="Gate ${gate.id}, ${escapeAttr(gate.title)}">
@@ -1215,8 +1176,9 @@ function renderWheel({ compact }) {
       <g>${marks}</g>
       <g class="center-seal">
         <circle cx="${cx}" cy="${cy}" r="92"></circle>
-        <text x="${cx}" y="${cy - 12}" text-anchor="middle">√3 → ∂ → ω → ε∞</text>
-        <text x="${cx}" y="${cy + 28}" text-anchor="middle">LOOP CLOSED</text>
+        <text x="${cx}" y="${cy - 20}" text-anchor="middle">SEED → MOTION</text>
+        <text x="${cx}" y="${cy + 8}" text-anchor="middle">MIRROR → RETURN</text>
+        <text x="${cx}" y="${cy + 40}" text-anchor="middle">COMPASS RHYTHM</text>
       </g>
     </svg>
   `;
@@ -1290,12 +1252,11 @@ function generateGuideResponse() {
   const recent = state.journal.slice(0, 3);
   const userLine = state.guideInput.trim() ? `<p><strong>Your signal:</strong> ${escapeHtml(state.guideInput.trim())}</p>` : "";
 
-  if (state.guideMode === "calculate") {
-    const calc = calculateLoop(state.calculatorSeed);
+  if (state.guideMode === "rhythm") {
     return `
       ${userLine}
-      <p>The active gate sits in the ${escapeHtml(step.symbol)} · ${escapeHtml(step.name)} operation. Use the number as a rhythm: start at ${formatNumber(calc.root, 6)}, differentiate to ${formatNumber(calc.delta, 6)}, observe ${formatNumber(calc.omega, 6)}, then return through ${formatNumber(calc.epsilon, 6)}.</p>
-      <p>The practical question is simple: where does ${escapeHtml(step.verb)} become the next honest move?</p>
+      <p>The active Gate is currently shaped by <strong>${escapeHtml(step.name)}</strong>. Use that movement as the next clean instruction.</p>
+      <p>${escapeHtml(step.prompt)}</p>
     `;
   }
 
@@ -1320,7 +1281,7 @@ function generateGuideResponse() {
     return `
       ${userLine}
       <p>Integration means the shadow pattern gets a job instead of an exile. For Gate ${gate.id}, watch for: ${escapeHtml(gate.shadow)}</p>
-      <p>Bring it through the loop: ${escapeHtml(step.symbol)} asks you to ${escapeHtml(step.verb)}. Then close the loop with one saved memory.</p>
+      <p>Move it through the rhythm: ${escapeHtml(step.name)} asks you to ${escapeHtml(step.verb)}. Then save one memory so the learning has somewhere to land.</p>
     `;
   }
 
@@ -1328,7 +1289,7 @@ function generateGuideResponse() {
     ${userLine}
     <p>Gate ${gate.id}, <strong>${escapeHtml(gate.title)}</strong>, points to this: ${escapeHtml(gate.essence)}</p>
     <p>The reflection question is: ${escapeHtml(gate.question)}</p>
-    <p>The symbolic map is ${escapeHtml(getCorridor(gate.mapping.corridor).name)} · ${escapeHtml(getDepth(gate.mapping.depth).name)} · ${escapeHtml(step.symbol)} ${escapeHtml(step.name)}. ${escapeHtml(gate.mapping.reason)}</p>
+    <p>The pattern map is ${escapeHtml(getCorridor(gate.mapping.corridor).name)} · ${escapeHtml(getDepth(gate.mapping.depth).name)} · ${escapeHtml(step.name)}. ${escapeHtml(gate.mapping.reason)}</p>
   `;
 }
 
@@ -1612,10 +1573,6 @@ document.addEventListener("click", (event) => {
       }
     }
   }
-  if (action === "reset-calculator") {
-    state.calculatorSeed = ROOT_SEED;
-    render();
-  }
   if (action === "clear-guide") {
     state.guideInput = "";
     state.guideOutput = "";
@@ -1707,10 +1664,6 @@ document.addEventListener("change", (event) => {
   if (target.dataset.action === "guide-mode") {
     state.guideMode = target.value;
     state.guideOutput = "";
-    render();
-  }
-  if (target.dataset.action === "calculator-seed") {
-    state.calculatorSeed = Number(target.value) || ROOT_SEED;
     render();
   }
   if (target.dataset.action === "start-date") {
