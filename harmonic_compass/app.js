@@ -1,671 +1,931 @@
-const STORAGE_KEY = "harmonic-compass-journal-v1";
-const SETTINGS_KEY = "harmonic-compass-settings-v1";
-const BACKUP_KEY = "harmonic-compass-journal-backup-v1";
+const STORAGE_KEY = "harmonic-compass-journal-v2";
+const SETTINGS_KEY = "harmonic-compass-settings-v2";
+const BACKUP_KEY = "harmonic-compass-backup-v2";
+const COMPLETIONS_KEY = "harmonic-compass-practice-completions-v2";
+const DRAFT_KEY = "harmonic-compass-draft-v2";
 
-const PRECEPTS = [
+const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
+const DEFAULT_START_DATE = "2026-05-23";
+const ROOT_SEED = Math.sqrt(3);
+
+const LOOP_STEPS = [
   {
-    id: 1,
-    text: "The Universe is Mental. You live in a U-inverse of your own creation - an inter-conceived notional experience and chosen soul journey for a dimensionally-limited Avatar Self, thoroughly designed by your multidimensional and omniscient Higher Self.",
-    themes: ["mental universe", "avatar self", "higher self"],
-    prompt: "Where am I forgetting that this experience is being perceived through a chosen Avatar Self?",
-    practice: "Name one place where you can reclaim authorship without blaming yourself."
+    id: "seed",
+    symbol: "√3",
+    name: "Seed",
+    verb: "notice",
+    value: ROOT_SEED,
+    formula: "root = √3",
+    experience: "First spark, honest beginning, latent intent becoming visible."
   },
   {
-    id: 2,
-    text: "You are the playwright, director, producer, and actor on your life's stage play. Your Higher Self chose to participate in a Multiplayer Spiritual Life Simulation - the One Source dividing itself into the many, to observe itself through greater variation of angular perception.",
-    themes: ["simulation", "source", "perception"],
-    prompt: "What role am I unconsciously performing today?",
-    practice: "Rewrite one scene as if your Higher Self placed it there for observation."
+    id: "expansion",
+    symbol: "∂",
+    name: "Expansion",
+    verb: "choose",
+    value: 5 * (ROOT_SEED - 1),
+    formula: "∂ = 5(√3 - 1)",
+    experience: "Differentiate the signal into one concrete motion."
   },
   {
-    id: 3,
-    text: "This experience enables increasing empathy and wisdom - the cumulative collection of all biased observational emotional responses of all divisions of Source Creation, expanding the knowledge database of spacetime memory.",
-    themes: ["empathy", "wisdom", "spacetime memory"],
-    prompt: "Which emotional response is asking to become wisdom instead of repetition?",
-    practice: "Translate one reaction into the wisdom it is trying to teach."
+    id: "reflection",
+    symbol: "ω",
+    name: "Reflection",
+    verb: "observe",
+    value: ((5 * (ROOT_SEED - 1)) ** 2) / 10 + 5,
+    formula: "ω = ∂² / 10 + 5",
+    experience: "Let the action reveal pattern, feedback, and complexity."
   },
   {
-    id: 4,
-    text: "The backdrop is Duality. The aim is to transcend Duality, integrate the Shadow, and attain the Philosopher's Stone of hemi-synchronization - merging Conscious and Unconscious Minds into ONE Whole: The Superconscious Mind.",
-    themes: ["duality", "shadow", "superconscious"],
-    prompt: "Where am I splitting myself into acceptable and unacceptable parts?",
-    practice: "Write one sentence from the conscious mind and one from the unconscious mind."
-  },
-  {
-    id: 5,
-    text: "The Hero and Villain co-depend on each other in order to define the boundary of their Self-perception. The Villain begins where the Hero ends and vice versa.",
-    themes: ["hero", "villain", "self-perception"],
-    prompt: "Who have I cast as the villain, and what boundary does that protect?",
-    practice: "Describe the villain's function without defending or attacking it."
-  },
-  {
-    id: 6,
-    text: "Learn to see the unseen. Believe in miracles (Mira = Look; Cle = Key). Study the Art of Science and Science of Art. Realize that everything connects to everything else. Embrace that Believing is Seeing.",
-    themes: ["miracles", "science", "art", "connection"],
-    prompt: "What invisible connection is trying to become visible?",
-    practice: "Track three small correspondences without forcing meaning."
-  },
-  {
-    id: 7,
-    text: "Seek not validation from others. You are NOT what you do. Your identity is independent of your accomplishments. What triggers you emotionally is an opportunity to expand awareness of Self.",
-    themes: ["validation", "identity", "trigger"],
-    prompt: "What accomplishment am I using as proof that I am allowed to exist?",
-    practice: "Do one action today without using it to earn identity."
-  },
-  {
-    id: 8,
-    text: "What you judge in others is what you like or dislike about yourself. Like perceives like through sympathetic resonance. A truly humble person perceives only humility - arrogance perceives arrogance.",
-    themes: ["projection", "judgment", "resonance"],
-    prompt: "What judgment keeps returning, and what self-image does it protect?",
-    practice: "Write the judgment as: I notice this because a version of me knows this frequency."
-  },
-  {
-    id: 9,
-    text: "Do not erase unpleasant awareness - see the beauty in polarity. Transmute the pain of suffering into the gold of soul evolution. All unattractive characteristics you eradicate from your persona will only multiply in your field around you in a new reflection.",
-    themes: ["polarity", "suffering", "transmutation"],
-    prompt: "What unpleasant awareness am I trying to erase?",
-    practice: "Hold the rejected trait as information before trying to improve it."
-  },
-  {
-    id: 10,
-    text: "The world doesn't happen TO you; it happens FOR you. Consciousness attracts self-similar consciousness: victim consciousness leads to more victimhood.",
-    themes: ["victimhood", "attraction", "self-similar"],
-    prompt: "Where am I describing myself as done-to rather than met-by?",
-    practice: "Change one sentence from 'to me' into 'for my awareness'."
-  },
-  {
-    id: 11,
-    text: "Feel and express deep empathy and gratitude for all perspectives. Sincere gratitude raises vibration almost instantaneously.",
-    themes: ["gratitude", "empathy", "vibration"],
-    prompt: "Which perspective can I bless without needing to become it?",
-    practice: "Express one precise gratitude out loud."
-  },
-  {
-    id: 12,
-    text: "Choose love over the desire for objective truths that make you right. The only objective truth is the love that underlies it all.",
-    themes: ["love", "truth", "rightness"],
-    prompt: "Where do I want to be right more than I want to remain open?",
-    practice: "Choose one conversation where love matters more than victory."
-  },
-  {
-    id: 13,
-    text: "Fall in love with the world as it is, without condition. Fall completely in love with yourself. What you voice will eventually be made manifest.",
-    themes: ["unconditional love", "manifestation", "voice"],
-    prompt: "What am I voicing repeatedly into the field?",
-    practice: "Speak one sentence that you are willing to see made manifest."
-  },
-  {
-    id: 14,
-    text: "Be the change you desire to see. It is not enmity that makes life difficult but self-loathing. Accept and integrate your shadow consciousness.",
-    themes: ["shadow", "self-loathing", "integration"],
-    prompt: "Where am I blaming the world for what is asking to be integrated within me?",
-    practice: "Name one disowned quality, thank it for protecting you, and ask what it needs in order to return."
-  },
-  {
-    id: 15,
-    text: "Study the Quadrivium: Arithmetic (Number in itself), Geometry (Number in Space), Music (Number in Time), and Cosmology (Number in Spacetime). The more I learn, the less I actually 'know.'",
-    themes: ["quadrivium", "number", "humility"],
-    prompt: "Which form of number is speaking today: itself, space, time, or spacetime?",
-    practice: "Study one pattern slowly enough that certainty softens."
-  },
-  {
-    id: 16,
-    text: "Engage in random acts of kindness, expecting absolutely NOTHING in return.",
-    themes: ["kindness", "service", "non-attachment"],
-    prompt: "Where can I give without making the gift into identity?",
-    practice: "Do one anonymous or unannounced act of kindness."
-  },
-  {
-    id: 17,
-    text: "Everyone you meet and every experience can be a divine communication. Learn to see the synchronicities from your Higher Self.",
-    themes: ["synchronicity", "communication", "higher self"],
-    prompt: "What has repeated enough times that it deserves attention?",
-    practice: "Log one synchronicity without deciding too quickly what it means."
-  },
-  {
-    id: 18,
-    text: "Practice mindfulness and intentionality. How you do one thing is how you do everything.",
-    themes: ["mindfulness", "intentionality", "practice"],
-    prompt: "What small action is revealing the pattern of the whole?",
-    practice: "Perform one ordinary act with total intentionality."
-  },
-  {
-    id: 19,
-    text: "Seek relationships that reflect where your consciousness is evolving. The heart expands as the ego dissolves.",
-    themes: ["relationship", "heart", "ego"],
-    prompt: "Which relationship reflects the consciousness I am growing into?",
-    practice: "Offer one moment of ego-softening contact."
-  },
-  {
-    id: 20,
-    text: "Match your frequency through modulation of emotional states. We perceive the world as we are, not as it is.",
-    themes: ["frequency", "emotion", "perception"],
-    prompt: "What emotional state is tinting the world right now?",
-    practice: "Modulate state before interpreting the situation."
-  },
-  {
-    id: 21,
-    text: "Embrace your unique expression. The Universe expands through unique perspectives. The only thing real in this Universal Mind Matrix is how we feel. There are no mistakes, only learnings.",
-    themes: ["expression", "feeling", "learning"],
-    prompt: "What unique expression have I been withholding?",
-    practice: "Let one honest expression exist without editing it into acceptability."
-  },
-  {
-    id: 22,
-    text: "Take risks, be vulnerable, love deeply. There is no actual death, only transition. There is no God judgment - only self-imposed judgments.",
-    themes: ["risk", "vulnerability", "transition"],
-    prompt: "What risk is my heart already moving toward?",
-    practice: "Do one vulnerable thing with clean intention and no demand."
-  },
-  {
-    id: 23,
-    text: "If you think you can or think you can't, you're right. Be an optimist. The only real obstacles are the ones we persistently believe in.",
-    themes: ["optimism", "belief", "obstacle"],
-    prompt: "Which belief is acting as a wall because I keep reasserting it?",
-    practice: "Replace one fixed belief with an experiment."
-  },
-  {
-    id: 24,
-    text: "Exercise your talents. Explore your depths. Have fun. Surrender to the beauty of this Divine Unfolding.",
-    themes: ["talent", "depth", "surrender", "play"],
-    prompt: "Where can depth and play stop being opposites?",
-    practice: "Use one talent today for beauty, not proof."
+    id: "return",
+    symbol: "ε∞",
+    name: "Return",
+    verb: "integrate",
+    value: 10 / (((5 * (ROOT_SEED - 1)) ** 2) / 10 + 5) - 1,
+    formula: "ε∞ = 10 / ω - 1",
+    experience: "Close the loop by turning experience into memory and practice."
   }
 ];
 
 const CORRIDORS = [
-  { id: 1, name: "Seed · Information", triple: "(3,4,5)", rapidity: "acosh(4)", state: "Base Information / Digital Discrimination" },
-  { id: 2, name: "EM · Alphahedron", triple: "(5,12,13)", rapidity: "acosh(12)", state: "Electromagnetic Perception · Light Awareness" },
-  { id: 3, name: "Gravity", triple: "(8,15,17)", rapidity: "acosh(15)", state: "Gravitational Grounding · Embodiment" },
-  { id: 4, name: "Weak · Entropic", triple: "(7,24,25)", rapidity: "acosh(24)", state: "Entropic Transition · Change Recognition" },
-  { id: 5, name: "Time · Temporal", triple: "(9,40,41)", rapidity: "acosh(40)", state: "Temporal Flow · Memory Integration" },
-  { id: 6, name: "Strong · Nuclear", triple: "(11,60,61)", rapidity: "acosh(60)", state: "Nuclear Coherence · Unified Field" },
-  { id: 7, name: "Dark Energy", triple: "(13,84,85)", rapidity: "acosh(84)", state: "Non-Local Expansion · Cosmic Awareness" }
+  { id: "seed", name: "Seed / Information", tone: "origin", symbol: "∴", meaning: "The beginning point where a signal becomes distinguishable." },
+  { id: "light", name: "Light / Perception", tone: "clarity", symbol: "◇", meaning: "Seeing, feedback, attention, symbolic pattern recognition." },
+  { id: "ground", name: "Ground / Embodiment", tone: "body", symbol: "▣", meaning: "Capacity, pacing, boundaries, and practical form." },
+  { id: "entropy", name: "Entropy / Change", tone: "threshold", symbol: "∆", meaning: "Transition, friction, release, repair, and transformation." },
+  { id: "time", name: "Time / Memory", tone: "sequence", symbol: "⌁", meaning: "Echoes, rhythm, relationship history, and lived continuity." },
+  { id: "coherence", name: "Coherence / Power", tone: "will", symbol: "✦", meaning: "Aligned action, clean desire, voice, and integration." },
+  { id: "field", name: "Field / Expansion", tone: "mystery", symbol: "◎", meaning: "Service, spaciousness, non-local awareness, and surrender." }
 ];
 
-const DIMENSIONS = [
-  { id: 0, name: "0D · Point", primitive: "θ = 0, (1,0)", mode: "Pure potential - undifferentiated awareness before the first distinction", signature: "ε∞ = 1/√3 · the loop seed" },
-  { id: 1, name: "1D · Line", primitive: "Rapidity axis θₙ", mode: "Sequential awareness - time, causality, linear narrative consciousness", signature: "Metallic series λₙ" },
-  { id: 2, name: "2D · Plane", primitive: "Right triangle (a,b,c)", mode: "Relational awareness - the perception of force, tension, and angle between things", signature: "∂ · seed corridor (3,4,5)" },
-  { id: 3, name: "3D · Solid", primitive: "Polytope V=2c", mode: "Embodied awareness - topology, form, the sense of being a bounded self in space", signature: "Alphahedron V=26 · n=12" },
-  { id: 4, name: "4D · Field", primitive: "Coherence field ρ(x,y,z,t)", mode: "Non-local awareness - the observer as a field, not a point; entanglement as geometry", signature: "S = 0 · variational identity" }
+const DEPTHS = [
+  { id: "d0", name: "0D · Point", primitive: "single mark", mode: "pure potential before the first distinction" },
+  { id: "d1", name: "1D · Line", primitive: "sequence", mode: "motion, timing, direction, and choice" },
+  { id: "d2", name: "2D · Plane", primitive: "relationship", mode: "tension, comparison, mirrors, and symbolic geometry" },
+  { id: "d3", name: "3D · Body", primitive: "form", mode: "embodiment, boundary, repair, and lived consequence" },
+  { id: "d4", name: "4D · Field", primitive: "coherence", mode: "pattern across time, meaning, and non-local awareness" }
 ];
 
-const RECURSIVE_STEPS = [
-  { id: "root", symbol: "√3", value: "1.7320508...", operation: "Root - primal emergence", mode: "Undifferentiated Field" },
-  { id: "delta", symbol: "∂", value: "3.6602540...", operation: "Expansion x 5 minus 5", mode: "Individuated Awareness" },
-  { id: "omega", symbol: "ω", value: "6.3397459...", operation: "Self-squaring, scaled", mode: "Reflective Complexity" },
-  { id: "epsilon", symbol: "ε∞", value: "0.5773502...", operation: "Inversion -> return to 1/√3", mode: "Dissolution / Return" }
-];
+function practices(gateId, rows) {
+  return rows.map((row, index) => ({
+    id: `g${String(gateId).padStart(2, "0")}-p${index + 1}`,
+    gateId,
+    title: row[0],
+    type: row[1],
+    duration: row[2],
+    action: row[3],
+    prompt: row[4]
+  }));
+}
 
-const CODEX_ARTICLES = [
+const GATES = [
   {
-    id: "attribution",
-    title: "Attribution",
-    body: "Primary source framework credited to Robert Edward Grant and the Sovereign Avatar / The Universal One material from Codex Universalis Press, 2026. Harmonic Compass is a private personal-use interface for working with this original framework while preserving Robert Edward Grant's name, source language, and codex attribution throughout the product.",
-    formula: "Robert Edward Grant · Codex Universalis Press · 2026"
+    id: 1,
+    title: "First Spark",
+    essence: "A beginning asks for one honest motion, not a perfect map. Let the smallest true impulse become visible.",
+    shadow: "Waiting for certainty before starting.",
+    question: "What wants one simple yes from me now?",
+    themes: ["beginning", "intent", "signal"],
+    mapping: { corridor: "seed", depth: "d0", layer: "Will", step: "seed", reason: "This gate starts the loop by turning latent intent into a single visible mark." },
+    practices: practices(1, [
+      ["One True Motion", "Action", "2 min", "Do the smallest honest action that would make the next step real.", "What changed once the beginning existed outside your head?"],
+      ["No Perfect Map", "Writing", "5 min", "Write three imperfect first steps and choose one.", "Which step carries the most life even if it is not complete?"],
+      ["Visible Signal", "Environment", "3 min", "Place one object where it can remind you of today's intention.", "What did the visible symbol help you remember?"]
+    ])
   },
   {
-    id: "loop",
-    title: "Recursive Harmonic Loop",
-    body: "The Recursive Codex reveals a loop that closes with perfect precision at arbitrary digit depth. This recursive closure is a mathematical model of self-referential awareness - the process by which a system returns exactly to its own origin.",
-    formula: "∂ = 5(√3 - 1) -> ω = ∂²/10 + 5 -> 10/ω - 1 = 1/√3 = ε∞ <=> LOOP CLOSED"
+    id: 2,
+    title: "Quiet Axis",
+    essence: "Stability appears when attention returns to the center beneath reaction. From there, choice becomes cleaner.",
+    shadow: "Over-correcting to regain control.",
+    question: "Where can I pause before steering?",
+    themes: ["center", "pause", "choice"],
+    mapping: { corridor: "ground", depth: "d1", layer: "Body", step: "return", reason: "The loop closes briefly through the body so reaction can settle before choice." },
+    practices: practices(2, [
+      ["Axis Breath", "Body", "90 sec", "Stand still, soften the jaw, and breathe down the center line of the body.", "Where did choice return when your body slowed down?"],
+      ["Before Steering", "Observation", "3 min", "Notice an urge to fix, advise, or correct, then wait three breaths.", "What did the pause reveal underneath the urge?"],
+      ["Clean Next Turn", "Action", "4 min", "Choose one response from steadiness instead of speed.", "How did the action feel different when it came from center?"]
+    ])
   },
   {
-    id: "signature",
-    title: "The Signature of Intent",
-    body: "From two geometric operators Δθ and Δφ, three dimensionless constants of physics emerge from the same framework with no free parameters. The architecture of reality is intentional. The constants are a message from You to you: from the part that remembers, to the part that forgot.",
-    formula: "P(chance alignment) ≈ 1 : 10^429"
+    id: 3,
+    title: "Living Measure",
+    essence: "Growth becomes sustainable when pace and capacity are listened to together. More is not always wiser than enough.",
+    shadow: "Confusing intensity with progress.",
+    question: "What rhythm can I actually sustain?",
+    themes: ["pace", "capacity", "measure"],
+    mapping: { corridor: "ground", depth: "d3", layer: "Body", step: "reflection", reason: "The body tests whether expansion has become sustainable form." },
+    practices: practices(3, [
+      ["Capacity Check", "Body", "4 min", "Rate your real capacity from 1 to 10 before adding more effort.", "What did your system say it can honestly hold today?"],
+      ["Enough Line", "Boundary", "5 min", "Define what enough looks like before you begin a task.", "Where did the enough line prevent overextension?"],
+      ["Rhythm Audit", "Planning", "8 min", "Review your day and remove one intensity spike that is masquerading as devotion.", "What rhythm would let this practice last?"]
+    ])
   },
   {
-    id: "grammar",
-    title: "Four Constants as Recursive Grammar",
-    body: "Each step in the loop encodes a distinct operation of consciousness: expansion, complexification, inversion, return. ∂ + ω = 9.999... (Chi, χ) - the exact infinite sum of Phi and Sieve. The loop is neither arbitrary nor approximated: it is closed.",
-    formula: "√3 -> ∂ -> ω -> ε∞ -> 1/√3"
+    id: 4,
+    title: "Pattern Weaver",
+    essence: "Separate details begin to speak when you notice the relationship between them. Meaning often lives in the arrangement.",
+    shadow: "Collecting signals without synthesis.",
+    question: "What pattern is forming across the pieces?",
+    themes: ["pattern", "synthesis", "relationship"],
+    mapping: { corridor: "light", depth: "d2", layer: "Mind", step: "expansion", reason: "Attention differentiates the parts, then the plane shows their relationships." },
+    practices: practices(4, [
+      ["Three Signals", "Observation", "6 min", "List three repeated details from the last day and draw a line between them.", "What relationship appeared between the signals?"],
+      ["Arrange the Pieces", "Creative", "10 min", "Move notes, images, or objects into a pattern that feels true.", "What did the arrangement reveal that the list could not?"],
+      ["Name the Weave", "Writing", "4 min", "Give the emerging pattern a title of five words or fewer.", "What does the title clarify?"]
+    ])
   },
   {
-    id: "yhwh",
-    title: "YHWH Tetragrammaton Mapping",
-    body: "The four letters of the Tetragrammaton map to the four constants of the harmonic loop. The Name encodes the same recursive structure as the loop itself: primal ground -> expansion -> complexification -> return.",
-    formula: "י (Yod) = √3 | ה (He) = ∂ | ו (Vav) = ω | ה (He) = ε∞ = 1/√3"
+    id: 5,
+    title: "Threshold Breath",
+    essence: "Change often arrives as a narrow doorway rather than a grand announcement. Step through with enough presence to feel the crossing.",
+    shadow: "Retreating when transition feels undefined.",
+    question: "What doorway am I already standing in?",
+    themes: ["transition", "doorway", "presence"],
+    mapping: { corridor: "entropy", depth: "d1", layer: "Spirit", step: "seed", reason: "A threshold begins a new sequence by admitting that the old sequence has changed." },
+    practices: practices(5, [
+      ["Doorway Naming", "Writing", "5 min", "Name the transition you are already inside.", "What changes when the threshold has a name?"],
+      ["Crossing Gesture", "Body", "2 min", "Physically step across a doorway with one clear intention.", "What did your body register as you crossed?"],
+      ["Transition Witness", "Ritual", "7 min", "Light, hold, or arrange one simple object to mark the crossing.", "What is ready to be honored before the new form appears?"]
+    ])
   },
   {
-    id: "compass",
-    title: "Compass Harmonics",
-    body: "The two angles sum to exactly 100° - not 90°, not 360°, but the base-10 century angle. This links the harmonic loop to both angular geometry and decimal number consciousness.",
-    formula: "∂ x 10 = 36°36'9\" · ω x 10 = 63°23'51\" · Sum = 100°"
+    id: 6,
+    title: "Merciful Mirror",
+    essence: "Feedback becomes useful when it is received without collapse or defense. The mirror is not the judge; it is the instrument.",
+    shadow: "Turning insight into self-attack.",
+    question: "What can I see clearly without making it cruel?",
+    themes: ["mirror", "feedback", "compassion"],
+    mapping: { corridor: "light", depth: "d2", layer: "Heart", step: "reflection", reason: "This gate belongs to light because the user is learning to see; it belongs to reflection because feedback becomes compassionate pattern, not punishment." },
+    practices: practices(6, [
+      ["Kind Mirror", "Reflection", "5 min", "Write one difficult truth using language you would trust from a wise friend.", "What truth became usable when it stopped attacking you?"],
+      ["Feedback Without Collapse", "Body", "3 min", "Receive one piece of feedback while keeping both feet on the floor and one hand on the heart.", "What helped the body stay present?"],
+      ["Instrument Not Judge", "Inquiry", "6 min", "Ask what the mirror is measuring, then ask what it is not allowed to decide about your worth.", "What did the mirror reveal without becoming the judge?"]
+    ])
   },
   {
-    id: "operator",
-    title: "The Consciousness Operator",
-    body: "The consciousness operator C is the iterated harmonic loop. Its fixed point under iteration is not a static value but the infinite sum Chi = ∂ + ω = 9.999... - a number that is simultaneously 9 (discrete, countable) and 10 (continuous, complete).",
-    formula: "C = limₙ→∞ [∂ -> ω -> ε∞ -> ∂]ⁿ · Fixed point: ∂ + ω = 9.999... (χ)"
+    id: 7,
+    title: "Hidden Current",
+    essence: "Beneath the visible situation, a quieter motive may be moving everything. Follow the current before naming the conclusion.",
+    shadow: "Reacting only to surface events.",
+    question: "What deeper need is shaping this moment?",
+    themes: ["motive", "depth", "need"],
+    mapping: { corridor: "time", depth: "d4", layer: "Heart", step: "reflection", reason: "Hidden motives often reveal themselves across repetition, memory, and emotional pattern." },
+    practices: practices(7, [
+      ["Need Under Story", "Inquiry", "7 min", "Under a current story, write the need that might be moving it.", "What need was quieter than the explanation?"],
+      ["Current Tracking", "Observation", "1 day", "Notice every time the same emotional current appears today.", "Where did the current move through different scenes?"],
+      ["Name Before Conclusion", "Writing", "4 min", "Before deciding what something means, list three possible currents beneath it.", "Which possibility softened your certainty?"]
+    ])
+  },
+  {
+    id: 8,
+    title: "Clear Flame",
+    essence: "Desire becomes trustworthy when it is clarified rather than denied. Let wanting mature into direction.",
+    shadow: "Either indulging impulse or suppressing it.",
+    question: "What desire becomes clean when I tell the truth about it?",
+    themes: ["desire", "direction", "energy"],
+    mapping: { corridor: "coherence", depth: "d1", layer: "Will", step: "expansion", reason: "Desire differentiates raw energy into a chosen direction." },
+    practices: practices(8, [
+      ["Desire Sentence", "Writing", "5 min", "Write: I want... Then write what this wanting protects, serves, or seeks.", "What made the desire cleaner?"],
+      ["Impulse to Direction", "Action", "8 min", "Turn one impulse into one responsible next action.", "What changed when energy became direction?"],
+      ["Flame Check", "Body", "3 min", "Feel where desire lives in the body and ask whether it is hot, clear, tight, or open.", "What did the body say about the quality of wanting?"]
+    ])
+  },
+  {
+    id: 9,
+    title: "Open Hand",
+    essence: "Release is not abandonment; it is the end of gripping what has finished teaching. Space returns when the hand unclenches.",
+    shadow: "Holding familiar weight as identity.",
+    question: "What am I allowed to stop carrying?",
+    themes: ["release", "space", "identity"],
+    mapping: { corridor: "entropy", depth: "d3", layer: "Spirit", step: "return", reason: "Release closes a cycle by letting finished material change form." },
+    practices: practices(9, [
+      ["Unclench Practice", "Body", "2 min", "Make a fist around the thing you are gripping, then slowly open the hand.", "What did release feel like before the mind explained it?"],
+      ["Finished Teaching", "Writing", "6 min", "Write what an old pattern already taught you.", "What can end because the lesson has been received?"],
+      ["Make Space", "Environment", "10 min", "Clear one physical space that represents the thing you are done carrying.", "What entered when space returned?"]
+    ])
+  },
+  {
+    id: 10,
+    title: "Brave Listening",
+    essence: "Real listening changes the listener before it answers. Let another reality enter without rushing to organize it.",
+    shadow: "Listening only to prepare a response.",
+    question: "What have I not let myself fully hear?",
+    themes: ["listening", "receptivity", "relationship"],
+    mapping: { corridor: "light", depth: "d2", layer: "Heart", step: "reflection", reason: "Listening uses perception as a relational mirror instead of a debate tool." },
+    practices: practices(10, [
+      ["No Reply Listening", "Relationship", "1 conversation", "In one conversation, listen without planning your next sentence.", "What entered when you stopped preparing a response?"],
+      ["Repeat Back", "Relationship", "5 min", "Repeat what someone said until they feel accurately heard.", "What changed when accuracy mattered more than speed?"],
+      ["Listen to Silence", "Observation", "3 min", "Let silence have three full breaths before answering.", "What did the silence communicate?"]
+    ])
+  },
+  {
+    id: 11,
+    title: "Shared Bridge",
+    essence: "A bridge is built from both sides, with patience for difference. Connection strengthens when translation matters more than winning.",
+    shadow: "Demanding sameness before trust.",
+    question: "Where can I translate instead of persuade?",
+    themes: ["translation", "bridge", "trust"],
+    mapping: { corridor: "coherence", depth: "d2", layer: "Social", step: "expansion", reason: "A bridge expands the field by creating shared structure without erasing difference." },
+    practices: practices(11, [
+      ["Translate One Need", "Relationship", "6 min", "Translate your position into the need underneath it.", "What bridge appeared when the need was named?"],
+      ["Both Sides Map", "Writing", "8 min", "Draw two columns: what I mean, what they might hear.", "Where was translation needed?"],
+      ["Ask Before Persuading", "Relationship", "1 conversation", "Ask one sincere clarifying question before making your point.", "What softened when curiosity came first?"]
+    ])
+  },
+  {
+    id: 12,
+    title: "Boundary Bell",
+    essence: "A clean boundary protects the life of the connection. It rings before resentment has to shout.",
+    shadow: "Mistaking self-erasure for kindness.",
+    question: "What limit would preserve my generosity?",
+    themes: ["boundary", "generosity", "integrity"],
+    mapping: { corridor: "coherence", depth: "d3", layer: "Will", step: "return", reason: "The boundary returns scattered energy to integrity so connection can survive." },
+    practices: practices(12, [
+      ["Bell Sentence", "Writing", "5 min", "Write one boundary as a clean sentence with no courtroom speech around it.", "What limit preserves your generosity?"],
+      ["Resentment Forecast", "Inquiry", "4 min", "Ask where resentment will grow if no boundary is named.", "What is the earliest kind boundary?"],
+      ["Small No", "Action", "Today", "Practice one small no where you normally overextend.", "What happened when the no was simple?"]
+    ])
+  },
+  {
+    id: 13,
+    title: "Inner Weather",
+    essence: "Feelings move like weather when they are allowed to pass through the body. Naming the storm is different from becoming it.",
+    shadow: "Fusing identity with passing emotion.",
+    question: "What feeling needs room without becoming the whole sky?",
+    themes: ["emotion", "weather", "body"],
+    mapping: { corridor: "time", depth: "d3", layer: "Body", step: "reflection", reason: "Emotion is tracked as a moving pattern through the body across time." },
+    practices: practices(13, [
+      ["Weather Report", "Body", "3 min", "Name the feeling as weather: cloudy, electric, heavy, bright, shifting.", "What changed when the feeling became weather, not identity?"],
+      ["Ninety Seconds", "Body", "90 sec", "Let one emotion move in the body for ninety seconds without solving it.", "Where did the feeling move?"],
+      ["Sky Sentence", "Writing", "4 min", "Write: this feeling is in me, and it is not all of me.", "What space opened around the emotion?"]
+    ])
+  },
+  {
+    id: 14,
+    title: "Mind Garden",
+    essence: "Thoughts become a habitat through repetition. Tend the ones that make perception more honest and alive.",
+    shadow: "Letting inherited thoughts run unexamined.",
+    question: "Which thought am I feeding by habit?",
+    themes: ["thought", "habit", "garden"],
+    mapping: { corridor: "ground", depth: "d2", layer: "Mind", step: "return", reason: "This gate returns thought to tended form by pruning what repeats unconsciously." },
+    practices: practices(14, [
+      ["Thought Weeding", "Writing", "6 min", "Write one thought you keep feeding and one thought you want to cultivate instead.", "Which thought deserves less nourishment?"],
+      ["Inherited Voice Check", "Inquiry", "5 min", "Ask whether a repeating thought is yours, inherited, or borrowed from fear.", "Whose voice is this thought using?"],
+      ["Plant One Line", "Ritual", "2 min", "Choose one truthful sentence and repeat it slowly three times.", "What did the new sentence make possible?"]
+    ])
+  },
+  {
+    id: 15,
+    title: "Golden Friction",
+    essence: "Resistance can reveal where growth is asking for traction. Meet the difficulty as information before calling it obstruction.",
+    shadow: "Treating discomfort as a stop sign.",
+    question: "What is this friction trying to strengthen?",
+    themes: ["friction", "growth", "strength"],
+    mapping: { corridor: "entropy", depth: "d3", layer: "Will", step: "expansion", reason: "Friction is change pressure; the expansion step turns resistance into usable force." },
+    practices: practices(15, [
+      ["Friction Inventory", "Writing", "5 min", "List three places you feel resistance and what each may be strengthening.", "Which friction contains traction?"],
+      ["One Degree Harder", "Action", "5 min", "Take a tiny action toward the difficulty without overwhelming the system.", "What became stronger through contact?"],
+      ["Obstruction Reframe", "Inquiry", "4 min", "Ask what the obstacle is training instead of blocking.", "What training is hidden in the difficulty?"]
+    ])
+  },
+  {
+    id: 16,
+    title: "True Scale",
+    essence: "Some choices shrink when seen up close and expand when seen in context. Adjust the scale until the next right move appears.",
+    shadow: "Magnifying urgency beyond proportion.",
+    question: "What changes when I widen the frame?",
+    themes: ["scale", "perspective", "context"],
+    mapping: { corridor: "light", depth: "d4", layer: "Mind", step: "reflection", reason: "Perspective widens perception until proportion becomes visible." },
+    practices: practices(16, [
+      ["Zoom Out", "Observation", "4 min", "Imagine the issue from tomorrow, next month, and five years out.", "Which scale made the next move clearer?"],
+      ["Proportion Line", "Writing", "5 min", "Draw a line from tiny to enormous and place the issue honestly on it.", "Was the urgency proportionate?"],
+      ["Context Question", "Inquiry", "3 min", "Ask what context is missing from your current interpretation.", "What fact or feeling changed the scale?"]
+    ])
+  },
+  {
+    id: 17,
+    title: "Rooted Voice",
+    essence: "Expression carries farther when it rises from the body, not performance. Speak from contact with what is actually true.",
+    shadow: "Shaping words to be approved.",
+    question: "What would I say if I stayed connected to myself?",
+    themes: ["voice", "truth", "expression"],
+    mapping: { corridor: "coherence", depth: "d3", layer: "Social", step: "seed", reason: "Authentic expression begins as a grounded seed before it becomes social signal." },
+    practices: practices(17, [
+      ["Hand on Belly", "Body", "2 min", "Place a hand on the belly before saying the true sentence.", "Did the words stay connected to the body?"],
+      ["Unapproved Draft", "Writing", "7 min", "Write the thing you would say if approval were not the goal.", "What truth appeared before editing?"],
+      ["One Rooted Sentence", "Relationship", "Today", "Speak one honest sentence without overexplaining it.", "What carried farther because it was simple?"]
+    ])
+  },
+  {
+    id: 18,
+    title: "Luminous Repair",
+    essence: "Repair does not erase rupture; it brings care to the place where trust was strained. The willingness to mend is itself a signal.",
+    shadow: "Avoiding accountability to avoid shame.",
+    question: "What repair would restore dignity for everyone involved?",
+    themes: ["repair", "trust", "accountability"],
+    mapping: { corridor: "entropy", depth: "d3", layer: "Heart", step: "return", reason: "Repair returns relationship through the changed place instead of pretending rupture did not happen." },
+    practices: practices(18, [
+      ["Dignity Repair", "Relationship", "8 min", "Write or speak a repair that names impact without self-erasure.", "What restored dignity on both sides?"],
+      ["Accountability Without Shame", "Body", "4 min", "Feel the body while naming one thing you can own cleanly.", "What could be owned without collapse?"],
+      ["Care at the Strain", "Action", "Today", "Bring one specific care action to a strained place.", "What signal did repair send?"]
+    ])
+  },
+  {
+    id: 19,
+    title: "Nested Choice",
+    essence: "Every decision sits inside larger loyalties. Choose in a way your future self can inhabit.",
+    shadow: "Optimizing the moment while betraying the arc.",
+    question: "What larger commitment should guide this choice?",
+    themes: ["choice", "principle", "future self"],
+    mapping: { corridor: "seed", depth: "d1", layer: "Will", step: "reflection", reason: "A choice is a line; reflection aligns that line with the larger pattern it belongs to." },
+    practices: practices(19, [
+      ["Future Self Vote", "Writing", "5 min", "Ask your future self which option they can inhabit with dignity.", "Which choice aged well in imagination?"],
+      ["Loyalty Stack", "Inquiry", "6 min", "List the loyalties inside the decision: comfort, truth, love, freedom, craft, body.", "Which loyalty should lead?"],
+      ["Arc Over Moment", "Action", "Today", "Make one choice that serves the arc rather than the momentary reward.", "What arc did you strengthen?"]
+    ])
+  },
+  {
+    id: 20,
+    title: "Creative Tension",
+    essence: "Opposites can generate movement when neither is forced to vanish. Hold the stretch until a third possibility appears.",
+    shadow: "Splitting reality into either-or.",
+    question: "What new option appears if both truths remain present?",
+    themes: ["polarity", "novelty", "third option"],
+    mapping: { corridor: "entropy", depth: "d2", layer: "Mind", step: "expansion", reason: "Tension differentiates two poles, then creates motion toward a third form." },
+    practices: practices(20, [
+      ["Both Truths", "Writing", "6 min", "Write two opposing truths without resolving them.", "What changed when neither truth had to vanish?"],
+      ["Third Door", "Creative", "8 min", "Brainstorm five options that are not either original pole.", "Which third door has life?"],
+      ["Hold the Stretch", "Body", "3 min", "Hold both hands apart, naming one truth in each hand, then breathe.", "What did the body learn about tension?"]
+    ])
+  },
+  {
+    id: 21,
+    title: "Ancestral Echo",
+    essence: "Some reactions are older than the present scene. Honor the origin without letting it author the future.",
+    shadow: "Repeating inherited survival strategies unconsciously.",
+    question: "What old echo is asking to be updated?",
+    themes: ["memory", "legacy", "choice"],
+    mapping: { corridor: "time", depth: "d4", layer: "Spirit", step: "return", reason: "An old pattern is returned to choice when memory is honored without obeying it blindly." },
+    practices: practices(21, [
+      ["Older Than Now", "Inquiry", "5 min", "Ask whether your reaction belongs entirely to the current moment.", "What part of the reaction felt older than now?"],
+      ["Honor and Update", "Writing", "7 min", "Thank the old strategy, then write the update it needs today.", "What can be honored without being repeated?"],
+      ["Future Author", "Action", "Today", "Choose one response that lets the future author the next line.", "Where did choice replace inheritance?"]
+    ])
+  },
+  {
+    id: 22,
+    title: "Useful Mystery",
+    essence: "Not knowing can be an active intelligence when it keeps inquiry open. Let uncertainty become a chamber for listening.",
+    shadow: "Forcing premature answers to escape ambiguity.",
+    question: "What can remain unknown while I stay engaged?",
+    themes: ["mystery", "inquiry", "uncertainty"],
+    mapping: { corridor: "field", depth: "d4", layer: "Spirit", step: "seed", reason: "Mystery seeds inquiry by leaving enough space for the field to respond." },
+    practices: practices(22, [
+      ["Unknown List", "Writing", "5 min", "List what you do not know without solving any of it.", "Which unknown became less threatening when it was named?"],
+      ["Open Question Walk", "Observation", "10 min", "Walk with one open question and do not answer it during the walk.", "What did the question do when it stayed open?"],
+      ["No Premature Seal", "Practice", "1 day", "Refuse one premature conclusion today.", "What stayed alive because you did not seal it too early?"]
+    ])
+  },
+  {
+    id: 23,
+    title: "Embodied Yes",
+    essence: "Consent, commitment, and enthusiasm each have a bodily signature. Wait for the answer that includes your whole system.",
+    shadow: "Agreeing from pressure or momentum.",
+    question: "Where does my body say yes, no, or not yet?",
+    themes: ["consent", "body", "commitment"],
+    mapping: { corridor: "ground", depth: "d3", layer: "Body", step: "reflection", reason: "The body becomes the measuring instrument for yes, no, and not yet." },
+    practices: practices(23, [
+      ["Yes No Not Yet", "Body", "4 min", "Ask the body for yes, no, and not yet, noticing each signature.", "Which answer included your whole system?"],
+      ["Pressure Check", "Inquiry", "3 min", "Before agreeing, ask whether the yes is clean or pressured.", "What pressure was trying to speak as consent?"],
+      ["Delay for Truth", "Action", "Today", "Use the sentence: I need to feel into this before I answer.", "What truth arrived after the delay?"]
+    ])
+  },
+  {
+    id: 24,
+    title: "Field Offering",
+    essence: "The work becomes complete when it serves beyond the self. Offer what has ripened without needing to control its reception.",
+    shadow: "Withholding gifts until guaranteed recognition.",
+    question: "What is ready to be given cleanly?",
+    themes: ["service", "gift", "surrender"],
+    mapping: { corridor: "field", depth: "d4", layer: "Social", step: "expansion", reason: "Integration expands into the field when the gift is offered without control." },
+    practices: practices(24, [
+      ["Clean Offering", "Action", "Today", "Share one useful gift without tracking how it is received.", "What was clean about offering without control?"],
+      ["Ripened Gift", "Writing", "6 min", "Name one skill, insight, or kindness that is ripe enough to give.", "What has ripened beyond private possession?"],
+      ["Release Reception", "Ritual", "3 min", "After giving, open both hands and release the need to manage the outcome.", "What changed when reception was no longer yours to control?"]
+    ])
   }
 ];
 
-const ENTRY_TYPES = [
-  "Intention",
-  "Trigger",
-  "Synchronicity",
-  "Gratitude",
-  "Shadow Integration",
-  "Dream",
-  "Relationship Reflection",
-  "Frequency Shift",
-  "Return-to-Origin Insight",
-  "Freeform"
-];
+const ALL_PRACTICES = GATES.flatMap((gate) => gate.practices);
+const VIEW_TITLES = {
+  today: "Today",
+  wheel: "Wheel",
+  gates: "Gates",
+  practices: "Practices",
+  journal: "Journal",
+  codex: "Codex",
+  guide: "Guide",
+  export: "Export"
+};
+
+const root = document.querySelector("#app-root");
+const title = document.querySelector("#view-title");
+const toastNode = document.querySelector("#toast");
 
 const state = {
   view: "today",
-  selectedPrecept: dailyCompass().precept.id,
-  search: "",
+  selectedGateId: null,
+  selectedPracticeId: null,
   journal: loadJournal(),
+  completions: loadCompletions(),
+  settings: loadSettings(),
+  draft: loadDraft(),
   editingId: null,
-  filters: {
-    type: "All",
-    precept: "All"
-  }
+  search: "",
+  practiceSearch: "",
+  filters: { type: "all", gate: "all", practice: "all" },
+  wheelMode: "today",
+  guideInput: "",
+  guideMode: "reflect",
+  guideOutput: "",
+  calculatorSeed: ROOT_SEED
 };
 
-let searchRenderTimer = 0;
+state.selectedGateId = dailyCompass().gate.id;
+state.selectedPracticeId = getGate(state.selectedGateId).practices[0].id;
 
-function loadSettings() {
+function safeGetItem(key) {
   try {
-    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-    return { startDate: saved.startDate || "2026-05-23" };
-  } catch {
-    return { startDate: "2026-05-23" };
+    return window.localStorage.getItem(key);
+  } catch (error) {
+    return null;
   }
 }
 
-function saveSettings(settings) {
-  return safeSetItem(SETTINGS_KEY, JSON.stringify(settings));
+function safeSetItem(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    toast("Local storage is unavailable in this browser context.");
+    return false;
+  }
+}
+
+function safeRemoveItem(key) {
+  try {
+    window.localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    toast("Local storage is unavailable in this browser context.");
+    return false;
+  }
 }
 
 function loadJournal() {
+  const stored = safeGetItem(STORAGE_KEY);
+  if (!stored) return [];
   try {
-    const entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return Array.isArray(entries) ? entries : [];
-  } catch {
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
     return [];
   }
 }
 
-function saveJournal() {
-  return persistJournal(state.journal);
+function loadCompletions() {
+  const stored = safeGetItem(COMPLETIONS_KEY);
+  if (!stored) return [];
+  try {
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function loadSettings() {
+  const defaults = { startDate: DEFAULT_START_DATE };
+  const stored = safeGetItem(SETTINGS_KEY);
+  if (!stored) return defaults;
+  try {
+    return { ...defaults, ...JSON.parse(stored) };
+  } catch (error) {
+    return defaults;
+  }
+}
+
+function loadDraft() {
+  const stored = safeGetItem(DRAFT_KEY);
+  if (!stored) return {};
+  try {
+    const parsed = JSON.parse(stored);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (error) {
+    return {};
+  }
 }
 
 function persistJournal(entries) {
   return safeSetItem(STORAGE_KEY, JSON.stringify(entries));
 }
 
-function safeSetItem(key, value) {
-  try {
-    localStorage.setItem(key, value);
-    return true;
-  } catch {
-    toast("This browser could not save the latest change. Export your journal before continuing.");
-    return false;
-  }
+function persistCompletions(completions) {
+  return safeSetItem(COMPLETIONS_KEY, JSON.stringify(completions));
 }
 
-function dailyCompass(date = new Date()) {
-  const settings = loadSettings();
-  const start = new Date(`${settings.startDate}T00:00:00`);
-  const current = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const days = Math.max(0, Math.floor((current - start) / 86400000));
-  const precept = PRECEPTS[days % PRECEPTS.length];
-  const corridor = CORRIDORS[(precept.id - 1) % CORRIDORS.length];
-  const dimension = DIMENSIONS[(precept.id - 1) % DIMENSIONS.length];
-  const step = RECURSIVE_STEPS[(precept.id - 1) % RECURSIVE_STEPS.length];
-
-  return { days, precept, corridor, dimension, step };
+function saveSettings(next) {
+  state.settings = { ...state.settings, ...next };
+  return safeSetItem(SETTINGS_KEY, JSON.stringify(state.settings));
 }
 
-function byId(id) {
-  return document.getElementById(id);
+function saveDraft(next) {
+  state.draft = { ...state.draft, ...next };
+  return safeSetItem(DRAFT_KEY, JSON.stringify(state.draft));
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function clearDraft() {
+  state.draft = {};
+  safeRemoveItem(DRAFT_KEY);
+}
+
+function getGate(id) {
+  return GATES.find((gate) => gate.id === Number(id)) || GATES[0];
+}
+
+function getPractice(id) {
+  return ALL_PRACTICES.find((practice) => practice.id === id) || null;
+}
+
+function getCorridor(id) {
+  return CORRIDORS.find((corridor) => corridor.id === id) || CORRIDORS[0];
+}
+
+function getDepth(id) {
+  return DEPTHS.find((depth) => depth.id === id) || DEPTHS[0];
+}
+
+function getStep(id) {
+  return LOOP_STEPS.find((step) => step.id === id) || LOOP_STEPS[0];
+}
+
+function currentGate() {
+  return getGate(state.selectedGateId || dailyCompass().gate.id);
+}
+
+function currentPractice(gate = currentGate()) {
+  const selected = getPractice(state.selectedPracticeId);
+  if (selected && selected.gateId === gate.id) return selected;
+  state.selectedPracticeId = gate.practices[0].id;
+  return gate.practices[0];
+}
+
+function dailyCompass() {
+  const start = new Date(`${state?.settings?.startDate || DEFAULT_START_DATE}T00:00:00`);
+  const now = new Date();
+  const startDay = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const day = Math.max(0, Math.floor((today - startDay) / 86400000));
+  return { day, gate: GATES[day % GATES.length] };
+}
+
+function calculateLoop(seed = ROOT_SEED) {
+  const rootValue = clamp(Number(seed) || ROOT_SEED, 0.2, 5);
+  const delta = 5 * (rootValue - 1);
+  const omega = (delta ** 2) / 10 + 5;
+  const epsilon = 10 / omega - 1;
+  const chi = delta + omega;
+  const reciprocal = 1 / rootValue;
+  return {
+    root: rootValue,
+    delta,
+    omega,
+    epsilon,
+    chi,
+    reciprocal,
+    closure: Math.abs(epsilon - reciprocal)
+  };
+}
+
+function completionForPractice(practiceId) {
+  return state.completions.find((item) => item.practiceId === practiceId);
+}
+
+function completionsForGate(gateId) {
+  return state.completions.filter((item) => item.gateId === Number(gateId));
+}
+
+function journalForGate(gateId) {
+  return state.journal.filter((entry) => Number(entry.gateId) === Number(gateId));
 }
 
 function setView(view) {
-  state.view = view;
-  document.querySelectorAll(".nav-item").forEach((button) => {
-    button.classList.toggle("active", button.dataset.view === view);
-  });
+  state.view = view === "precepts" ? "gates" : view === "avatar" ? "guide" : view;
   render();
-}
-
-function toast(message) {
-  const el = byId("toast");
-  el.textContent = message;
-  el.classList.add("visible");
-  window.setTimeout(() => el.classList.remove("visible"), 2600);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function render() {
-  const titleMap = {
-    today: "Today",
-    wheel: "Harmonic Wheel",
-    precepts: "The 24 Precepts",
-    journal: "Journal Memory Field",
-    codex: "Codex Library",
-    export: "Export & Privacy"
+  const normalized = state.view === "precepts" ? "gates" : state.view;
+  state.view = VIEW_TITLES[normalized] ? normalized : "today";
+  title.textContent = VIEW_TITLES[state.view];
+  document.querySelectorAll(".nav-item").forEach((button) => {
+    button.classList.toggle("active", button.dataset.view === state.view);
+  });
+
+  const views = {
+    today: renderToday,
+    wheel: renderWheelView,
+    gates: renderGates,
+    practices: renderPractices,
+    journal: renderJournal,
+    codex: renderCodex,
+    guide: renderGuide,
+    export: renderExport
   };
 
-  byId("view-title").textContent = titleMap[state.view] || "Harmonic Compass";
-  const root = byId("app-root");
-
-  if (state.view === "today") root.innerHTML = renderToday();
-  if (state.view === "wheel") root.innerHTML = renderWheelView();
-  if (state.view === "precepts") root.innerHTML = renderPrecepts();
-  if (state.view === "journal") root.innerHTML = renderJournal();
-  if (state.view === "codex") root.innerHTML = renderCodex();
-  if (state.view === "export") root.innerHTML = renderExport();
-
-  bindViewEvents();
+  root.innerHTML = views[state.view]();
 }
 
 function renderToday() {
-  const compass = dailyCompass();
-  const entryCount = entriesForPrecept(compass.precept.id).length;
-  const selected = PRECEPTS.find((item) => item.id === state.selectedPrecept) || compass.precept;
-  const selectedCorridor = CORRIDORS[(selected.id - 1) % CORRIDORS.length];
-  const selectedDimension = DIMENSIONS[(selected.id - 1) % DIMENSIONS.length];
-  const selectedStep = RECURSIVE_STEPS[(selected.id - 1) % RECURSIVE_STEPS.length];
+  const daily = dailyCompass();
+  const gate = currentGate();
+  const practice = currentPractice(gate);
+  const step = getStep(gate.mapping.step);
+  const corridor = getCorridor(gate.mapping.corridor);
+  const depth = getDepth(gate.mapping.depth);
+  const complete = completionForPractice(practice.id);
+  const gateEntries = journalForGate(gate.id);
 
   return `
     <div class="today-grid">
       <section class="hero-panel">
         <div class="panel-top">
-          <span class="micro-label">Today's Compass</span>
-          <span class="cycle-chip">Day ${compass.days + 1} · ${new Date().toLocaleDateString()}</span>
+          <p class="micro-label">${daily.gate.id === gate.id ? "Daily gate" : "Selected gate"}</p>
+          <span>Cycle day ${daily.day + 1}</span>
         </div>
         <div class="precept-hero">
-          <div class="precept-number">Precept ${compass.precept.id}</div>
-          <blockquote>${escapeHtml(compass.precept.text)}</blockquote>
+          <span class="precept-number">Gate ${gate.id}</span>
+          <h2 class="gate-title">${escapeHtml(gate.title)}</h2>
+          <blockquote>${escapeHtml(gate.essence)}</blockquote>
         </div>
-        <div class="harmonic-strip" aria-label="Daily harmonic mapping">
-          <span>${escapeHtml(compass.corridor.name)}</span>
-          <span>${escapeHtml(compass.dimension.name)}</span>
-          <span>${escapeHtml(compass.step.symbol)} · ${escapeHtml(compass.step.mode)}</span>
+        <div class="harmonic-strip">
+          <span>${escapeHtml(corridor.name)}</span>
+          <span>${escapeHtml(depth.name)}</span>
+          <span>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</span>
         </div>
         <div class="prompt-row">
           <div>
-            <span class="micro-label">Prompt</span>
-            <p>${escapeHtml(compass.precept.prompt)}</p>
+            <strong>Shadow pattern</strong>
+            <p>${escapeHtml(gate.shadow)}</p>
           </div>
           <div>
-            <span class="micro-label">Practice</span>
-            <p>${escapeHtml(compass.precept.practice)}</p>
+            <strong>Integration question</strong>
+            <p>${escapeHtml(gate.question)}</p>
           </div>
         </div>
-        <div class="panel-actions">
-          <button class="primary-button" type="button" data-action="journal-today">Journal With This</button>
-          <button class="ghost-button" type="button" data-action="open-wheel">Open Wheel</button>
-        </div>
+        ${renderLoopLadder(gate.mapping.step)}
       </section>
 
       <section class="wheel-panel compact-wheel">
-        ${renderWheelSvg(compass.precept.id)}
+        ${renderWheel({ compact: true })}
       </section>
 
       <aside class="state-panel">
-        <div class="panel-top">
-          <span class="micro-label">State Check</span>
-          <span>${entryCount} linked entries</span>
+        <div class="stat-strip">
+          <span><strong>${gateEntries.length}</strong> memories</span>
+          <span><strong>${completionsForGate(gate.id).length}</strong> practices</span>
+          <span><strong>${step.verb}</strong> loop verb</span>
         </div>
-        ${renderStateControls()}
-        <div class="formula-card">
-          <span class="micro-label">Recursive Codex</span>
-          <code>∂ = 5(√3−1) → ω = ∂²/10+5 → 10/ω−1 = 1/√3</code>
+        <div class="practice-switcher">
+          <p class="micro-label">Practice lens</p>
+          ${gate.practices.map((item) => `
+            <button class="practice-choice ${item.id === practice.id ? "selected" : ""}" type="button" data-action="choose-practice" data-practice="${item.id}">
+              <span>${escapeHtml(item.title)}</span>
+              <small>${escapeHtml(item.duration)} · ${escapeHtml(item.type)}</small>
+            </button>
+          `).join("")}
+        </div>
+        <div class="formula-card practice-focus">
+          <p class="micro-label">${complete ? "Completed" : "Active practice"}</p>
+          <h3>${escapeHtml(practice.title)}</h3>
+          <p>${escapeHtml(practice.action)}</p>
+          <code>${escapeHtml(practice.prompt)}</code>
+        </div>
+        <div class="panel-actions">
+          <button class="primary-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal Practice</button>
+          <button class="ghost-button full" type="button" data-action="toggle-practice" data-practice="${practice.id}">${complete ? "Mark Open" : "Mark Done"}</button>
+          <button class="ghost-button full" type="button" data-action="open-wheel">Open Wheel</button>
         </div>
       </aside>
     </div>
 
     <section class="detail-band">
       <div>
-        <span class="micro-label">Selected Harmonic</span>
-        <h2>Precept ${selected.id}</h2>
-        <p>${escapeHtml(selected.text)}</p>
+        <p class="micro-label">Why the math is here</p>
+        <h2>Math as a practice loop.</h2>
+        <p>The compass uses √3 → ∂ → ω → ε∞ as a symbolic operating rhythm: notice the seed, choose one expansion, observe the reflection, then return the result to memory. It is a contemplative grammar, not a public proof claim.</p>
       </div>
       <div class="mini-matrix">
-        <span><strong>${escapeHtml(selectedCorridor.name)}</strong>${escapeHtml(selectedCorridor.state)}</span>
-        <span><strong>${escapeHtml(selectedDimension.name)}</strong>${escapeHtml(selectedDimension.mode)}</span>
-        <span><strong>${escapeHtml(selectedStep.symbol)} ${escapeHtml(selectedStep.value)}</strong>${escapeHtml(selectedStep.operation)}</span>
+        <span><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>
+        <span><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</span>
+        <span><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</span>
       </div>
     </section>
   `;
 }
 
-function renderStateControls() {
-  return `
-    <div class="range-stack">
-      ${renderRange("Frequency", 62)}
-      ${renderRange("Energy", 54)}
-      ${renderRange("Clarity", 71)}
-    </div>
-    <div class="toggle-row">
-      <label><input type="checkbox" id="check-shadow"> Shadow</label>
-      <label><input type="checkbox" id="check-sync"> Synchronicity</label>
-      <label><input type="checkbox" id="check-gratitude" checked> Gratitude</label>
-    </div>
-  `;
-}
-
-function renderRange(label, value) {
-  return `
-    <label class="range-control">
-      <span>${label}<strong>${value}</strong></span>
-      <input type="range" min="0" max="100" value="${value}" aria-label="${label}">
-    </label>
-  `;
-}
-
 function renderWheelView() {
-  const selected = PRECEPTS.find((item) => item.id === state.selectedPrecept) || dailyCompass().precept;
-  const corridor = CORRIDORS[(selected.id - 1) % CORRIDORS.length];
-  const dimension = DIMENSIONS[(selected.id - 1) % DIMENSIONS.length];
-  const step = RECURSIVE_STEPS[(selected.id - 1) % RECURSIVE_STEPS.length];
+  const gate = currentGate();
+  const practice = currentPractice(gate);
+  const corridor = getCorridor(gate.mapping.corridor);
+  const depth = getDepth(gate.mapping.depth);
+  const step = getStep(gate.mapping.step);
+
   return `
     <div class="wheel-layout">
       <section class="wheel-stage">
         <div class="wheel-stage-head">
           <div>
-            <span class="micro-label">Recursive harmonic loop of consciousness</span>
-            <h2>24 gates around a closed return.</h2>
+            <p class="micro-label">Recursive harmonic wheel</p>
+            <h2>24 original Compass Gates.</h2>
           </div>
-          <button class="ghost-button" type="button" data-action="spin-wheel">Spin</button>
+          <div class="topbar-actions">
+            ${["today", "memory", "practice", "dimension"].map((mode) => `
+              <button class="ghost-button ${state.wheelMode === mode ? "selected" : ""}" type="button" data-action="set-wheel-mode" data-mode="${mode}">${mode}</button>
+            `).join("")}
+            <button class="ghost-button" type="button" data-action="spin-wheel">Spin</button>
+          </div>
         </div>
-        ${renderWheelSvg(dailyCompass().precept.id)}
+        ${renderWheel({ compact: false })}
       </section>
+
       <aside class="selection-panel">
-        <span class="micro-label">Active Segment</span>
-        <h2>Precept ${selected.id}</h2>
-        <p>${escapeHtml(selected.text)}</p>
+        <p class="micro-label">Active segment</p>
+        <h2>Gate ${gate.id}<br>${escapeHtml(gate.title)}</h2>
+        <p>${escapeHtml(gate.essence)}</p>
         <div class="selection-grid">
-          <div><strong>${escapeHtml(corridor.name)}</strong><span>${escapeHtml(corridor.triple)} · ${escapeHtml(corridor.rapidity)}</span></div>
-          <div><strong>${escapeHtml(dimension.name)}</strong><span>${escapeHtml(dimension.signature)}</span></div>
-          <div><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.mode)}</strong><span>${escapeHtml(step.operation)}</span></div>
+          <div><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</div>
+          <div><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</div>
+          <div><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</div>
         </div>
-        <button class="primary-button full" type="button" data-action="journal-selected">Journal With Precept ${selected.id}</button>
+        <div class="formula-card practice-focus">
+          <p class="micro-label">Suggested practice</p>
+          <h3>${escapeHtml(practice.title)}</h3>
+          <p>${escapeHtml(practice.action)}</p>
+        </div>
+        <button class="primary-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal Gate ${gate.id}</button>
       </aside>
     </div>
   `;
 }
 
-function renderWheelSvg(todayId) {
-  const size = 720;
-  const cx = size / 2;
-  const cy = size / 2;
-  const outer = 330;
-  const inner = 245;
-  const segments = PRECEPTS.map((precept, index) => {
-    const start = -90 + index * 15 + 0.5;
-    const end = start + 14;
-    const path = describeArc(cx, cy, outer, inner, start, end);
-    const labelAngle = (start + end) / 2;
-    const label = polarToCartesian(cx, cy, 292, labelAngle);
-    const isSelected = precept.id === state.selectedPrecept;
-    const isToday = precept.id === todayId;
-    return `
-      <g class="wheel-segment ${isSelected ? "selected" : ""} ${isToday ? "today" : ""}" data-precept="${precept.id}" tabindex="0" role="button" aria-label="Precept ${precept.id}">
-        <path d="${path}"></path>
-        <text x="${label.x}" y="${label.y}" text-anchor="middle" dominant-baseline="central">${precept.id}</text>
-      </g>
-    `;
-  }).join("");
-
-  const corridorMarks = CORRIDORS.map((corridor, index) => {
-    const angle = -90 + index * (360 / CORRIDORS.length);
-    const p1 = polarToCartesian(cx, cy, 215, angle);
-    const p2 = polarToCartesian(cx, cy, 232, angle);
-    const label = polarToCartesian(cx, cy, 190, angle);
-    return `
-      <line class="corridor-mark" x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}"></line>
-      <text class="corridor-label" x="${label.x}" y="${label.y}" text-anchor="middle" dominant-baseline="central">${index + 1}</text>
-    `;
-  }).join("");
-
-  return `
-    <svg class="harmonic-wheel" viewBox="0 0 ${size} ${size}" role="img" aria-label="Harmonic Wheel with 24 precepts">
-      <defs>
-        <radialGradient id="wheelGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#68c7ff" stop-opacity="0.22"></stop>
-          <stop offset="42%" stop-color="#d9a441" stop-opacity="0.10"></stop>
-          <stop offset="100%" stop-color="#050913" stop-opacity="0"></stop>
-        </radialGradient>
-      </defs>
-      <rect width="${size}" height="${size}" fill="url(#wheelGlow)"></rect>
-      <circle class="wheel-grid" cx="${cx}" cy="${cy}" r="318"></circle>
-      <circle class="wheel-grid inner" cx="${cx}" cy="${cy}" r="218"></circle>
-      <circle class="gold-ring" cx="${cx}" cy="${cy}" r="174"></circle>
-      <ellipse class="orbit orbit-one" cx="${cx}" cy="${cy}" rx="260" ry="76"></ellipse>
-      <ellipse class="orbit orbit-two" cx="${cx}" cy="${cy}" rx="112" ry="260" transform="rotate(38 ${cx} ${cy})"></ellipse>
-      ${segments}
-      ${corridorMarks}
-      <g class="center-seal">
-        <circle cx="${cx}" cy="${cy}" r="112"></circle>
-        <text x="${cx}" y="${cy - 18}" text-anchor="middle">√3 → ∂ → ω → ε∞</text>
-        <text x="${cx}" y="${cy + 22}" text-anchor="middle">LOOP CLOSED</text>
-      </g>
-    </svg>
-  `;
-}
-
-function polarToCartesian(cx, cy, r, angleInDegrees) {
-  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
-  return {
-    x: cx + (r * Math.cos(angleInRadians)),
-    y: cy + (r * Math.sin(angleInRadians))
-  };
-}
-
-function describeArc(cx, cy, outerR, innerR, startAngle, endAngle) {
-  const outerStart = polarToCartesian(cx, cy, outerR, endAngle);
-  const outerEnd = polarToCartesian(cx, cy, outerR, startAngle);
-  const innerStart = polarToCartesian(cx, cy, innerR, startAngle);
-  const innerEnd = polarToCartesian(cx, cy, innerR, endAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-  return [
-    "M", outerStart.x, outerStart.y,
-    "A", outerR, outerR, 0, largeArcFlag, 0, outerEnd.x, outerEnd.y,
-    "L", innerStart.x, innerStart.y,
-    "A", innerR, innerR, 0, largeArcFlag, 1, innerEnd.x, innerEnd.y,
-    "Z"
-  ].join(" ");
-}
-
-function renderPrecepts() {
-  const query = state.search.trim().toLowerCase();
-  const filtered = PRECEPTS.filter((precept) => {
-    if (!query) return true;
-    return `precept ${precept.id} ${precept.text} ${precept.themes.join(" ")}`.toLowerCase().includes(query);
+function renderGates() {
+  const term = state.search.trim().toLowerCase();
+  const gates = GATES.filter((gate) => {
+    const haystack = `${gate.id} ${gate.title} ${gate.essence} ${gate.shadow} ${gate.question} ${gate.themes.join(" ")}`.toLowerCase();
+    return !term || haystack.includes(term);
   });
 
   return `
     <section class="library-head">
       <div>
-        <span class="micro-label">Universal Mind</span>
-        <h2>The 24 Precepts</h2>
-        <p>Canonical source text is preserved. Prompts and practices are secondary navigation layers.</p>
+        <p class="micro-label">Paraphrased original model</p>
+        <h2>The Compass Gates</h2>
+        <p>Each gate is written in Harmonic Compass's own voice: a state, a shadow pattern, a symbolic mapping, and three concrete practices.</p>
       </div>
-      <input class="search-input" type="search" value="${escapeHtml(state.search)}" placeholder="Search precepts, themes, or number" data-action="search">
+      <input class="search-input" type="search" placeholder="Search gates" value="${escapeAttr(state.search)}" data-action="search-gates">
     </section>
+
     <div class="precept-grid">
-      ${filtered.map(renderPreceptCard).join("")}
+      ${gates.map((gate) => {
+        const step = getStep(gate.mapping.step);
+        const corridor = getCorridor(gate.mapping.corridor);
+        return `
+          <article class="precept-card ${gate.id === state.selectedGateId ? "selected" : ""}">
+            <div class="card-top">
+              <span>Gate ${gate.id}</span>
+              <span>${escapeHtml(step.symbol)}</span>
+            </div>
+            <h3>${escapeHtml(gate.title)}</h3>
+            <p>${escapeHtml(gate.essence)}</p>
+            <div class="theme-row">
+              <span>${escapeHtml(corridor.name)}</span>
+              ${gate.themes.map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
+            </div>
+            <div class="card-actions">
+              <button class="ghost-button" type="button" data-action="select-gate" data-gate="${gate.id}">Open</button>
+              <button class="primary-button small" type="button" data-action="journal-gate" data-gate="${gate.id}">Journal</button>
+            </div>
+          </article>
+        `;
+      }).join("")}
     </div>
   `;
 }
 
-function renderPreceptCard(precept) {
-  const entries = entriesForPrecept(precept.id);
+function renderPractices() {
+  const term = state.practiceSearch.trim().toLowerCase();
+  const status = state.filters.practice;
+  const practicesList = ALL_PRACTICES.filter((practice) => {
+    const gate = getGate(practice.gateId);
+    const haystack = `${gate.title} ${practice.title} ${practice.type} ${practice.action} ${practice.prompt}`.toLowerCase();
+    const matchesTerm = !term || haystack.includes(term);
+    const done = Boolean(completionForPractice(practice.id));
+    const matchesStatus = status === "all" || (status === "done" && done) || (status === "open" && !done);
+    return matchesTerm && matchesStatus;
+  });
+
   return `
-    <article class="precept-card ${precept.id === state.selectedPrecept ? "selected" : ""}" data-precept-card="${precept.id}">
-      <div class="card-top">
-        <span>Precept ${precept.id}</span>
-        <span>${entries.length} entries</span>
+    <section class="library-head">
+      <div>
+        <p class="micro-label">72 concrete actions</p>
+        <h2>Practice Bank</h2>
+        <p>Every gate has three actions that can be completed by anyone: body, writing, observation, relationship, ritual, environment, or creative work.</p>
       </div>
-      <p>${escapeHtml(precept.text)}</p>
-      <div class="theme-row">${precept.themes.map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}</div>
-      <div class="card-actions">
-        <button class="ghost-button" type="button" data-action="select-precept" data-precept="${precept.id}">Select</button>
-        <button class="primary-button small" type="button" data-action="journal-precept" data-precept="${precept.id}">Journal</button>
+      <div class="filter-row">
+        <input class="search-input" type="search" placeholder="Search practices" value="${escapeAttr(state.practiceSearch)}" data-action="search-practices">
+        <select data-action="filter-practice">
+          ${option("all", "All", status)}
+          ${option("open", "Open", status)}
+          ${option("done", "Done", status)}
+        </select>
       </div>
-    </article>
+    </section>
+
+    <div class="practice-grid">
+      ${practicesList.map((practice) => renderPracticeCard(practice)).join("")}
+    </div>
   `;
 }
 
 function renderJournal() {
-  const entries = filteredEntries();
-  const selected = PRECEPTS.find((item) => item.id === state.selectedPrecept) || dailyCompass().precept;
   const editing = state.editingId ? state.journal.find((entry) => entry.id === state.editingId) : null;
+  const gateId = Number(editing?.gateId || state.draft.gateId || state.selectedGateId || dailyCompass().gate.id);
+  const gate = getGate(gateId);
+  const practice = getPractice(editing?.practiceId || state.draft.practiceId || state.selectedPracticeId) || gate.practices[0];
+  const values = {
+    title: editing?.title || state.draft.title || `${gate.title} · ${practice.title}`,
+    type: editing?.type || state.draft.type || "practice",
+    gateId,
+    practiceId: practice.id,
+    before: editing?.before ?? state.draft.before ?? 50,
+    after: editing?.after ?? state.draft.after ?? 50,
+    tags: editing?.tags?.join(", ") || state.draft.tags || gate.themes.slice(0, 2).join(", "),
+    body: editing?.body || state.draft.body || ""
+  };
+  const entries = filteredEntries();
 
   return `
     <div class="journal-layout">
       <section class="journal-composer">
-        <span class="micro-label">${editing ? "Edit Memory" : "New Memory"}</span>
-        <h2>${editing ? "Refine the entry." : "Add to the memory field."}</h2>
+        <p class="micro-label">${editing ? "Editing memory" : "Memory field"}</p>
+        <h2>${editing ? "Edit entry" : "Journal practice"}</h2>
         <form id="journal-form">
-          <label>
-            Entry type
-            <select name="type">
-              ${ENTRY_TYPES.map((type) => `<option ${editing?.type === type ? "selected" : ""}>${type}</option>`).join("")}
-            </select>
-          </label>
-          <label>
-            Linked precept
-            <select name="preceptId">
-              ${PRECEPTS.map((precept) => `<option value="${precept.id}" ${(editing?.preceptId || selected.id) === precept.id ? "selected" : ""}>Precept ${precept.id}</option>`).join("")}
-            </select>
-          </label>
-          <label>
-            Title
-            <input name="title" value="${escapeHtml(editing?.title || "")}" placeholder="A short name for this signal">
-          </label>
-          <label>
-            Entry
-            <textarea name="body" rows="7" placeholder="What happened, what moved, what returned?">${escapeHtml(editing?.body || "")}</textarea>
-          </label>
+          <input type="hidden" name="id" value="${escapeAttr(editing?.id || "")}">
           <div class="form-grid">
-            <label>Frequency before <input name="before" type="number" min="0" max="100" value="${editing?.before ?? 50}"></label>
-            <label>Frequency after <input name="after" type="number" min="0" max="100" value="${editing?.after ?? 68}"></label>
+            <label>Gate
+              <select name="gateId" data-action="compose-gate">
+                ${GATES.map((item) => option(String(item.id), `Gate ${item.id} · ${item.title}`, String(values.gateId))).join("")}
+              </select>
+            </label>
+            <label>Practice
+              <select name="practiceId" data-action="compose-draft">
+                ${gate.practices.map((item) => option(item.id, item.title, values.practiceId)).join("")}
+              </select>
+            </label>
           </div>
-          <label>
-            Tags
-            <input name="tags" value="${escapeHtml((editing?.tags || []).join(", "))}" placeholder="shadow, relationship, synchronicity">
+          <label>Title
+            <input name="title" value="${escapeAttr(values.title)}" data-action="compose-draft">
           </label>
+          <label>Entry
+            <textarea name="body" data-action="compose-draft" placeholder="${escapeAttr(practice.prompt)}">${escapeHtml(values.body)}</textarea>
+          </label>
+          <div class="prompt-row journal-prompt">
+            <div><strong>Practice</strong><p>${escapeHtml(practice.action)}</p></div>
+            <div><strong>Prompt</strong><p>${escapeHtml(practice.prompt)}</p></div>
+          </div>
+          <div class="form-grid">
+            <label>Type
+              <select name="type" data-action="compose-draft">
+                ${["practice", "dream", "synchronicity", "insight", "shadow", "repair"].map((item) => option(item, capitalize(item), values.type)).join("")}
+              </select>
+            </label>
+            <label>Tags
+              <input name="tags" value="${escapeAttr(values.tags)}" data-action="compose-draft">
+            </label>
+          </div>
+          <div class="form-grid">
+            <label>Before state
+              <input name="before" type="range" min="0" max="100" value="${values.before}" data-action="compose-draft">
+            </label>
+            <label>After state
+              <input name="after" type="range" min="0" max="100" value="${values.after}" data-action="compose-draft">
+            </label>
+          </div>
           <div class="panel-actions">
-            <button class="primary-button" type="submit">${editing ? "Save Entry" : "Create Entry"}</button>
-            ${editing ? `<button class="ghost-button" type="button" data-action="cancel-edit">Cancel</button>` : ""}
+            <button class="primary-button" type="submit" data-action="save-journal">${editing ? "Save Changes" : "Save Memory"}</button>
+            ${editing ? `<button class="ghost-button" type="button" data-action="cancel-edit">Cancel</button>` : `<button class="ghost-button" type="button" data-action="clear-draft">Clear Draft</button>`}
           </div>
         </form>
       </section>
@@ -673,53 +933,328 @@ function renderJournal() {
       <section class="journal-timeline">
         <div class="timeline-head">
           <div>
-            <span class="micro-label">Memory Field</span>
-            <h2>${entries.length} entries</h2>
+            <p class="micro-label">Linked memory</p>
+            <h2>${state.journal.length} saved ${state.journal.length === 1 ? "entry" : "entries"}</h2>
           </div>
           <div class="filter-row">
-            <select data-action="filter-type" aria-label="Filter by entry type">
-              <option>All</option>
-              ${ENTRY_TYPES.map((type) => `<option ${state.filters.type === type ? "selected" : ""}>${type}</option>`).join("")}
+            <select data-action="filter-type">
+              ${option("all", "All types", state.filters.type)}
+              ${["practice", "dream", "synchronicity", "insight", "shadow", "repair"].map((item) => option(item, capitalize(item), state.filters.type)).join("")}
             </select>
-            <select data-action="filter-precept" aria-label="Filter by precept">
-              <option>All</option>
-              ${PRECEPTS.map((precept) => `<option value="${precept.id}" ${state.filters.precept === String(precept.id) ? "selected" : ""}>Precept ${precept.id}</option>`).join("")}
+            <select data-action="filter-gate">
+              ${option("all", "All gates", state.filters.gate)}
+              ${GATES.map((item) => option(String(item.id), `Gate ${item.id}`, state.filters.gate)).join("")}
             </select>
           </div>
         </div>
-        ${entries.length ? entries.map(renderEntry).join("") : renderEmptyJournal()}
+        ${renderPatternSummary()}
+        ${entries.length ? entries.map(renderEntryCard).join("") : renderEmptyState("No memories match this filter.", "Journal a gate or clear the filters to repopulate the field.")}
       </section>
     </div>
   `;
 }
 
-function renderEmptyJournal() {
-  const today = dailyCompass().precept;
+function renderCodex() {
+  const calc = calculateLoop(state.calculatorSeed);
+
   return `
-    <div class="empty-state">
-      <span class="micro-label">Pattern field forming</span>
-      <h3>Begin with today's precept.</h3>
-      <p>${escapeHtml(today.prompt)}</p>
-      <button class="primary-button" type="button" data-action="journal-today">Journal With Precept ${today.id}</button>
+    <div class="codex-stack">
+      <article class="codex-article">
+        <p class="micro-label">Loop calculator</p>
+        <h3>√3 → ∂ → ω → ε∞</h3>
+        <p>The calculator shows the numeric loop used by the instrument. Its role here is symbolic and experiential: it gives the practice a rhythm, not a public scientific proof.</p>
+        <label>Loop seed
+          <input type="number" step="0.000001" min="0.2" max="5" value="${formatNumber(calc.root, 9)}" data-action="calculator-seed">
+        </label>
+        <code>${[
+          `root = ${formatNumber(calc.root, 9)}`,
+          `∂ = 5(root - 1) = ${formatNumber(calc.delta, 9)}`,
+          `ω = ∂² / 10 + 5 = ${formatNumber(calc.omega, 9)}`,
+          `ε∞ = 10 / ω - 1 = ${formatNumber(calc.epsilon, 9)}`,
+          `1 / root = ${formatNumber(calc.reciprocal, 9)}`,
+          `|ε∞ - 1/root| = ${formatNumber(calc.closure, 12)}`,
+          `χ lens = ∂ + ω = ${formatNumber(calc.chi, 9)}`
+        ].map(escapeHtml).join("\n")}</code>
+        <div class="panel-actions">
+          <button class="ghost-button" type="button" data-action="reset-calculator">Reset √3</button>
+        </div>
+      </article>
+
+      <article class="codex-article">
+        <p class="micro-label">Symbol glossary</p>
+        <h3>The four operations</h3>
+        <div class="mini-matrix">
+          ${LOOP_STEPS.map((step) => `<span><strong>${escapeHtml(step.symbol)} · ${escapeHtml(step.name)}</strong>${escapeHtml(step.experience)}</span>`).join("")}
+        </div>
+      </article>
+
+      <article class="codex-article">
+        <p class="micro-label">Seven corridors</p>
+        <h3>Force as experience</h3>
+        <div class="mini-matrix">
+          ${CORRIDORS.map((corridor) => `<span><strong>${escapeHtml(corridor.symbol)} · ${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>`).join("")}
+        </div>
+      </article>
+
+      <article class="codex-article">
+        <p class="micro-label">Five depth states</p>
+        <h3>Geometry as lens</h3>
+        <div class="mini-matrix">
+          ${DEPTHS.map((depth) => `<span><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.primitive)} · ${escapeHtml(depth.mode)}</span>`).join("")}
+        </div>
+      </article>
+    </div>
+
+    <section class="data-table-card mapping-card">
+      <div class="library-head inset">
+        <div>
+          <p class="micro-label">Curated symbolic mapping</p>
+          <h2>Gate matrix</h2>
+          <p>Mappings are intentionally curated for practice coherence. They are not generated by modulo arithmetic or presented as mathematical proof.</p>
+        </div>
+      </div>
+      <div class="data-table mapping-table">
+        <div class="table-head"><strong>Gate</strong><strong>Corridor</strong><strong>Depth</strong><strong>Loop</strong><strong>Reason</strong></div>
+        ${GATES.map((gate) => `
+          <div>
+            <strong>${gate.id}. ${escapeHtml(gate.title)}</strong>
+            <span>${escapeHtml(getCorridor(gate.mapping.corridor).name)}</span>
+            <span>${escapeHtml(getDepth(gate.mapping.depth).name)}</span>
+            <span>${escapeHtml(getStep(gate.mapping.step).symbol)} · ${escapeHtml(getStep(gate.mapping.step).name)}</span>
+            <span>${escapeHtml(gate.mapping.reason)}</span>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderGuide() {
+  const gate = currentGate();
+  const practice = currentPractice(gate);
+  const output = state.guideOutput || generateGuideResponse();
+
+  return `
+    <div class="guide-layout">
+      <section class="journal-composer">
+        <p class="micro-label">Local compass guide</p>
+        <h2>Ask the instrument.</h2>
+        <form id="guide-form">
+          <label>Mode
+            <select name="mode" data-action="guide-mode">
+              ${option("reflect", "Reflect", state.guideMode)}
+              ${option("integrate", "Integrate", state.guideMode)}
+              ${option("practice", "Choose practice", state.guideMode)}
+              ${option("calculate", "Calculate", state.guideMode)}
+              ${option("remember", "Remember", state.guideMode)}
+            </select>
+          </label>
+          <label>Question or situation
+            <textarea name="guideInput" data-action="guide-input" placeholder="Write what you want to bring to Gate ${gate.id}.">${escapeHtml(state.guideInput)}</textarea>
+          </label>
+          <div class="panel-actions">
+            <button class="primary-button" type="submit" data-action="generate-guide">Generate Guidance</button>
+            <button class="ghost-button" type="button" data-action="clear-guide">Clear</button>
+          </div>
+        </form>
+        <p class="privacy-note">This guide is local/static. It does not call a remote AI service, analytics endpoint, or cloud journal.</p>
+      </section>
+
+      <section class="journal-timeline guide-output">
+        <p class="micro-label">Response for Gate ${gate.id}</p>
+        <h2>${escapeHtml(gate.title)}</h2>
+        ${output}
+        <div class="formula-card practice-focus">
+          <p class="micro-label">Next embodied action</p>
+          <h3>${escapeHtml(practice.title)}</h3>
+          <p>${escapeHtml(practice.action)}</p>
+          <code>${escapeHtml(practice.prompt)}</code>
+        </div>
+        <div class="panel-actions">
+          <button class="primary-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal This</button>
+          <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${completionForPractice(practice.id) ? "Mark Open" : "Mark Done"}</button>
+        </div>
+      </section>
     </div>
   `;
 }
 
-function renderEntry(entry) {
-  const precept = PRECEPTS.find((item) => item.id === Number(entry.preceptId));
+function renderExport() {
+  return `
+    <div class="export-layout">
+      <section class="export-card">
+        <p class="micro-label">Private archive</p>
+        <h2>Export</h2>
+        <p>Journal entries, practice completions, and settings live in this browser's local storage unless you export them.</p>
+        <div class="panel-actions vertical">
+          <button class="primary-button full" type="button" data-action="export-json">Download JSON</button>
+          <button class="ghost-button full" type="button" data-action="export-markdown">Download Markdown</button>
+        </div>
+      </section>
+
+      <section class="export-card">
+        <p class="micro-label">Restore</p>
+        <h2>Import</h2>
+        <p>Import replaces the current local archive after confirmation. A local backup is saved first when possible.</p>
+        <label class="file-button">
+          <span class="ghost-button full">Choose JSON Archive</span>
+          <input type="file" accept="application/json,.json" data-action="import-json">
+        </label>
+        <div class="date-setting">
+          <label>Cycle start date
+            <input type="date" value="${escapeAttr(state.settings.startDate)}" data-action="start-date">
+          </label>
+        </div>
+      </section>
+
+      <section class="export-card">
+        <p class="micro-label">Credit and privacy</p>
+        <h2>About</h2>
+        <p>${escapeHtml(ATTRIBUTION)}</p>
+        <p>This V2 uses original Compass Gate language and curated symbolic mappings. It is not affiliated with, endorsed by, or copied from any public site.</p>
+        <div class="stat-strip stacked">
+          <span><strong>${state.journal.length}</strong> local memories</span>
+          <span><strong>${state.completions.length}</strong> completed practices</span>
+          <span><strong>0</strong> network journal calls</span>
+        </div>
+        <div class="panel-actions vertical">
+          <button class="danger-button full" type="button" data-action="clear-completions">Clear Practice Marks</button>
+          <button class="danger-button full" type="button" data-action="clear-all-data">Clear All Local Data</button>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderPracticeCard(practice) {
+  const gate = getGate(practice.gateId);
+  const done = completionForPractice(practice.id);
+  return `
+    <article class="practice-card ${done ? "completed" : ""}">
+      <div class="card-top">
+        <span>Gate ${gate.id} · ${escapeHtml(gate.title)}</span>
+        <span>${done ? "Done" : escapeHtml(practice.duration)}</span>
+      </div>
+      <h3>${escapeHtml(practice.title)}</h3>
+      <p>${escapeHtml(practice.action)}</p>
+      <code>${escapeHtml(practice.prompt)}</code>
+      <div class="theme-row">
+        <span>${escapeHtml(practice.type)}</span>
+        <span>${escapeHtml(getStep(gate.mapping.step).symbol)} · ${escapeHtml(getStep(gate.mapping.step).name)}</span>
+      </div>
+      <div class="card-actions">
+        <button class="ghost-button" type="button" data-action="start-practice" data-practice="${practice.id}">Open</button>
+        <button class="primary-button small" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal</button>
+        <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderLoopLadder(activeStepId) {
+  return `
+    <div class="loop-ladder">
+      ${LOOP_STEPS.map((step, index) => `
+        <div class="loop-step ${step.id === activeStepId ? "active" : ""}">
+          <span>${index + 1}</span>
+          <strong>${escapeHtml(step.symbol)}</strong>
+          <small>${escapeHtml(step.name)} · ${escapeHtml(step.verb)}</small>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderWheel({ compact }) {
+  const daily = dailyCompass().gate;
+  const selected = currentGate();
+  const radiusOuter = compact ? 300 : 330;
+  const radiusInner = compact ? 205 : 224;
+  const cx = 360;
+  const cy = 360;
+  const segmentAngle = 360 / GATES.length;
+
+  const segments = GATES.map((gate, index) => {
+    const start = -90 + index * segmentAngle + 1.2;
+    const end = -90 + (index + 1) * segmentAngle - 1.2;
+    const mid = (start + end) / 2;
+    const textPoint = polar(cx, cy, (radiusInner + radiusOuter) / 2, mid);
+    const entries = journalForGate(gate.id).length;
+    const completed = completionsForGate(gate.id).length;
+    const overlayClass = state.wheelMode === "memory" && entries ? "has-memory" :
+      state.wheelMode === "practice" && completed ? "has-practice" :
+      state.wheelMode === "dimension" ? `depth-${gate.mapping.depth}` : "";
+    return `
+      <g class="wheel-segment ${gate.id === selected.id ? "selected" : ""} ${gate.id === daily.id ? "today" : ""} ${overlayClass}"
+         data-action="select-gate" data-gate="${gate.id}" tabindex="0" role="button" aria-label="Gate ${gate.id}, ${escapeAttr(gate.title)}">
+        <path d="${ringSegment(cx, cy, radiusInner, radiusOuter, start, end)}"></path>
+        <text x="${textPoint.x}" y="${textPoint.y}" text-anchor="middle" dominant-baseline="middle">${gate.id}</text>
+      </g>
+    `;
+  }).join("");
+
+  const marks = CORRIDORS.map((corridor, index) => {
+    const angle = -90 + index * (360 / CORRIDORS.length);
+    const inner = polar(cx, cy, compact ? 160 : 174, angle);
+    const outer = polar(cx, cy, compact ? 186 : 204, angle);
+    const label = polar(cx, cy, compact ? 144 : 154, angle + 3);
+    return `
+      <line class="corridor-mark" x1="${inner.x}" y1="${inner.y}" x2="${outer.x}" y2="${outer.y}"></line>
+      <text class="corridor-label" x="${label.x}" y="${label.y}" text-anchor="middle" dominant-baseline="middle">${index + 1}</text>
+    `;
+  }).join("");
+
+  return `
+    <svg class="harmonic-wheel ${compact ? "compact" : ""}" viewBox="0 0 720 720" role="img" aria-label="Harmonic Compass wheel with 24 original gates">
+      <circle class="wheel-grid" cx="${cx}" cy="${cy}" r="304"></circle>
+      <circle class="wheel-grid inner" cx="${cx}" cy="${cy}" r="234"></circle>
+      <circle class="gold-ring" cx="${cx}" cy="${cy}" r="168"></circle>
+      <ellipse class="orbit orbit-one" cx="${cx}" cy="${cy}" rx="260" ry="76" transform="rotate(-22 ${cx} ${cy})"></ellipse>
+      <ellipse class="orbit orbit-two" cx="${cx}" cy="${cy}" rx="260" ry="76" transform="rotate(44 ${cx} ${cy})"></ellipse>
+      <g>${segments}</g>
+      <g>${marks}</g>
+      <g class="center-seal">
+        <circle cx="${cx}" cy="${cy}" r="92"></circle>
+        <text x="${cx}" y="${cy - 12}" text-anchor="middle">√3 → ∂ → ω → ε∞</text>
+        <text x="${cx}" y="${cy + 28}" text-anchor="middle">LOOP CLOSED</text>
+      </g>
+    </svg>
+  `;
+}
+
+function renderPatternSummary() {
+  const topGate = mostFrequent(state.journal.map((entry) => Number(entry.gateId)).filter(Boolean));
+  const topTags = topItems(state.journal.flatMap((entry) => entry.tags || []), 4);
+  const tagText = topTags.map(escapeHtml).join(", ");
+  return `
+    <div class="pattern-panel">
+      <span><strong>${topGate ? `Gate ${topGate}` : "No dominant gate"}</strong>${topGate ? escapeHtml(getGate(topGate).title) : "Begin journaling to reveal a pattern."}</span>
+      <span><strong>${topTags.length ? tagText : "No recurring tags"}</strong>${topTags.length ? "Recurring language in the memory field." : "Tags will summarize your themes."}</span>
+      <span><strong>${state.completions.length} completions</strong>Practice marks across the compass.</span>
+    </div>
+  `;
+}
+
+function renderEntryCard(entry) {
+  const gate = getGate(entry.gateId);
+  const practice = getPractice(entry.practiceId);
   return `
     <article class="entry-card">
       <div class="entry-head">
         <div>
-          <span class="micro-label">${escapeHtml(entry.type)} · Precept ${entry.preceptId}</span>
-          <h3>${escapeHtml(entry.title || "Untitled signal")}</h3>
+          <h3>${escapeHtml(entry.title || "Untitled memory")}</h3>
+          <div class="entry-meta">
+            <span>Gate ${gate.id} · ${escapeHtml(gate.title)}</span>
+            ${practice ? `<span>${escapeHtml(practice.title)}</span>` : ""}
+            <span>${escapeHtml(entry.type || "entry")}</span>
+          </div>
         </div>
-        <time>${new Date(entry.createdAt).toLocaleDateString()}</time>
+        <time>${formatDate(entry.createdAt)}</time>
       </div>
-      <p>${escapeHtml(entry.body || "")}</p>
-      ${precept ? `<blockquote>${escapeHtml(precept.text)}</blockquote>` : ""}
+      <p>${escapeHtml(entry.body)}</p>
+      <blockquote>${escapeHtml(gate.question)}</blockquote>
       <div class="entry-meta">
-        <span>${entry.before ?? 0} -> ${entry.after ?? 0}</span>
+        <span>state ${entry.before ?? 0} → ${entry.after ?? 0}</span>
         ${(entry.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
       </div>
       <div class="card-actions">
@@ -730,339 +1265,164 @@ function renderEntry(entry) {
   `;
 }
 
+function renderEmptyState(titleText, bodyText) {
+  return `
+    <div class="empty-state">
+      <h3>${escapeHtml(titleText)}</h3>
+      <p>${escapeHtml(bodyText)}</p>
+      <button class="primary-button" type="button" data-action="new-entry">New Entry</button>
+    </div>
+  `;
+}
+
 function filteredEntries() {
-  return state.journal
-    .filter((entry) => state.filters.type === "All" || entry.type === state.filters.type)
-    .filter((entry) => state.filters.precept === "All" || String(entry.preceptId) === state.filters.precept)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-}
-
-function entriesForPrecept(preceptId) {
-  return state.journal.filter((entry) => Number(entry.preceptId) === Number(preceptId));
-}
-
-function renderCodex() {
-  const query = state.search.trim().toLowerCase();
-  const articles = CODEX_ARTICLES.filter((article) => {
-    if (!query) return true;
-    return `${article.title} ${article.body} ${article.formula}`.toLowerCase().includes(query);
-  });
-
-  return `
-    <section class="library-head">
-      <div>
-        <span class="micro-label">Sovereign Avatar · The Universal One</span>
-        <h2>Codex Library</h2>
-        <p>Robert Edward Grant · Codex Universalis Press · 2026. Source language is preserved for private study.</p>
-      </div>
-      <input class="search-input" type="search" value="${escapeHtml(state.search)}" placeholder="Search ∂, ω, χ, shadow, YHWH" data-action="search">
-    </section>
-
-    <div class="codex-stack">
-      ${articles.map((article) => `
-        <article class="codex-article">
-          <span class="micro-label">${escapeHtml(article.id)}</span>
-          <h3>${escapeHtml(article.title)}</h3>
-          <p>${escapeHtml(article.body)}</p>
-          <code>${escapeHtml(article.formula)}</code>
-        </article>
-      `).join("")}
-    </div>
-
-    <section class="codex-tables">
-      ${renderCorridorTable()}
-      ${renderDimensionTable()}
-      ${renderConstantsTable()}
-    </section>
-  `;
-}
-
-function renderCorridorTable() {
-  return `
-    <article class="data-table-card">
-      <h3>Seven Force Corridors</h3>
-      <div class="data-table">
-        ${CORRIDORS.map((item) => `
-          <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.triple)}</span><span>${escapeHtml(item.rapidity)}</span><span>${escapeHtml(item.state)}</span></div>
-        `).join("")}
-      </div>
-    </article>
-  `;
-}
-
-function renderDimensionTable() {
-  return `
-    <article class="data-table-card">
-      <h3>Dimensional States of Consciousness</h3>
-      <div class="data-table dimensions">
-        ${DIMENSIONS.map((item) => `
-          <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.primitive)}</span><span>${escapeHtml(item.mode)}</span><span>${escapeHtml(item.signature)}</span></div>
-        `).join("")}
-      </div>
-    </article>
-  `;
-}
-
-function renderConstantsTable() {
-  return `
-    <article class="data-table-card">
-      <h3>Four Constants as Recursive Grammar</h3>
-      <div class="data-table constants">
-        ${RECURSIVE_STEPS.map((item) => `
-          <div><strong>${escapeHtml(item.symbol)}</strong><span>${escapeHtml(item.value)}</span><span>${escapeHtml(item.operation)}</span><span>${escapeHtml(item.mode)}</span></div>
-        `).join("")}
-      </div>
-    </article>
-  `;
-}
-
-function renderExport() {
-  const settings = loadSettings();
-  return `
-    <div class="export-layout">
-      <section class="export-card">
-        <span class="micro-label">Privacy</span>
-        <h2>Local-first memory.</h2>
-        <p>V1 stores journal entries in this browser. It does not require an account, cloud sync, or AI service. This public route is marked noindex and omitted from the sitemap.</p>
-        <label class="date-setting">
-          Daily cycle start
-          <input type="date" value="${escapeHtml(settings.startDate)}" data-action="start-date">
-        </label>
-      </section>
-      <section class="export-card">
-        <span class="micro-label">Export</span>
-        <h2>Carry the field with you.</h2>
-        <p>Export includes Robert Edward Grant attribution, source-linked precept IDs, and all saved journal entries.</p>
-        <div class="panel-actions">
-          <button class="primary-button" type="button" data-action="export-json">Export JSON</button>
-          <button class="ghost-button" type="button" data-action="export-markdown">Export Markdown</button>
-        </div>
-      </section>
-      <section class="export-card">
-        <span class="micro-label">Import</span>
-        <h2>Restore a JSON archive.</h2>
-        <p>Imports only replace the journal after the file validates as a Harmonic Compass archive or journal entry array.</p>
-        <input type="file" accept="application/json" data-action="import-json">
-      </section>
-    </div>
-  `;
-}
-
-function bindViewEvents() {
-  document.querySelectorAll(".wheel-segment").forEach((segment) => {
-    segment.addEventListener("click", () => {
-      state.selectedPrecept = Number(segment.dataset.precept);
-      render();
-    });
-    segment.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        state.selectedPrecept = Number(segment.dataset.precept);
-        render();
-      }
-    });
-  });
-
-  document.querySelectorAll("[data-action='search']").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const cursor = event.target.selectionStart ?? event.target.value.length;
-      state.search = event.target.value;
-      window.clearTimeout(searchRenderTimer);
-      searchRenderTimer = window.setTimeout(() => {
-        render();
-        requestAnimationFrame(() => {
-          const restoredInput = document.querySelector("[data-action='search']");
-          if (restoredInput) {
-            restoredInput.focus();
-            restoredInput.setSelectionRange(cursor, cursor);
-          }
-        });
-      }, 220);
-    });
-  });
-
-  const form = byId("journal-form");
-  if (form) {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const data = new FormData(form);
-      const entry = {
-        id: state.editingId || `entry-${Date.now()}`,
-        createdAt: state.editingId ? state.journal.find((item) => item.id === state.editingId)?.createdAt || new Date().toISOString() : new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        type: data.get("type"),
-        preceptId: Number(data.get("preceptId")),
-        title: String(data.get("title") || "").trim(),
-        body: String(data.get("body") || "").trim(),
-        before: clamp(Number(data.get("before")), 0, 100),
-        after: clamp(Number(data.get("after")), 0, 100),
-        tags: String(data.get("tags") || "").split(",").map((tag) => tag.trim()).filter(Boolean)
-      };
-
-      if (!entry.body) {
-        toast("Write a few words before saving.");
-        return;
-      }
-
-      const nextJournal = state.editingId
-        ? state.journal.map((item) => item.id === state.editingId ? entry : item)
-        : [entry, ...state.journal];
-
-      if (!persistJournal(nextJournal)) {
-        return;
-      }
-
-      state.journal = nextJournal;
-      state.editingId = null;
-      state.selectedPrecept = entry.preceptId;
-      toast("Memory saved.");
-      render();
-    });
-  }
-
-  document.querySelectorAll("[data-action='filter-type']").forEach((select) => {
-    select.addEventListener("change", (event) => {
-      state.filters.type = event.target.value;
-      render();
-    });
-  });
-
-  document.querySelectorAll("[data-action='filter-precept']").forEach((select) => {
-    select.addEventListener("change", (event) => {
-      state.filters.precept = event.target.value;
-      render();
-    });
+  return state.journal.filter((entry) => {
+    const typeOk = state.filters.type === "all" || entry.type === state.filters.type;
+    const gateOk = state.filters.gate === "all" || Number(entry.gateId) === Number(state.filters.gate);
+    return typeOk && gateOk;
   });
 }
 
-function clamp(value, min, max) {
-  if (Number.isNaN(value)) return min;
-  return Math.min(max, Math.max(min, value));
+function generateGuideResponse() {
+  const gate = currentGate();
+  const practice = currentPractice(gate);
+  const step = getStep(gate.mapping.step);
+  const recent = state.journal.slice(0, 3);
+  const userLine = state.guideInput.trim() ? `<p><strong>Your signal:</strong> ${escapeHtml(state.guideInput.trim())}</p>` : "";
+
+  if (state.guideMode === "calculate") {
+    const calc = calculateLoop(state.calculatorSeed);
+    return `
+      ${userLine}
+      <p>The active gate sits in the ${escapeHtml(step.symbol)} · ${escapeHtml(step.name)} operation. Use the number as a rhythm: start at ${formatNumber(calc.root, 6)}, differentiate to ${formatNumber(calc.delta, 6)}, observe ${formatNumber(calc.omega, 6)}, then return through ${formatNumber(calc.epsilon, 6)}.</p>
+      <p>The practical question is simple: where does ${escapeHtml(step.verb)} become the next honest move?</p>
+    `;
+  }
+
+  if (state.guideMode === "remember") {
+    return `
+      ${userLine}
+      <p>Your memory field currently holds ${state.journal.length} ${state.journal.length === 1 ? "entry" : "entries"} and ${state.completions.length} completed practice ${state.completions.length === 1 ? "mark" : "marks"}.</p>
+      <p>${recent.length ? `Recent signals: ${recent.map((entry) => escapeHtml(entry.title || getGate(entry.gateId).title)).join(", ")}.` : "The field is open. Save one memory to begin seeing recurrence."}</p>
+      <p>Return to Gate ${gate.id}: ${escapeHtml(gate.question)}</p>
+    `;
+  }
+
+  if (state.guideMode === "practice") {
+    return `
+      ${userLine}
+      <p>Choose the body of the work, not just the idea. The cleanest next practice is <strong>${escapeHtml(practice.title)}</strong>: ${escapeHtml(practice.action)}</p>
+      <p>Complete it once, then journal what actually happened rather than what should have happened.</p>
+    `;
+  }
+
+  if (state.guideMode === "integrate") {
+    return `
+      ${userLine}
+      <p>Integration means the shadow pattern gets a job instead of an exile. For Gate ${gate.id}, watch for: ${escapeHtml(gate.shadow)}</p>
+      <p>Bring it through the loop: ${escapeHtml(step.symbol)} asks you to ${escapeHtml(step.verb)}. Then close the loop with one saved memory.</p>
+    `;
+  }
+
+  return `
+    ${userLine}
+    <p>Gate ${gate.id}, <strong>${escapeHtml(gate.title)}</strong>, points to this: ${escapeHtml(gate.essence)}</p>
+    <p>The reflection question is: ${escapeHtml(gate.question)}</p>
+    <p>The symbolic map is ${escapeHtml(getCorridor(gate.mapping.corridor).name)} · ${escapeHtml(getDepth(gate.mapping.depth).name)} · ${escapeHtml(step.symbol)} ${escapeHtml(step.name)}. ${escapeHtml(gate.mapping.reason)}</p>
+  `;
 }
-
-document.addEventListener("click", (event) => {
-  const target = event.target.closest("[data-view], [data-action]");
-  if (!target) return;
-
-  if (target.dataset.view) {
-    setView(target.dataset.view);
-    return;
-  }
-
-  const action = target.dataset.action;
-  if (action === "open-today") setView("today");
-  if (action === "new-entry") {
-    state.editingId = null;
-    setView("journal");
-  }
-  if (action === "open-wheel") setView("wheel");
-  if (action === "journal-today") {
-    state.selectedPrecept = dailyCompass().precept.id;
-    state.editingId = null;
-    setView("journal");
-  }
-  if (action === "journal-selected") {
-    state.editingId = null;
-    setView("journal");
-  }
-  if (action === "journal-precept") {
-    state.selectedPrecept = Number(target.dataset.precept);
-    state.editingId = null;
-    setView("journal");
-  }
-  if (action === "select-precept") {
-    state.selectedPrecept = Number(target.dataset.precept);
-    setView("today");
-  }
-  if (action === "spin-wheel") {
-    state.selectedPrecept = Math.floor(Math.random() * 24) + 1;
-    render();
-  }
-  if (action === "cancel-edit") {
-    state.editingId = null;
-    render();
-  }
-  if (action === "edit-entry") {
-    state.editingId = target.dataset.entry;
-    render();
-  }
-  if (action === "delete-entry") {
-    const entryId = target.dataset.entry;
-    const entry = state.journal.find((item) => item.id === entryId);
-    if (entry && window.confirm(`Delete "${entry.title || "Untitled signal"}"?`)) {
-      const nextJournal = state.journal.filter((item) => item.id !== entryId);
-      if (!persistJournal(nextJournal)) {
-        return;
-      }
-      state.journal = nextJournal;
-      toast("Memory deleted.");
-      render();
-    }
-  }
-  if (action === "export-json") exportJson();
-  if (action === "export-markdown") exportMarkdown();
-});
-
-document.addEventListener("change", (event) => {
-  const target = event.target.closest("[data-action]");
-  if (!target) return;
-
-  if (target.dataset.action === "start-date") {
-    if (saveSettings({ startDate: target.value || "2026-05-23" })) {
-      toast("Cycle start updated.");
-      render();
-    }
-  }
-
-  if (target.dataset.action === "import-json") {
-    importJson(target.files?.[0]);
-    target.value = "";
-  }
-});
 
 function archivePayload() {
   return {
     app: "Harmonic Compass",
-    version: 1,
-    attribution: "Primary source framework credited to Robert Edward Grant and Codex Universalis Press, 2026.",
+    version: 2,
+    attribution: ATTRIBUTION,
     exportedAt: new Date().toISOString(),
-    journal: state.journal
+    settings: state.settings,
+    journal: state.journal,
+    completions: state.completions
   };
 }
 
 function exportJson() {
-  downloadFile("harmonic-compass-journal.json", JSON.stringify(archivePayload(), null, 2), "application/json");
+  downloadFile("harmonic-compass-archive.json", JSON.stringify(archivePayload(), null, 2), "application/json");
 }
 
 function exportMarkdown() {
   const lines = [
-    "# Harmonic Compass Journal",
+    "# Harmonic Compass Archive",
     "",
-    "Primary source framework credited to Robert Edward Grant and Codex Universalis Press, 2026.",
+    ATTRIBUTION,
+    "",
+    "This archive contains original Compass Gate journal entries and practice marks from local browser storage.",
     "",
     `Exported: ${new Date().toLocaleString()}`,
+    "",
+    "## Practice Completions",
+    "",
+    ...state.completions.map((item) => {
+      const practice = getPractice(item.practiceId);
+      const gate = getGate(item.gateId);
+      return `- ${formatDate(item.completedAt)} · Gate ${gate.id} ${gate.title} · ${practice?.title || item.practiceId}`;
+    }),
+    "",
+    "## Journal",
     ""
   ];
 
   state.journal.forEach((entry) => {
-    const precept = PRECEPTS.find((item) => item.id === Number(entry.preceptId));
-    lines.push(`## ${entry.title || "Untitled signal"}`);
+    const gate = getGate(entry.gateId);
+    const practice = getPractice(entry.practiceId);
+    lines.push(`### ${entry.title || "Untitled memory"}`);
+    lines.push(`- Date: ${formatDate(entry.createdAt)}`);
+    lines.push(`- Gate: ${gate.id} · ${gate.title}`);
+    if (practice) lines.push(`- Practice: ${practice.title}`);
+    lines.push(`- Type: ${entry.type}`);
+    lines.push(`- State: ${entry.before ?? 0} -> ${entry.after ?? 0}`);
+    if (entry.tags?.length) lines.push(`- Tags: ${entry.tags.join(", ")}`);
     lines.push("");
-    lines.push(`Type: ${entry.type}`);
-    lines.push(`Precept: ${entry.preceptId}`);
-    lines.push(`Date: ${new Date(entry.createdAt).toLocaleString()}`);
-    lines.push(`State: ${entry.before ?? 0} -> ${entry.after ?? 0}`);
-    if (entry.tags?.length) lines.push(`Tags: ${entry.tags.join(", ")}`);
-    lines.push("");
-    if (precept) {
-      lines.push(`> ${precept.text}`);
-      lines.push("");
-    }
     lines.push(entry.body || "");
     lines.push("");
   });
 
-  downloadFile("harmonic-compass-journal.md", lines.join("\n"), "text/markdown");
+  downloadFile("harmonic-compass-archive.md", lines.join("\n"), "text/markdown");
+}
+
+function importJson(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const payload = JSON.parse(String(reader.result));
+      const journal = Array.isArray(payload) ? payload : payload.journal || [];
+      const completions = Array.isArray(payload.completions) ? payload.completions : [];
+      const settings = payload.settings && typeof payload.settings === "object" ? payload.settings : state.settings;
+      if (!Array.isArray(journal)) throw new Error("No journal array found");
+      const valid = journal.every((entry) => entry && entry.id && entry.createdAt && entry.body !== undefined);
+      if (!valid) throw new Error("Archive contains invalid entries");
+
+      if (state.journal.length || state.completions.length) {
+        const confirmed = window.confirm("Importing this archive replaces the current local Harmonic Compass data. A local backup will be attempted first. Continue?");
+        if (!confirmed) {
+          toast("Import cancelled.");
+          return;
+        }
+        safeSetItem(BACKUP_KEY, JSON.stringify({ createdAt: new Date().toISOString(), payload: archivePayload() }));
+      }
+
+      persistJournal(journal);
+      persistCompletions(completions);
+      saveSettings(settings);
+      state.journal = journal;
+      state.completions = completions;
+      state.settings = { ...state.settings, ...settings };
+      toast("Archive imported.");
+      setView("journal");
+    } catch (error) {
+      toast(`Import failed: ${error.message}`);
+    }
+  };
+  reader.readAsText(file);
 }
 
 function downloadFile(filename, content, type) {
@@ -1077,38 +1437,379 @@ function downloadFile(filename, content, type) {
   URL.revokeObjectURL(url);
 }
 
-function importJson(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const payload = JSON.parse(String(reader.result));
-      const entries = Array.isArray(payload) ? payload : payload.journal;
-      if (!Array.isArray(entries)) throw new Error("No journal array found");
-      const valid = entries.every((entry) => entry && entry.id && entry.createdAt && entry.body !== undefined);
-      if (!valid) throw new Error("Archive contains invalid entries");
+function markPractice(practiceId) {
+  const practice = getPractice(practiceId);
+  if (!practice) return;
+  const existing = completionForPractice(practice.id);
+  const next = existing
+    ? state.completions.filter((item) => item.practiceId !== practice.id)
+    : [{ id: createId(), practiceId: practice.id, gateId: practice.gateId, completedAt: new Date().toISOString() }, ...state.completions];
+  if (persistCompletions(next)) {
+    state.completions = next;
+    toast(existing ? "Practice reopened." : "Practice marked complete.");
+    render();
+  }
+}
 
-      if (state.journal.length) {
-        const confirmed = window.confirm(`Importing this archive will replace ${state.journal.length} existing journal ${state.journal.length === 1 ? "entry" : "entries"}. Export first if you need a separate backup. Continue?`);
-        if (!confirmed) {
-          toast("Import cancelled.");
-          return;
-        }
-        safeSetItem(BACKUP_KEY, JSON.stringify({ createdAt: new Date().toISOString(), journal: state.journal }));
-      }
+function preparePracticeJournal(practiceId) {
+  const practice = getPractice(practiceId);
+  if (!practice) return;
+  const gate = getGate(practice.gateId);
+  state.selectedGateId = gate.id;
+  state.selectedPracticeId = practice.id;
+  state.editingId = null;
+  saveDraft({
+    gateId: gate.id,
+    practiceId: practice.id,
+    type: "practice",
+    title: `${gate.title} · ${practice.title}`,
+    tags: `${practice.type.toLowerCase()}, ${gate.themes.slice(0, 2).join(", ")}`,
+    body: `Practice: ${practice.action}\n\nPrompt: ${practice.prompt}\n\nWhat happened:\n`
+  });
+  setView("journal");
+}
 
-      if (!persistJournal(entries)) {
-        return;
-      }
-
-      state.journal = entries;
-      toast("Journal archive imported.");
-      setView("journal");
-    } catch (error) {
-      toast(`Import failed: ${error.message}`);
-    }
+function saveJournalFromForm(form) {
+  const data = new FormData(form);
+  const id = String(data.get("id") || "").trim();
+  const gateId = Number(data.get("gateId")) || dailyCompass().gate.id;
+  const practiceId = String(data.get("practiceId") || "");
+  const entry = {
+    id: id || createId(),
+    createdAt: id ? state.journal.find((item) => item.id === id)?.createdAt || new Date().toISOString() : new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    gateId,
+    practiceId,
+    type: String(data.get("type") || "practice"),
+    title: String(data.get("title") || "").trim(),
+    body: String(data.get("body") || "").trim(),
+    before: clamp(Number(data.get("before")), 0, 100),
+    after: clamp(Number(data.get("after")), 0, 100),
+    tags: String(data.get("tags") || "").split(",").map((tag) => tag.trim()).filter(Boolean)
   };
-  reader.readAsText(file);
+
+  if (!entry.body) {
+    toast("Write a few words before saving.");
+    return;
+  }
+
+  const nextJournal = id
+    ? state.journal.map((item) => item.id === id ? entry : item)
+    : [entry, ...state.journal];
+
+  if (persistJournal(nextJournal)) {
+    state.journal = nextJournal;
+    state.editingId = null;
+    state.selectedGateId = gateId;
+    state.selectedPracticeId = practiceId || getGate(gateId).practices[0].id;
+    clearDraft();
+    toast("Memory saved.");
+    render();
+  }
+}
+
+function updateDraftFromForm(form) {
+  if (state.editingId) return;
+  const data = new FormData(form);
+  saveDraft({
+    gateId: Number(data.get("gateId")) || state.selectedGateId,
+    practiceId: String(data.get("practiceId") || ""),
+    type: String(data.get("type") || "practice"),
+    title: String(data.get("title") || ""),
+    body: String(data.get("body") || ""),
+    before: Number(data.get("before")) || 0,
+    after: Number(data.get("after")) || 0,
+    tags: String(data.get("tags") || "")
+  });
+}
+
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-view], [data-action]");
+  if (!target) return;
+
+  if (target.dataset.view) {
+    setView(target.dataset.view);
+    return;
+  }
+
+  const action = target.dataset.action;
+  if (action === "save-journal") {
+    event.preventDefault();
+    const form = target.closest("#journal-form");
+    if (form) saveJournalFromForm(form);
+    return;
+  }
+  if (action === "generate-guide") {
+    event.preventDefault();
+    const form = target.closest("#guide-form");
+    if (form) {
+      const data = new FormData(form);
+      state.guideMode = String(data.get("mode") || "reflect");
+      state.guideInput = String(data.get("guideInput") || "");
+      state.guideOutput = generateGuideResponse();
+      render();
+    }
+    return;
+  }
+  if (action === "open-today") setView("today");
+  if (action === "new-entry") {
+    state.editingId = null;
+    setView("journal");
+  }
+  if (action === "open-wheel") setView("wheel");
+  if (action === "select-gate") {
+    const gate = getGate(target.dataset.gate);
+    state.selectedGateId = gate.id;
+    state.selectedPracticeId = gate.practices[0].id;
+    render();
+  }
+  if (action === "choose-practice" || action === "start-practice") {
+    const practice = getPractice(target.dataset.practice);
+    if (practice) {
+      state.selectedGateId = practice.gateId;
+      state.selectedPracticeId = practice.id;
+      setView(action === "start-practice" ? "today" : state.view);
+    }
+  }
+  if (action === "journal-practice") preparePracticeJournal(target.dataset.practice);
+  if (action === "journal-gate") {
+    const gate = getGate(target.dataset.gate);
+    state.selectedGateId = gate.id;
+    state.selectedPracticeId = gate.practices[0].id;
+    preparePracticeJournal(gate.practices[0].id);
+  }
+  if (action === "toggle-practice") markPractice(target.dataset.practice);
+  if (action === "spin-wheel") {
+    const gate = GATES[Math.floor(Math.random() * GATES.length)];
+    state.selectedGateId = gate.id;
+    state.selectedPracticeId = gate.practices[0].id;
+    render();
+  }
+  if (action === "set-wheel-mode") {
+    state.wheelMode = target.dataset.mode || "today";
+    render();
+  }
+  if (action === "cancel-edit") {
+    state.editingId = null;
+    render();
+  }
+  if (action === "clear-draft") {
+    clearDraft();
+    render();
+  }
+  if (action === "edit-entry") {
+    state.editingId = target.dataset.entry;
+    render();
+  }
+  if (action === "delete-entry") {
+    const entry = state.journal.find((item) => item.id === target.dataset.entry);
+    if (entry && window.confirm(`Delete "${entry.title || "Untitled memory"}"?`)) {
+      const next = state.journal.filter((item) => item.id !== entry.id);
+      if (persistJournal(next)) {
+        state.journal = next;
+        toast("Memory deleted.");
+        render();
+      }
+    }
+  }
+  if (action === "reset-calculator") {
+    state.calculatorSeed = ROOT_SEED;
+    render();
+  }
+  if (action === "clear-guide") {
+    state.guideInput = "";
+    state.guideOutput = "";
+    render();
+  }
+  if (action === "export-json") exportJson();
+  if (action === "export-markdown") exportMarkdown();
+  if (action === "clear-completions" && window.confirm("Clear all practice completion marks?")) {
+    if (persistCompletions([])) {
+      state.completions = [];
+      toast("Practice marks cleared.");
+      render();
+    }
+  }
+  if (action === "clear-all-data" && window.confirm("Clear all local Harmonic Compass data in this browser? Export first if needed.")) {
+    safeSetItem(BACKUP_KEY, JSON.stringify({ createdAt: new Date().toISOString(), payload: archivePayload() }));
+    [STORAGE_KEY, COMPLETIONS_KEY, SETTINGS_KEY, DRAFT_KEY].forEach(safeRemoveItem);
+    state.journal = [];
+    state.completions = [];
+    state.settings = loadSettings();
+    clearDraft();
+    toast("Local data cleared.");
+    render();
+  }
+});
+
+document.addEventListener("submit", (event) => {
+  if (event.target.id === "journal-form") {
+    event.preventDefault();
+    saveJournalFromForm(event.target);
+  }
+  if (event.target.id === "guide-form") {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    state.guideMode = String(data.get("mode") || "reflect");
+    state.guideInput = String(data.get("guideInput") || "");
+    state.guideOutput = generateGuideResponse();
+    render();
+  }
+});
+
+document.addEventListener("input", (event) => {
+  const target = event.target.closest("[data-action]");
+  if (!target) return;
+  if (target.dataset.action === "search-gates") {
+    state.search = target.value;
+    render();
+  }
+  if (target.dataset.action === "search-practices") {
+    state.practiceSearch = target.value;
+    render();
+  }
+  if (target.dataset.action === "compose-draft") {
+    const form = target.closest("#journal-form");
+    if (form) updateDraftFromForm(form);
+  }
+  if (target.dataset.action === "guide-input") {
+    state.guideInput = target.value;
+  }
+});
+
+document.addEventListener("change", (event) => {
+  const target = event.target.closest("[data-action]");
+  if (!target) return;
+  if (target.dataset.action === "filter-type") {
+    state.filters.type = target.value;
+    render();
+  }
+  if (target.dataset.action === "filter-gate") {
+    state.filters.gate = target.value;
+    render();
+  }
+  if (target.dataset.action === "filter-practice") {
+    state.filters.practice = target.value;
+    render();
+  }
+  if (target.dataset.action === "compose-gate") {
+    const gate = getGate(target.value);
+    state.selectedGateId = gate.id;
+    state.selectedPracticeId = gate.practices[0].id;
+    const form = target.closest("#journal-form");
+    if (form) updateDraftFromForm(form);
+    render();
+  }
+  if (target.dataset.action === "compose-draft") {
+    const form = target.closest("#journal-form");
+    if (form) updateDraftFromForm(form);
+  }
+  if (target.dataset.action === "guide-mode") {
+    state.guideMode = target.value;
+    state.guideOutput = "";
+    render();
+  }
+  if (target.dataset.action === "calculator-seed") {
+    state.calculatorSeed = Number(target.value) || ROOT_SEED;
+    render();
+  }
+  if (target.dataset.action === "start-date") {
+    if (saveSettings({ startDate: target.value || DEFAULT_START_DATE })) {
+      toast("Cycle start updated.");
+      render();
+    }
+  }
+  if (target.dataset.action === "import-json") {
+    importJson(target.files?.[0]);
+    target.value = "";
+  }
+});
+
+function ringSegment(cx, cy, innerRadius, outerRadius, startAngle, endAngle) {
+  const outerStart = polar(cx, cy, outerRadius, startAngle);
+  const outerEnd = polar(cx, cy, outerRadius, endAngle);
+  const innerEnd = polar(cx, cy, innerRadius, endAngle);
+  const innerStart = polar(cx, cy, innerRadius, startAngle);
+  const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+  return [
+    `M ${outerStart.x} ${outerStart.y}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${outerEnd.x} ${outerEnd.y}`,
+    `L ${innerEnd.x} ${innerEnd.y}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${innerStart.x} ${innerStart.y}`,
+    "Z"
+  ].join(" ");
+}
+
+function polar(cx, cy, radius, angle) {
+  const radians = (Math.PI / 180) * angle;
+  return {
+    x: Number((cx + radius * Math.cos(radians)).toFixed(3)),
+    y: Number((cy + radius * Math.sin(radians)).toFixed(3))
+  };
+}
+
+function option(value, label, selected) {
+  return `<option value="${escapeAttr(value)}" ${String(value) === String(selected) ? "selected" : ""}>${escapeHtml(label)}</option>`;
+}
+
+function topItems(items, limit) {
+  const counts = new Map();
+  items.filter(Boolean).forEach((item) => counts.set(item, (counts.get(item) || 0) + 1));
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([item]) => item);
+}
+
+function mostFrequent(items) {
+  return topItems(items, 1)[0] || null;
+}
+
+function formatDate(dateString) {
+  try {
+    return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(new Date(dateString));
+  } catch (error) {
+    return dateString || "";
+  }
+}
+
+function formatNumber(value, digits = 6) {
+  return Number(value).toFixed(digits).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function capitalize(value) {
+  return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+}
+
+function clamp(value, min, max) {
+  if (Number.isNaN(value)) return min;
+  return Math.min(max, Math.max(min, value));
+}
+
+function createId() {
+  return window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value);
+}
+
+let toastTimer = null;
+function toast(message) {
+  toastNode.textContent = message;
+  toastNode.classList.add("visible");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastNode.classList.remove("visible"), 2600);
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
 }
 
 render();
