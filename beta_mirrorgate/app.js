@@ -1131,10 +1131,16 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     return state.audio;
   }
 
-  function resumeAudioContext(ctx) {
-    if (!ctx || ctx.state !== "suspended") return Promise.resolve();
-    const resumed = ctx.resume();
-    return resumed && typeof resumed.then === "function" ? resumed : Promise.resolve();
+  function requestAudioResume(ctx, retryMessage) {
+    if (!ctx || ctx.state !== "suspended") return;
+    try {
+      const resumed = ctx.resume();
+      if (resumed && typeof resumed.catch === "function") {
+        resumed.catch(() => showStatus(retryMessage, "success"));
+      }
+    } catch {
+      showStatus(retryMessage, "success");
+    }
   }
 
   function stopActiveAudio() {
@@ -1192,72 +1198,64 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const ctx = ensureAudio();
     stopTone();
     const requestId = state.toneRequestId;
-    const startTone = () => {
-      if (state.toneRequestId !== requestId) return;
-      const isContinuous = !Number.isFinite(seconds);
-      const toneSeconds = isContinuous ? 24 : Math.max(0.4, seconds);
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.0001, ctx.currentTime);
-      master.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.12);
-      if (!isContinuous) {
-        master.gain.setValueAtTime(0.16, ctx.currentTime + Math.max(0.18, toneSeconds - 0.18));
-        master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + toneSeconds);
+    requestAudioResume(ctx, "Tap the tone button once more to start audio.");
+    if (state.toneRequestId !== requestId) return;
+    const isContinuous = !Number.isFinite(seconds);
+    const toneSeconds = isContinuous ? 24 : Math.max(0.4, seconds);
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, ctx.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.12);
+    if (!isContinuous) {
+      master.gain.setValueAtTime(0.16, ctx.currentTime + Math.max(0.18, toneSeconds - 0.18));
+      master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + toneSeconds);
+    }
+    master.connect(ctx.destination);
+
+    const freqs = mode === "soundscape"
+      ? [frequency, frequency * 1.5, frequency * 2.01].filter((value) => value < 1200)
+      : [frequency];
+
+    state.toneOscillators = freqs.map((freq, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      osc.type = index === 0 ? "sine" : "triangle";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      if (mode === "pulse") {
+        osc.frequency.linearRampToValueAtTime(freq * 1.01, ctx.currentTime + toneSeconds / 2);
+        osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + toneSeconds);
       }
-      master.connect(ctx.destination);
+      gain.gain.value = index === 0 ? 0.75 : 0.18;
+      filter.type = "lowpass";
+      filter.frequency.value = 1400;
+      osc.connect(gain);
+      gain.connect(filter);
+      filter.connect(master);
+      osc.start();
+      if (!isContinuous) osc.stop(ctx.currentTime + toneSeconds + 0.02);
+      return { osc, gain: master };
+    });
 
-      const freqs = mode === "soundscape"
-        ? [frequency, frequency * 1.5, frequency * 2.01].filter((value) => value < 1200)
-        : [frequency];
-
-      state.toneOscillators = freqs.map((freq, index) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const filter = ctx.createBiquadFilter();
-        osc.type = index === 0 ? "sine" : "triangle";
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        if (mode === "pulse") {
-          osc.frequency.linearRampToValueAtTime(freq * 1.01, ctx.currentTime + toneSeconds / 2);
-          osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + toneSeconds);
-        }
-        gain.gain.value = index === 0 ? 0.75 : 0.18;
-        filter.type = "lowpass";
-        filter.frequency.value = 1400;
-        osc.connect(gain);
-        gain.connect(filter);
-        filter.connect(master);
-        osc.start();
-        if (!isContinuous) osc.stop(ctx.currentTime + toneSeconds + 0.02);
-        return { osc, gain: master };
-      });
-
-      if (!isContinuous) state.toneStopTimer = window.setTimeout(stopTone, (toneSeconds + 0.08) * 1000);
-    };
-
-    resumeAudioContext(ctx)
-      .then(startTone)
-      .catch(() => showStatus("Tap the tone button once more to start audio.", "success"));
+    if (!isContinuous) state.toneStopTimer = window.setTimeout(stopTone, (toneSeconds + 0.08) * 1000);
   }
 
   function playTonePing(frequency = state.draft.tone || 144, seconds = 0.42) {
     const ctx = ensureAudio();
     const requestId = state.toneRequestId;
-    resumeAudioContext(ctx)
-      .then(() => {
-        if (state.toneRequestId !== requestId) return;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const duration = Math.max(0.18, seconds);
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(frequency, ctx.currentTime);
-        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration + 0.03);
-      })
-      .catch(() => showStatus("Tap the node once more to start audio.", "success"));
+    requestAudioResume(ctx, "Tap the node once more to start audio.");
+    if (state.toneRequestId !== requestId) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const duration = Math.max(0.18, seconds);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration + 0.03);
   }
 
   function seedFromText(text) {
