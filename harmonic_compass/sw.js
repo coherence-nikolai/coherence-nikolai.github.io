@@ -1,9 +1,9 @@
-const CACHE_NAME = "harmonic-compass-v10";
+const CACHE_NAME = "harmonic-compass-v11";
 const APP_SHELL = [
   "/harmonic_compass/",
   "/harmonic_compass/index.html",
-  "/harmonic_compass/styles.css?v=10",
-  "/harmonic_compass/app.js?v=10",
+  "/harmonic_compass/styles.css?v=11",
+  "/harmonic_compass/app.js?v=11",
   "/harmonic_compass/manifest.webmanifest",
   "/assets/favicon.svg"
 ];

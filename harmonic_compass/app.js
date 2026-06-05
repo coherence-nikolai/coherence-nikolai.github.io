@@ -628,6 +628,12 @@ function renderToday() {
   const depth = getDepth(gate.mapping.depth);
   const complete = completionForPractice(practice.id);
   const gateEntries = journalForGate(gate.id);
+  const ritualCopy = {
+    seed: "Set your intention",
+    expansion: "Take one clean action",
+    reflection: "Reflect and integrate",
+    return: "Rest and renew"
+  };
 
   return `
     <div class="observatory-today">
@@ -642,7 +648,7 @@ function renderToday() {
               <span class="ritual-orb">${index + 1}</span>
               <span>
                 <strong>${escapeHtml(item.name)}</strong>
-                <small>${escapeHtml(item.prompt)}</small>
+                <small>${escapeHtml(ritualCopy[item.id] || item.prompt)}</small>
               </span>
             </div>
           `).join("")}
