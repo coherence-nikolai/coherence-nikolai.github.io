@@ -171,6 +171,24 @@ function setTheme(state) {
   root.style.setProperty("--state-color-faint", `${state.color}18`);
 }
 
+function clamp(value, minimum, maximum) {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function normalise(value, minimum, maximum) {
+  return clamp((value - minimum) / (maximum - minimum), 0, 1);
+}
+
+function updateWaveVisualControls() {
+  const amplitudeLevel = normalise(Number(amplitude.value || 36), 12, 72);
+  const brightnessLevel = normalise(Number(brightness.value || 44), 0, 100);
+  const strokeWidth = 6.2 + amplitudeLevel * 8.8;
+  const glowSize = 12 + brightnessLevel * 22;
+
+  root.style.setProperty("--wave-stroke", strokeWidth.toFixed(2));
+  root.style.setProperty("--wave-glow", `${glowSize.toFixed(1)}px`);
+}
+
 function renderCopy() {
   document.documentElement.lang = lang;
   main.dataset.lang = lang;
@@ -252,6 +270,7 @@ function updateSelectedState() {
   amplitudeOutput.textContent = amplitude.value;
   brightnessOutput.textContent = brightness.value;
   setTheme(activeState);
+  updateWaveVisualControls();
 }
 
 function ensureAudio() {
@@ -283,14 +302,16 @@ function shimmerFrequency() {
 function makeWavePath(width, height, timestamp, options = {}) {
   const pointCount = options.points || 10;
   const padding = options.padding || 8;
-  const cycles = options.cycles || 1.36;
-  const phase = timestamp * (options.speed || 0.0007);
-  const amplitudeBoost = isPlaying ? 1.18 : 1;
-  const amplitudeValue = Number(brightness.value || 44);
+  const amplitudeLevel = normalise(Number(amplitude.value || 36), 12, 72);
+  const brightnessLevel = normalise(Number(brightness.value || 44), 0, 100);
+  const cycles = (options.cycles || 1.26) + brightnessLevel * (options.cycleRange || 0.36);
+  const phase = timestamp * ((options.speed || 0.00056) + brightnessLevel * (options.speedRange || 0.00042));
+  const amplitudeBoost = isPlaying ? 1.16 : 1;
   const amplitudeBase = options.amplitude || 34;
-  const amplitudeRange = options.range || 0.26;
-  const amplitudeWave = (amplitudeBase + amplitudeValue * amplitudeRange) * amplitudeBoost;
-  const centerY = height * (options.center || 0.52) + Math.sin(timestamp * 0.00032) * 4;
+  const amplitudeRange = options.range || 38;
+  const amplitudeWave = (amplitudeBase + amplitudeLevel * amplitudeRange) * amplitudeBoost;
+  const rippleMix = (options.ripple || 0.07) + brightnessLevel * (options.rippleRange || 0.18);
+  const centerY = height * (options.center || 0.52) + Math.sin(timestamp * 0.00032) * (2 + amplitudeLevel * 4);
   const points = [];
 
   for (let index = 0; index < pointCount; index += 1) {
@@ -299,7 +320,7 @@ function makeWavePath(width, height, timestamp, options = {}) {
     const y =
       centerY +
       Math.sin(progress * Math.PI * 2 * cycles + phase) * amplitudeWave +
-      Math.sin(progress * Math.PI * 4 * cycles + phase * 0.58) * amplitudeWave * 0.14;
+      Math.sin(progress * Math.PI * 4 * cycles + phase * 0.58) * amplitudeWave * rippleMix;
     points.push([x, y]);
   }
 
@@ -323,10 +344,14 @@ function animateWave(timestamp) {
   if (!reduceMotion) {
     if (webWavePath) {
       webWavePath.setAttribute("d", makeWavePath(520, 220, timestamp, {
-        amplitude: 34,
-        range: 0.22,
-        cycles: 1.42,
-        speed: isPlaying ? 0.00125 : 0.00048,
+        amplitude: 22,
+        range: 54,
+        cycles: 1.12,
+        cycleRange: 0.50,
+        speed: isPlaying ? 0.00082 : 0.00038,
+        speedRange: isPlaying ? 0.00070 : 0.00038,
+        ripple: 0.05,
+        rippleRange: 0.20,
         points: 11,
         center: 0.53
       }));
@@ -335,9 +360,13 @@ function animateWave(timestamp) {
     if (miniWavePath) {
       miniWavePath.setAttribute("d", makeWavePath(420, 160, timestamp + 900, {
         amplitude: 20,
-        range: 0.12,
-        cycles: 1.36,
-        speed: 0.00042,
+        range: 28,
+        cycles: 1.16,
+        cycleRange: 0.28,
+        speed: 0.00032,
+        speedRange: 0.00022,
+        ripple: 0.04,
+        rippleRange: 0.12,
         points: 9,
         center: 0.54
       }));
