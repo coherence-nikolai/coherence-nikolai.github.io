@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Harmonic Compass - Private Codex Instrument</title>
+  <meta name="description" content="A private harmonic compass for working with Robert Edward Grant's 24 Precepts, recursive loop, codex library, and journal memory field.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#050913">
+  <link rel="canonical" href="https://coherence-nikolai.app/harmonic_compass/">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="stellar-field" aria-hidden="true"></div>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Harmonic Compass navigation">
+      <a class="brand" href="/harmonic_compass/" aria-label="Harmonic Compass home">
+        <span class="brand-mark">HC</span>
+        <span>
+          <strong>Harmonic</strong>
+          <small>Compass</small>
+        </span>
+      </a>
+
+      <nav class="nav-list" aria-label="Primary">
+        <button class="nav-item active" type="button" data-view="today">Today</button>
+        <button class="nav-item" type="button" data-view="wheel">Wheel</button>
+        <button class="nav-item" type="button" data-view="precepts">Precepts</button>
+        <button class="nav-item" type="button" data-view="journal">Journal</button>
+        <button class="nav-item" type="button" data-view="codex">Codex</button>
+        <button class="nav-item" type="button" data-view="export">Export</button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <span>Robert Edward Grant</span>
+        <span>Codex Universalis Press</span>
+        <span>Private study instrument</span>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="source-line">Robert Edward Grant · Codex Universalis Press · private study instrument</p>
+          <h1 id="view-title">Harmonic Compass</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="ghost-button" type="button" data-action="open-today">Today</button>
+          <button class="primary-button" type="button" data-action="new-entry">New Entry</button>
+        </div>
+      </header>
+
+      <section id="app-root" class="view-root" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
