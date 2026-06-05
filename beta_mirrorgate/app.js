@@ -507,7 +507,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     still: "Still seal",
     pulse: "Pulsing breath anchor",
     orbit: "Orbiting gate mark",
-    spiral: "Spiral recursion"
+    spiral: "Spinning spiral seal"
   };
 
   const glyphEmotionalTones = {
@@ -4035,6 +4035,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const motion = profile.animationStyle || "pulse";
     const pulse = motion === "pulse" ? 1 + Math.sin(t * (1.3 + emotionalBias)) * (0.018 + intensity * 0.035) : 1;
     const orbit = motion === "orbit" ? t * (0.16 + emotionalBias * 0.08) : 0;
+    const spin = motion === "spiral" ? t * (0.18 + emotionalBias * 0.08) : 0;
     const spiralPhase = motion === "spiral" ? t * (0.55 + emotionalBias * 0.42) : t * 0.18;
     const outerRadius = base * (0.62 + profile.spiralStrength * 0.12);
     const innerRadius = outerRadius * (0.44 + Math.min(0.18, profile.spiralStrength * 0.18));
@@ -4059,6 +4060,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
 
     ctx.save();
     ctx.scale(pulse, pulse);
+    ctx.rotate(spin);
     ctx.shadowColor = colors.primary;
     ctx.shadowBlur = motion === "still" ? 8 + intensity * 8 : 14 + intensity * 18;
 
