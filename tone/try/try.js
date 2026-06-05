@@ -128,6 +128,9 @@ const amplitudeOutput = document.getElementById("amplitude-output");
 const brightnessOutput = document.getElementById("brightness-output");
 const playButton = document.getElementById("play-button");
 const saveButton = document.getElementById("save-button");
+const webWavePath = document.querySelector(".web-wave path");
+const miniWavePath = document.querySelector(".mini-wave path");
+const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 let lang = "en";
 let activeState = states.find((state) => state.id === "clarity") || states[0];
@@ -136,6 +139,7 @@ let masterGain = null;
 let oscillator = null;
 let shimmer = null;
 let isPlaying = false;
+let reduceMotion = motionQuery.matches;
 
 function t(key) {
   return copy[lang][key] || copy.en[key] || key;
@@ -276,6 +280,73 @@ function shimmerFrequency() {
   return activeState.frequency * Math.pow(2, cents / 1200);
 }
 
+function makeWavePath(width, height, timestamp, options = {}) {
+  const pointCount = options.points || 10;
+  const padding = options.padding || 8;
+  const cycles = options.cycles || 1.36;
+  const phase = timestamp * (options.speed || 0.0007);
+  const amplitudeBoost = isPlaying ? 1.18 : 1;
+  const amplitudeValue = Number(brightness.value || 44);
+  const amplitudeBase = options.amplitude || 34;
+  const amplitudeRange = options.range || 0.26;
+  const amplitudeWave = (amplitudeBase + amplitudeValue * amplitudeRange) * amplitudeBoost;
+  const centerY = height * (options.center || 0.52) + Math.sin(timestamp * 0.00032) * 4;
+  const points = [];
+
+  for (let index = 0; index < pointCount; index += 1) {
+    const progress = index / (pointCount - 1);
+    const x = padding + progress * (width - padding * 2);
+    const y =
+      centerY +
+      Math.sin(progress * Math.PI * 2 * cycles + phase) * amplitudeWave +
+      Math.sin(progress * Math.PI * 4 * cycles + phase * 0.58) * amplitudeWave * 0.14;
+    points.push([x, y]);
+  }
+
+  let path = `M ${points[0][0].toFixed(1)} ${points[0][1].toFixed(1)}`;
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const p0 = points[Math.max(0, index - 1)];
+    const p1 = points[index];
+    const p2 = points[index + 1];
+    const p3 = points[Math.min(points.length - 1, index + 2)];
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    path += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+
+  return path;
+}
+
+function animateWave(timestamp) {
+  if (!reduceMotion) {
+    if (webWavePath) {
+      webWavePath.setAttribute("d", makeWavePath(520, 220, timestamp, {
+        amplitude: 34,
+        range: 0.22,
+        cycles: 1.42,
+        speed: isPlaying ? 0.00125 : 0.00048,
+        points: 11,
+        center: 0.53
+      }));
+    }
+
+    if (miniWavePath) {
+      miniWavePath.setAttribute("d", makeWavePath(420, 160, timestamp + 900, {
+        amplitude: 20,
+        range: 0.12,
+        cycles: 1.36,
+        speed: 0.00042,
+        points: 9,
+        center: 0.54
+      }));
+    }
+  }
+
+  window.requestAnimationFrame(animateWave);
+}
+
 function startTone() {
   ensureAudio().then(() => {
     if (isPlaying) {
@@ -296,6 +367,7 @@ function startTone() {
     shimmer.start();
 
     isPlaying = true;
+    root.classList.add("is-sounding");
     renderCopy();
     toneStatus.textContent = t("statusPlaying");
 
@@ -329,6 +401,7 @@ function stopTone() {
   oscillator = null;
   shimmer = null;
   isPlaying = false;
+  root.classList.remove("is-sounding");
   renderCopy();
   toneStatus.textContent = t("statusStopped");
 }
@@ -382,8 +455,18 @@ saveButton.addEventListener("click", saveCurrentTone);
 amplitude.addEventListener("input", updateAudioTone);
 brightness.addEventListener("input", updateAudioTone);
 window.addEventListener("pagehide", stopTone);
+if (motionQuery.addEventListener) {
+  motionQuery.addEventListener("change", (event) => {
+    reduceMotion = event.matches;
+  });
+} else if (motionQuery.addListener) {
+  motionQuery.addListener((event) => {
+    reduceMotion = event.matches;
+  });
+}
 
 renderCopy();
 updateSelectedState();
 renderStates();
 renderSaved();
+window.requestAnimationFrame(animateWave);
