@@ -205,15 +205,27 @@ textarea:focus-visible,
   text-transform: uppercase;
 }
 
+.private-compass-label {
+  margin: 34px 0 0 66px;
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
 .nav-list {
   display: grid;
   gap: 7px;
-  margin-top: 42px;
+  margin-top: 34px;
 }
 
 .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  min-height: 44px;
+  min-height: 54px;
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 0 14px;
@@ -221,6 +233,33 @@ textarea:focus-visible,
   background: transparent;
   text-align: left;
   transition: border-color 180ms ease, background 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.nav-glyph {
+  position: relative;
+  flex: 0 0 auto;
+  width: 23px;
+  height: 23px;
+  border: 1px solid rgba(251, 243, 230, 0.44);
+  border-radius: 50%;
+  opacity: 0.72;
+}
+
+.nav-glyph::before,
+.nav-glyph::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.54;
+}
+
+.nav-glyph::after {
+  inset: 10px 3px;
+  border-width: 1px 0;
+  border-radius: 0;
+  transform: rotate(-28deg);
 }
 
 .nav-item:hover,
@@ -237,6 +276,14 @@ textarea:focus-visible,
   box-shadow:
     inset 2px 0 0 rgba(247, 213, 142, 0.72),
     0 0 26px rgba(118, 214, 255, 0.08);
+}
+
+.nav-item.active .nav-glyph,
+.nav-item:hover .nav-glyph {
+  border-color: rgba(247, 213, 142, 0.78);
+  color: var(--gold-soft);
+  opacity: 1;
+  box-shadow: 0 0 20px rgba(247, 213, 142, 0.18);
 }
 
 .sidebar-foot {
@@ -292,7 +339,7 @@ textarea:focus-visible,
 }
 
 .topbar h1 {
-  font-size: clamp(2.4rem, 5vw, 5.6rem);
+  font-size: clamp(2rem, 3.2vw, 3.4rem);
   text-shadow:
     0 0 28px rgba(118, 214, 255, 0.20),
     0 12px 34px rgba(0, 0, 0, 0.28);
@@ -370,6 +417,399 @@ textarea:focus-visible,
   grid-template-columns: minmax(350px, 0.9fr) minmax(410px, 1fr) minmax(270px, 0.6fr);
   gap: clamp(16px, 1.5vw, 24px);
   align-items: stretch;
+}
+
+.observatory-today {
+  display: grid;
+  grid-template-columns: minmax(620px, 1fr) minmax(330px, 370px);
+  grid-template-areas:
+    "ritual chamber"
+    "wheel chamber"
+    "cards chamber";
+  gap: clamp(18px, 1.6vw, 26px);
+  align-items: stretch;
+}
+
+.ritual-band {
+  grid-area: ritual;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(190px, 0.22fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-height: 112px;
+  border: 1px solid rgba(247, 213, 142, 0.24);
+  border-radius: 8px;
+  padding: 18px 22px;
+  background:
+    linear-gradient(112deg, rgba(247, 213, 142, 0.08), rgba(118, 214, 255, 0.07) 52%, rgba(245, 168, 199, 0.06)),
+    rgba(5, 12, 24, 0.66);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px) saturate(1.22);
+}
+
+.ritual-band::before {
+  content: "";
+  position: absolute;
+  inset: -30% -8%;
+  pointer-events: none;
+  background:
+    linear-gradient(102deg, transparent 30%, rgba(118, 214, 255, 0.18), transparent 66%),
+    radial-gradient(ellipse at 84% 22%, rgba(247, 213, 142, 0.18), transparent 32%);
+  filter: blur(22px);
+  opacity: 0.72;
+}
+
+.ritual-band > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ritual-band h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--display);
+  font-size: clamp(1.3rem, 2vw, 2rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.ritual-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ritual-step {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 68px;
+  color: var(--muted);
+}
+
+.ritual-orb {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(220, 235, 255, 0.22);
+  border-radius: 50%;
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  box-shadow: inset 0 0 18px rgba(118, 214, 255, 0.08);
+}
+
+.ritual-step strong,
+.ritual-step small {
+  display: block;
+}
+
+.ritual-step strong {
+  color: var(--text);
+  font-family: var(--display);
+  font-size: 1.18rem;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.ritual-step small {
+  margin-top: 3px;
+  font-size: 0.74rem;
+  line-height: 1.25;
+}
+
+.ritual-step.active .ritual-orb {
+  border-color: rgba(247, 213, 142, 0.84);
+  color: var(--gold-soft);
+  background: rgba(247, 213, 142, 0.12);
+  box-shadow:
+    0 0 30px rgba(247, 213, 142, 0.18),
+    inset 0 0 24px rgba(247, 213, 142, 0.10);
+}
+
+.cosmic-wheel-panel,
+.gate-chamber,
+.observatory-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(10, 20, 38, 0.82), rgba(3, 8, 18, 0.66)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.065), transparent 42%);
+  box-shadow:
+    0 28px 90px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px) saturate(1.22);
+}
+
+.cosmic-wheel-panel {
+  grid-area: wheel;
+  display: grid;
+  place-items: center;
+  min-height: clamp(590px, 57vw, 760px);
+  isolation: isolate;
+}
+
+.cosmic-wheel-panel::before,
+.cosmic-wheel-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.cosmic-wheel-panel::before {
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(247, 213, 142, 0.16), transparent 16%),
+    radial-gradient(circle at 50% 50%, rgba(118, 214, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 16% 32%, rgba(251, 243, 230, 0.58) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 78% 18%, rgba(247, 213, 142, 0.55) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 88% 68%, rgba(118, 214, 255, 0.44) 0 1px, transparent 1.5px);
+  background-size: auto, auto, 190px 190px, 260px 260px, 330px 330px;
+}
+
+.cosmic-wheel-panel::after {
+  inset: 8% -12%;
+  z-index: 0;
+  background:
+    linear-gradient(110deg, transparent 22%, rgba(118, 214, 255, 0.28) 42%, rgba(140, 239, 216, 0.18) 50%, transparent 68%),
+    linear-gradient(66deg, transparent 26%, rgba(245, 168, 199, 0.16) 46%, rgba(247, 213, 142, 0.13) 60%, transparent 78%);
+  filter: blur(18px);
+  opacity: 0.92;
+  transform: rotate(-7deg);
+}
+
+.wheel-constellation {
+  position: absolute;
+  inset: 11%;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(247, 213, 142, 0.16);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 46px rgba(118, 214, 255, 0.018),
+    0 0 0 96px rgba(247, 213, 142, 0.012),
+    inset 0 0 90px rgba(118, 214, 255, 0.08);
+}
+
+.cosmic-wheel-panel .harmonic-wheel {
+  width: min(92%, 790px);
+}
+
+.gate-chamber {
+  grid-area: chamber;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: clamp(20px, 2.4vw, 28px);
+}
+
+.gate-chamber::before,
+.observatory-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(118, 214, 255, 0.09), transparent 38%),
+    linear-gradient(292deg, rgba(247, 213, 142, 0.08), transparent 48%);
+}
+
+.gate-chamber > *,
+.observatory-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.chamber-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+.gate-chamber h2,
+.gate-chamber h3 {
+  margin: 0;
+}
+
+.gate-chamber h2 {
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.gate-chamber h3 {
+  color: var(--text);
+  font-family: var(--display);
+  font-size: clamp(2rem, 3vw, 3.15rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.gate-chamber > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.gate-tags,
+.chamber-map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gate-tags span,
+.chamber-map span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border: 1px solid rgba(118, 214, 255, 0.22);
+  border-radius: 999px;
+  padding: 0 11px;
+  color: rgba(251, 243, 230, 0.76);
+  background: rgba(118, 214, 255, 0.055);
+  font-size: 0.72rem;
+}
+
+.practice-orbit-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(247, 213, 142, 0.24);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 18% 50%, rgba(118, 214, 255, 0.14), transparent 22%),
+    linear-gradient(145deg, rgba(247, 213, 142, 0.08), rgba(2, 5, 12, 0.20));
+}
+
+.practice-orbit-card h3 {
+  font-size: 1.45rem;
+}
+
+.practice-orbit-card span {
+  color: var(--faint);
+  font-size: 0.78rem;
+}
+
+.practice-orbit-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.58;
+}
+
+.reflection-prompt {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.reflection-prompt blockquote {
+  margin: 0;
+  border-left: 1px solid rgba(247, 213, 142, 0.40);
+  padding-left: 14px;
+  color: rgba(251, 243, 230, 0.78);
+  font-family: var(--body);
+  font-size: 0.98rem;
+  line-height: 1.58;
+}
+
+.privacy-row {
+  margin: 0;
+  border-top: 1px solid rgba(220, 235, 255, 0.10);
+  padding-top: 12px;
+  color: var(--faint);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.observatory-card-grid {
+  grid-area: cards;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 1.4vw, 18px);
+}
+
+.observatory-card {
+  display: grid;
+  grid-template-rows: 110px auto auto 1fr auto;
+  gap: 12px;
+  min-height: 275px;
+  padding: 18px;
+}
+
+.observatory-card h3 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--display);
+  font-size: 1.45rem;
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.observatory-card p:not(.micro-label) {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.card-visual {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 66%, rgba(247, 213, 142, 0.34), transparent 18%),
+    radial-gradient(circle at 50% 50%, rgba(118, 214, 255, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(4, 11, 22, 0.20), rgba(2, 5, 12, 0.72));
+  box-shadow: inset 0 0 60px rgba(118, 214, 255, 0.08);
+}
+
+.card-visual::before,
+.card-visual::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.card-visual::before {
+  inset: 24px 38%;
+  border: 1px solid rgba(247, 213, 142, 0.48);
+  border-radius: 50%;
+  box-shadow: 0 0 28px rgba(247, 213, 142, 0.22);
+}
+
+.card-visual::after {
+  inset: 48% 12%;
+  border-top: 1px solid rgba(118, 214, 255, 0.34);
+  transform: rotate(-12deg);
+}
+
+.rhythm-visual {
+  background:
+    radial-gradient(circle at 50% 72%, rgba(140, 239, 216, 0.35), transparent 14%),
+    radial-gradient(ellipse at 50% 70%, rgba(118, 214, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(4, 11, 22, 0.20), rgba(2, 5, 12, 0.72));
+}
+
+.journal-visual {
+  background:
+    radial-gradient(ellipse at 50% 76%, rgba(247, 213, 142, 0.30), transparent 18%),
+    radial-gradient(ellipse at 50% 55%, rgba(245, 168, 199, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(4, 11, 22, 0.20), rgba(2, 5, 12, 0.72));
 }
 
 .hero-panel,
@@ -640,6 +1080,32 @@ blockquote {
   fill: var(--gold);
   font-size: 10px;
   letter-spacing: 0.22em;
+}
+
+.center-seal .center-label {
+  fill: var(--gold-soft);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+}
+
+.center-seal .center-number {
+  fill: var(--gold-soft);
+  font-family: var(--display);
+  font-size: 58px;
+  letter-spacing: 0;
+}
+
+.center-seal .center-title {
+  fill: var(--text);
+  font-family: var(--display);
+  font-size: 17px;
+  letter-spacing: 0;
+}
+
+.center-seal .center-subtitle {
+  fill: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.04em;
 }
 
 .state-panel {
@@ -1162,6 +1628,18 @@ textarea {
   .wheel-stage {
     min-height: 660px;
   }
+
+  .observatory-today {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 350px);
+  }
+
+  .ritual-band {
+    grid-template-columns: 1fr;
+  }
+
+  .cosmic-wheel-panel {
+    min-height: clamp(560px, 54vw, 700px);
+  }
 }
 
 @media (max-width: 1180px) {
@@ -1180,6 +1658,19 @@ textarea {
   .selection-panel,
   .export-card:last-child {
     grid-column: 1 / -1;
+  }
+
+  .observatory-today {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "ritual"
+      "wheel"
+      "chamber"
+      "cards";
+  }
+
+  .gate-chamber {
+    min-height: auto;
   }
 
   .precept-grid,
@@ -1211,6 +1702,7 @@ textarea {
   }
 
   .brand,
+  .private-compass-label,
   .sidebar-foot {
     display: none;
   }
@@ -1257,6 +1749,7 @@ textarea {
   }
 
   .today-grid,
+  .observatory-card-grid,
   .journal-layout,
   .wheel-layout,
   .export-layout,
@@ -1266,6 +1759,18 @@ textarea {
   .codex-stack,
   .harmonic-strip {
     grid-template-columns: 1fr;
+  }
+
+  .ritual-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .ritual-step {
+    min-height: auto;
+  }
+
+  .cosmic-wheel-panel {
+    min-height: 540px;
   }
 
   .state-panel,
@@ -1317,6 +1822,10 @@ textarea {
     width: min(100%, 520px);
   }
 
+  .cosmic-wheel-panel .harmonic-wheel {
+    width: min(100%, 600px);
+  }
+
   .center-seal text {
     font-size: 11px;
   }
@@ -1333,7 +1842,7 @@ textarea {
   }
 
   .topbar h1 {
-    font-size: 2.65rem;
+    font-size: 2.35rem;
   }
 
   .primary-button,
@@ -1346,6 +1855,24 @@ textarea {
 
   .nav-item {
     font-size: 0.6rem;
+  }
+
+  .nav-glyph {
+    display: none;
+  }
+
+  .ritual-band,
+  .gate-chamber,
+  .observatory-card {
+    padding: 16px;
+  }
+
+  .cosmic-wheel-panel {
+    min-height: 420px;
+  }
+
+  .center-seal .center-number {
+    font-size: 50px;
   }
 
   .hero-panel,

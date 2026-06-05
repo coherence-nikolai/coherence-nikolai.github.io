@@ -409,7 +409,7 @@ const GATES = [
 
 const ALL_PRACTICES = GATES.flatMap((gate) => gate.practices);
 const VIEW_TITLES = {
-  today: "Today",
+  today: "Good evening, Seeker.",
   wheel: "Wheel",
   gates: "Gates",
   practices: "Practices",
@@ -630,80 +630,92 @@ function renderToday() {
   const gateEntries = journalForGate(gate.id);
 
   return `
-    <div class="today-grid">
-      <section class="hero-panel">
-        <div class="panel-top">
+    <div class="observatory-today">
+      <section class="ritual-band">
+        <div>
+          <p class="micro-label">Today's rhythm</p>
+          <h2>Seed → Motion → Mirror → Return</h2>
+        </div>
+        <div class="ritual-flow">
+          ${RHYTHM_STEPS.map((item, index) => `
+            <div class="ritual-step ${item.id === gate.mapping.step ? "active" : ""}">
+              <span class="ritual-orb">${index + 1}</span>
+              <span>
+                <strong>${escapeHtml(item.name)}</strong>
+                <small>${escapeHtml(item.prompt)}</small>
+              </span>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="cosmic-wheel-panel">
+        <div class="wheel-constellation" aria-hidden="true"></div>
+        ${renderWheel({ compact: false })}
+      </section>
+
+      <aside class="gate-chamber">
+        <div class="chamber-top">
           <p class="micro-label">${daily.gate.id === gate.id ? "Daily gate" : "Selected gate"}</p>
           <span>Cycle day ${daily.day + 1}</span>
         </div>
-        <div class="precept-hero">
-          <span class="precept-number">Gate ${gate.id}</span>
-          <h2 class="gate-title">${escapeHtml(gate.title)}</h2>
-          <blockquote>${escapeHtml(gate.essence)}</blockquote>
+        <h2>Gate ${String(gate.id).padStart(2, "0")}</h2>
+        <h3>${escapeHtml(gate.title)}</h3>
+        <div class="gate-tags">
+          ${gate.themes.slice(0, 3).map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
         </div>
-        <div class="harmonic-strip">
+        <p>${escapeHtml(gate.essence)}</p>
+
+        <div class="chamber-map">
           <span>${escapeHtml(corridor.name)}</span>
           <span>${escapeHtml(depth.name)}</span>
           <span>${escapeHtml(step.name)}</span>
         </div>
-        <div class="prompt-row">
-          <div>
-            <strong>Shadow pattern</strong>
-            <p>${escapeHtml(gate.shadow)}</p>
-          </div>
-          <div>
-            <strong>Integration question</strong>
-            <p>${escapeHtml(gate.question)}</p>
-          </div>
-        </div>
-        ${renderRhythmLadder(gate.mapping.step)}
-      </section>
 
-      <section class="wheel-panel compact-wheel">
-        ${renderWheel({ compact: true })}
-      </section>
-
-      <aside class="state-panel">
-        <div class="stat-strip">
-          <span><strong>${gateEntries.length}</strong> memories</span>
-          <span><strong>${completionsForGate(gate.id).length}</strong> practices</span>
-          <span><strong>${escapeHtml(step.name)}</strong> rhythm</span>
-        </div>
-        <div class="practice-switcher">
-          <p class="micro-label">Practice lens</p>
-          ${gate.practices.map((item) => `
-            <button class="practice-choice ${item.id === practice.id ? "selected" : ""}" type="button" data-action="choose-practice" data-practice="${item.id}">
-              <span>${escapeHtml(item.title)}</span>
-              <small>${escapeHtml(item.duration)} · ${escapeHtml(item.type)}</small>
-            </button>
-          `).join("")}
-        </div>
-        <div class="focus-card practice-focus">
-          <p class="micro-label">${complete ? "Completed" : "Active practice"}</p>
+        <div class="practice-orbit-card">
+          <p class="micro-label">${complete ? "Completed practice" : "Today's practice"}</p>
           <h3>${escapeHtml(practice.title)}</h3>
+          <span>${escapeHtml(practice.duration)} · ${escapeHtml(practice.type)}</span>
           <p>${escapeHtml(practice.action)}</p>
-          <code>${escapeHtml(practice.prompt)}</code>
         </div>
-        <div class="panel-actions">
-          <button class="primary-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal Practice</button>
-          <button class="ghost-button full" type="button" data-action="toggle-practice" data-practice="${practice.id}">${complete ? "Mark Open" : "Mark Done"}</button>
-          <button class="ghost-button full" type="button" data-action="open-wheel">Open Wheel</button>
-        </div>
-      </aside>
-    </div>
 
-    <section class="detail-band">
-      <div>
-        <p class="micro-label">Compass rhythm</p>
-        <h2>Seed → Motion → Mirror → Return.</h2>
-        <p>Every session moves through the same quiet rhythm: name the signal, take one concrete action, notice what the action reflects, then save what wants to be carried forward.</p>
+        <div class="reflection-prompt">
+          <p class="micro-label">Reflection prompt</p>
+          <blockquote>${escapeHtml(practice.prompt)}</blockquote>
+        </div>
+
+        <div class="panel-actions">
+          <button class="primary-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Open Journal</button>
+          <button class="ghost-button full" type="button" data-action="toggle-practice" data-practice="${practice.id}">${complete ? "Mark Open" : "Mark Done"}</button>
+        </div>
+
+        <p class="privacy-row">${gateEntries.length} memories · ${completionsForGate(gate.id).length} completed practices · stored locally</p>
+      </aside>
+
+      <div class="observatory-card-grid">
+        <article class="observatory-card">
+          <div class="card-visual intention-visual" aria-hidden="true"></div>
+          <p class="micro-label">Daily intention</p>
+          <h3>${escapeHtml(gate.question)}</h3>
+          <p>Choose one clean sentence to carry through the day.</p>
+          <button class="ghost-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Set Intention</button>
+        </article>
+        <article class="observatory-card">
+          <div class="card-visual rhythm-visual" aria-hidden="true"></div>
+          <p class="micro-label">Rhythm support</p>
+          <h3>${escapeHtml(step.name)} · ${escapeHtml(capitalize(step.verb))}</h3>
+          <p>${escapeHtml(step.prompt)}</p>
+          <button class="ghost-button" type="button" data-action="open-wheel">Open Wheel</button>
+        </article>
+        <article class="observatory-card">
+          <div class="card-visual journal-visual" aria-hidden="true"></div>
+          <p class="micro-label">Journaling</p>
+          <h3>${gateEntries.length ? `${gateEntries.length} memories saved` : "Begin the memory field"}</h3>
+          <p>Capture insights, patterns, and moments of connection.</p>
+          <button class="ghost-button" type="button" data-action="new-entry">Continue Journal</button>
+        </article>
       </div>
-      <div class="mini-matrix">
-        <span><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>
-        <span><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</span>
-        <span><strong>${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</span>
-      </div>
-    </section>
+    </div>
   `;
 }
 
@@ -1176,9 +1188,10 @@ function renderWheel({ compact }) {
       <g>${marks}</g>
       <g class="center-seal">
         <circle cx="${cx}" cy="${cy}" r="92"></circle>
-        <text x="${cx}" y="${cy - 20}" text-anchor="middle">SEED → MOTION</text>
-        <text x="${cx}" y="${cy + 8}" text-anchor="middle">MIRROR → RETURN</text>
-        <text x="${cx}" y="${cy + 40}" text-anchor="middle">COMPASS RHYTHM</text>
+        <text class="center-label" x="${cx}" y="${cy - 42}" text-anchor="middle">ACTIVE GATE</text>
+        <text class="center-number" x="${cx}" y="${cy + 6}" text-anchor="middle">${String(selected.id).padStart(2, "0")}</text>
+        <text class="center-title" x="${cx}" y="${cy + 36}" text-anchor="middle">${escapeHtml(selected.title)}</text>
+        <text class="center-subtitle" x="${cx}" y="${cy + 58}" text-anchor="middle">${escapeHtml(selected.themes.slice(0, 3).join(" · "))}</text>
       </g>
     </svg>
   `;
