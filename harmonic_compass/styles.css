@@ -553,7 +553,7 @@ textarea:focus-visible,
   grid-area: wheel;
   display: grid;
   place-items: center;
-  min-height: clamp(500px, 45vw, 640px);
+  min-height: clamp(460px, 39vw, 540px);
   isolation: isolate;
 }
 
@@ -600,7 +600,7 @@ textarea:focus-visible,
 }
 
 .cosmic-wheel-panel .harmonic-wheel {
-  width: min(86%, 650px);
+  width: min(78%, 540px);
 }
 
 .gate-chamber {
@@ -1638,7 +1638,7 @@ textarea {
   }
 
   .cosmic-wheel-panel {
-    min-height: clamp(500px, 45vw, 640px);
+    min-height: clamp(460px, 39vw, 540px);
   }
 }
 
@@ -1770,7 +1770,7 @@ textarea {
   }
 
   .cosmic-wheel-panel {
-    min-height: 430px;
+    min-height: 410px;
   }
 
   .state-panel,
@@ -1823,7 +1823,7 @@ textarea {
   }
 
   .cosmic-wheel-panel .harmonic-wheel {
-    width: min(100%, 520px);
+    width: min(94%, 480px);
   }
 
   .center-seal text {
@@ -1868,7 +1868,7 @@ textarea {
   }
 
   .cosmic-wheel-panel {
-    min-height: 350px;
+    min-height: 330px;
   }
 
   .center-seal .center-number {
