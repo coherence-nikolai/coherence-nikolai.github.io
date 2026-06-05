@@ -1,9 +1,9 @@
-const CACHE_NAME = "harmonic-compass-v12";
+const CACHE_NAME = "harmonic-compass-v16";
 const APP_SHELL = [
   "/harmonic_compass/",
   "/harmonic_compass/index.html",
-  "/harmonic_compass/styles.css?v=12",
-  "/harmonic_compass/app.js?v=12",
+  "/harmonic_compass/styles.css?v=16",
+  "/harmonic_compass/app.js?v=16",
   "/harmonic_compass/manifest.webmanifest",
   "/assets/favicon.svg"
 ];
@@ -24,6 +24,17 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== location.origin || !url.pathname.startsWith("/harmonic_compass/")) {
+    return;
+  }
+
+  if (event.request.mode === "navigate" || url.pathname.endsWith("/index.html")) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(() => caches.match(event.request).then((cached) => cached || caches.match("/harmonic_compass/index.html")))
+    );
     return;
   }
 

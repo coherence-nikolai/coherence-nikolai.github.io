@@ -412,7 +412,9 @@ const VIEW_TITLES = {
   today: "Good evening, Seeker.",
   wheel: "Wheel",
   gates: "Gates",
+  gateDetail: "Gate Detail",
   practices: "Practices",
+  practiceSession: "Practice Session",
   journal: "Journal",
   codex: "Method",
   guide: "Guide",
@@ -591,25 +593,42 @@ function journalForGate(gateId) {
   return state.journal.filter((entry) => Number(entry.gateId) === Number(gateId));
 }
 
+function resetScrollPosition() {
+  const reset = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+  reset();
+  window.requestAnimationFrame(reset);
+  window.setTimeout(reset, 0);
+  window.setTimeout(reset, 80);
+}
+
 function setView(view) {
   state.view = view === "precepts" ? "gates" : view === "avatar" ? "guide" : view;
+  resetScrollPosition();
   render();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  resetScrollPosition();
 }
 
 function render() {
   const normalized = state.view === "precepts" ? "gates" : state.view;
   state.view = VIEW_TITLES[normalized] ? normalized : "today";
-  title.textContent = VIEW_TITLES[state.view];
+  const gate = currentGate();
+  title.textContent = state.view === "gateDetail" ? `Gate ${String(gate.id).padStart(2, "0")}` : VIEW_TITLES[state.view];
+  const activeNav = state.view === "gateDetail" ? "gates" : state.view === "practiceSession" ? "practices" : state.view;
   document.querySelectorAll(".nav-item").forEach((button) => {
-    button.classList.toggle("active", button.dataset.view === state.view);
+    button.classList.toggle("active", button.dataset.view === activeNav);
   });
 
   const views = {
     today: renderToday,
     wheel: renderWheelView,
     gates: renderGates,
+    gateDetail: renderGateDetail,
     practices: renderPractices,
+    practiceSession: renderPracticeSession,
     journal: renderJournal,
     codex: renderMethod,
     guide: renderGuide,
@@ -691,7 +710,9 @@ function renderToday() {
         </div>
 
         <div class="panel-actions">
-          <button class="primary-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Open Journal</button>
+          <button class="primary-button full" type="button" data-action="start-practice" data-practice="${practice.id}">Start Practice</button>
+          <button class="ghost-button full" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate</button>
+          <button class="ghost-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Open Journal</button>
           <button class="ghost-button full" type="button" data-action="toggle-practice" data-practice="${practice.id}">${complete ? "Mark Open" : "Mark Done"}</button>
         </div>
 
@@ -769,7 +790,11 @@ function renderWheelView() {
           <h3>${escapeHtml(practice.title)}</h3>
           <p>${escapeHtml(practice.action)}</p>
         </div>
-        <button class="primary-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal Gate ${gate.id}</button>
+        <div class="panel-actions vertical">
+          <button class="primary-button full" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate ${gate.id}</button>
+          <button class="ghost-button full" type="button" data-action="start-practice" data-practice="${practice.id}">Start Practice</button>
+          <button class="ghost-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal Gate ${gate.id}</button>
+        </div>
       </aside>
     </div>
   `;
@@ -787,7 +812,7 @@ function renderGates() {
       <div>
         <p class="micro-label">Paraphrased original model</p>
         <h2>The Compass Gates</h2>
-        <p>Each gate is written in Harmonic Compass's own voice: a state, a shadow pattern, a pattern mapping, and three concrete practices.</p>
+        <p>Each gate is written in Harmonic Compass's own voice: a state, a shadow signal, a guidance shape, and three concrete practices.</p>
       </div>
       <input class="search-input" type="search" placeholder="Search gates" value="${escapeAttr(state.search)}" data-action="search-gates">
     </section>
@@ -809,12 +834,92 @@ function renderGates() {
               ${gate.themes.map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
             </div>
             <div class="card-actions">
-              <button class="ghost-button" type="button" data-action="select-gate" data-gate="${gate.id}">Open</button>
+              <button class="ghost-button" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate</button>
               <button class="primary-button small" type="button" data-action="journal-gate" data-gate="${gate.id}">Journal</button>
             </div>
           </article>
         `;
       }).join("")}
+    </div>
+  `;
+}
+
+function renderGateDetail() {
+  const gate = currentGate();
+  const practice = currentPractice(gate);
+  const corridor = getCorridor(gate.mapping.corridor);
+  const depth = getDepth(gate.mapping.depth);
+  const step = getStep(gate.mapping.step);
+  const entries = journalForGate(gate.id);
+  const completed = completionsForGate(gate.id);
+
+  return `
+    <div class="gate-detail-layout">
+      <section class="gate-detail-hero">
+        <div class="detail-action-row">
+          <button class="ghost-button" type="button" data-action="back-to-gates">All Gates</button>
+          <button class="ghost-button" type="button" data-action="open-wheel">Wheel</button>
+        </div>
+        <p class="micro-label">Gate ${String(gate.id).padStart(2, "0")} · ${escapeHtml(corridor.name)}</p>
+        <h2>${escapeHtml(gate.title)}</h2>
+        <p class="detail-essence">${escapeHtml(gate.essence)}</p>
+        <div class="gate-tags detail-tags">
+          ${gate.themes.map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
+        </div>
+
+        <div class="gate-question-card">
+          <p class="micro-label">Integration question</p>
+          <blockquote>${escapeHtml(gate.question)}</blockquote>
+        </div>
+
+        <div class="detail-rhythm-panel">
+          <div>
+            <p class="micro-label">Guided movement</p>
+            <h3>${escapeHtml(step.name)} · ${escapeHtml(capitalize(step.verb))}</h3>
+            <p>${escapeHtml(step.prompt)}</p>
+          </div>
+          ${renderRhythmLadder(gate.mapping.step)}
+        </div>
+
+        <div class="panel-actions">
+          <button class="primary-button" type="button" data-action="start-practice" data-practice="${practice.id}">Start ${escapeHtml(practice.title)}</button>
+          <button class="ghost-button" type="button" data-action="journal-gate" data-gate="${gate.id}">Journal Gate</button>
+        </div>
+      </section>
+
+      <aside class="gate-detail-side">
+        <div class="stat-strip stacked">
+          <span><strong>${entries.length}</strong>${entries.length === 1 ? "saved memory" : "saved memories"}</span>
+          <span><strong>${completed.length}</strong>${completed.length === 1 ? "practice complete" : "practices complete"}</span>
+          <span><strong>${escapeHtml(step.name)}</strong>active movement</span>
+        </div>
+
+        <article class="focus-card practice-focus">
+          <p class="micro-label">Shadow signal</p>
+          <h3>${escapeHtml(gate.shadow)}</h3>
+          <p>Use this as a signal for practice, not as a verdict.</p>
+        </article>
+
+        <article class="focus-card practice-focus">
+          <p class="micro-label">Compass lens</p>
+          <h3>${escapeHtml(depth.name)}</h3>
+          <p>${escapeHtml(depth.mode)}</p>
+          <p>${escapeHtml(gate.mapping.reason)}</p>
+        </article>
+      </aside>
+
+      <section class="gate-practice-suite">
+        <div class="section-heading">
+          <div>
+            <p class="micro-label">Three concrete actions</p>
+            <h2>Practice This Gate</h2>
+          </div>
+          <button class="ghost-button" type="button" data-action="view-practices">Practice Bank</button>
+        </div>
+        <div class="gate-practice-grid">
+          ${gate.practices.map((item) => renderPracticeCard(item)).join("")}
+        </div>
+      </section>
     </div>
   `;
 }
@@ -842,7 +947,7 @@ function renderPractices() {
         <input class="search-input" type="search" placeholder="Search practices" value="${escapeAttr(state.practiceSearch)}" data-action="search-practices">
         <select data-action="filter-practice">
           ${option("all", "All", status)}
-          ${option("open", "Open", status)}
+          ${option("open", "Unfinished", status)}
           ${option("done", "Done", status)}
         </select>
       </div>
@@ -850,6 +955,101 @@ function renderPractices() {
 
     <div class="practice-grid">
       ${practicesList.map((practice) => renderPracticeCard(practice)).join("")}
+    </div>
+  `;
+}
+
+function renderPracticeSession() {
+  const gate = currentGate();
+  const practice = currentPractice(gate);
+  const step = getStep(gate.mapping.step);
+  const done = completionForPractice(practice.id);
+  const sessionSteps = [
+    {
+      name: "Seed",
+      label: "Name the signal",
+      body: gate.question,
+      action: "Write one sentence about what is actually asking for attention."
+    },
+    {
+      name: "Motion",
+      label: "Do the practice",
+      body: practice.action,
+      action: "Complete the action once, at the smallest honest scale."
+    },
+    {
+      name: "Mirror",
+      label: "Notice the reflection",
+      body: practice.prompt,
+      action: "Record what changed in body, emotion, thought, or relationship."
+    },
+    {
+      name: "Return",
+      label: "Carry one line forward",
+      body: "Let the experience become a usable memory.",
+      action: "Save a journal entry, mark the practice complete, or choose the next gate."
+    }
+  ];
+
+  return `
+    <div class="practice-session-layout">
+      <section class="practice-session-hero">
+        <div class="detail-action-row">
+          <button class="ghost-button" type="button" data-action="back-to-gate">Back to Gate</button>
+          <button class="ghost-button" type="button" data-action="view-practices">Practice Bank</button>
+        </div>
+        <p class="micro-label">Gate ${String(gate.id).padStart(2, "0")} · ${escapeHtml(gate.title)}</p>
+        <h2>${escapeHtml(practice.title)}</h2>
+        <p class="detail-essence">${escapeHtml(practice.action)}</p>
+        <div class="gate-tags detail-tags">
+          <span>${escapeHtml(practice.duration)}</span>
+          <span>${escapeHtml(practice.type)}</span>
+          <span>${escapeHtml(step.name)}</span>
+        </div>
+
+        <div class="session-prompt-card">
+          <p class="micro-label">Reflection prompt</p>
+          <blockquote>${escapeHtml(practice.prompt)}</blockquote>
+        </div>
+
+        <div class="panel-actions">
+          <button class="primary-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal This Practice</button>
+          <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
+        </div>
+      </section>
+
+      <section class="session-steps-panel">
+        <p class="micro-label">Guided session</p>
+        <h2>Seed → Motion → Mirror → Return</h2>
+        <div class="session-step-grid">
+          ${sessionSteps.map((item, index) => `
+            <article class="session-step-card ${item.name === step.name ? "active" : ""}">
+              <span>${index + 1}</span>
+              <h3>${escapeHtml(item.name)}</h3>
+              <strong>${escapeHtml(item.label)}</strong>
+              <p>${escapeHtml(item.body)}</p>
+              <small>${escapeHtml(item.action)}</small>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+
+      <aside class="session-side-panel">
+        <article class="focus-card practice-focus">
+          <p class="micro-label">${done ? "Completed" : "Current status"}</p>
+          <h3>${done ? "This practice is complete." : "This practice is ready."}</h3>
+          <p>${done ? `Completed ${formatDate(done.completedAt)}.` : "Move through the four steps, then choose whether to journal, mark done, or return to the gate."}</p>
+        </article>
+        <article class="focus-card practice-focus">
+          <p class="micro-label">Gate question</p>
+          <h3>${escapeHtml(gate.question)}</h3>
+          <p>${escapeHtml(gate.essence)}</p>
+        </article>
+        <div class="panel-actions vertical">
+          <button class="primary-button full" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate Detail</button>
+          <button class="ghost-button full" type="button" data-action="open-wheel">Open Wheel</button>
+        </div>
+      </aside>
     </div>
   `;
 }
@@ -1090,7 +1290,7 @@ function renderExport() {
         <p class="micro-label">Credit and privacy</p>
         <h2>About</h2>
         <p>${escapeHtml(ATTRIBUTION)}</p>
-        <p>This V2 uses original Compass Gate language and curated pattern mappings. It is not affiliated with, endorsed by, or copied from any public site.</p>
+        <p>This private build uses original Compass Gate language and curated practice guidance. It is not affiliated with, endorsed by, or copied from any public site.</p>
         <div class="stat-strip stacked">
           <span><strong>${state.journal.length}</strong> local memories</span>
           <span><strong>${state.completions.length}</strong> completed practices</span>
@@ -1122,7 +1322,7 @@ function renderPracticeCard(practice) {
         <span>${escapeHtml(getStep(gate.mapping.step).name)}</span>
       </div>
       <div class="card-actions">
-        <button class="ghost-button" type="button" data-action="start-practice" data-practice="${practice.id}">Open</button>
+        <button class="ghost-button" type="button" data-action="start-practice" data-practice="${practice.id}">Start</button>
         <button class="primary-button small" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal</button>
         <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
       </div>
@@ -1537,6 +1737,17 @@ document.addEventListener("click", (event) => {
     setView("journal");
   }
   if (action === "open-wheel") setView("wheel");
+  if (action === "open-gate") {
+    const gate = getGate(target.dataset.gate || state.selectedGateId);
+    state.selectedGateId = gate.id;
+    if (!getPractice(state.selectedPracticeId) || getPractice(state.selectedPracticeId)?.gateId !== gate.id) {
+      state.selectedPracticeId = gate.practices[0].id;
+    }
+    setView("gateDetail");
+  }
+  if (action === "back-to-gates") setView("gates");
+  if (action === "back-to-gate") setView("gateDetail");
+  if (action === "view-practices") setView("practices");
   if (action === "select-gate") {
     const gate = getGate(target.dataset.gate);
     state.selectedGateId = gate.id;
@@ -1548,7 +1759,7 @@ document.addEventListener("click", (event) => {
     if (practice) {
       state.selectedGateId = practice.gateId;
       state.selectedPracticeId = practice.id;
-      setView(action === "start-practice" ? "today" : state.view);
+      setView(action === "start-practice" ? "practiceSession" : state.view);
     }
   }
   if (action === "journal-practice") preparePracticeJournal(target.dataset.practice);
