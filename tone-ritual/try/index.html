@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try Tone Ritual - A free web ritual</title>
+  <meta name="description" content="Try the free web version of Tone Ritual. Choose a ritual, receive ten small acts, and save a private field note in your browser.">
+  <meta name="theme-color" content="#0b0707">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone-ritual/try/">
+  <meta property="og:title" content="Try Tone Ritual">
+  <meta property="og:description" content="Ten small acts. One changed field.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/tone-ritual/try/">
+  <meta property="og:image" content="https://coherence-nikolai.app/assets/tone-ritual-icon.png">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/tone-ritual/try/try.css">
+</head>
+<body class="ritual-try-page">
+  <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
+      <span>coherence</span>
+      <span>nikolai</span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/tone-ritual/">Tone Ritual</a>
+      <a href="/#apps">Apps</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </header>
+
+  <main class="ritual-main" data-lang="en">
+    <section class="ritual-hero" aria-labelledby="ritual-title">
+      <div class="ritual-hero-copy">
+        <p class="label" data-i18n="label">Free web ritual</p>
+        <h1 id="ritual-title" data-i18n="heroTitle">Try Tone Ritual</h1>
+        <p class="hero-line" data-i18n="heroLine">Ten small acts. One changed field.</p>
+        <p class="hero-copy" data-i18n="heroCopy">
+          Choose a small ritual, receive ten acts, complete any that feel possible, and save a private field note in this browser.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#web-ritual" data-i18n="startCta">Start the web ritual</a>
+          <a class="button ghost" href="https://apps.apple.com/au/app/tone-ritual/id6768269989" data-i18n="appCta">Open the iOS app</a>
+        </div>
+      </div>
+      <div class="ritual-hero-panel" aria-hidden="true">
+        <div class="ritual-mark large-mark">
+          <span class="mark-orb"></span>
+          <span class="mark-ring"></span>
+          <span class="mark-dot dot-one"></span>
+          <span class="mark-dot dot-two"></span>
+          <span class="mark-dot dot-three"></span>
+          <span class="mark-dot dot-four"></span>
+          <span class="mark-dot dot-five"></span>
+          <span class="mark-dot dot-six"></span>
+          <span class="mark-dot dot-seven"></span>
+          <span class="mark-dot dot-eight"></span>
+          <span class="mark-dot dot-nine"></span>
+          <span class="mark-dot dot-ten"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="web-map section" aria-label="Web ritual map">
+      <div class="section-head centered">
+        <p class="label" data-i18n="mapLabel">Map</p>
+        <h2 data-i18n="mapTitle">A small taste of the iOS app.</h2>
+        <p data-i18n="mapCopy">
+          The web ritual keeps the free core simple: choose, receive, complete, save. The iOS app holds the larger rotating libraries, Tone Plus packs, languages, and the full native experience.
+        </p>
+      </div>
+      <div class="web-map-grid">
+        <article><span>01</span><h3 data-i18n="mapOneTitle">Choose</h3><p data-i18n="mapOneCopy">Pick the ritual that fits the day.</p></article>
+        <article><span>02</span><h3 data-i18n="mapTwoTitle">Receive</h3><p data-i18n="mapTwoCopy">Let ten small acts gather into view.</p></article>
+        <article><span>03</span><h3 data-i18n="mapThreeTitle">Complete</h3><p data-i18n="mapThreeCopy">Mark only what feels possible.</p></article>
+        <article><span>04</span><h3 data-i18n="mapFourTitle">Save</h3><p data-i18n="mapFourCopy">Keep one field note privately in this browser.</p></article>
+      </div>
+    </section>
+
+    <section class="ritual-shell section" id="web-ritual" aria-label="Tone Ritual web practice">
+      <div class="language-strip">
+        <p data-i18n="languageIntro">Language</p>
+        <div class="language-actions" role="group" aria-label="Language">
+          <button class="lang-button active" type="button" data-lang-button="en">English</button>
+          <button class="lang-button" type="button" data-lang-button="es">Español</button>
+        </div>
+      </div>
+
+      <div class="ritual-grid">
+        <div class="ritual-picker-card">
+          <div class="control-head">
+            <div>
+              <p class="label" data-i18n="chooseLabel">Choose</p>
+              <h2 data-i18n="chooseTitle">One small ritual.</h2>
+            </div>
+            <span data-i18n="chooseHint">free web set</span>
+          </div>
+          <div class="ritual-choice-grid" id="ritual-choice-grid" role="list"></div>
+          <button class="button ghost full-button" type="button" id="new-session-button" data-i18n="newSetButton">Generate another set</button>
+        </div>
+
+        <div class="ritual-progress-card">
+          <div class="progress-head">
+            <span class="ritual-pill" id="selected-ritual-pill">Core</span>
+            <strong id="progress-count">0 of 10 done</strong>
+          </div>
+          <div class="interactive-mark" id="interactive-mark" aria-hidden="true"></div>
+          <p class="progress-line" id="progress-line" aria-live="polite">One act matters.</p>
+          <p class="progress-copy" data-i18n="progressCopy">No need to complete all ten.</p>
+        </div>
+      </div>
+
+      <div class="acts-panel">
+        <div class="section-head">
+          <p class="label" data-i18n="actsLabel">Today's acts</p>
+          <h2 data-i18n="actsTitle">Complete any that feel possible.</h2>
+        </div>
+        <div class="act-list" id="act-list"></div>
+      </div>
+    </section>
+
+    <section class="field-note-shell section" aria-labelledby="field-note-title">
+      <div class="section-head">
+        <p class="label" data-i18n="fieldLabel">Field note</p>
+        <h2 id="field-note-title" data-i18n="fieldTitle">What shifted in the field?</h2>
+        <p data-i18n="fieldCopy">No change is still a true answer.</p>
+      </div>
+
+      <div class="reflection-grid" id="reflection-grid"></div>
+      <label class="note-control">
+        <span data-i18n="noteLabel">One sentence about today</span>
+        <textarea id="note-input" rows="4" data-i18n-placeholder="notePlaceholder" placeholder="The day has been touched."></textarea>
+      </label>
+      <button class="button primary full-button" type="button" id="save-note-button" data-i18n="saveNoteButton">Save field note</button>
+      <p class="save-status" id="save-status" aria-live="polite"></p>
+    </section>
+
+    <section class="saved-shell section" aria-labelledby="saved-title">
+      <div class="section-head">
+        <p class="label" data-i18n="savedLabel">Field notes</p>
+        <h2 id="saved-title" data-i18n="savedTitle">Saved in this browser.</h2>
+        <p data-i18n="savedCopy">These notes are stored only in your browser. Clear browser storage and they disappear.</p>
+      </div>
+      <div class="saved-grid" id="saved-grid"></div>
+    </section>
+
+    <section class="section split try-boundaries">
+      <div>
+        <p class="label" data-i18n="privacyLabel">Privacy</p>
+        <h2 data-i18n="privacyTitle">Local by default.</h2>
+        <p data-i18n="privacyCopy">No account, no server, no tracking. The web version uses your browser only.</p>
+      </div>
+      <div>
+        <p class="label" data-i18n="iosLabel">iOS app</p>
+        <h2 data-i18n="iosTitle">The full ritual field lives on iPhone.</h2>
+        <p data-i18n="iosCopy">Tone Ritual for iOS includes larger rotating act libraries, 9 languages, local field notes, and Tone Plus ritual packs.</p>
+        <a class="button primary compact-button" href="https://apps.apple.com/au/app/tone-ritual/id6768269989" data-i18n="downloadButton">Download Tone Ritual</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p data-i18n="footerNote">Tone Ritual is a reflective wellbeing app, not medical advice, therapy, diagnosis, crisis support, or an emergency service.</p>
+    <nav aria-label="Footer navigation">
+      <a href="/tone-ritual/">Tone Ritual</a>
+      <a href="/tone/">Tone Recall</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </footer>
+
+  <script src="/assets/site.js"></script>
+  <script src="/tone-ritual/try/try.js"></script>
+</body>
+</html>
