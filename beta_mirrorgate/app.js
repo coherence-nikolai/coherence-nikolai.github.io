@@ -140,6 +140,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     audio: null,
     toneOscillators: [],
     toneStopTimer: null,
+    toneRequestId: 0,
     activeAudio: null,
     statusTimer: null,
     cameraStream: null,
@@ -163,6 +164,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     currentFlowStep: "mode",
     moduleSteps: {},
     advancedModules: {},
+    gateFieldActive: false,
     gateBreathSealed: false,
     gateHeldIntention: false,
     gateTouchedNodes: [],
@@ -1126,8 +1128,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       state.audio = new AudioContext();
     }
-    if (state.audio.state === "suspended") state.audio.resume();
     return state.audio;
+  }
+
+  function resumeAudioContext(ctx) {
+    if (!ctx || ctx.state !== "suspended") return Promise.resolve();
+    const resumed = ctx.resume();
+    return resumed && typeof resumed.then === "function" ? resumed : Promise.resolve();
   }
 
   function stopActiveAudio() {
@@ -1158,6 +1165,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   }
 
   function stopTone() {
+    state.toneRequestId += 1;
     if (state.toneStopTimer) {
       window.clearTimeout(state.toneStopTimer);
       state.toneStopTimer = null;
@@ -1177,48 +1185,79 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       }
     });
     state.toneOscillators = [];
+    state.gateFieldActive = false;
   }
 
   function playTone(frequency = state.draft.tone || 144, seconds = 2.4, mode = "single") {
     const ctx = ensureAudio();
     stopTone();
-    const isContinuous = !Number.isFinite(seconds);
-    const toneSeconds = isContinuous ? 24 : Math.max(0.4, seconds);
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, ctx.currentTime);
-    master.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.12);
-    if (!isContinuous) {
-      master.gain.setValueAtTime(0.16, ctx.currentTime + Math.max(0.18, toneSeconds - 0.18));
-      master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + toneSeconds);
-    }
-    master.connect(ctx.destination);
-
-    const freqs = mode === "soundscape"
-      ? [frequency, frequency * 1.5, frequency * 2.01].filter((value) => value < 1200)
-      : [frequency];
-
-    state.toneOscillators = freqs.map((freq, index) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const filter = ctx.createBiquadFilter();
-      osc.type = index === 0 ? "sine" : "triangle";
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      if (mode === "pulse") {
-        osc.frequency.linearRampToValueAtTime(freq * 1.01, ctx.currentTime + toneSeconds / 2);
-        osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + toneSeconds);
+    const requestId = state.toneRequestId;
+    const startTone = () => {
+      if (state.toneRequestId !== requestId) return;
+      const isContinuous = !Number.isFinite(seconds);
+      const toneSeconds = isContinuous ? 24 : Math.max(0.4, seconds);
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, ctx.currentTime);
+      master.gain.exponentialRampToValueAtTime(0.16, ctx.currentTime + 0.12);
+      if (!isContinuous) {
+        master.gain.setValueAtTime(0.16, ctx.currentTime + Math.max(0.18, toneSeconds - 0.18));
+        master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + toneSeconds);
       }
-      gain.gain.value = index === 0 ? 0.75 : 0.18;
-      filter.type = "lowpass";
-      filter.frequency.value = 1400;
-      osc.connect(gain);
-      gain.connect(filter);
-      filter.connect(master);
-      osc.start();
-      if (!isContinuous) osc.stop(ctx.currentTime + toneSeconds + 0.02);
-      return { osc, gain: master };
-    });
+      master.connect(ctx.destination);
 
-    if (!isContinuous) state.toneStopTimer = window.setTimeout(stopTone, (toneSeconds + 0.08) * 1000);
+      const freqs = mode === "soundscape"
+        ? [frequency, frequency * 1.5, frequency * 2.01].filter((value) => value < 1200)
+        : [frequency];
+
+      state.toneOscillators = freqs.map((freq, index) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        osc.type = index === 0 ? "sine" : "triangle";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        if (mode === "pulse") {
+          osc.frequency.linearRampToValueAtTime(freq * 1.01, ctx.currentTime + toneSeconds / 2);
+          osc.frequency.linearRampToValueAtTime(freq, ctx.currentTime + toneSeconds);
+        }
+        gain.gain.value = index === 0 ? 0.75 : 0.18;
+        filter.type = "lowpass";
+        filter.frequency.value = 1400;
+        osc.connect(gain);
+        gain.connect(filter);
+        filter.connect(master);
+        osc.start();
+        if (!isContinuous) osc.stop(ctx.currentTime + toneSeconds + 0.02);
+        return { osc, gain: master };
+      });
+
+      if (!isContinuous) state.toneStopTimer = window.setTimeout(stopTone, (toneSeconds + 0.08) * 1000);
+    };
+
+    resumeAudioContext(ctx)
+      .then(startTone)
+      .catch(() => showStatus("Tap the tone button once more to start audio.", "success"));
+  }
+
+  function playTonePing(frequency = state.draft.tone || 144, seconds = 0.42) {
+    const ctx = ensureAudio();
+    const requestId = state.toneRequestId;
+    resumeAudioContext(ctx)
+      .then(() => {
+        if (state.toneRequestId !== requestId) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const duration = Math.max(0.18, seconds);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration + 0.03);
+      })
+      .catch(() => showStatus("Tap the node once more to start audio.", "success"));
   }
 
   function seedFromText(text) {
@@ -2317,10 +2356,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       return [
         { title: "Orient the Gate", instruction: "Use Gate when the intention is dimensional or stellar ally contact. This is the contact portal.", notice: "Start only when the intention is clear enough to hold without forcing." },
         { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate geometry; the Breath Seal sets the body rhythm.", notice: "Choose the Breath Seal by the pace your body needs for this contact." },
-        { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone and geometry establish the threshold.", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
+        { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone, breath seal, and geometry establish the threshold.", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
         { title: "Seal the Breath", instruction: "Complete one full Breath Seal and mark it sealed when the body feels steady enough.", notice: "The breath seal is a body anchor, not a race." },
         { title: "Hold Intention", instruction: "Name the contact intention silently, then mark it held. Keep it simple.", notice: "The intention should feel like a clear beacon, not a demand." },
-        { title: "Unlock Glyph Nodes", instruction: "Tap the glyph nodes in order. This completes the gate sequence.", notice: "When the gate opens, remain still. Let contact unfold naturally." },
+        { title: "Open Contact Window", instruction: "Tap the glyph nodes in order. When the third node opens, remain here before moving to integration.", notice: "Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence." },
         { title: "Integrate Through Mirror", instruction: "After the gate, open Mirror to reflect and integrate what came through.", notice: "Do not chase certainty. Return through Mirror even if the gate was quiet." }
       ];
     }
@@ -2347,6 +2386,31 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
             <small>${escapeHtml(step.title)}</small>
           </span>
         `).join("")}
+      </div>
+    `;
+  }
+
+  function renderBreathSealVisual(cycle = state.draft.breathSeal || "4-4-4-4") {
+    const phaseNames = ["Inhale", "Hold", "Exhale", "Pause"];
+    const values = String(cycle).split("-")
+      .map((value) => Number(value.trim()))
+      .filter((value) => Number.isFinite(value) && value > 0);
+    const total = values.reduce((sum, value) => sum + value, 0) || 1;
+    return `
+      <div class="breath-seal-visual" aria-label="Selected breath seal ${escapeHtml(cycle)}">
+        <div class="breath-seal-heading">
+          <strong>Breath Seal ${escapeHtml(cycle)}</strong>
+          <span>${total}s cycle</span>
+        </div>
+        <div class="breath-seal-track">
+          ${values.map((seconds, index) => `
+            <span style="--phase-flex: ${seconds}">
+              <b>${escapeHtml(phaseNames[index] || `Phase ${index + 1}`)}</b>
+              <small>${seconds}s</small>
+            </span>
+          `).join("")}
+        </div>
+        <p>Use this rhythm while the Gate Field tone runs. The prime triplet shapes the gate; this breath pattern paces your body through it.</p>
       </div>
     `;
   }
@@ -2381,8 +2445,12 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const back = stepIndex > 0
       ? `<button class="button button-quiet" data-action="module-prev-step" data-module-name="${escapeHtml(name)}">Back</button>`
       : `<button class="button button-quiet" data-action="open-wheel">Return to Wheel</button>`;
+    const isGateContactWindow = name === "gate" && stepIndex === 5;
+    const gateCanIntegrate = !isGateContactWindow || state.gateTouchedNodes.length >= 3;
+    const nextLabel = isGateContactWindow ? "Continue to Mirror Integration" : "Next Step";
+    const nextDisabled = gateCanIntegrate ? "" : " disabled aria-disabled=\"true\"";
     const next = stepIndex < count - 1
-      ? `<button class="button button-primary" data-action="module-next-step" data-module-name="${escapeHtml(name)}">Next Step</button>`
+      ? `<button class="button button-primary" data-action="module-next-step" data-module-name="${escapeHtml(name)}"${nextDisabled}>${nextLabel}</button>`
       : `<button class="button button-primary" data-action="module-complete" data-module-name="${escapeHtml(name)}">${escapeHtml(moduleCompletionLabel(name))}</button>`;
     const advanced = stepIndex < count - 1
       ? `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Advanced View</button>`
@@ -2531,10 +2599,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (stepIndex === 2) {
       return `
         <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+        ${renderBreathSealVisual(state.draft.breathSeal || "4-4-4-4")}
         <div class="action-panel">
           <button class="button button-primary" data-action="enter-gate">Begin Gate Field</button>
           <button class="button button-muted" data-action="stop-audio">Stop Gate Tone</button>
-          <p class="small-copy">Begin starts the gate tone and motion. Let the field run while you move through breath, intention, and glyph nodes.</p>
+          <p class="small-copy">Begin starts the gate tone and motion. Keep the tone running while you move through breath, intention, and glyph nodes.</p>
         </div>
       `;
     }
@@ -2542,6 +2611,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       return `
         <h3>Breath Seal</h3>
         <p>Complete one full ${escapeHtml(state.draft.breathSeal || "4-4-4-4")} breath cycle. Tap the seal only after the body feels steady enough.</p>
+        ${renderBreathSealVisual(state.draft.breathSeal || "4-4-4-4")}
         <button class="button button-primary button-wide" data-action="seal-breath">Seal Completed Breath</button>
         <div class="metric-grid">
           <span class="metric"><small>Breath Cycle</small><strong id="breath-lock">${state.gateBreathSealed ? "Sealed" : "Pending"}</strong></span>
@@ -2562,13 +2632,30 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     if (stepIndex === 5) {
       const nodes = state.draft.triplet.split("-");
+      const isOpen = state.gateTouchedNodes.length >= nodes.length;
       return `
         <h3>Glyph Nodes</h3>
         <p>Tap in order: ${escapeHtml(nodes.join(" -> "))}. The selected module color marks each node as it opens.</p>
+        ${renderBreathSealVisual(state.draft.breathSeal || "4-4-4-4")}
         <div class="control-row" id="node-buttons"></div>
         <div class="metric-grid">
           <span class="metric"><small>Glyph Sequence</small><strong id="node-lock">${state.gateTouchedNodes.length} / 3</strong></span>
-          <span class="metric"><small>Gate</small><strong id="gate-lock">${state.gateTouchedNodes.length >= 3 ? "Open" : "Locked"}</strong></span>
+          <span class="metric"><small>Gate</small><strong id="gate-lock">${isOpen ? "Open" : "Locked"}</strong></span>
+        </div>
+        <div class="gate-contact-window ${isOpen ? "open" : ""}">
+          <h3>${isOpen ? "Gate Open: Remain Here" : "Before the Gate Opens"}</h3>
+          <p>${isOpen
+            ? "This is the contact window. Keep the Gate Field tone running, continue the chosen Breath Seal, and hold the intention without forcing an answer."
+            : "Complete the glyph nodes first. When the third node opens, stay on this screen before moving to Mirror integration."}</p>
+          <ul>
+            <li>Look for presence, inner words, geometry, emotion, body sensation, image, pressure, temperature, or stillness.</li>
+            <li>Do not chase certainty. Silence or nothing obvious is still a valid gate session.</li>
+            <li>Move to Mirror integration only when the contact window feels complete.</li>
+          </ul>
+          <div class="control-row">
+            <button class="button button-muted" data-action="play-path-invocation" data-invocation="dimensional">Play Contact Guidance</button>
+            <button class="button button-quiet" data-action="stop-audio">Stop Gate Tone</button>
+          </div>
         </div>
       `;
     }
@@ -3353,11 +3440,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     if (action === "module-next-step" || action === "module-prev-step") {
       stopActiveAudio();
-      stopTone();
       const moduleName = target.dataset.moduleName || state.module;
       const steps = moduleStepDefinitions(moduleName);
       const offset = action === "module-next-step" ? 1 : -1;
-      state.moduleSteps[moduleName] = Math.min(steps.length - 1, Math.max(0, currentModuleStep(moduleName) + offset));
+      const nextStep = Math.min(steps.length - 1, Math.max(0, currentModuleStep(moduleName) + offset));
+      const keepGateTone = moduleName === "gate" && state.gateFieldActive && nextStep >= 2 && nextStep <= 5;
+      if (!keepGateTone) stopTone();
+      state.moduleSteps[moduleName] = nextStep;
       renderModule(moduleName, { resetScroll: true });
     }
     if (action === "module-advanced") {
@@ -3446,6 +3535,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "start-breath") playTone(state.draft.tone, Infinity, "soundscape");
     if (action === "enter-gate") {
       playTone(state.draft.tone, Infinity, "soundscape");
+      state.gateFieldActive = true;
       showStatus("Gate field started. Continue with breath, intention, and glyph nodes.", "success");
     }
     if (action === "seal-breath") {
@@ -3465,8 +3555,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       const touched = state.gateTouchedNodes.length;
       $("#node-lock") && ($("#node-lock").textContent = `${touched} / 3`);
       if (touched >= 3 && $("#gate-lock")) $("#gate-lock").textContent = "Open";
-      playTone(state.draft.tone + Number(target.dataset.node || 0) * 2, 0.42, "single");
-      if (touched >= 3) showStatus("Glyph sequence unlocked. Gate is open.", "success");
+      playTonePing(state.draft.tone + Number(target.dataset.node || 0) * 2, 0.42);
+      if (touched >= 3) {
+        showStatus("Glyph sequence unlocked. Gate is open. Remain in the contact window.", "success");
+        withPreservedScroll(() => renderModule("gate", { resetScroll: false }));
+      }
     }
     if (action === "start-camera") startCamera();
     if (action === "save-session") saveManualSession();
