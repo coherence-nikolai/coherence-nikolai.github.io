@@ -6,7 +6,7 @@ const DRAFT_KEY = "harmonic-compass-draft-v2";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const VOICE_VERSION = "19";
+const VOICE_VERSION = "20";
 const VOICE_BASE = "./voice/audio/";
 
 const VOICE_GUIDES = {
@@ -29,6 +29,17 @@ const STEP_VOICE = {
   Mirror: VOICE_GUIDES.mirror,
   Return: VOICE_GUIDES.return
 };
+
+const APP_INTRO_TRANSCRIPT = [
+  "Welcome to Harmonic Compass.",
+  "This private study instrument is inspired by the works of Robert Edward Grant, especially the 24 precepts of Universal Mind.",
+  "Those precepts point toward a way of seeing: that consciousness, perception, relationship, shadow, gratitude, courage, love, and creative expression are not separate subjects. They are parts of one living practice.",
+  "Harmonic Compass does not ask you to memorize philosophy or decode mathematics. It turns the spirit of the 24 precepts into 24 original Compass Gates, each written in its own paraphrased voice.",
+  "Each Gate gives you three things: a simple orientation, a concrete practice, and a reflection prompt. The purpose is not to get the right answer. The purpose is to notice what your life is showing you, and to move one honest step from there.",
+  "The app uses a four-part rhythm: Seed, Motion, Mirror, Return. Seed asks you to name the signal. Motion asks you to take one clean action. Mirror asks you to notice what changed. Return asks you to carry one line of learning forward.",
+  "Begin with Today if you want the app to choose the next Gate for you. Open the Wheel if you want to explore the full field. Use Practices when you need one action you can actually do. Use Journal when something in the day feels worth remembering.",
+  "Everything here is private and stored locally in this browser. Treat it as a compass, not a command. Let the guidance stay simple. Listen, practice once, write honestly, and return tomorrow with a little more coherence."
+];
 
 const RHYTHM_STEPS = [
   {
@@ -1313,46 +1324,58 @@ function renderGuide() {
   const output = state.guideOutput || generateGuideResponse();
 
   return `
-    <div class="guide-layout">
-      <section class="journal-composer">
-        <p class="micro-label">Local compass guide</p>
-        <h2>Ask the instrument.</h2>
-        <form id="guide-form">
-          <label>Mode
-            <select name="mode" data-action="guide-mode">
-              ${option("reflect", "Reflect", state.guideMode)}
-              ${option("integrate", "Integrate", state.guideMode)}
-              ${option("practice", "Choose practice", state.guideMode)}
-              ${option("rhythm", "Rhythm", state.guideMode)}
-              ${option("remember", "Remember", state.guideMode)}
-            </select>
-          </label>
-          <label>Question or situation
-            <textarea name="guideInput" data-action="guide-input" placeholder="Write what you want to bring to Gate ${gate.id}.">${escapeHtml(state.guideInput)}</textarea>
-          </label>
-          <div class="panel-actions">
-            <button class="primary-button" type="submit" data-action="generate-guide">Generate Guidance</button>
-            <button class="ghost-button" type="button" data-action="clear-guide">Clear</button>
-          </div>
-        </form>
-        <p class="privacy-note">This guide is local/static. It does not call a remote AI service, analytics endpoint, or cloud journal.</p>
+    <div class="guide-stack">
+      <section class="guide-intro-panel">
+        <div>
+          <p class="micro-label">Introduction guidance</p>
+          <h2>How to use Harmonic Compass.</h2>
+          <p>This introduction credits Robert Edward Grant's 24 precepts as the inspiration for the app, then explains how to move through the private practice flow.</p>
+        </div>
+        ${renderVoicePanel([VOICE_GUIDES.welcome], "Introduction audio")}
+        ${renderDisclosure("Read transcript", renderTranscript(APP_INTRO_TRANSCRIPT), "transcript-disclosure")}
       </section>
 
-      <section class="journal-timeline guide-output">
-        <p class="micro-label">Response for Gate ${gate.id}</p>
-        <h2>${escapeHtml(gate.title)}</h2>
-        ${output}
-        <div class="focus-card practice-focus">
-          <p class="micro-label">Next embodied action</p>
-          <h3>${escapeHtml(practice.title)}</h3>
-          <p>${escapeHtml(practice.action)}</p>
-          <code>${escapeHtml(practice.prompt)}</code>
-        </div>
-        <div class="panel-actions">
-          <button class="primary-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal This</button>
-          <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${completionForPractice(practice.id) ? "Mark Open" : "Mark Done"}</button>
-        </div>
-      </section>
+      <div class="guide-layout">
+        <section class="journal-composer">
+          <p class="micro-label">Local compass guide</p>
+          <h2>Ask the instrument.</h2>
+          <form id="guide-form">
+            <label>Mode
+              <select name="mode" data-action="guide-mode">
+                ${option("reflect", "Reflect", state.guideMode)}
+                ${option("integrate", "Integrate", state.guideMode)}
+                ${option("practice", "Choose practice", state.guideMode)}
+                ${option("rhythm", "Rhythm", state.guideMode)}
+                ${option("remember", "Remember", state.guideMode)}
+              </select>
+            </label>
+            <label>Question or situation
+              <textarea name="guideInput" data-action="guide-input" placeholder="Write what you want to bring to Gate ${gate.id}.">${escapeHtml(state.guideInput)}</textarea>
+            </label>
+            <div class="panel-actions">
+              <button class="primary-button" type="submit" data-action="generate-guide">Generate Guidance</button>
+              <button class="ghost-button" type="button" data-action="clear-guide">Clear</button>
+            </div>
+          </form>
+          <p class="privacy-note">This guide is local/static. It does not call a remote AI service, analytics endpoint, or cloud journal.</p>
+        </section>
+
+        <section class="journal-timeline guide-output">
+          <p class="micro-label">Response for Gate ${gate.id}</p>
+          <h2>${escapeHtml(gate.title)}</h2>
+          ${output}
+          <div class="focus-card practice-focus">
+            <p class="micro-label">Next embodied action</p>
+            <h3>${escapeHtml(practice.title)}</h3>
+            <p>${escapeHtml(practice.action)}</p>
+            <code>${escapeHtml(practice.prompt)}</code>
+          </div>
+          <div class="panel-actions">
+            <button class="primary-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal This</button>
+            <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${completionForPractice(practice.id) ? "Mark Open" : "Mark Done"}</button>
+          </div>
+        </section>
+      </div>
     </div>
   `;
 }
@@ -1470,6 +1493,14 @@ function renderPracticeRow(practice, selectedId) {
         <em>${done ? "Done" : escapeHtml(practice.duration)}</em>
       </span>
     </button>
+  `;
+}
+
+function renderTranscript(lines) {
+  return `
+    <div class="transcript-copy">
+      ${lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("")}
+    </div>
   `;
 }
 
