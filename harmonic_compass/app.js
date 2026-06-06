@@ -6,6 +6,29 @@ const DRAFT_KEY = "harmonic-compass-draft-v2";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
+const VOICE_VERSION = "17";
+const VOICE_BASE = "./voice/audio/";
+
+const VOICE_GUIDES = {
+  welcome: { label: "Welcome", short: "Welcome", file: "guide_welcome.mp3" },
+  today: { label: "Today Guide", short: "Today", file: "guide_today.mp3" },
+  wheel: { label: "Wheel Guide", short: "Wheel", file: "guide_wheel.mp3" },
+  gateDetail: { label: "Gate Detail Guide", short: "Gate Guide", file: "guide_gate_detail.mp3" },
+  practice: { label: "Practice Guide", short: "Practice", file: "guide_practice.mp3" },
+  seed: { label: "Seed", short: "Seed", file: "guide_seed.mp3" },
+  motion: { label: "Motion", short: "Motion", file: "guide_motion.mp3" },
+  mirror: { label: "Mirror", short: "Mirror", file: "guide_mirror.mp3" },
+  return: { label: "Return", short: "Return", file: "guide_return.mp3" },
+  journal: { label: "Journal Guide", short: "Journal", file: "guide_journal.mp3" },
+  completion: { label: "Completion", short: "Completion", file: "guide_completion.mp3" }
+};
+
+const STEP_VOICE = {
+  Seed: VOICE_GUIDES.seed,
+  Motion: VOICE_GUIDES.motion,
+  Mirror: VOICE_GUIDES.mirror,
+  Return: VOICE_GUIDES.return
+};
 
 const RHYTHM_STEPS = [
   {
@@ -572,6 +595,19 @@ function currentPractice(gate = currentGate()) {
   return gate.practices[0];
 }
 
+function voiceSrc(file) {
+  return `${VOICE_BASE}${file}?v=${VOICE_VERSION}`;
+}
+
+function gateVoice(gate) {
+  const number = String(gate.id).padStart(2, "0");
+  return {
+    label: `Gate ${number}`,
+    short: `Gate ${number}`,
+    file: `gate_${number}.mp3`
+  };
+}
+
 function dailyCompass() {
   const start = new Date(`${state?.settings?.startDate || DEFAULT_START_DATE}T00:00:00`);
   const now = new Date();
@@ -690,6 +726,7 @@ function renderToday() {
           ${gate.themes.slice(0, 3).map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
         </div>
         <p>${escapeHtml(gate.essence)}</p>
+        ${renderVoicePanel([VOICE_GUIDES.welcome, VOICE_GUIDES.today, gateVoice(gate)], "Begin with audio")}
 
         <div class="chamber-map">
           <span>${escapeHtml(corridor.name)}</span>
@@ -780,6 +817,7 @@ function renderWheelView() {
         <p class="micro-label">Active segment</p>
         <h2>Gate ${gate.id}<br>${escapeHtml(gate.title)}</h2>
         <p>${escapeHtml(gate.essence)}</p>
+        ${renderVoicePanel([VOICE_GUIDES.wheel, gateVoice(gate)], "Voice guide")}
         <div class="selection-grid">
           <div><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</div>
           <div><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</div>
@@ -866,6 +904,7 @@ function renderGateDetail() {
         <div class="gate-tags detail-tags">
           ${gate.themes.map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
         </div>
+        ${renderVoicePanel([VOICE_GUIDES.gateDetail, gateVoice(gate)], "Voice guide")}
 
         <div class="gate-question-card">
           <p class="micro-label">Integration question</p>
@@ -943,13 +982,16 @@ function renderPractices() {
         <h2>Practice Bank</h2>
         <p>Every gate has three actions that can be completed by anyone: body, writing, observation, relationship, ritual, environment, or creative work.</p>
       </div>
-      <div class="filter-row">
-        <input class="search-input" type="search" placeholder="Search practices" value="${escapeAttr(state.practiceSearch)}" data-action="search-practices">
-        <select data-action="filter-practice">
-          ${option("all", "All", status)}
-          ${option("open", "Unfinished", status)}
-          ${option("done", "Done", status)}
-        </select>
+      <div class="practice-library-tools">
+        ${renderVoiceButton(VOICE_GUIDES.practice)}
+        <div class="filter-row">
+          <input class="search-input" type="search" placeholder="Search practices" value="${escapeAttr(state.practiceSearch)}" data-action="search-practices">
+          <select data-action="filter-practice">
+            ${option("all", "All", status)}
+            ${option("open", "Unfinished", status)}
+            ${option("done", "Done", status)}
+          </select>
+        </div>
       </div>
     </section>
 
@@ -1006,6 +1048,7 @@ function renderPracticeSession() {
           <span>${escapeHtml(practice.type)}</span>
           <span>${escapeHtml(step.name)}</span>
         </div>
+        ${renderVoicePanel([VOICE_GUIDES.practice, gateVoice(gate)], "Voice guide")}
 
         <div class="session-prompt-card">
           <p class="micro-label">Reflection prompt</p>
@@ -1029,6 +1072,7 @@ function renderPracticeSession() {
               <strong>${escapeHtml(item.label)}</strong>
               <p>${escapeHtml(item.body)}</p>
               <small>${escapeHtml(item.action)}</small>
+              ${renderVoiceButton(STEP_VOICE[item.name], { compact: true })}
             </article>
           `).join("")}
         </div>
@@ -1040,6 +1084,7 @@ function renderPracticeSession() {
           <h3>${done ? "This practice is complete." : "This practice is ready."}</h3>
           <p>${done ? `Completed ${formatDate(done.completedAt)}.` : "Move through the four steps, then choose whether to journal, mark done, or return to the gate."}</p>
         </article>
+        ${done ? renderVoicePanel([VOICE_GUIDES.completion], "Completion audio") : ""}
         <article class="focus-card practice-focus">
           <p class="micro-label">Gate question</p>
           <h3>${escapeHtml(gate.question)}</h3>
@@ -1076,6 +1121,7 @@ function renderJournal() {
       <section class="journal-composer">
         <p class="micro-label">${editing ? "Editing memory" : "Memory field"}</p>
         <h2>${editing ? "Edit entry" : "Journal practice"}</h2>
+        ${renderVoicePanel([VOICE_GUIDES.journal], "Voice guide")}
         <form id="journal-form">
           <input type="hidden" name="id" value="${escapeAttr(editing?.id || "")}">
           <div class="form-grid">
@@ -1327,6 +1373,41 @@ function renderPracticeCard(practice) {
         <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
       </div>
     </article>
+  `;
+}
+
+function renderVoicePanel(guides, heading = "Voice guide") {
+  const items = guides.filter(Boolean);
+  if (!items.length) return "";
+  return `
+    <div class="voice-guide-panel">
+      <div class="voice-guide-copy">
+        <span class="voice-pulse" aria-hidden="true"></span>
+        <div>
+          <p class="micro-label">${escapeHtml(heading)}</p>
+          <h3>Listen before moving.</h3>
+        </div>
+      </div>
+      <div class="voice-actions">
+        ${items.map((guide) => renderVoiceButton(guide)).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderVoiceButton(guide, options = {}) {
+  if (!guide?.file) return "";
+  const label = guide.label || "Guide";
+  const visible = options.compact ? guide.short || label : `Listen · ${label}`;
+  return `
+    <button class="voice-button ${options.compact ? "compact" : ""}" type="button"
+      data-action="play-voice"
+      data-audio="${escapeAttr(voiceSrc(guide.file))}"
+      data-label="${escapeAttr(label)}"
+      aria-label="Play ${escapeAttr(label)}">
+      <span class="voice-icon" aria-hidden="true"></span>
+      <span>${escapeHtml(visible)}</span>
+    </button>
   `;
 }
 
@@ -1703,6 +1784,48 @@ function updateDraftFromForm(form) {
   });
 }
 
+let voiceAudio = null;
+let activeVoiceUrl = "";
+
+function clearVoiceButtons() {
+  document.querySelectorAll(".voice-button.playing").forEach((button) => button.classList.remove("playing"));
+}
+
+function playVoice(audioPath, label, button) {
+  if (!audioPath) return;
+  const nextUrl = new URL(audioPath, window.location.href).href;
+  if (!voiceAudio) {
+    voiceAudio = new Audio();
+    voiceAudio.preload = "none";
+    voiceAudio.addEventListener("ended", () => {
+      activeVoiceUrl = "";
+      clearVoiceButtons();
+    });
+  }
+
+  if (activeVoiceUrl === nextUrl && !voiceAudio.paused) {
+    voiceAudio.pause();
+    activeVoiceUrl = "";
+    clearVoiceButtons();
+    toast(`${label || "Audio"} paused.`);
+    return;
+  }
+
+  clearVoiceButtons();
+  activeVoiceUrl = nextUrl;
+  voiceAudio.src = nextUrl;
+  voiceAudio.currentTime = 0;
+  button?.classList.add("playing");
+
+  voiceAudio.play()
+    .then(() => toast(`Playing ${label || "audio guide"}.`))
+    .catch(() => {
+      activeVoiceUrl = "";
+      clearVoiceButtons();
+      toast("Audio could not start. Tap again or check browser audio permissions.");
+    });
+}
+
 document.addEventListener("click", (event) => {
   const target = event.target.closest("[data-view], [data-action]");
   if (!target) return;
@@ -1713,6 +1836,10 @@ document.addEventListener("click", (event) => {
   }
 
   const action = target.dataset.action;
+  if (action === "play-voice") {
+    playVoice(target.dataset.audio, target.dataset.label, target);
+    return;
+  }
   if (action === "save-journal") {
     event.preventDefault();
     const form = target.closest("#journal-form");
