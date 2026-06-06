@@ -3745,7 +3745,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const cx = w / 2;
     const cy = h / 2;
     const side = Math.min(w, h);
-    const r = side * (compact ? 0.28 : 0.38);
+    const isWheelCenter = canvas.id === "wheel-center-sigil-canvas";
+    const r = side * (isWheelCenter ? 0.42 : compact ? 0.28 : 0.38);
     const rotation = sigilRotation(time, compact);
     const accentSource = canvas.closest(".wheel-card, .wheel-center, .anchor-sigil, .recovery-card") || document.documentElement;
     const accent = getComputedStyle(accentSource).getPropertyValue("--selected-accent").trim()
@@ -3839,7 +3840,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     });
     ctx.shadowBlur = 0;
 
-    drawSpiralPath(ctx, side * (compact ? 0.14 : 0.2), -rotation * 2.2, "#e2b856", compact ? 1.4 : 1.8);
+    drawSpiralPath(ctx, side * (isWheelCenter ? 0.23 : compact ? 0.14 : 0.2), -rotation * 2.2, "#e2b856", isWheelCenter ? 1.7 : compact ? 1.4 : 1.8);
     ctx.restore();
   }
 
