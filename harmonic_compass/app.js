@@ -6,7 +6,7 @@ const DRAFT_KEY = "harmonic-compass-draft-v2";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const VOICE_VERSION = "18";
+const VOICE_VERSION = "19";
 const VOICE_BASE = "./voice/audio/";
 
 const VOICE_GUIDES = {
@@ -695,7 +695,7 @@ function renderToday() {
       <section class="ritual-band">
         <div>
           <p class="micro-label">Today's rhythm</p>
-          <h2>Seed → Motion → Mirror → Return</h2>
+          <h2>${escapeHtml(step.name)} phase</h2>
         </div>
         <div class="ritual-flow">
           ${RHYTHM_STEPS.map((item, index) => `
@@ -726,13 +726,14 @@ function renderToday() {
           ${gate.themes.slice(0, 3).map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
         </div>
         <p>${escapeHtml(gate.essence)}</p>
-        ${renderVoicePanel([VOICE_GUIDES.welcome, VOICE_GUIDES.today, gateVoice(gate)], "Begin with audio")}
+        ${renderVoicePanel([VOICE_GUIDES.today], "Begin with audio")}
 
-        <div class="chamber-map">
-          <span>${escapeHtml(corridor.name)}</span>
-          <span>${escapeHtml(depth.name)}</span>
-          <span>${escapeHtml(step.name)}</span>
-        </div>
+        ${renderDisclosure("More audio", `
+          <div class="voice-actions compact-stack">
+            ${renderVoiceButton(VOICE_GUIDES.welcome)}
+            ${renderVoiceButton(gateVoice(gate))}
+          </div>
+        `)}
 
         <div class="practice-orbit-card">
           <p class="micro-label">${complete ? "Completed practice" : "Today's practice"}</p>
@@ -741,10 +742,7 @@ function renderToday() {
           <p>${escapeHtml(practice.action)}</p>
         </div>
 
-        <div class="reflection-prompt">
-          <p class="micro-label">Reflection prompt</p>
-          <blockquote>${escapeHtml(practice.prompt)}</blockquote>
-        </div>
+        ${renderDisclosure("Reflection prompt", `<blockquote>${escapeHtml(practice.prompt)}</blockquote>`)}
 
         <div class="panel-actions">
           <button class="primary-button full" type="button" data-action="start-practice" data-practice="${practice.id}">Start Practice</button>
@@ -758,6 +756,14 @@ function renderToday() {
           </div>
         `)}
 
+        ${renderDisclosure("Compass context", `
+          <div class="chamber-map">
+            <span>${escapeHtml(corridor.name)}</span>
+            <span>${escapeHtml(depth.name)}</span>
+            <span>${escapeHtml(step.name)}</span>
+          </div>
+        `)}
+
         ${renderDisclosure("Local status", `<p class="privacy-row">${gateEntries.length} memories · ${completionsForGate(gate.id).length} completed practices · stored locally</p>`)}
       </aside>
 
@@ -766,7 +772,7 @@ function renderToday() {
           <div class="card-visual intention-visual" aria-hidden="true"></div>
           <p class="micro-label">Daily intention</p>
           <h3>${escapeHtml(gate.question)}</h3>
-          <p>Choose one clean sentence to carry through the day.</p>
+          <p>Choose one clean sentence.</p>
           <button class="ghost-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Set Intention</button>
         </article>
         <article class="observatory-card">
@@ -780,7 +786,7 @@ function renderToday() {
           <div class="card-visual journal-visual" aria-hidden="true"></div>
           <p class="micro-label">Journaling</p>
           <h3>${gateEntries.length ? `${gateEntries.length} memories saved` : "Begin the memory field"}</h3>
-          <p>Capture insights, patterns, and moments of connection.</p>
+          <p>Save the signal while it is fresh.</p>
           <button class="ghost-button" type="button" data-action="new-entry">Continue Journal</button>
         </article>
       </div>
@@ -990,13 +996,18 @@ function renderPractices() {
     const matchesStatus = status === "all" || (status === "done" && done) || (status === "open" && !done);
     return matchesTerm && matchesStatus;
   });
+  const selected = getPractice(state.selectedPracticeId);
+  const featured = practicesList.find((practice) => practice.id === selected?.id) || practicesList[0] || null;
+  const visiblePractices = featured
+    ? [featured, ...practicesList.filter((practice) => practice.id !== featured.id)].slice(0, 18)
+    : [];
 
   return `
     <section class="library-head">
       <div>
-        <p class="micro-label">72 concrete actions</p>
+        <p class="micro-label">Practice instrument</p>
         <h2>Practice Bank</h2>
-        <p>Every gate has three actions that can be completed by anyone: body, writing, observation, relationship, ritual, environment, or creative work.</p>
+        <p>Choose one concrete action. Keep the rest available without letting the whole archive crowd the moment.</p>
       </div>
       <div class="practice-library-tools">
         ${renderVoiceButton(VOICE_GUIDES.practice)}
@@ -1011,9 +1022,29 @@ function renderPractices() {
       </div>
     </section>
 
-    <div class="practice-grid">
-      ${practicesList.map((practice) => renderPracticeCard(practice)).join("")}
-    </div>
+    ${featured ? `
+      <div class="practice-bank-shell">
+        ${renderPracticeSpotlight(featured, practicesList.length)}
+        <section class="practice-list-panel">
+          <div class="practice-list-head">
+            <div>
+              <p class="micro-label">Available practices</p>
+              <h3>${practicesList.length} ${practicesList.length === 1 ? "match" : "matches"}</h3>
+            </div>
+            <span>${visiblePractices.length === practicesList.length ? "All shown" : `Showing ${visiblePractices.length}`}</span>
+          </div>
+          <div class="practice-list">
+            ${visiblePractices.map((practice) => renderPracticeRow(practice, featured.id)).join("")}
+          </div>
+        </section>
+      </div>
+    ` : `
+      <section class="empty-state">
+        <p class="micro-label">No practices found</p>
+        <h2>No matching practice.</h2>
+        <p>Clear the search or change the filter to return to the full bank.</p>
+      </section>
+    `}
   `;
 }
 
@@ -1395,6 +1426,50 @@ function renderPracticeCard(practice) {
         <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
       </div>
     </article>
+  `;
+}
+
+function renderPracticeSpotlight(practice, total) {
+  const gate = getGate(practice.gateId);
+  const step = getStep(gate.mapping.step);
+  const done = completionForPractice(practice.id);
+  return `
+    <article class="practice-spotlight ${done ? "completed" : ""}">
+      <div class="spotlight-meta">
+        <span>Gate ${String(gate.id).padStart(2, "0")} · ${escapeHtml(gate.title)}</span>
+        <span>${escapeHtml(practice.duration)}</span>
+      </div>
+      <p class="micro-label">${total} practices in this view</p>
+      <h3>${escapeHtml(practice.title)}</h3>
+      <p>${escapeHtml(practice.action)}</p>
+      <div class="theme-row">
+        <span>${escapeHtml(practice.type)}</span>
+        <span>${escapeHtml(step.name)}</span>
+      </div>
+      ${renderDisclosure("Prompt", `<code>${escapeHtml(practice.prompt)}</code>`, "card-disclosure")}
+      <div class="panel-actions">
+        <button class="primary-button" type="button" data-action="start-practice" data-practice="${practice.id}">Start Practice</button>
+        <button class="ghost-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal</button>
+        <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderPracticeRow(practice, selectedId) {
+  const gate = getGate(practice.gateId);
+  const done = completionForPractice(practice.id);
+  return `
+    <button class="practice-row ${practice.id === selectedId ? "selected" : ""} ${done ? "completed" : ""}" type="button" data-action="choose-practice" data-practice="${practice.id}">
+      <span>
+        <small>Gate ${gate.id} · ${escapeHtml(gate.title)}</small>
+        <strong>${escapeHtml(practice.title)}</strong>
+      </span>
+      <span>
+        <small>${escapeHtml(practice.type)}</small>
+        <em>${done ? "Done" : escapeHtml(practice.duration)}</em>
+      </span>
+    </button>
   `;
 }
 
