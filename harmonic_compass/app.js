@@ -6,7 +6,7 @@ const DRAFT_KEY = "harmonic-compass-draft-v2";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const VOICE_VERSION = "20";
+const VOICE_VERSION = "21";
 const VOICE_BASE = "./voice/audio/";
 
 const VOICE_GUIDES = {
