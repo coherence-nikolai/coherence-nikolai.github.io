@@ -1,6 +1,8 @@
 const copy = {
   en: {
     label: "Free web ritual",
+    navApps: "Apps",
+    navSupport: "Support",
     heroTitle: "Try Tone Ritual",
     heroLine: "Ten small acts. One changed field.",
     heroCopy: "Choose a small ritual, receive ten acts, complete any that feel possible, and save a private field note in this browser.",
@@ -42,6 +44,9 @@ const copy = {
     iosCopy: "Tone Ritual for iOS includes larger rotating act libraries, 9 languages, local field notes, and Tone Plus ritual packs.",
     downloadButton: "Download Tone Ritual",
     footerNote: "Tone Ritual is a reflective wellbeing app, not medical advice, therapy, diagnosis, crisis support, or an emergency service.",
+    footerPrivacy: "Privacy",
+    footerTerms: "Terms",
+    footerSupport: "Support",
     done: "Done",
     mark: "Mark",
     oneAct: "One act matters.",
@@ -53,6 +58,8 @@ const copy = {
   },
   es: {
     label: "Ritual web gratis",
+    navApps: "Apps",
+    navSupport: "Soporte",
     heroTitle: "Prueba Tone Ritual",
     heroLine: "Diez actos pequeños. Un campo que cambia.",
     heroCopy: "Elige un ritual pequeño, recibe diez actos, completa los que se sientan posibles y guarda una nota privada en este navegador.",
@@ -94,6 +101,9 @@ const copy = {
     iosCopy: "Tone Ritual para iOS incluye bibliotecas rotativas más amplias, 9 idiomas, notas locales y packs Tone Plus.",
     downloadButton: "Descargar Tone Ritual",
     footerNote: "Tone Ritual es una app de bienestar reflexivo, no consejo médico, terapia, diagnóstico, apoyo de crisis ni servicio de emergencia.",
+    footerPrivacy: "Privacidad",
+    footerTerms: "Términos",
+    footerSupport: "Soporte",
     done: "Hecho",
     mark: "Marcar",
     oneAct: "Un acto importa.",
