@@ -17,8 +17,8 @@
     <meta property="og:url" content="https://coherence-nikolai.app/innerorbit/">
     <title>Inner Orbit - Hold both</title>
     <link rel="icon" href="./assets/favicon-BHggJHi1.svg" type="image/svg+xml">
-    <script type="module" crossorigin src="./assets/index-3qng-s1m.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-FvafPVnH.css">
+    <script type="module" crossorigin src="./assets/index-C4RqUTFD.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DJ-YAAMK.css">
   </head>
   <body>
     <div id="app" class="practice-app">
@@ -90,6 +90,42 @@
               >
             </div>
 
+            <div class="mode-row">
+              <span class="field-caption">Practice mode</span>
+              <fieldset class="segmented-field compact mode-field" aria-label="Practice mode">
+                <label>
+                  <input type="radio" name="practiceMode" value="natural" checked>
+                  <span>Natural</span>
+                </label>
+                <label>
+                  <input type="radio" name="practiceMode" value="breath">
+                  <span>Breath</span>
+                </label>
+              </fieldset>
+            </div>
+
+            <div class="breath-row" id="breathPatternRow" hidden>
+              <span class="field-caption">Breath rhythm</span>
+              <fieldset class="segmented-field compact breath-field" aria-label="Breath rhythm">
+                <label>
+                  <input type="radio" name="breathPattern" value="box" checked>
+                  <span>4 4 4 4</span>
+                </label>
+                <label>
+                  <input type="radio" name="breathPattern" value="calm">
+                  <span>4 2 6 2</span>
+                </label>
+                <label>
+                  <input type="radio" name="breathPattern" value="deep">
+                  <span>5 5 7 3</span>
+                </label>
+                <label>
+                  <input type="radio" name="breathPattern" value="release">
+                  <span>4 7 8 1</span>
+                </label>
+              </fieldset>
+            </div>
+
             <div class="voice-row">
               <span class="field-caption">Guide voice</span>
               <fieldset class="segmented-field compact voice-field" aria-label="Guide voice">
@@ -99,7 +135,7 @@
                 </label>
                 <label>
                   <input type="radio" name="voiceGuide" value="soft">
-                  <span>Soft</span>
+                  <span>Guide</span>
                 </label>
                 <label>
                   <input type="radio" name="voiceGuide" value="mine">
@@ -144,7 +180,7 @@
         <section class="practice-dock" id="practiceDock" aria-label="Practice controls" hidden>
           <div class="dock-copy">
             <span id="phaseTimer">0:00</span>
-            <strong id="dockCue">Let the breath be natural.</strong>
+            <strong id="dockCue">Watch the orbs. Let breath be natural.</strong>
           </div>
           <div class="dock-actions">
             <button class="icon-button" type="button" id="pauseButton" aria-label="Pause practice">Pause</button>
@@ -174,14 +210,31 @@
       <dialog id="aboutDialog" class="about-dialog">
         <button class="dialog-close" type="button" id="closeAbout" aria-label="Close about">Close</button>
         <h2>Inner Orbit</h2>
-        <p>
-          A symbolic paradox practice inspired by mathematical, geometric, and consciousness-related themes
-          explored in the works of Robert Edward Grant. Independently created.
-        </p>
-        <p>
-          The amber loop holds what is here. The blue field holds what is also true.
-          The gold center is where attention practices holding both.
-        </p>
+        <div class="about-tabs" role="tablist" aria-label="About Inner Orbit">
+          <button type="button" class="about-tab is-active" data-about-tab="practice">Practice</button>
+          <button type="button" class="about-tab" data-about-tab="breath">Breath</button>
+        </div>
+        <section class="about-panel is-active" data-about-panel="practice">
+          <p>
+            A symbolic paradox practice inspired by mathematical, geometric, and consciousness-related themes
+            explored in the works of Robert Edward Grant. Independently created.
+          </p>
+          <p>
+            The copper loop holds what is present. The blue field holds what is also true.
+            The pale-gold center is where attention practices holding both.
+          </p>
+        </section>
+        <section class="about-panel" data-about-panel="breath" hidden>
+          <p>
+            Breath mode is inspired by Grant's breath-as-lens framing, translated here into a simple visual guide.
+          </p>
+          <ul>
+            <li>Inhale: follow the blue hyperboloid orb.</li>
+            <li>Pause: let the pale-gold focal ring shine.</li>
+            <li>Exhale: follow the copper toroidal orb.</li>
+            <li>Rest: let the whole field settle.</li>
+          </ul>
+        </section>
       </dialog>
     </div>
 
