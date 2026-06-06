@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta
       name="description"
-      content="Inner Orbit is a phone-first paradox-holding breath practice with a luminous toroid, hyperboloid, and center ring."
+      content="Inner Orbit is a phone-first paradox-holding practice with a luminous toroid, hyperboloid, and center ring."
     >
     <link rel="canonical" href="https://coherence-nikolai.app/innerorbit/">
     <meta property="og:title" content="Inner Orbit">
     <meta
       property="og:description"
-      content="A phone-first paradox-holding breath practice with a luminous toroid, hyperboloid, and center ring."
+      content="A phone-first paradox-holding practice with a luminous toroid, hyperboloid, and center ring."
     >
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://coherence-nikolai.app/innerorbit/">
     <title>Inner Orbit - Hold both</title>
     <link rel="icon" href="./assets/favicon-BHggJHi1.svg" type="image/svg+xml">
-    <script type="module" crossorigin src="./assets/index-Cq5TPcYW.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BBqS9RHv.css">
+    <script type="module" crossorigin src="./assets/index-3qng-s1m.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-FvafPVnH.css">
   </head>
   <body>
     <div id="app" class="practice-app">
@@ -90,24 +90,6 @@
               >
             </div>
 
-            <div class="pattern-row">
-              <span class="field-caption">Breath pattern</span>
-              <fieldset class="segmented-field compact pattern-field" aria-label="Breath pattern">
-                <label>
-                  <input type="radio" name="pattern" value="gentle" checked>
-                  <span>Gentle</span>
-                </label>
-                <label>
-                  <input type="radio" name="pattern" value="balanced">
-                  <span>Balanced</span>
-                </label>
-                <label>
-                  <input type="radio" name="pattern" value="deep">
-                  <span>Deep</span>
-                </label>
-              </fieldset>
-            </div>
-
             <div class="voice-row">
               <span class="field-caption">Guide voice</span>
               <fieldset class="segmented-field compact voice-field" aria-label="Guide voice">
@@ -135,30 +117,16 @@
               <p class="voice-status" id="voiceStatus" aria-live="polite">Record the general cues once.</p>
             </section>
 
-            <div class="choice-row">
+            <div class="choice-row simple-choice-row">
               <div>
-                <span class="field-caption">Breath begins with</span>
-                <fieldset class="segmented-field compact" aria-label="Breath direction">
+                <span class="field-caption">Practice length</span>
+                <fieldset class="segmented-field compact duration-field" aria-label="Practice length">
                   <label>
-                    <input type="radio" name="direction" value="here" checked>
-                    <span>What is here</span>
+                    <input type="radio" name="duration" value="open" checked>
+                    <span>Open</span>
                   </label>
                   <label>
-                    <input type="radio" name="direction" value="also">
-                    <span>What is also true</span>
-                  </label>
-                </fieldset>
-              </div>
-
-              <div>
-                <span class="field-caption">Duration</span>
-                <fieldset class="segmented-field compact duration-field" aria-label="Duration">
-                  <label>
-                    <input type="radio" name="duration" value="1">
-                    <span>1</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="duration" value="3" checked>
+                    <input type="radio" name="duration" value="3">
                     <span>3</span>
                   </label>
                   <label>
@@ -175,11 +143,11 @@
 
         <section class="practice-dock" id="practiceDock" aria-label="Practice controls" hidden>
           <div class="dock-copy">
-            <span id="phaseTimer">3:00</span>
-            <strong id="dockCue">Hold both.</strong>
+            <span id="phaseTimer">0:00</span>
+            <strong id="dockCue">Let the breath be natural.</strong>
           </div>
           <div class="dock-actions">
-            <button class="icon-button" type="button" id="pauseButton" aria-label="Pause">Pause</button>
+            <button class="icon-button" type="button" id="pauseButton" aria-label="Pause practice">Pause</button>
             <button class="icon-button" type="button" id="endButton" aria-label="End practice">End</button>
           </div>
         </section>
@@ -207,7 +175,7 @@
         <button class="dialog-close" type="button" id="closeAbout" aria-label="Close about">Close</button>
         <h2>Inner Orbit</h2>
         <p>
-          A symbolic breath practice inspired by mathematical, geometric, and consciousness-related themes
+          A symbolic paradox practice inspired by mathematical, geometric, and consciousness-related themes
           explored in the works of Robert Edward Grant. Independently created.
         </p>
         <p>
