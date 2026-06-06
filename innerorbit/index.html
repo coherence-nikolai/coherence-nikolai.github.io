@@ -17,8 +17,8 @@
     <meta property="og:url" content="https://coherence-nikolai.app/innerorbit/">
     <title>Inner Orbit - Hold both</title>
     <link rel="icon" href="./assets/favicon-BHggJHi1.svg" type="image/svg+xml">
-    <script type="module" crossorigin src="./assets/index-BlvemvJo.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CNz7nqE-.css">
+    <script type="module" crossorigin src="./assets/index-DgDTy-gB.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CQJIN37A.css">
   </head>
   <body>
     <div id="app" class="practice-app">
@@ -107,6 +107,33 @@
                 </label>
               </fieldset>
             </div>
+
+            <div class="voice-row">
+              <span class="field-caption">Guide voice</span>
+              <fieldset class="segmented-field compact voice-field" aria-label="Guide voice">
+                <label>
+                  <input type="radio" name="voiceGuide" value="off" checked>
+                  <span>Off</span>
+                </label>
+                <label>
+                  <input type="radio" name="voiceGuide" value="soft">
+                  <span>Soft</span>
+                </label>
+                <label>
+                  <input type="radio" name="voiceGuide" value="mine">
+                  <span>Mine</span>
+                </label>
+              </fieldset>
+            </div>
+
+            <section class="voice-recorder-panel" id="voiceRecorderPanel" aria-label="My voice guide" hidden>
+              <div class="voice-panel-head">
+                <strong>My voice guide</strong>
+                <button class="text-button" type="button" id="voiceResetButton">Clear</button>
+              </div>
+              <div class="voice-cue-list" id="voiceCueList"></div>
+              <p class="voice-status" id="voiceStatus" aria-live="polite">Record the general cues once.</p>
+            </section>
 
             <div class="choice-row">
               <div>
