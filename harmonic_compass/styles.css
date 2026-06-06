@@ -1235,12 +1235,21 @@ blockquote {
   fill: none;
   stroke: rgba(118, 214, 255, 0.62);
   stroke-width: 2;
+  stroke-dasharray: 420 190 80 360;
+  stroke-linecap: round;
+  opacity: 0.76;
   transform-origin: 360px 360px;
   filter: drop-shadow(0 0 12px rgba(118, 214, 255, 0.20));
 }
 
+.orbit-one {
+  stroke-dashoffset: 90;
+}
+
 .orbit-two {
   stroke: rgba(140, 239, 216, 0.34);
+  stroke-dasharray: 360 260 110 300;
+  stroke-dashoffset: 280;
 }
 
 .wheel-segment path {
@@ -1777,22 +1786,24 @@ textarea {
   }
 
   .orbit-one {
-    animation: orbitDrift 28s linear infinite;
+    animation: orbitTrace 18s ease-in-out infinite alternate;
   }
 
   .orbit-two {
-    animation: orbitDriftReverse 36s linear infinite;
+    animation: orbitTraceSoft 24s ease-in-out infinite alternate;
   }
 
-  @keyframes orbitDrift {
+  @keyframes orbitTrace {
     to {
-      transform: rotate(360deg);
+      stroke-dashoffset: -80;
+      opacity: 0.58;
     }
   }
 
-  @keyframes orbitDriftReverse {
+  @keyframes orbitTraceSoft {
     to {
-      transform: rotate(-322deg);
+      stroke-dashoffset: 80;
+      opacity: 0.46;
     }
   }
 
@@ -2260,6 +2271,79 @@ textarea {
   line-height: 1.58;
 }
 
+.soft-disclosure {
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(220, 235, 255, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(118, 214, 255, 0.045), rgba(247, 213, 142, 0.03)),
+    rgba(2, 5, 12, 0.18);
+}
+
+.soft-disclosure + .soft-disclosure {
+  margin-top: 10px;
+}
+
+.soft-disclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 13px;
+  color: rgba(251, 243, 230, 0.76);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  list-style: none;
+}
+
+.soft-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.soft-disclosure summary::after {
+  content: "+";
+  color: var(--gold-soft);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.soft-disclosure[open] summary::after {
+  content: "-";
+}
+
+.disclosure-body {
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid rgba(220, 235, 255, 0.10);
+  padding: 13px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.disclosure-body p,
+.disclosure-body h3,
+.disclosure-body blockquote {
+  margin: 0;
+}
+
+.disclosure-body blockquote {
+  color: rgba(251, 243, 230, 0.88);
+  font-family: var(--display);
+  font-size: clamp(1.25rem, 1.8vw, 1.8rem);
+  line-height: 1.15;
+}
+
+.disclosure-stack {
+  display: grid;
+  gap: 14px;
+}
+
 .rhythm-ladder {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2335,7 +2419,7 @@ textarea {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 270px;
+  min-height: 225px;
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -2378,9 +2462,13 @@ textarea {
 }
 
 .practice-card code {
+  border-top: 0;
+  padding-top: 0;
+  font-size: 0.78rem;
+}
+
+.practice-card .soft-disclosure {
   margin-top: 14px;
-  border-top: 1px solid rgba(247, 213, 142, 0.22);
-  padding-top: 12px;
 }
 
 .gate-detail-layout {
@@ -2502,6 +2590,15 @@ textarea {
   font-size: clamp(2rem, 3.2vw, 3.4rem);
 }
 
+.practice-session-hero h2 {
+  font-size: clamp(2.25rem, 3.7vw, 4.3rem);
+}
+
+.session-steps-panel h2 {
+  font-size: clamp(1.8rem, 2.6vw, 2.75rem);
+  line-height: 1.02;
+}
+
 .detail-essence {
   max-width: 820px;
   margin: 0;
@@ -2509,6 +2606,15 @@ textarea {
   font-family: var(--display);
   font-size: clamp(1.7rem, 2.7vw, 3.2rem);
   line-height: 1.05;
+}
+
+.session-action-line {
+  max-width: 680px;
+  margin: 0;
+  color: rgba(251, 243, 230, 0.84);
+  font-family: var(--display);
+  font-size: clamp(1.28rem, 1.7vw, 2rem);
+  line-height: 1.16;
 }
 
 .detail-tags {
@@ -2585,7 +2691,7 @@ textarea {
 
 .practice-session-layout {
   display: grid;
-  grid-template-columns: minmax(320px, 0.78fr) minmax(420px, 1fr) 330px;
+  grid-template-columns: minmax(300px, 0.72fr) minmax(420px, 1fr) minmax(260px, 0.58fr);
   gap: 18px;
   align-items: start;
 }
@@ -2606,11 +2712,12 @@ textarea {
 .session-step-card {
   display: grid;
   gap: 10px;
-  min-height: 220px;
+  min-height: 168px;
   padding: 18px;
+  align-content: start;
 }
 
-.session-step-card span {
+.session-step-card > .step-index {
   display: grid;
   place-items: center;
   width: 36px;
@@ -2639,6 +2746,7 @@ textarea {
 }
 
 .session-step-card.active {
+  min-height: 230px;
   border-color: rgba(247, 213, 142, 0.54);
   background:
     linear-gradient(145deg, rgba(247, 213, 142, 0.13), rgba(118, 214, 255, 0.08)),
@@ -2647,6 +2755,15 @@ textarea {
     0 30px 90px rgba(0, 0, 0, 0.48),
     0 0 32px rgba(247, 213, 142, 0.10),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.session-step-card.is-compact {
+  gap: 8px;
+  color: rgba(251, 243, 230, 0.74);
+}
+
+.session-step-card.is-compact h3 {
+  font-size: 1.35rem;
 }
 
 .journal-prompt {

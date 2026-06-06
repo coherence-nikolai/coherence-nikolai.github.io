@@ -6,7 +6,7 @@ const DRAFT_KEY = "harmonic-compass-draft-v2";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const VOICE_VERSION = "17";
+const VOICE_VERSION = "18";
 const VOICE_BASE = "./voice/audio/";
 
 const VOICE_GUIDES = {
@@ -748,12 +748,17 @@ function renderToday() {
 
         <div class="panel-actions">
           <button class="primary-button full" type="button" data-action="start-practice" data-practice="${practice.id}">Start Practice</button>
-          <button class="ghost-button full" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate</button>
-          <button class="ghost-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Open Journal</button>
-          <button class="ghost-button full" type="button" data-action="toggle-practice" data-practice="${practice.id}">${complete ? "Mark Open" : "Mark Done"}</button>
         </div>
 
-        <p class="privacy-row">${gateEntries.length} memories · ${completionsForGate(gate.id).length} completed practices · stored locally</p>
+        ${renderDisclosure("More actions", `
+          <div class="panel-actions vertical">
+            <button class="ghost-button full" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate</button>
+            <button class="ghost-button full" type="button" data-action="journal-practice" data-practice="${practice.id}">Open Journal</button>
+            <button class="ghost-button full" type="button" data-action="toggle-practice" data-practice="${practice.id}">${complete ? "Mark Open" : "Mark Done"}</button>
+          </div>
+        `)}
+
+        ${renderDisclosure("Local status", `<p class="privacy-row">${gateEntries.length} memories · ${completionsForGate(gate.id).length} completed practices · stored locally</p>`)}
       </aside>
 
       <div class="observatory-card-grid">
@@ -818,11 +823,11 @@ function renderWheelView() {
         <h2>Gate ${gate.id}<br>${escapeHtml(gate.title)}</h2>
         <p>${escapeHtml(gate.essence)}</p>
         ${renderVoicePanel([VOICE_GUIDES.wheel, gateVoice(gate)], "Voice guide")}
-        <div class="selection-grid">
+        ${renderDisclosure("Compass map", `<div class="selection-grid">
           <div><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</div>
           <div><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.mode)}</div>
           <div><strong>${escapeHtml(step.name)}</strong>${escapeHtml(gate.mapping.reason)}</div>
-        </div>
+        </div>`)}
         <div class="focus-card practice-focus">
           <p class="micro-label">Suggested practice</p>
           <h3>${escapeHtml(practice.title)}</h3>
@@ -869,7 +874,7 @@ function renderGates() {
             <p>${escapeHtml(gate.essence)}</p>
             <div class="theme-row">
               <span>${escapeHtml(corridor.name)}</span>
-              ${gate.themes.map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
+              ${gate.themes.slice(0, 2).map((theme) => `<span>${escapeHtml(theme)}</span>`).join("")}
             </div>
             <div class="card-actions">
               <button class="ghost-button" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate</button>
@@ -927,24 +932,35 @@ function renderGateDetail() {
       </section>
 
       <aside class="gate-detail-side">
-        <div class="stat-strip stacked">
-          <span><strong>${entries.length}</strong>${entries.length === 1 ? "saved memory" : "saved memories"}</span>
-          <span><strong>${completed.length}</strong>${completed.length === 1 ? "practice complete" : "practices complete"}</span>
-          <span><strong>${escapeHtml(step.name)}</strong>active movement</span>
-        </div>
-
         <article class="focus-card practice-focus">
-          <p class="micro-label">Shadow signal</p>
-          <h3>${escapeHtml(gate.shadow)}</h3>
-          <p>Use this as a signal for practice, not as a verdict.</p>
+          <p class="micro-label">Start here</p>
+          <h3>${escapeHtml(practice.title)}</h3>
+          <p>${escapeHtml(practice.action)}</p>
         </article>
 
-        <article class="focus-card practice-focus">
-          <p class="micro-label">Compass lens</p>
-          <h3>${escapeHtml(depth.name)}</h3>
-          <p>${escapeHtml(depth.mode)}</p>
-          <p>${escapeHtml(gate.mapping.reason)}</p>
-        </article>
+        ${renderDisclosure("Shadow and lens", `
+          <div class="disclosure-stack">
+            <div>
+              <p class="micro-label">Shadow signal</p>
+              <h3>${escapeHtml(gate.shadow)}</h3>
+              <p>Use this as a signal for practice, not as a verdict.</p>
+            </div>
+            <div>
+              <p class="micro-label">Compass lens</p>
+              <h3>${escapeHtml(depth.name)}</h3>
+              <p>${escapeHtml(depth.mode)}</p>
+              <p>${escapeHtml(gate.mapping.reason)}</p>
+            </div>
+          </div>
+        `)}
+
+        ${renderDisclosure("Saved progress", `
+          <div class="stat-strip stacked">
+            <span><strong>${entries.length}</strong>${entries.length === 1 ? "saved memory" : "saved memories"}</span>
+            <span><strong>${completed.length}</strong>${completed.length === 1 ? "practice complete" : "practices complete"}</span>
+            <span><strong>${escapeHtml(step.name)}</strong>active movement</span>
+          </div>
+        `)}
       </aside>
 
       <section class="gate-practice-suite">
@@ -1042,7 +1058,7 @@ function renderPracticeSession() {
         </div>
         <p class="micro-label">Gate ${String(gate.id).padStart(2, "0")} · ${escapeHtml(gate.title)}</p>
         <h2>${escapeHtml(practice.title)}</h2>
-        <p class="detail-essence">${escapeHtml(practice.action)}</p>
+        <p class="session-action-line">${escapeHtml(practice.action)}</p>
         <div class="gate-tags detail-tags">
           <span>${escapeHtml(practice.duration)}</span>
           <span>${escapeHtml(practice.type)}</span>
@@ -1050,10 +1066,7 @@ function renderPracticeSession() {
         </div>
         ${renderVoicePanel([VOICE_GUIDES.practice, gateVoice(gate)], "Voice guide")}
 
-        <div class="session-prompt-card">
-          <p class="micro-label">Reflection prompt</p>
-          <blockquote>${escapeHtml(practice.prompt)}</blockquote>
-        </div>
+        ${renderDisclosure("Reflection prompt", `<blockquote>${escapeHtml(practice.prompt)}</blockquote>`, "prompt-disclosure")}
 
         <div class="panel-actions">
           <button class="primary-button" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal This Practice</button>
@@ -1065,31 +1078,40 @@ function renderPracticeSession() {
         <p class="micro-label">Guided session</p>
         <h2>Seed → Motion → Mirror → Return</h2>
         <div class="session-step-grid">
-          ${sessionSteps.map((item, index) => `
-            <article class="session-step-card ${item.name === step.name ? "active" : ""}">
-              <span>${index + 1}</span>
-              <h3>${escapeHtml(item.name)}</h3>
-              <strong>${escapeHtml(item.label)}</strong>
-              <p>${escapeHtml(item.body)}</p>
-              <small>${escapeHtml(item.action)}</small>
-              ${renderVoiceButton(STEP_VOICE[item.name], { compact: true })}
-            </article>
-          `).join("")}
+          ${sessionSteps.map((item, index) => {
+            const active = item.name === step.name;
+            return `
+              <article class="session-step-card ${active ? "active" : "is-compact"}">
+                <span class="step-index">${index + 1}</span>
+                <h3>${escapeHtml(item.name)}</h3>
+                <strong>${escapeHtml(item.label)}</strong>
+                ${active ? `
+                  <p>${escapeHtml(item.body)}</p>
+                  <small>${escapeHtml(item.action)}</small>
+                ` : ""}
+                ${renderVoiceButton(STEP_VOICE[item.name], { compact: true })}
+              </article>
+            `;
+          }).join("")}
         </div>
       </section>
 
       <aside class="session-side-panel">
         <article class="focus-card practice-focus">
           <p class="micro-label">${done ? "Completed" : "Current status"}</p>
-          <h3>${done ? "This practice is complete." : "This practice is ready."}</h3>
-          <p>${done ? `Completed ${formatDate(done.completedAt)}.` : "Move through the four steps, then choose whether to journal, mark done, or return to the gate."}</p>
+          <h3>${done ? "Complete." : "Ready."}</h3>
+          <p>${done ? `Completed ${formatDate(done.completedAt)}.` : "Move through one step at a time."}</p>
         </article>
         ${done ? renderVoicePanel([VOICE_GUIDES.completion], "Completion audio") : ""}
-        <article class="focus-card practice-focus">
-          <p class="micro-label">Gate question</p>
-          <h3>${escapeHtml(gate.question)}</h3>
-          <p>${escapeHtml(gate.essence)}</p>
-        </article>
+        ${renderDisclosure("Gate context", `
+          <div class="disclosure-stack">
+            <div>
+              <p class="micro-label">Gate question</p>
+              <h3>${escapeHtml(gate.question)}</h3>
+            </div>
+            <p>${escapeHtml(gate.essence)}</p>
+          </div>
+        `)}
         <div class="panel-actions vertical">
           <button class="primary-button full" type="button" data-action="open-gate" data-gate="${gate.id}">View Gate Detail</button>
           <button class="ghost-button full" type="button" data-action="open-wheel">Open Wheel</button>
@@ -1208,25 +1230,25 @@ function renderMethod() {
       <article class="codex-article">
         <p class="micro-label">Four movements</p>
         <h3>How guidance is shaped</h3>
-        <div class="mini-matrix">
+        ${renderDisclosure("Show movements", `<div class="mini-matrix">
           ${RHYTHM_STEPS.map((step) => `<span><strong>${escapeHtml(step.name)}</strong>${escapeHtml(step.prompt)} ${escapeHtml(step.experience)}</span>`).join("")}
-        </div>
+        </div>`)}
       </article>
 
       <article class="codex-article">
         <p class="micro-label">Seven lenses</p>
         <h3>How a Gate is colored</h3>
-        <div class="mini-matrix">
+        ${renderDisclosure("Show lenses", `<div class="mini-matrix">
           ${CORRIDORS.map((corridor) => `<span><strong>${escapeHtml(corridor.name)}</strong>${escapeHtml(corridor.meaning)}</span>`).join("")}
-        </div>
+        </div>`)}
       </article>
 
       <article class="codex-article">
         <p class="micro-label">Five pattern layers</p>
         <h3>How a Gate is grounded</h3>
-        <div class="mini-matrix">
+        ${renderDisclosure("Show layers", `<div class="mini-matrix">
           ${DEPTHS.map((depth) => `<span><strong>${escapeHtml(depth.name)}</strong>${escapeHtml(depth.primitive)} · ${escapeHtml(depth.mode)}</span>`).join("")}
-        </div>
+        </div>`)}
       </article>
     </div>
 
@@ -1238,7 +1260,7 @@ function renderMethod() {
           <p>Mappings are intentionally curated for practice coherence. They decide which movement, lens, and layer shape the user's prompts.</p>
         </div>
       </div>
-      <div class="data-table mapping-table">
+      ${renderDisclosure("Show full mapping table", `<div class="data-table mapping-table">
         <div class="table-head"><strong>Gate</strong><strong>Lens</strong><strong>Layer</strong><strong>Rhythm</strong><strong>Reason</strong></div>
         ${GATES.map((gate) => `
           <div>
@@ -1249,7 +1271,7 @@ function renderMethod() {
             <span>${escapeHtml(gate.mapping.reason)}</span>
           </div>
         `).join("")}
-      </div>
+      </div>`)}
     </section>
   `;
 }
@@ -1362,17 +1384,26 @@ function renderPracticeCard(practice) {
       </div>
       <h3>${escapeHtml(practice.title)}</h3>
       <p>${escapeHtml(practice.action)}</p>
-      <code>${escapeHtml(practice.prompt)}</code>
       <div class="theme-row">
         <span>${escapeHtml(practice.type)}</span>
         <span>${escapeHtml(getStep(gate.mapping.step).name)}</span>
       </div>
+      ${renderDisclosure("Prompt", `<code>${escapeHtml(practice.prompt)}</code>`, "card-disclosure")}
       <div class="card-actions">
         <button class="ghost-button" type="button" data-action="start-practice" data-practice="${practice.id}">Start</button>
         <button class="primary-button small" type="button" data-action="journal-practice" data-practice="${practice.id}">Journal</button>
         <button class="ghost-button" type="button" data-action="toggle-practice" data-practice="${practice.id}">${done ? "Mark Open" : "Mark Done"}</button>
       </div>
     </article>
+  `;
+}
+
+function renderDisclosure(label, content, className = "") {
+  return `
+    <details class="soft-disclosure ${escapeAttr(className)}">
+      <summary>${escapeHtml(label)}</summary>
+      <div class="disclosure-body">${content}</div>
+    </details>
   `;
 }
 
