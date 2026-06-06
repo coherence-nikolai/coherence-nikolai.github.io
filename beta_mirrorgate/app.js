@@ -1745,6 +1745,45 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     renderContactPaths();
   }
 
+  function wheelPortalMark(moduleKey) {
+    const marks = {
+      mirror: `
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="12" y="14" width="32" height="24" rx="5"></rect>
+          <circle cx="44" cy="44" r="8"></circle>
+          <path d="M22 45h14M22 50h10"></path>
+        </svg>
+      `,
+      gate: `
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="12" r="5"></circle>
+          <circle cx="14" cy="46" r="5"></circle>
+          <circle cx="50" cy="46" r="5"></circle>
+          <path d="M32 17 18 42M32 17l14 25M19 46h26"></path>
+          <circle cx="32" cy="34" r="6"></circle>
+        </svg>
+      `,
+      breath: `
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <ellipse cx="32" cy="25" rx="20" ry="9"></ellipse>
+          <ellipse cx="32" cy="39" rx="20" ry="9"></ellipse>
+          <path d="M12 32c7-6 33-6 40 0M12 32c7 6 33 6 40 0"></path>
+          <path d="M24 32c3-3 13-3 16 0M24 32c3 3 13 3 16 0"></path>
+        </svg>
+      `,
+      vector: `
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M14 48 46 16"></path>
+          <path d="M31 16h15v15"></path>
+          <circle cx="14" cy="48" r="5"></circle>
+          <circle cx="32" cy="30" r="4"></circle>
+          <path d="M16 20c9-6 22-6 31 0M21 52c9 4 21 4 30-2"></path>
+        </svg>
+      `
+    };
+    return marks[moduleKey] || marks.mirror;
+  }
+
   function renderWheelSelection(moduleKey) {
     const module = modules[moduleKey] || modules.mirror;
     $$(".wheel-quadrant").forEach((button) => {
@@ -1758,7 +1797,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     panel.style.setProperty("--module-accent", module.accent);
     panel.innerHTML = `
       <p class="path-label">${escapeHtml(module.sequenceLabel)}</p>
-      <h3><span>${escapeHtml(module.icon)}</span>${escapeHtml(module.actionLabel)}</h3>
+      <h3><span class="panel-portal-mark">${wheelPortalMark(moduleKey)}</span>${escapeHtml(module.actionLabel)}</h3>
       <p class="path-label original-module-name">${escapeHtml(module.title)}</p>
       <p>${escapeHtml(module.wheelGuidance)}</p>
       <p class="small-copy">${escapeHtml(module.modality)}</p>

@@ -471,20 +471,30 @@ h3 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  width: min(88vw, 480px);
+  width: min(88vw, 520px);
   margin: 0 auto;
   aspect-ratio: 1;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--selected-accent) 64%, transparent);
+  border: 1px solid color-mix(in srgb, var(--selected-accent) 72%, transparent);
   border-radius: 50%;
   background:
-    radial-gradient(circle at center, rgba(7, 8, 13, 0.88) 0 23%, transparent 24%),
-    repeating-radial-gradient(circle at center, rgba(226, 184, 86, 0.12) 0 1px, transparent 1px 48px),
-    radial-gradient(circle at center, rgba(38, 47, 96, 0.35), rgba(2, 3, 7, 0.9) 72%);
+    radial-gradient(circle at center, rgba(6, 7, 13, 0.96) 0 21%, transparent 22%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--selected-accent) 22%, transparent), transparent 38%),
+    repeating-radial-gradient(circle at center, rgba(216, 226, 255, 0.13) 0 1px, transparent 1px 48px),
+    conic-gradient(
+      from -90deg,
+      color-mix(in srgb, var(--gate) 12%, transparent) 0 25%,
+      color-mix(in srgb, var(--vector) 12%, transparent) 25% 50%,
+      color-mix(in srgb, var(--echo) 12%, transparent) 50% 75%,
+      color-mix(in srgb, var(--mirror) 12%, transparent) 75% 100%
+    ),
+    radial-gradient(circle at center, rgba(43, 51, 106, 0.36), rgba(2, 3, 7, 0.92) 72%);
   box-shadow:
     inset 0 0 36px rgba(255, 255, 255, 0.04),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 0 40px color-mix(in srgb, var(--selected-accent) 24%, transparent);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 0 10px rgba(9, 11, 20, 0.52),
+    0 0 42px color-mix(in srgb, var(--selected-accent) 26%, transparent),
+    0 0 112px rgba(86, 120, 255, 0.1);
   animation: wheelAura 5.4s ease-in-out infinite;
 }
 
@@ -502,7 +512,7 @@ h3 {
   content: "";
   position: absolute;
   z-index: 3;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--selected-accent) 68%, rgba(210, 218, 245, 0.35)), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--selected-accent) 76%, rgba(210, 218, 245, 0.45)), transparent);
   pointer-events: none;
 }
 
@@ -544,30 +554,70 @@ h3 {
 
 .wheel-quadrant {
   position: relative;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   min-width: 0;
   min-height: 0;
   border: 0;
   color: var(--text);
   background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 18%, transparent), transparent 58%),
-    rgba(8, 9, 16, 0.5);
+    radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 16%, transparent), transparent 58%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 62%),
+    rgba(8, 9, 16, 0.43);
   cursor: pointer;
-  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  text-align: center;
+  transition: background 180ms ease, box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.wheel-quadrant::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--module-accent) 22%, transparent), transparent 68%),
+    linear-gradient(135deg, color-mix(in srgb, var(--module-accent) 12%, transparent), transparent 58%);
+  opacity: 0.34;
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+.wheel-quadrant::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 18%, transparent), transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
 }
 
 .wheel-quadrant:hover,
 .wheel-quadrant.selected {
   background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 38%, transparent), transparent 62%),
-    rgba(12, 13, 22, 0.7);
+    radial-gradient(circle at center, color-mix(in srgb, var(--module-accent) 34%, transparent), transparent 64%),
+    linear-gradient(135deg, color-mix(in srgb, var(--module-accent) 12%, transparent), transparent 62%),
+    rgba(12, 13, 22, 0.72);
   box-shadow:
-    inset 0 0 48px color-mix(in srgb, var(--module-accent) 24%, transparent),
-    0 0 34px color-mix(in srgb, var(--module-accent) 18%, transparent);
-  transform: scale(1.012);
+    inset 0 0 54px color-mix(in srgb, var(--module-accent) 28%, transparent),
+    0 0 34px color-mix(in srgb, var(--module-accent) 20%, transparent);
+  filter: saturate(1.1);
+}
+
+.wheel-quadrant:hover::before,
+.wheel-quadrant.selected::before {
+  opacity: 0.88;
+  filter: saturate(1.2);
+}
+
+.wheel-quadrant.selected::after {
+  opacity: 0.36;
+}
+
+.wheel-quadrant:hover .portal-mark,
+.wheel-quadrant.selected .portal-mark {
+  transform: translateY(-2px) scale(1.08);
 }
 
 .quadrant-mirror { --module-accent: var(--mirror); }
@@ -575,22 +625,82 @@ h3 {
 .quadrant-echo { --module-accent: var(--echo); }
 .quadrant-vector { --module-accent: var(--vector); }
 
-.wheel-quadrant .wheel-icon {
+.quadrant-mirror {
+  padding: 13% 16% 30% 24%;
+}
+
+.quadrant-gate {
+  padding: 13% 24% 30% 16%;
+}
+
+.quadrant-echo {
+  padding: 20% 16% 23% 24%;
+}
+
+.quadrant-vector {
+  padding: 20% 24% 23% 16%;
+}
+
+.portal-mark,
+.panel-portal-mark {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: clamp(42px, 6.5vw, 66px);
+  aspect-ratio: 1;
   color: var(--module-accent);
-  font-size: clamp(1.25rem, 5vw, 2rem);
-  line-height: 1;
-  text-shadow: 0 0 16px color-mix(in srgb, var(--module-accent) 76%, transparent);
+  border: 1px solid color-mix(in srgb, var(--module-accent) 34%, transparent);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 36%, color-mix(in srgb, var(--module-accent) 20%, transparent), transparent 68%),
+    rgba(5, 7, 13, 0.62);
+  box-shadow:
+    inset 0 0 18px color-mix(in srgb, var(--module-accent) 12%, transparent),
+    0 0 22px color-mix(in srgb, var(--module-accent) 28%, transparent);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
-.wheel-quadrant strong {
+.portal-mark svg,
+.panel-portal-mark svg {
+  width: 72%;
+  height: 72%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--module-accent) 78%, transparent));
+}
+
+.portal-title {
+  position: relative;
+  z-index: 1;
   color: var(--silver);
-  font-size: clamp(0.9rem, 3.6vw, 1.2rem);
-  line-height: 1;
+  font-size: clamp(0.98rem, 2.4vw, 1.38rem);
+  font-weight: 900;
+  line-height: 1.05;
+  text-shadow: 0 1px 20px rgba(0, 0, 0, 0.45);
 }
 
-.wheel-quadrant small {
+.portal-action {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  padding: 5px 10px 6px;
+  border: 1px solid color-mix(in srgb, var(--module-accent) 32%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--module-accent) 12%, rgba(4, 5, 10, 0.64));
   color: var(--module-accent);
   font-weight: 800;
+  font-size: clamp(0.72rem, 1.4vw, 0.88rem);
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--module-accent) 12%, transparent);
 }
 
 .wheel-center {
@@ -662,6 +772,12 @@ h3 {
   justify-content: center;
   gap: 9px;
   color: var(--module-accent);
+}
+
+.wheel-selected-panel .panel-portal-mark {
+  width: 48px;
+  flex: 0 0 auto;
+  border-radius: 15px;
 }
 
 .wheel-selected-panel .original-module-name {
@@ -1804,7 +1920,12 @@ h3 {
 
   #screen-wheel > h2 {
     margin-bottom: 4px;
-    font-size: clamp(4.2rem, 6vw, 6.8rem);
+    font-size: clamp(3.35rem, 4.8vw, 5rem);
+    line-height: 0.95;
+  }
+
+  #screen-wheel > .lede {
+    margin-bottom: 8px;
   }
 
   .wheel-card {
@@ -1814,7 +1935,7 @@ h3 {
   }
 
   .quadrant-wheel {
-    width: min(38vw, 500px);
+    width: min(37vw, 492px);
   }
 
   .wheel-selected-panel {
@@ -2046,12 +2167,23 @@ h3 {
     width: min(76vw, 326px);
   }
 
-  .wheel-quadrant strong {
+  .portal-mark {
+    width: 36px;
+    border-radius: 12px;
+  }
+
+  .portal-mark svg {
+    stroke-width: 3.4;
+  }
+
+  .portal-title {
     font-size: 0.9rem;
   }
 
-  .wheel-quadrant small {
-    font-size: 0.74rem;
+  .portal-action {
+    min-width: 58px;
+    padding: 4px 7px 5px;
+    font-size: 0.68rem;
   }
 
   .wheel-selected-panel {

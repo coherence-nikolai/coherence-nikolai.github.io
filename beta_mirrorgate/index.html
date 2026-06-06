@@ -75,24 +75,53 @@
       <div class="wheel-card" aria-label="Harmonic Wheel">
         <div class="quadrant-wheel" id="quadrant-wheel">
           <button class="wheel-quadrant quadrant-mirror selected" data-wheel-module="mirror" aria-label="Symbolic Mirror Interface">
-            <span class="wheel-icon">▣</span>
-            <strong>Mirror</strong>
-            <small>Align</small>
+            <span class="portal-mark" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <rect x="12" y="14" width="32" height="24" rx="5"></rect>
+                <circle cx="44" cy="44" r="8"></circle>
+                <path d="M22 45h14M22 50h10"></path>
+              </svg>
+            </span>
+            <span class="portal-title">Mirror</span>
+            <span class="portal-action">Align</span>
           </button>
           <button class="wheel-quadrant quadrant-gate" data-wheel-module="gate" aria-label="Prime-Harmonic Gate Sequencing">
-            <span class="wheel-icon">⌬</span>
-            <strong>Gate</strong>
-            <small>Contact</small>
+            <span class="portal-mark" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <circle cx="32" cy="12" r="5"></circle>
+                <circle cx="14" cy="46" r="5"></circle>
+                <circle cx="50" cy="46" r="5"></circle>
+                <path d="M32 17 18 42M32 17l14 25M19 46h26"></path>
+                <circle cx="32" cy="34" r="6"></circle>
+              </svg>
+            </span>
+            <span class="portal-title">Gate</span>
+            <span class="portal-action">Contact</span>
           </button>
           <button class="wheel-quadrant quadrant-echo" data-wheel-module="breath" aria-label="Toroidal Phase Echoing">
-            <span class="wheel-icon">≋</span>
-            <strong>Echo</strong>
-            <small>Integrate</small>
+            <span class="portal-mark" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <ellipse cx="32" cy="25" rx="20" ry="9"></ellipse>
+                <ellipse cx="32" cy="39" rx="20" ry="9"></ellipse>
+                <path d="M12 32c7-6 33-6 40 0M12 32c7 6 33 6 40 0"></path>
+                <path d="M24 32c3-3 13-3 16 0M24 32c3 3 13 3 16 0"></path>
+              </svg>
+            </span>
+            <span class="portal-title">Echo</span>
+            <span class="portal-action">Integrate</span>
           </button>
           <button class="wheel-quadrant quadrant-vector" data-wheel-module="vector" aria-label="Harmonic Vector Transmission">
-            <span class="wheel-icon">↗</span>
-            <strong>Vector</strong>
-            <small>Transmit</small>
+            <span class="portal-mark" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <path d="M14 48 46 16"></path>
+                <path d="M31 16h15v15"></path>
+                <circle cx="14" cy="48" r="5"></circle>
+                <circle cx="32" cy="30" r="4"></circle>
+                <path d="M16 20c9-6 22-6 31 0M21 52c9 4 21 4 30-2"></path>
+              </svg>
+            </span>
+            <span class="portal-title">Vector</span>
+            <span class="portal-action">Transmit</span>
           </button>
           <div class="wheel-center" aria-hidden="true">
             <canvas id="wheel-center-sigil-canvas" width="220" height="220"></canvas>
