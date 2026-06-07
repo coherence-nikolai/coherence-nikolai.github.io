@@ -349,9 +349,10 @@
   }
 
   function createMetatronGeometry() {
-    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0.2 }];
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
     const innerRadius = 1;
     const outerRadius = 2;
+    const circleRadius = 1;
     for (let i = 0; i < 6; i += 1) {
       const angle = -Math.PI / 2 + i * Math.PI / 3;
       nodes.push({
@@ -359,7 +360,7 @@
         ring: "inner",
         x: Math.cos(angle) * innerRadius,
         y: Math.sin(angle) * innerRadius,
-        z: 0.04
+        z: 0
       });
     }
     for (let i = 0; i < 6; i += 1) {
@@ -369,29 +370,19 @@
         ring: "outer",
         x: Math.cos(angle) * outerRadius,
         y: Math.sin(angle) * outerRadius,
-        z: -0.18
+        z: 0
       });
     }
 
     const lines = [];
-    const add = (from, to, weight) => lines.push({ from, to, weight });
-    for (let i = 1; i <= 12; i += 1) add(0, i, 0.72);
-    for (let i = 0; i < 6; i += 1) {
-      const inner = 1 + i;
-      const nextInner = 1 + ((i + 1) % 6);
-      const skipInner = 1 + ((i + 2) % 6);
-      const outer = 7 + i;
-      const nextOuter = 7 + ((i + 1) % 6);
-      const skipOuter = 7 + ((i + 2) % 6);
-      add(inner, nextInner, 0.88);
-      add(inner, skipInner, 0.42);
-      add(outer, nextOuter, 0.7);
-      add(outer, skipOuter, 0.32);
-      add(inner, outer, 0.8);
-      add(inner, nextOuter, 0.5);
-      add(outer, nextInner, 0.44);
+    for (let from = 0; from < nodes.length; from += 1) {
+      for (let to = from + 1; to < nodes.length; to += 1) {
+        const distance = Math.hypot(nodes[from].x - nodes[to].x, nodes[from].y - nodes[to].y);
+        const weight = 0.25 + Math.max(0, 1 - distance / 4) * 0.75;
+        lines.push({ from, to, weight, distance });
+      }
     }
-    return { nodes, lines };
+    return { nodes, lines, circleRadius };
   }
 
   class ThreeGlyphRenderer {
@@ -404,7 +395,7 @@
       this.lineMeshes = [];
       this.ringMeshes = [];
       this.drag = { active: false, x: 0, y: 0, moved: false };
-      this.rotation = { x: 0.58, y: -0.18, z: -0.24 };
+      this.rotation = { x: 0, y: 0, z: 0 };
       this.raycaster = null;
       this.pointer = null;
     }
@@ -422,7 +413,7 @@
 
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
-      this.camera.position.set(0, 0, 7.4);
+      this.camera.position.set(0, 0, 10.4);
 
       this.group = new THREE.Group();
       this.scene.add(this.group);
@@ -448,8 +439,7 @@
       const colors = this.state.colors;
       const nodeGeometry = new THREE.SphereGeometry(0.075, 28, 18);
       const centerGeometry = new THREE.SphereGeometry(0.12, 36, 24);
-      const ringGeometry = new THREE.TorusGeometry(0.48, 0.009, 12, 140);
-      const auraGeometry = new THREE.TorusGeometry(2.55, 0.01, 12, 220);
+      const ringGeometry = new THREE.TorusGeometry(this.model.circleRadius, 0.008, 12, 180);
 
       this.model.lines.forEach((line, index) => {
         const from = this.model.nodes[line.from];
@@ -457,13 +447,13 @@
         const material = new THREE.MeshStandardMaterial({
           color: colors[1],
           emissive: colors[1],
-          emissiveIntensity: 0.55,
+          emissiveIntensity: 0.48,
           transparent: true,
-          opacity: 0.18 + line.weight * 0.32,
+          opacity: 0.12 + line.weight * 0.2,
           roughness: 0.42,
           metalness: 0.2
         });
-        const mesh = makeCylinderBetween(THREE, point(from), point(to), 0.007 + line.weight * 0.006, material);
+        const mesh = makeCylinderBetween(THREE, point(from), point(to), 0.004 + line.weight * 0.004, material);
         mesh.userData = { line, index, baseOpacity: material.opacity };
         this.lineMeshes.push(mesh);
         this.group.add(mesh);
@@ -484,11 +474,11 @@
         this.group.add(mesh);
 
         const ringMaterial = new THREE.MeshStandardMaterial({
-          color: colors[index > 6 ? 3 : 0],
-          emissive: colors[index > 6 ? 3 : 0],
-          emissiveIntensity: 0.46,
+          color: index === 0 ? colors[0] : colors[1],
+          emissive: index === 0 ? colors[0] : colors[1],
+          emissiveIntensity: 0.58,
           transparent: true,
-          opacity: index === 0 ? 0.28 : 0.2,
+          opacity: index === 0 ? 0.34 : 0.28,
           roughness: 0.5
         });
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
@@ -497,18 +487,6 @@
         this.ringMeshes.push(ring);
         this.group.add(ring);
       });
-
-      const auraMaterial = new THREE.MeshStandardMaterial({
-        color: colors[0],
-        emissive: colors[0],
-        emissiveIntensity: 0.32,
-        transparent: true,
-        opacity: 0.18,
-        roughness: 0.5
-      });
-      const aura = new THREE.Mesh(auraGeometry, auraMaterial);
-      this.ringMeshes.push(aura);
-      this.group.add(aura);
 
       function point(node) {
         return new THREE.Vector3(node.x, node.y, node.z);
@@ -579,7 +557,7 @@
         mesh.material.emissive.set(colors[1]);
       });
       this.ringMeshes.forEach((mesh, index) => {
-        const color = index > 6 ? colors[3] : colors[0];
+        const color = index === 0 ? colors[0] : colors[1];
         mesh.material.color.set(color);
         mesh.material.emissive.set(color);
       });
@@ -597,7 +575,6 @@
 
       if (!this.drag.active && !reduced) {
         this.rotation.z += mode === "kasina" ? 0.00018 : 0.00042;
-        this.rotation.y += mode === "play" ? 0.00095 : 0.00036;
       }
 
       this.group.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z);
@@ -730,8 +707,8 @@
     const colors = options.colors;
     const cx = width / 2;
     const cy = height * (options.wallpaper ? 0.44 : 0.48);
-    const scale = Math.min(width, height) * (options.wallpaper ? 0.19 : 0.24);
-    const circleRadius = scale * 0.48;
+    const scale = Math.min(width, height) * (options.wallpaper ? 0.15 : 0.16);
+    const circleRadius = scale * options.model.circleRadius;
     const timePulse = options.pulse || 0;
     const breath = 1 + (options.mode === "breath" ? 0.035 : 0.014) * Math.sin(Date.now() / 900);
 
@@ -747,16 +724,25 @@
       const angle = options.rotation || 0;
       const x = node.x * Math.cos(angle) - node.y * Math.sin(angle);
       const y = node.x * Math.sin(angle) + node.y * Math.cos(angle);
-      const depth = 1 + node.z * 0.25;
       return {
         x: cx + x * scale * breath,
-        y: cy + y * scale * 0.84 * breath - node.z * scale * 0.38,
-        depth
+        y: cy + y * scale * breath
       };
     });
 
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
+    projected.forEach((node, index) => {
+      const ringColor = index === 0 ? colors[0] : colors[1];
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, circleRadius, 0, Math.PI * 2);
+      ctx.lineWidth = Math.max(1.1, scale * 0.008);
+      ctx.strokeStyle = alpha(ringColor, index === 0 ? 0.4 : 0.3);
+      ctx.shadowColor = ringColor;
+      ctx.shadowBlur = 12 + timePulse * 12;
+      ctx.stroke();
+    });
+
     options.model.lines.forEach((line, index) => {
       const from = projected[line.from];
       const to = projected[line.to];
@@ -764,21 +750,10 @@
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.lineTo(to.x, to.y);
-      ctx.lineWidth = Math.max(1.2, scale * 0.009 * (0.7 + line.weight));
-      ctx.strokeStyle = alpha(colors[1], 0.16 + line.weight * 0.18 + linePulse * 0.08 + timePulse * 0.14);
+      ctx.lineWidth = Math.max(0.8, scale * 0.0045 * (0.75 + line.weight));
+      ctx.strokeStyle = alpha(colors[1], 0.14 + line.weight * 0.15 + linePulse * 0.06 + timePulse * 0.12);
       ctx.shadowColor = colors[1];
-      ctx.shadowBlur = 16 + timePulse * 22;
-      ctx.stroke();
-    });
-
-    projected.forEach((node, index) => {
-      const ringColor = index > 6 ? colors[3] : colors[0];
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, circleRadius * (index === 0 ? 1.03 : 1), 0, Math.PI * 2);
-      ctx.lineWidth = Math.max(1.1, scale * 0.008);
-      ctx.strokeStyle = alpha(ringColor, index === 0 ? 0.34 : 0.22);
-      ctx.shadowColor = ringColor;
-      ctx.shadowBlur = 12 + timePulse * 12;
+      ctx.shadowBlur = 12 + timePulse * 18;
       ctx.stroke();
     });
 
