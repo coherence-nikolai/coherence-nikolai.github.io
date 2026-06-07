@@ -16,9 +16,9 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://coherence-nikolai.app/toneparadox/">
     <title>Tone Paradox - Hold Both</title>
-    <link rel="icon" href="./assets/favicon-BhbhUo8d.svg" type="image/svg+xml">
-    <script type="module" crossorigin src="./assets/index-BvF0vYyp.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-Baq9QENf.css">
+    <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
+    <script type="module" crossorigin src="./assets/index-B8qqwNSt.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Aa0r6WbM.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -44,38 +44,41 @@
                   <stop offset=".72" stop-color="#100b0a"/>
                   <stop offset="1" stop-color="#070404"/>
                 </radialGradient>
+                <radialGradient id="glyphOrb" cx="50%" cy="50%" r="62%">
+                  <stop offset="0" stop-color="#fff5dd"/>
+                  <stop offset=".22" stop-color="#efd5ad" stop-opacity=".8"/>
+                  <stop offset=".5" stop-color="#a98a63" stop-opacity=".42"/>
+                  <stop offset=".78" stop-color="#4b3f31" stop-opacity=".16"/>
+                  <stop offset="1" stop-color="#0b0707" stop-opacity="0"/>
+                </radialGradient>
                 <linearGradient id="glyphCream" x1="20" x2="76" y1="20" y2="76">
                   <stop offset="0" stop-color="#fff9ed"/>
                   <stop offset=".5" stop-color="#e7d6b7"/>
                   <stop offset="1" stop-color="#fff2d8"/>
                 </linearGradient>
                 <linearGradient id="glyphCopper" x1="18" x2="78" y1="72" y2="24">
-                  <stop offset="0" stop-color="#9f5635"/>
-                  <stop offset=".54" stop-color="#e19a4c"/>
-                  <stop offset="1" stop-color="#bd7f55"/>
-                </linearGradient>
-                <linearGradient id="glyphBlue" x1="32" x2="64" y1="23" y2="73">
-                  <stop offset="0" stop-color="#d6fbff"/>
-                  <stop offset=".5" stop-color="#6ce2f8"/>
-                  <stop offset="1" stop-color="#b8f8ff"/>
+                  <stop offset="0" stop-color="#fff8ec"/>
+                  <stop offset=".5" stop-color="#e7d6b7"/>
+                  <stop offset="1" stop-color="#d8bf95"/>
                 </linearGradient>
                 <filter id="glyphGlow" x="-70%" y="-70%" width="240%" height="240%">
-                  <feGaussianBlur stdDeviation="2.1" result="blur"/>
+                  <feGaussianBlur stdDeviation="2" result="blur"/>
                   <feMerge>
                     <feMergeNode in="blur"/>
                     <feMergeNode in="SourceGraphic"/>
                   </feMerge>
                 </filter>
               </defs>
-              <rect x="5" y="5" width="86" height="86" rx="25" fill="url(#glyphBg)"/>
-              <circle cx="48" cy="48" r="31" fill="#d5b98a" opacity=".1"/>
-              <circle cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCream)" stroke-width="1.5" opacity=".68"/>
-              <circle cx="48" cy="48" r="23" fill="none" stroke="#e7d6b7" stroke-width=".8" opacity=".22"/>
-              <circle cx="48" cy="48" r="23.6" fill="none" stroke="#e19a4c" stroke-width="1.1" stroke-dasharray=".8 3.2" opacity=".72"/>
-              <ellipse cx="48" cy="48" rx="23" ry="7.8" fill="none" stroke="url(#glyphCopper)" stroke-width="2.2" opacity=".82" filter="url(#glyphGlow)"/>
-              <path d="M34 24C43 36 43 43 48 48C53 53 53 60 62 72" fill="none" stroke="url(#glyphBlue)" stroke-width="2.9" stroke-linecap="round" filter="url(#glyphGlow)"/>
-              <path d="M62 24C53 36 53 43 48 48C43 53 43 60 34 72" fill="none" stroke="url(#glyphBlue)" stroke-width="2.9" stroke-linecap="round" filter="url(#glyphGlow)"/>
-              <circle cx="48" cy="48" r="8" fill="#070404" stroke="url(#glyphCream)" stroke-width="4.2" filter="url(#glyphGlow)"/>
+              <rect x="5" y="5" width="86" height="86" rx="25" fill="url(#glyphBg)" opacity=".32"/>
+              <circle cx="48" cy="48" r="34" fill="#d5b98a" opacity=".12" filter="url(#glyphGlow)"/>
+              <circle cx="48" cy="48" r="28" fill="url(#glyphOrb)" opacity=".68"/>
+              <circle cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCream)" stroke-width="1.35" opacity=".72"/>
+              <circle cx="48" cy="48" r="27" fill="none" stroke="#fff7e8" stroke-width=".45" opacity=".34"/>
+              <ellipse cx="48" cy="48" rx="27" ry="8.4" fill="none" stroke="url(#glyphCopper)" stroke-width="2.7" opacity=".62" filter="url(#glyphGlow)"/>
+              <path d="M34 25C43 37 43 44 48 48C53 52 53 59 62 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
+              <path d="M62 25C53 37 53 44 48 48C43 52 43 59 34 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
+              <path d="M22 51C30 48 38 47 48 48C58 49 66 48 74 45" fill="none" stroke="#fff7e8" stroke-width="1.35" stroke-linecap="round" opacity=".54" filter="url(#glyphGlow)"/>
+              <circle cx="48" cy="48" r="8.4" fill="#070404" stroke="url(#glyphCream)" stroke-width="4.4" filter="url(#glyphGlow)"/>
             </svg>
           </div>
 
@@ -114,6 +117,13 @@
                   <stop offset=".72" stop-color="#100b0a"/>
                   <stop offset="1" stop-color="#070404"/>
                 </radialGradient>
+                <radialGradient id="brandOrb" cx="50%" cy="50%" r="62%">
+                  <stop offset="0" stop-color="#fff5dd"/>
+                  <stop offset=".22" stop-color="#efd5ad" stop-opacity=".8"/>
+                  <stop offset=".5" stop-color="#a98a63" stop-opacity=".42"/>
+                  <stop offset=".78" stop-color="#4b3f31" stop-opacity=".16"/>
+                  <stop offset="1" stop-color="#0b0707" stop-opacity="0"/>
+                </radialGradient>
                 <linearGradient id="brandCream" x1="20" x2="76" y1="20" y2="76">
                   <stop offset="0" stop-color="#fff9ed"/>
                   <stop offset=".5" stop-color="#e7d6b7"/>
@@ -121,12 +131,15 @@
                 </linearGradient>
               </defs>
               <rect x="5" y="5" width="86" height="86" rx="25" fill="url(#brandBg)"/>
-              <circle cx="48" cy="48" r="27" fill="none" stroke="url(#brandCream)" stroke-width="1.5" opacity=".72"/>
-              <circle cx="48" cy="48" r="23.6" fill="none" stroke="#d8924b" stroke-width="1.2" stroke-dasharray=".8 3.2" opacity=".74"/>
-              <ellipse cx="48" cy="48" rx="23" ry="7.8" fill="none" stroke="#d98641" stroke-width="2.4" opacity=".86"/>
-              <path d="M34 24C43 36 43 43 48 48C53 53 53 60 62 72" fill="none" stroke="#baf7ff" stroke-width="2.9" stroke-linecap="round"/>
-              <path d="M62 24C53 36 53 43 48 48C43 53 43 60 34 72" fill="none" stroke="#baf7ff" stroke-width="2.9" stroke-linecap="round"/>
-              <circle cx="48" cy="48" r="8" fill="#070404" stroke="url(#brandCream)" stroke-width="4.2"/>
+              <circle cx="48" cy="48" r="34" fill="#d5b98a" opacity=".12"/>
+              <circle cx="48" cy="48" r="28" fill="url(#brandOrb)" opacity=".68"/>
+              <circle cx="48" cy="48" r="27" fill="none" stroke="url(#brandCream)" stroke-width="1.35" opacity=".72"/>
+              <circle cx="48" cy="48" r="27" fill="none" stroke="#fff7e8" stroke-width=".45" opacity=".34"/>
+              <ellipse cx="48" cy="48" rx="27" ry="8.4" fill="none" stroke="#e7d6b7" stroke-width="2.7" opacity=".62"/>
+              <path d="M34 25C43 37 43 44 48 48C53 52 53 59 62 71" fill="none" stroke="url(#brandCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86"/>
+              <path d="M62 25C53 37 53 44 48 48C43 52 43 59 34 71" fill="none" stroke="url(#brandCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86"/>
+              <path d="M22 51C30 48 38 47 48 48C58 49 66 48 74 45" fill="none" stroke="#fff7e8" stroke-width="1.35" stroke-linecap="round" opacity=".54"/>
+              <circle cx="48" cy="48" r="8.4" fill="#070404" stroke="url(#brandCream)" stroke-width="4.4"/>
             </svg>
           </span>
           <span>
