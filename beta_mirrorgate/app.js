@@ -3255,7 +3255,17 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <div class="choice-grid">${renderChoiceGroup(tones, getTone(profile.carrierToneID).value, "tone-choice", "tone")}</div>
         `}
         <h3>Color Mode</h3>
-        <div class="choice-grid">${Object.entries(glyphColorModes).map(([id, item]) => `<button class="choice ${profile.colorMode === id ? "selected" : ""}" data-color-mode="${id}">${escapeHtml(item.title)}<span>${escapeHtml(item.primary)} / ${escapeHtml(item.secondary)}</span></button>`).join("")}</div>
+        <div class="choice-grid">${Object.entries(glyphColorModes).map(([id, item]) => `
+          <button
+            class="choice color-choice ${profile.colorMode === id ? "selected" : ""}"
+            data-color-mode="${id}"
+            style="--swatch-primary: ${escapeHtml(item.primary)}; --swatch-secondary: ${escapeHtml(item.secondary)}"
+          >
+            <i class="color-swatch" aria-hidden="true"></i>
+            <span class="choice-title">${escapeHtml(item.title)}</span>
+            <span>${escapeHtml(item.primary)} / ${escapeHtml(item.secondary)}</span>
+          </button>
+        `).join("")}</div>
         <h3>Motion</h3>
         <div class="choice-grid">${Object.entries(glyphAnimationStyles).map(([id, title]) => `<button class="choice ${profile.animationStyle === id ? "selected" : ""}" data-animation-style="${id}">${escapeHtml(title)}<span>${escapeHtml(id)}</span></button>`).join("")}</div>
         <p class="small-copy">Use the active glyph as breath anchor, mirror overlay, gate key, vector seal, Codex memory, and capsule cover.</p>

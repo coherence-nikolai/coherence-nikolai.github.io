@@ -2222,6 +2222,418 @@ h3 {
   }
 }
 
+/* Aesthetic elevation pass: stronger instrument surfaces, luminous geometry, and clearer module identity. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -18vmax;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-radial-gradient(circle at 48% 38%, transparent 0 108px, rgba(158, 209, 255, 0.032) 109px 110px, transparent 111px 214px),
+    linear-gradient(118deg, transparent 0 38%, rgba(226, 184, 86, 0.035) 39% 39.35%, transparent 40% 100%),
+    linear-gradient(62deg, transparent 0 48%, rgba(173, 122, 255, 0.026) 49% 49.35%, transparent 50% 100%);
+  opacity: 0.78;
+}
+
+.panel {
+  position: relative;
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 14%, rgba(210, 218, 245, 0.13));
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), transparent 34%),
+    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--module-accent, var(--gold)) 8%, transparent), transparent 46%),
+    linear-gradient(180deg, rgba(18, 20, 31, 0.92), rgba(9, 10, 17, 0.94));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 24px 72px rgba(0, 0, 0, 0.32);
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--module-accent, var(--gold)) 28%, transparent), transparent 32%, transparent 68%, rgba(210, 218, 245, 0.08));
+  opacity: 0.22;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  padding: 1px;
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+
+.button {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 12px 34px rgba(0, 0, 0, 0.22);
+}
+
+.button-primary,
+#screen-module .button-primary {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--module-accent, var(--gold)) 78%, #fff 18%), var(--module-accent, var(--gold)));
+}
+
+.wheel-card {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--selected-accent) 26%, rgba(226, 184, 86, 0.18));
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--selected-accent) 20%, transparent), transparent 40%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.052), transparent 36%),
+    linear-gradient(180deg, rgba(22, 24, 37, 0.95), rgba(7, 8, 14, 0.96));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    0 28px 96px rgba(0, 0, 0, 0.46),
+    0 0 76px color-mix(in srgb, var(--selected-accent) 18%, transparent);
+}
+
+.wheel-card::before,
+.wheel-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.wheel-card::before {
+  inset: -20%;
+  background:
+    repeating-radial-gradient(circle at center, transparent 0 74px, rgba(210, 218, 245, 0.035) 75px 76px, transparent 77px 148px),
+    conic-gradient(from 22deg, transparent, color-mix(in srgb, var(--selected-accent) 12%, transparent), transparent 14%, transparent 50%, rgba(226, 184, 86, 0.07), transparent 65%);
+  opacity: 0.68;
+}
+
+.wheel-card::after {
+  inset: 18px;
+  border-radius: calc(var(--radius) - 1px);
+  border: 1px solid rgba(210, 218, 245, 0.06);
+}
+
+.quadrant-wheel {
+  width: min(86vw, 560px);
+  border-color: color-mix(in srgb, var(--selected-accent) 78%, rgba(226, 184, 86, 0.2));
+  background:
+    radial-gradient(circle at center, rgba(6, 7, 13, 0.98) 0 20.5%, transparent 21%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--selected-accent) 25%, transparent), transparent 39%),
+    repeating-radial-gradient(circle at center, rgba(216, 226, 255, 0.13) 0 1px, transparent 1px 56px),
+    repeating-conic-gradient(from -90deg, rgba(255, 255, 255, 0.042) 0 0.45deg, transparent 0.5deg 9deg),
+    conic-gradient(
+      from -90deg,
+      color-mix(in srgb, var(--gate) 17%, transparent) 0 25%,
+      color-mix(in srgb, var(--vector) 17%, transparent) 25% 50%,
+      color-mix(in srgb, var(--echo) 17%, transparent) 50% 75%,
+      color-mix(in srgb, var(--mirror) 17%, transparent) 75% 100%
+    ),
+    radial-gradient(circle at center, rgba(43, 51, 106, 0.4), rgba(2, 3, 7, 0.94) 72%);
+}
+
+.quadrant-wheel::before,
+.quadrant-wheel::after {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--selected-accent) 88%, rgba(210, 218, 245, 0.5)), transparent);
+  opacity: 0.86;
+}
+
+.wheel-quadrant {
+  gap: 8px;
+}
+
+.wheel-quadrant:hover,
+.wheel-quadrant.selected {
+  transform: translateZ(0) scale(1.006);
+}
+
+.wheel-quadrant.selected .portal-title,
+.wheel-quadrant:hover .portal-title {
+  color: var(--text);
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--module-accent) 54%, transparent),
+    0 1px 20px rgba(0, 0, 0, 0.54);
+}
+
+.portal-mark,
+.panel-portal-mark {
+  width: clamp(46px, 6.2vw, 66px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--module-accent) 28%, transparent), transparent 62%),
+    rgba(5, 7, 13, 0.7);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--module-accent) 28%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--module-accent) 18%, transparent),
+    0 0 30px color-mix(in srgb, var(--module-accent) 33%, transparent);
+}
+
+.portal-mark::after,
+.panel-portal-mark::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--module-accent) 22%, transparent);
+  opacity: 0.42;
+}
+
+.portal-title {
+  font-size: clamp(1.08rem, 2.55vw, 1.48rem);
+}
+
+.portal-action {
+  min-width: 82px;
+  font-size: clamp(0.74rem, 1.45vw, 0.9rem);
+}
+
+.wheel-center {
+  width: 35.5%;
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--selected-accent) 24%, transparent), transparent 56%),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.96), rgba(6, 7, 13, 0.86) 70%);
+  box-shadow:
+    inset 0 0 26px rgba(255, 255, 255, 0.035),
+    0 0 38px color-mix(in srgb, var(--selected-accent) 36%, transparent),
+    0 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
+.wheel-center canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.wheel-selected-panel {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--module-accent) 42%, transparent);
+  background:
+    radial-gradient(circle at 8% 18%, color-mix(in srgb, var(--module-accent) 18%, transparent), transparent 40%),
+    linear-gradient(135deg, color-mix(in srgb, var(--module-accent) 14%, transparent), rgba(0, 0, 0, 0.18) 58%),
+    rgba(4, 5, 11, 0.72);
+  text-align: left;
+}
+
+.wheel-selected-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, transparent, var(--module-accent), transparent);
+  opacity: 0.84;
+}
+
+.wheel-selected-panel h3 {
+  justify-content: flex-start;
+  font-size: clamp(1.28rem, 2vw, 1.72rem);
+}
+
+.wheel-selected-panel .path-label,
+.wheel-selected-panel .original-module-name {
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.wheel-selected-panel .panel-portal-mark {
+  width: 52px;
+}
+
+.wheel-selected-panel p:not(.path-label) {
+  max-width: 58ch;
+}
+
+#screen-module .module-header {
+  position: relative;
+  padding: 20px 20px 22px;
+  border: 1px solid color-mix(in srgb, var(--module-accent, var(--gold)) 22%, transparent);
+  border-left: 4px solid var(--module-accent, var(--gold));
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 0% 12%, color-mix(in srgb, var(--module-accent, var(--gold)) 18%, transparent), transparent 42%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 42%),
+    rgba(8, 9, 16, 0.76);
+  box-shadow: 0 26px 78px rgba(0, 0, 0, 0.32);
+}
+
+.guided-module-root .module-header {
+  border-left-width: 4px;
+  padding-left: 20px;
+}
+
+.module-step-progress {
+  padding: 10px 0 6px;
+}
+
+.module-step-progress span {
+  min-height: 42px;
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 24%, transparent);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent),
+    rgba(0, 0, 0, 0.26);
+}
+
+.module-step-progress span.active {
+  box-shadow:
+    inset 0 0 22px color-mix(in srgb, var(--module-accent, var(--gold)) 11%, transparent),
+    0 0 30px color-mix(in srgb, var(--module-accent, var(--gold)) 18%, transparent);
+}
+
+.module-canvas-card {
+  position: relative;
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 20%, rgba(255, 255, 255, 0.08));
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--module-accent, var(--gold)) 14%, transparent), transparent 44%),
+    repeating-radial-gradient(circle at center, transparent 0 76px, rgba(210, 218, 245, 0.04) 77px 78px, transparent 79px 152px),
+    rgba(3, 4, 9, 0.74);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 0 54px rgba(0, 0, 0, 0.18),
+    0 18px 52px rgba(0, 0, 0, 0.28);
+}
+
+.glyph-preview-panel {
+  overflow: hidden;
+}
+
+.glyph-preview-panel::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px solid rgba(226, 184, 86, 0.08);
+  pointer-events: none;
+}
+
+.glyph-preview-panel .module-canvas-card {
+  min-height: clamp(360px, 54vw, 640px);
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--module-accent, var(--gold)) 16%, transparent), transparent 38%),
+    repeating-radial-gradient(circle at center, transparent 0 84px, rgba(226, 184, 86, 0.07) 85px 86px, transparent 87px 168px),
+    rgba(3, 4, 9, 0.72);
+}
+
+.readable-choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.readable-choice-grid .choice {
+  min-height: 126px;
+  overflow: visible;
+}
+
+.choice,
+.tone-choice,
+.phase-choice {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.042), transparent 58%),
+    rgba(255, 255, 255, 0.045);
+}
+
+.choice:hover,
+.tone-choice:hover,
+.phase-choice:hover {
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 30%, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 0 22px color-mix(in srgb, var(--module-accent, var(--gold)) 9%, transparent);
+}
+
+.color-choice {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: 11px;
+}
+
+.color-choice .color-swatch {
+  grid-row: span 2;
+  width: 34px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, var(--swatch-primary), var(--swatch-secondary));
+  box-shadow:
+    inset 0 0 12px rgba(255, 255, 255, 0.12),
+    0 0 18px color-mix(in srgb, var(--swatch-primary) 28%, transparent);
+}
+
+.color-choice .choice-title {
+  display: block;
+  margin-top: 0;
+  opacity: 1;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.color-choice span:last-child {
+  margin-top: 1px;
+}
+
+@media (min-width: 1100px) {
+  #screen-wheel.screen-active {
+    grid-template-columns: minmax(560px, 690px) minmax(400px, 1fr);
+    gap: 20px 34px;
+  }
+
+  #screen-wheel > .wheel-card {
+    padding: 28px;
+  }
+
+  .quadrant-wheel {
+    width: min(38vw, 560px);
+  }
+
+  #screen-module #module-root {
+    grid-template-columns: minmax(370px, 0.74fr) minmax(560px, 1fr);
+  }
+
+  #screen-module #module-root.glyph-studio-root {
+    grid-template-columns: minmax(500px, 0.9fr) minmax(590px, 1fr);
+  }
+
+  #screen-module #module-root.glyph-studio-root > .glyph-preview-panel {
+    top: 92px;
+  }
+}
+
+@media (max-width: 680px) {
+  .quadrant-wheel {
+    width: min(78vw, 328px);
+  }
+
+  .portal-mark {
+    width: 38px;
+    border-radius: 50%;
+  }
+
+  .portal-mark::after {
+    inset: -5px;
+  }
+
+  .portal-title {
+    font-size: 0.96rem;
+  }
+
+  .portal-action {
+    min-width: 62px;
+    font-size: 0.7rem;
+  }
+
+  .wheel-center {
+    width: 37%;
+  }
+
+  .wheel-selected-panel {
+    text-align: left;
+    margin-bottom: 22px;
+  }
+
+  .readable-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .readable-choice-grid .choice {
+    min-height: 104px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
