@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta
+      name="description"
+      content="Tone Paradox is a phone-first paradox practice for holding a present state and its opposite in one visual field."
+    >
+    <link rel="canonical" href="https://coherence-nikolai.app/toneparadox/">
+    <meta property="og:title" content="Tone Paradox">
+    <meta
+      property="og:description"
+      content="A phone-first paradox practice for holding a present state and its opposite in one visual field."
+    >
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://coherence-nikolai.app/toneparadox/">
+    <title>Tone Paradox - Hold Both</title>
+    <link rel="icon" href="./assets/favicon-BM5TSqTL.svg" type="image/svg+xml">
+    <script type="module" crossorigin src="./assets/index-DwrUBXaN.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Baq9QENf.css">
+  </head>
+  <body data-mode="landing">
+    <div id="app" class="practice-app">
+      <section class="tone-landing" id="landingPage" aria-labelledby="landingTitle">
+        <header class="landing-header">
+          <a class="landing-wordmark" href="/" aria-label="Coherence Nikolai home">
+            <span>coherence</span>
+            <span>nikolai</span>
+          </a>
+          <div class="landing-nav" aria-label="Tone Paradox actions">
+            <button class="landing-link" type="button" id="landingAboutButton">About</button>
+            <button class="landing-link primary-link" type="button" id="landingTopStart">Begin</button>
+          </div>
+        </header>
+
+        <main class="landing-hero">
+          <div class="landing-glyph" aria-hidden="true">
+            <svg viewBox="0 0 320 320" role="img">
+              <defs>
+                <radialGradient id="glyphBg" cx="50%" cy="40%" r="72%">
+                  <stop offset="0%" stop-color="#172323"/>
+                  <stop offset="52%" stop-color="#0b0c0d"/>
+                  <stop offset="100%" stop-color="#050303"/>
+                </radialGradient>
+                <linearGradient id="glyphCopper" x1="58" x2="262" y1="248" y2="76">
+                  <stop offset="0%" stop-color="#b86b40"/>
+                  <stop offset="48%" stop-color="#e4a253"/>
+                  <stop offset="100%" stop-color="#c88553"/>
+                </linearGradient>
+                <linearGradient id="glyphBlue" x1="118" x2="202" y1="54" y2="266">
+                  <stop offset="0%" stop-color="#91efff"/>
+                  <stop offset="48%" stop-color="#58c9ef"/>
+                  <stop offset="100%" stop-color="#b8f8ff"/>
+                </linearGradient>
+                <radialGradient id="glyphGold" cx="48%" cy="42%" r="70%">
+                  <stop offset="0%" stop-color="#fff4b4"/>
+                  <stop offset="48%" stop-color="#f5cf69"/>
+                  <stop offset="100%" stop-color="#d69b45"/>
+                </radialGradient>
+                <filter id="glyphGlow" x="-70%" y="-70%" width="240%" height="240%">
+                  <feGaussianBlur stdDeviation="4.2" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <rect x="14" y="14" width="292" height="292" rx="72" fill="url(#glyphBg)" stroke="rgba(232,215,178,.22)" stroke-width="2"/>
+              <circle cx="160" cy="160" r="104" fill="rgba(5,3,3,.34)" stroke="rgba(232,215,178,.13)" stroke-width="1.5"/>
+              <g fill="none" stroke-linecap="round">
+                <circle cx="160" cy="160" r="90" stroke="url(#glyphCopper)" stroke-width="8" filter="url(#glyphGlow)"/>
+                <circle cx="160" cy="160" r="72" stroke="rgba(232,215,178,.17)" stroke-width="1.5"/>
+                <circle cx="160" cy="160" r="76" stroke="rgba(228,162,83,.48)" stroke-width="2" stroke-dasharray="1 11"/>
+                <path d="M116 70 C150 110 150 136 160 160 C170 184 170 210 204 250" stroke="url(#glyphBlue)" stroke-width="5.4" filter="url(#glyphGlow)"/>
+                <path d="M204 70 C170 110 170 136 160 160 C150 184 150 210 116 250" stroke="url(#glyphBlue)" stroke-width="5.4" filter="url(#glyphGlow)"/>
+                <path d="M132 84 C154 118 154 140 160 160 C166 180 166 202 188 236" stroke="rgba(184,248,255,.32)" stroke-width="1.4"/>
+                <path d="M188 84 C166 118 166 140 160 160 C154 180 154 202 132 236" stroke="rgba(184,248,255,.32)" stroke-width="1.4"/>
+                <circle cx="160" cy="160" r="22" stroke="url(#glyphGold)" stroke-width="8.5" filter="url(#glyphGlow)"/>
+                <circle cx="160" cy="160" r="12" stroke="rgba(5,3,3,.86)" stroke-width="8"/>
+              </g>
+            </svg>
+          </div>
+
+          <h1 class="landing-title" id="landingTitle" aria-label="Tone Paradox">
+            <span>TONE</span>
+            <span>PARADOX</span>
+          </h1>
+          <p class="landing-line">Hold the formed state and its opposite in one living field.</p>
+          <p class="landing-copy">
+            Name what is present, name what is also true, then let the moving forms become a visual anchor for both.
+          </p>
+          <div class="landing-actions">
+            <button class="landing-button primary" type="button" id="landingStartButton">Begin practice</button>
+            <button class="landing-button ghost" type="button" id="landingAboutHeroButton">About the practice</button>
+          </div>
+        </main>
+      </section>
+
+      <div class="scene-layer" aria-hidden="true">
+        <canvas id="orbitScene"></canvas>
+        <div id="mantraPanel" class="mantra-panel">
+          <div id="labelOne" class="polarity-label polarity-label-one">What is here</div>
+          <div id="centerLabel" class="center-label">+</div>
+          <div id="labelTwo" class="polarity-label polarity-label-two">What is also true</div>
+        </div>
+      </div>
+
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Reset Tone Paradox" id="brandReset">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 96 96">
+              <rect x="5" y="5" width="86" height="86" rx="25" fill="#060505"/>
+              <circle cx="48" cy="48" r="31" fill="#070b0d" stroke="rgba(232,215,178,.18)" stroke-width="1"/>
+              <circle cx="48" cy="48" r="26" fill="none" stroke="#d5924e" stroke-width="5"/>
+              <circle cx="48" cy="48" r="20" fill="none" stroke="rgba(232,215,178,.2)" stroke-width="1"/>
+              <path d="M35 19C45 32 45 41 48 48C51 55 51 64 61 77" fill="none" stroke="#80eaff" stroke-width="4" stroke-linecap="round"/>
+              <path d="M61 19C51 32 51 41 48 48C45 55 45 64 35 77" fill="none" stroke="#80eaff" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="48" cy="48" r="9" fill="#060505" stroke="#f1d06f" stroke-width="5"/>
+            </svg>
+          </span>
+          <span>
+            <strong>Tone Paradox</strong>
+            <small>Hold both</small>
+          </span>
+        </a>
+        <button class="ghost-button" type="button" id="aboutButton">About</button>
+      </header>
+
+      <main class="practice-main">
+        <section class="cue-panel" aria-live="polite">
+          <span id="phaseName">Arrive</span>
+          <strong id="phaseCue">Name the two poles.</strong>
+        </section>
+
+        <section class="bottom-sheet" id="setupSheet" aria-labelledby="setupTitle">
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <form id="setupForm">
+            <h1 id="setupTitle">What are you holding?</h1>
+
+            <fieldset class="segmented-field" aria-label="Tone">
+              <label>
+                <input type="radio" name="tone" value="unpleasant" checked>
+                <span>Unpleasant</span>
+              </label>
+              <label>
+                <input type="radio" name="tone" value="pleasant">
+                <span>Pleasant</span>
+              </label>
+            </fieldset>
+
+            <div class="field-stack">
+              <label for="hereInput">Name what is here.</label>
+              <input
+                id="hereInput"
+                name="here"
+                type="text"
+                value="Anxiety"
+                maxlength="36"
+                autocomplete="off"
+                placeholder="anxiety, anger, desire, peace..."
+              >
+            </div>
+
+            <div class="field-stack">
+              <label for="alsoInput">Name what is also true.</label>
+              <input
+                id="alsoInput"
+                name="also"
+                type="text"
+                value="Safety"
+                maxlength="36"
+                autocomplete="off"
+                placeholder="safety, forgiveness, enoughness..."
+              >
+            </div>
+
+            <p class="practice-hint">
+              Watch what is here in copper. Let the blue opposite appear. When both brighten, hold both in one field.
+            </p>
+
+            <div class="mode-row">
+              <span class="field-caption">Practice mode</span>
+              <fieldset class="segmented-field compact mode-field" aria-label="Practice mode">
+                <label>
+                  <input type="radio" name="practiceMode" value="natural" checked>
+                  <span>Natural</span>
+                </label>
+                <label>
+                  <input type="radio" name="practiceMode" value="breath">
+                  <span>Breath</span>
+                </label>
+              </fieldset>
+            </div>
+
+            <div class="breath-row" id="breathPatternRow" hidden>
+              <span class="field-caption">Breath rhythm</span>
+              <fieldset class="segmented-field compact breath-field" aria-label="Breath rhythm">
+                <label>
+                  <input type="radio" name="breathPattern" value="box" checked>
+                  <span>4 4 4 4</span>
+                </label>
+                <label>
+                  <input type="radio" name="breathPattern" value="calm">
+                  <span>4 2 6 2</span>
+                </label>
+                <label>
+                  <input type="radio" name="breathPattern" value="deep">
+                  <span>5 5 7 3</span>
+                </label>
+                <label>
+                  <input type="radio" name="breathPattern" value="release">
+                  <span>4 7 8 1</span>
+                </label>
+              </fieldset>
+            </div>
+
+            <div class="voice-row">
+              <span class="field-caption">Guide voice</span>
+              <fieldset class="segmented-field compact voice-field" aria-label="Guide voice">
+                <label>
+                  <input type="radio" name="voiceGuide" value="off" checked>
+                  <span>Off</span>
+                </label>
+                <label>
+                  <input type="radio" name="voiceGuide" value="soft">
+                  <span>Guide</span>
+                </label>
+                <label>
+                  <input type="radio" name="voiceGuide" value="mine">
+                  <span>Mine</span>
+                </label>
+              </fieldset>
+            </div>
+
+            <section class="voice-recorder-panel" id="voiceRecorderPanel" aria-label="My voice guide" hidden>
+              <div class="voice-panel-head">
+                <strong>My voice guide</strong>
+                <button class="text-button" type="button" id="voiceResetButton">Clear</button>
+              </div>
+              <div class="voice-cue-list" id="voiceCueList"></div>
+              <p class="voice-status" id="voiceStatus" aria-live="polite">Record the general cues once.</p>
+            </section>
+
+            <div class="choice-row simple-choice-row">
+              <div>
+                <span class="field-caption">Practice length</span>
+                <fieldset class="segmented-field compact duration-field" aria-label="Practice length">
+                  <label>
+                    <input type="radio" name="duration" value="open" checked>
+                    <span>Open</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="duration" value="3">
+                    <span>3</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="duration" value="7">
+                    <span>7</span>
+                  </label>
+                </fieldset>
+              </div>
+            </div>
+
+            <button class="primary-button" type="submit">Begin</button>
+          </form>
+        </section>
+
+        <section class="practice-dock" id="practiceDock" aria-label="Practice controls" hidden>
+          <div class="dock-copy">
+            <span id="phaseTimer">0:00</span>
+            <strong id="dockCue">Watch the orbs. Let breath be natural.</strong>
+          </div>
+          <div class="dock-actions">
+            <button class="icon-button" type="button" id="pauseButton" aria-label="Pause practice">Pause</button>
+            <button class="icon-button" type="button" id="endButton" aria-label="End practice">End</button>
+          </div>
+        </section>
+
+        <section class="bottom-sheet closing-sheet" id="closingSheet" aria-labelledby="closingTitle" hidden>
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <form id="closingForm">
+            <h2 id="closingTitle">What changed, even slightly?</h2>
+            <input
+              id="insightInput"
+              type="text"
+              maxlength="90"
+              autocomplete="off"
+              placeholder="A simple sentence..."
+            >
+            <div class="button-pair">
+              <button class="secondary-button" type="button" id="againButton">Practice again</button>
+              <button class="primary-button" type="submit">Save</button>
+            </div>
+          </form>
+        </section>
+      </main>
+
+      <dialog id="aboutDialog" class="about-dialog">
+        <button class="dialog-close" type="button" id="closeAbout" aria-label="Close about">Close</button>
+        <h2>Tone Paradox</h2>
+        <div class="about-tabs" role="tablist" aria-label="About Tone Paradox">
+          <button type="button" class="about-tab is-active" data-about-tab="practice">Practice</button>
+          <button type="button" class="about-tab" data-about-tab="breath">Breath</button>
+        </div>
+        <section class="about-panel is-active" data-about-panel="practice">
+          <p>
+            A symbolic paradox practice inspired by mathematical, geometric, and consciousness-related themes
+            explored in the works of Robert Edward Grant. Independently created.
+          </p>
+          <p>
+            The copper loop holds what is present. The blue field holds what is also true.
+            The pale-gold center is where attention practices holding both.
+          </p>
+          <p>
+            The center does not mean forcing positivity or escaping the difficult state.
+            It means attention becomes wide enough to include the formed pattern and its opposite
+            without making either one disappear.
+          </p>
+          <p>
+            In practice, the shift can feel sudden: not a step-by-step argument, but a moment when
+            two incompatible readings are allowed to coexist and the inner field reorganizes around that wider seeing.
+          </p>
+        </section>
+        <section class="about-panel" data-about-panel="breath" hidden>
+          <p>
+            Breath mode is inspired by Grant's breath-as-lens framing, translated here into a simple visual guide.
+          </p>
+          <ul>
+            <li>Inhale: follow the blue hyperboloid orb.</li>
+            <li>Pause: let the pale-gold focal ring shine.</li>
+            <li>Exhale: follow the copper toroidal loop.</li>
+            <li>Rest: let the whole field settle.</li>
+          </ul>
+        </section>
+      </dialog>
+    </div>
+
+  </body>
+</html>
