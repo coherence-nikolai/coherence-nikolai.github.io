@@ -1,0 +1,17 @@
+{
+  "name": "Tone Glyph",
+  "short_name": "Tone Glyph",
+  "description": "A living Metatron's Cube for breath, ritual, play, and personal glyph creation.",
+  "start_url": "/toneglyph/",
+  "scope": "/toneglyph/",
+  "display": "standalone",
+  "background_color": "#05070a",
+  "theme_color": "#05070a",
+  "icons": [
+    {
+      "src": "/toneglyph/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

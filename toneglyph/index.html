@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tone Glyph - Living Metatron Cube</title>
+  <meta name="description" content="Tone Glyph is a living Metatron's Cube for gaze, breath, play, ritual, and personal glyph creation.">
+  <meta name="theme-color" content="#05070a">
+  <link rel="canonical" href="https://coherence-nikolai.app/toneglyph/">
+  <meta property="og:title" content="Tone Glyph">
+  <meta property="og:description" content="A living Metatron's Cube for breath, ritual, play, and personal glyph creation.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/toneglyph/">
+  <meta property="og:image" content="https://coherence-nikolai.app/toneglyph/icon.svg">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-mode="ritual">
+  <main class="app-shell">
+    <section class="stage" aria-label="Tone Glyph instrument">
+      <canvas id="glyph-canvas" class="glyph-canvas" aria-label="Interactive Metatron's Cube"></canvas>
+      <div class="orbital-shade" aria-hidden="true"></div>
+    </section>
+
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Coherence Nikolai home">
+        <span class="brand-mark" aria-hidden="true">TG</span>
+        <span>
+          <strong>Tone Glyph</strong>
+          <small>Metatron ritual object</small>
+        </span>
+      </a>
+      <p id="render-status" class="render-status" aria-live="polite">Preparing field</p>
+    </header>
+
+    <nav class="mode-rail" aria-label="Tone Glyph modes">
+      <button class="mode-button" type="button" data-mode="kasina">Kasina</button>
+      <button class="mode-button" type="button" data-mode="breath">Breath</button>
+      <button class="mode-button" type="button" data-mode="play">Play</button>
+      <button class="mode-button" type="button" data-mode="ritual">Ritual</button>
+      <button class="mode-button" type="button" data-mode="glyph">Glyph</button>
+    </nav>
+
+    <section class="control-dock" aria-label="Tone Glyph controls">
+      <div class="panel ritual-panel">
+        <label class="input-label" for="intention-input">Intention</label>
+        <textarea id="intention-input" rows="2" maxlength="160" placeholder="Name what this glyph is holding"></textarea>
+        <div class="action-row">
+          <button id="seal-button" class="primary-action" type="button">Seal Ritual</button>
+          <button id="clear-button" class="quiet-action" type="button">Clear</button>
+        </div>
+      </div>
+
+      <div class="panel tone-panel">
+        <span class="input-label">Tone</span>
+        <div id="tone-options" class="option-grid" aria-label="Tone choices"></div>
+      </div>
+
+      <div class="panel color-panel">
+        <span class="input-label">Colours</span>
+        <div class="color-row" aria-label="Chosen colours">
+          <label><span>Core</span><input type="color" data-color-index="0" value="#f6d27a"></label>
+          <label><span>Line</span><input type="color" data-color-index="1" value="#66e2cf"></label>
+          <label><span>Aura</span><input type="color" data-color-index="2" value="#f08a7e"></label>
+          <label><span>Ground</span><input type="color" data-color-index="3" value="#8ea7ff"></label>
+        </div>
+        <div id="palette-options" class="palette-row" aria-label="Palette choices"></div>
+      </div>
+
+      <div class="panel export-panel">
+        <div class="action-row">
+          <button id="save-button" class="primary-action" type="button">Save Glyph</button>
+          <button id="share-button" class="quiet-action" type="button">Share</button>
+          <button id="download-button" class="quiet-action" type="button">Download</button>
+        </div>
+        <div id="saved-glyphs" class="saved-glyphs" aria-label="Saved glyphs"></div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
