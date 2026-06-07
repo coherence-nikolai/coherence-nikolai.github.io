@@ -3,10 +3,11 @@ const SETTINGS_KEY = "harmonic-compass-settings-v2";
 const BACKUP_KEY = "harmonic-compass-backup-v2";
 const COMPLETIONS_KEY = "harmonic-compass-practice-completions-v2";
 const DRAFT_KEY = "harmonic-compass-draft-v2";
+const INTRO_SEEN_KEY = "harmonic-compass-intro-seen-v1";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const VOICE_VERSION = "21";
+const VOICE_VERSION = "22";
 const VOICE_BASE = "./voice/audio/";
 
 const VOICE_GUIDES = {
@@ -474,7 +475,8 @@ const state = {
   wheelMode: "today",
   guideInput: "",
   guideMode: "reflect",
-  guideOutput: ""
+  guideOutput: "",
+  showIntro: safeGetItem(INTRO_SEEN_KEY) !== "true"
 };
 
 state.selectedGateId = dailyCompass().gate.id;
@@ -682,7 +684,30 @@ function render() {
     export: renderExport
   };
 
-  root.innerHTML = views[state.view]();
+  root.innerHTML = `${views[state.view]()}${state.showIntro ? renderIntroGate() : ""}`;
+}
+
+function renderIntroGate() {
+  return `
+    <section class="first-run-overlay" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+      <div class="first-run-card">
+        <div class="first-run-copy">
+          <p class="micro-label">Start here</p>
+          <h2 id="intro-title">Welcome to Harmonic Compass.</h2>
+          <p>This private study instrument is inspired by the works of Robert Edward Grant, especially the 24 precepts of Universal Mind.</p>
+          <p>Listen once before you begin. Then use Today, the Wheel, Practices, and Journal as a simple rhythm for noticing, acting, reflecting, and returning.</p>
+        </div>
+
+        <div class="first-run-action">
+          ${renderVoicePanel([VOICE_GUIDES.welcome], "Introduction audio")}
+          ${renderDisclosure("Read transcript", renderTranscript(APP_INTRO_TRANSCRIPT), "transcript-disclosure")}
+          <div class="panel-actions">
+            <button class="primary-button full" type="button" data-action="complete-intro">Continue to Compass</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
 }
 
 function renderToday() {
@@ -1977,6 +2002,13 @@ document.addEventListener("click", (event) => {
     playVoice(target.dataset.audio, target.dataset.label, target);
     return;
   }
+  if (action === "complete-intro") {
+    state.showIntro = false;
+    safeSetItem(INTRO_SEEN_KEY, "true");
+    toast("Welcome saved. Begin when you are ready.");
+    render();
+    return;
+  }
   if (action === "save-journal") {
     event.preventDefault();
     const form = target.closest("#journal-form");
@@ -2083,7 +2115,7 @@ document.addEventListener("click", (event) => {
   }
   if (action === "clear-all-data" && window.confirm("Clear all local Harmonic Compass data in this browser? Export first if needed.")) {
     safeSetItem(BACKUP_KEY, JSON.stringify({ createdAt: new Date().toISOString(), payload: archivePayload() }));
-    [STORAGE_KEY, COMPLETIONS_KEY, SETTINGS_KEY, DRAFT_KEY].forEach(safeRemoveItem);
+    [STORAGE_KEY, COMPLETIONS_KEY, SETTINGS_KEY, DRAFT_KEY, INTRO_SEEN_KEY].forEach(safeRemoveItem);
     state.journal = [];
     state.completions = [];
     state.settings = loadSettings();
