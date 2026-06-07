@@ -16,7 +16,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body data-mode="ritual">
+<body data-mode="ritual" data-view="living">
   <main class="app-shell">
     <section class="stage" aria-label="Tone Glyph instrument">
       <canvas id="glyph-canvas" class="glyph-canvas" aria-label="Interactive Metatron's Cube"></canvas>
@@ -31,7 +31,13 @@
           <small>Metatron ritual object</small>
         </span>
       </a>
-      <p id="render-status" class="render-status" aria-live="polite">Preparing field</p>
+      <div class="topbar-actions">
+        <p id="render-status" class="render-status" aria-live="polite">Preparing field</p>
+        <div class="view-toolbar" aria-label="View controls">
+          <button id="true-view-button" class="view-action" type="button" aria-pressed="false">True Glyph</button>
+          <button id="front-button" class="view-action" type="button">Front</button>
+        </div>
+      </div>
     </header>
 
     <nav class="mode-rail" aria-label="Tone Glyph modes">

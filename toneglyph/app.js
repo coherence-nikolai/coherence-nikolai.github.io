@@ -39,6 +39,7 @@
     sealedAt: null,
     activePulse: 0,
     activeNode: null,
+    trueGlyph: false,
     saves: [],
     reducedMotion: MOTION_QUERY.matches,
     renderer: null
@@ -76,6 +77,8 @@
     refs.save = document.getElementById("save-button");
     refs.share = document.getElementById("share-button");
     refs.download = document.getElementById("download-button");
+    refs.trueView = document.getElementById("true-view-button");
+    refs.front = document.getElementById("front-button");
     refs.savedGlyphs = document.getElementById("saved-glyphs");
   }
 
@@ -105,6 +108,8 @@
     refs.save.addEventListener("click", saveGlyph);
     refs.share.addEventListener("click", shareGlyph);
     refs.download.addEventListener("click", downloadGlyph);
+    refs.trueView.addEventListener("click", () => setTrueGlyph(!state.trueGlyph));
+    refs.front.addEventListener("click", resetFrontFace);
 
     MOTION_QUERY.addEventListener("change", (event) => {
       state.reducedMotion = event.matches;
@@ -180,6 +185,28 @@
     pulse(currentTone().freq, mode === "play" ? 0.1 : 0.055);
   }
 
+  function setTrueGlyph(enabled) {
+    state.trueGlyph = Boolean(enabled);
+    document.body.dataset.view = state.trueGlyph ? "true" : "living";
+    if (state.trueGlyph) resetRendererFront();
+    state.activePulse = performance.now();
+    updateUI();
+    pulse(currentTone().freq * (state.trueGlyph ? 1.25 : 1), 0.055);
+    showToast(state.trueGlyph ? "True glyph" : "Living field");
+  }
+
+  function resetFrontFace() {
+    resetRendererFront();
+    state.activePulse = performance.now();
+    updateUI();
+    pulse(currentTone().freq, 0.05);
+    showToast("Front facing");
+  }
+
+  function resetRendererFront() {
+    if (state.renderer && state.renderer.resetFrontFace) state.renderer.resetFrontFace();
+  }
+
   function sealRitual() {
     state.intention = refs.intention.value.trim();
     state.sealedAt = Date.now();
@@ -252,6 +279,9 @@
       button.classList.toggle("active", button.dataset.mode === state.mode);
     });
 
+    refs.trueView.classList.toggle("active", state.trueGlyph);
+    refs.trueView.setAttribute("aria-pressed", state.trueGlyph ? "true" : "false");
+
     Array.from(refs.toneOptions.children).forEach((button) => {
       button.classList.toggle("active", button.dataset.tone === state.tone);
     });
@@ -264,7 +294,7 @@
     });
 
     const label = modeCopy[state.mode] || "Field";
-    refs.status.textContent = state.renderer instanceof ThreeGlyphRenderer ? "3D field" : label;
+    refs.status.textContent = state.trueGlyph ? "True glyph" : state.renderer instanceof ThreeGlyphRenderer ? "3D field" : label;
   }
 
   function applyTheme() {
@@ -412,8 +442,11 @@
       this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
-      this.camera.position.set(0, 0, 10.4);
+      this.perspectiveCamera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+      this.perspectiveCamera.position.set(0, 0, 10.4);
+      this.orthographicCamera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 100);
+      this.orthographicCamera.position.set(0, 0, 10.4);
+      this.camera = this.perspectiveCamera;
 
       this.group = new THREE.Group();
       this.scene.add(this.group);
@@ -504,6 +537,11 @@
         const dx = event.clientX - this.drag.x;
         const dy = event.clientY - this.drag.y;
         if (Math.abs(dx) + Math.abs(dy) > 3) this.drag.moved = true;
+        if (this.state.trueGlyph) {
+          this.drag.x = event.clientX;
+          this.drag.y = event.clientY;
+          return;
+        }
         this.rotation.y += dx * 0.006;
         this.rotation.x += dy * 0.004;
         this.rotation.x = Math.max(0.15, Math.min(1.05, this.rotation.x));
@@ -522,7 +560,7 @@
       const rect = this.canvas.getBoundingClientRect();
       this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       this.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      this.raycaster.setFromCamera(this.pointer, this.camera);
+      this.raycaster.setFromCamera(this.pointer, this.activeCamera());
       const hits = this.raycaster.intersectObjects(this.nodeMeshes, false);
       if (hits[0]) {
         this.state.activeNode = hits[0].object.userData.index;
@@ -541,8 +579,17 @@
       const width = Math.max(1, Math.floor(rect.width));
       const height = Math.max(1, Math.floor(rect.height));
       this.renderer.setSize(width, height, false);
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
+      this.perspectiveCamera.aspect = width / height;
+      this.perspectiveCamera.updateProjectionMatrix();
+
+      const aspect = width / height;
+      const viewHeight = 6.55;
+      const viewWidth = viewHeight * aspect;
+      this.orthographicCamera.left = -viewWidth / 2;
+      this.orthographicCamera.right = viewWidth / 2;
+      this.orthographicCamera.top = viewHeight / 2;
+      this.orthographicCamera.bottom = -viewHeight / 2;
+      this.orthographicCamera.updateProjectionMatrix();
     }
 
     updateTheme() {
@@ -563,22 +610,34 @@
       });
     }
 
+    resetFrontFace() {
+      this.rotation.x = 0;
+      this.rotation.y = 0;
+      this.rotation.z = 0;
+      this.drag.active = false;
+    }
+
+    activeCamera() {
+      return this.state.trueGlyph ? this.orthographicCamera : this.perspectiveCamera;
+    }
+
     animate() {
       requestAnimationFrame(() => this.animate());
       const now = performance.now();
       const seconds = now / 1000;
       const mode = this.state.mode;
       const reduced = this.state.reducedMotion;
-      const breath = reduced ? 1 : 1 + Math.sin(seconds * (mode === "breath" ? 1.35 : 0.45)) * (mode === "breath" ? 0.08 : 0.018);
+      const trueGlyph = this.state.trueGlyph;
+      const breath = reduced || trueGlyph ? 1 : 1 + Math.sin(seconds * (mode === "breath" ? 1.35 : 0.45)) * (mode === "breath" ? 0.08 : 0.018);
       const sealPulse = this.state.sealedAt ? Math.max(0, 1 - (Date.now() - this.state.sealedAt) / 5200) : 0;
       const tapPulse = Math.max(0, 1 - (now - this.state.activePulse) / 1300);
 
-      if (!this.drag.active && !reduced) {
+      if (!this.drag.active && !reduced && !trueGlyph) {
         this.rotation.z += mode === "kasina" ? 0.00018 : 0.00042;
       }
 
-      this.group.rotation.set(this.rotation.x, this.rotation.y, this.rotation.z);
-      this.group.scale.setScalar(breath + sealPulse * 0.035);
+      this.group.rotation.set(trueGlyph ? 0 : this.rotation.x, trueGlyph ? 0 : this.rotation.y, trueGlyph ? 0 : this.rotation.z);
+      this.group.scale.setScalar(trueGlyph ? 1 : breath + sealPulse * 0.035);
 
       this.lineMeshes.forEach((mesh, index) => {
         const wave = reduced ? 0.25 : (Math.sin(seconds * 2.2 + index * 0.33) + 1) / 2;
@@ -594,12 +653,13 @@
       });
 
       this.ringMeshes.forEach((mesh, index) => {
-        const phase = reduced ? 0 : Math.sin(seconds * 0.85 + index * 0.4) * 0.035;
-        const modeLift = mode === "glyph" ? 0.035 : 0;
-        mesh.scale.setScalar(1 + phase + modeLift + sealPulse * 0.045);
+        const phase = reduced || trueGlyph ? 0 : Math.sin(seconds * 0.85 + index * 0.4) * 0.035;
+        const modeLift = mode === "glyph" && !trueGlyph ? 0.035 : 0;
+        mesh.scale.setScalar(trueGlyph ? 1 : 1 + phase + modeLift + sealPulse * 0.045);
         mesh.material.opacity = 0.14 + tapPulse * 0.08 + sealPulse * 0.09;
       });
 
+      this.camera = this.activeCamera();
       this.renderer.render(this.scene, this.camera);
     }
   }
@@ -628,6 +688,10 @@
       });
       this.canvas.addEventListener("pointermove", (event) => {
         if (!this.drag.active) return;
+        if (this.state.trueGlyph) {
+          this.drag.x = event.clientX;
+          return;
+        }
         this.rotation += (event.clientX - this.drag.x) * 0.008;
         this.drag.x = event.clientX;
       });
@@ -650,16 +714,22 @@
 
     animate() {
       requestAnimationFrame(() => this.animate());
-      if (!this.state.reducedMotion && !this.drag.active) this.rotation += 0.001;
+      if (!this.state.reducedMotion && !this.drag.active && !this.state.trueGlyph) this.rotation += 0.001;
       drawGlyph2D(this.ctx, this.width, this.height, {
         model: this.model,
         colors: this.state.colors,
         intention: "",
-        rotation: this.rotation,
+        rotation: this.state.trueGlyph ? 0 : this.rotation,
         mode: this.state.mode,
+        trueGlyph: this.state.trueGlyph,
         pulse: Math.max(0, 1 - (performance.now() - this.state.activePulse) / 1400),
         wallpaper: false
       });
+    }
+
+    resetFrontFace() {
+      this.rotation = 0;
+      this.drag.active = false;
     }
   }
 
@@ -684,8 +754,9 @@
       model: geometry,
       colors: state.colors,
       intention: state.intention,
-      rotation: -0.22,
+      rotation: state.trueGlyph ? 0 : -0.22,
       mode: state.mode,
+      trueGlyph: state.trueGlyph,
       pulse: state.sealedAt ? 0.8 : 0.36,
       wallpaper
     });
@@ -710,7 +781,7 @@
     const scale = Math.min(width, height) * (options.wallpaper ? 0.15 : 0.16);
     const circleRadius = scale * options.model.circleRadius;
     const timePulse = options.pulse || 0;
-    const breath = 1 + (options.mode === "breath" ? 0.035 : 0.014) * Math.sin(Date.now() / 900);
+    const breath = options.trueGlyph ? 1 : 1 + (options.mode === "breath" ? 0.035 : 0.014) * Math.sin(Date.now() / 900);
 
     ctx.clearRect(0, 0, width, height);
     const bg = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(width, height) * 0.72);
