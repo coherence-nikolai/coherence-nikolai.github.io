@@ -976,6 +976,22 @@ dd {
     rgba(255, 255, 255, 0.032);
 }
 
+.app-card.tone-compass-card {
+  background:
+    radial-gradient(circle at 50% 17%, rgba(232, 215, 178, 0.22), transparent 14rem),
+    radial-gradient(circle at 48% 44%, rgba(118, 214, 255, 0.10), transparent 15rem),
+    radial-gradient(circle at 62% 66%, rgba(140, 239, 216, 0.08), transparent 16rem),
+    rgba(255, 255, 255, 0.032);
+}
+
+.app-card.tone-paradox-card {
+  background:
+    radial-gradient(circle at 50% 17%, rgba(232, 215, 178, 0.22), transparent 14rem),
+    radial-gradient(circle at 42% 45%, rgba(105, 223, 255, 0.10), transparent 15rem),
+    radial-gradient(circle at 70% 62%, rgba(255, 145, 64, 0.10), transparent 16rem),
+    rgba(255, 255, 255, 0.032);
+}
+
 .app-card:hover {
   transform: translateY(-2px);
   border-color: rgba(232, 215, 178, 0.36);
