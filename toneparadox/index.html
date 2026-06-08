@@ -23,8 +23,8 @@
     <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="toneparadox-icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
-    <script type="module" crossorigin src="./assets/index-Cm08aT7G.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DT-ElGC4.css">
+    <script type="module" crossorigin src="./assets/index-Bqw8asjO.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-3ghEj6W9.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -41,6 +41,12 @@
         </header>
 
         <main class="landing-hero">
+          <h1 class="landing-title" id="landingTitle" aria-label="Tone Paradox">
+            <span>TONE</span>
+            <span>PARADOX</span>
+          </h1>
+          <p class="landing-line">Hold the formed state and its opposite.</p>
+
           <div class="landing-glyph landing-glyph-animated" aria-hidden="true">
             <svg viewBox="0 0 96 96" role="img">
               <defs>
@@ -75,32 +81,27 @@
                   </feMerge>
                 </filter>
               </defs>
-              <rect x="5" y="5" width="86" height="86" rx="25" fill="url(#glyphBg)" opacity=".32"/>
               <circle cx="48" cy="48" r="34" fill="#d5b98a" opacity=".12" filter="url(#glyphGlow)"/>
               <circle cx="48" cy="48" r="28" fill="url(#glyphOrb)" opacity=".68"/>
               <circle class="glyph-focal-ring" cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCream)" stroke-width="1.35" opacity=".72"/>
               <circle cx="48" cy="48" r="27" fill="none" stroke="#fff7e8" stroke-width=".45" opacity=".34"/>
-              <ellipse class="glyph-tube" cx="48" cy="48" rx="27" ry="8.4" fill="none" stroke="url(#glyphCopper)" stroke-width="2.7" opacity=".62" filter="url(#glyphGlow)"/>
-              <path class="glyph-hyper glyph-hyper-track" d="M34 25C43 37 43 44 48 48C53 52 53 59 62 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
-              <path class="glyph-hyper glyph-hyper-right" d="M62 25C53 37 53 44 48 48C43 52 43 59 34 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".36" filter="url(#glyphGlow)"/>
-              <path d="M22 51C30 48 38 47 48 48C58 49 66 48 74 45" fill="none" stroke="#fff7e8" stroke-width="1.35" stroke-linecap="round" opacity=".54" filter="url(#glyphGlow)"/>
-              <circle class="glyph-blue-orb" cx="34" cy="25" r="2.2" fill="#9df1ff" filter="url(#glyphGlow)"/>
+              <path class="glyph-tube" d="M31 68A27 27 0 0 1 31 28" fill="none" stroke="url(#glyphCopper)" stroke-width="6.2" stroke-linecap="round" opacity=".7" filter="url(#glyphGlow)"/>
+              <path class="glyph-tube-core" d="M31 68A27 27 0 0 1 31 28" fill="none" stroke="#ffd76f" stroke-width="2.2" stroke-linecap="round" opacity=".9" filter="url(#glyphGlow)"/>
+              <path class="glyph-hyper glyph-hyper-track" d="M34 22C43 34 43 44 48 48C53 52 53 62 62 74" fill="none" stroke="#7ee7ff" stroke-width="2.4" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
+              <path class="glyph-hyper glyph-hyper-right" d="M62 22C53 34 53 44 48 48C43 52 43 62 34 74" fill="none" stroke="#7ee7ff" stroke-width="2.4" stroke-linecap="round" opacity=".58" filter="url(#glyphGlow)"/>
+              <circle class="glyph-blue-orb glyph-blue-orb-a" cx="34" cy="22" r="2.4" fill="#9df1ff" filter="url(#glyphGlow)"/>
+              <circle class="glyph-blue-orb glyph-blue-orb-b" cx="62" cy="74" r="2.4" fill="#9df1ff" filter="url(#glyphGlow)"/>
               <circle cx="48" cy="48" r="8.4" fill="#070404" stroke="url(#glyphCream)" stroke-width="4.4" filter="url(#glyphGlow)"/>
             </svg>
           </div>
 
-          <h1 class="landing-title" id="landingTitle" aria-label="Tone Paradox">
-            <span>TONE</span>
-            <span>PARADOX</span>
-          </h1>
-          <p class="landing-line">Hold the formed state and its opposite in one living field.</p>
+          <div class="landing-actions">
+            <button class="landing-button primary" type="button" id="landingStartButton">Enter Paradox</button>
+            <button class="landing-button ghost" type="button" id="landingAboutHeroButton">About the practice</button>
+          </div>
           <p class="landing-copy">
             Name what is present, name what is also true, then let the moving forms become a visual anchor for both.
           </p>
-          <div class="landing-actions">
-            <button class="landing-button primary" type="button" id="landingStartButton">Begin practice</button>
-            <button class="landing-button ghost" type="button" id="landingAboutHeroButton">About the practice</button>
-          </div>
         </main>
       </section>
 
