@@ -1135,11 +1135,11 @@ h3 {
 }
 
 .module-step-progress {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
   gap: 8px;
-  overflow-x: auto;
+  overflow: visible;
   padding: 8px 0 2px;
-  scrollbar-width: none;
 }
 
 .module-step-progress::-webkit-scrollbar {
@@ -1149,12 +1149,11 @@ h3 {
 .module-step-progress span {
   display: grid;
   grid-template-columns: auto 1fr;
-  align-items: center;
+  align-items: start;
   gap: 7px;
-  flex: 0 0 auto;
-  max-width: 190px;
+  min-width: 0;
   border: 1px solid color-mix(in srgb, var(--module-accent, var(--gold)) 16%, transparent);
-  border-radius: 999px;
+  border-radius: 18px;
   padding: 7px 10px 7px 8px;
   color: var(--muted);
   background: rgba(0, 0, 0, 0.22);
@@ -1172,10 +1171,12 @@ h3 {
 }
 
 .module-step-progress small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
   font-weight: 800;
+  line-height: 1.15;
 }
 
 .module-step-progress span.done,
