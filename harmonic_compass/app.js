@@ -7,7 +7,7 @@ const INTRO_SEEN_KEY = "harmonic-compass-intro-seen-v1";
 
 const ATTRIBUTION = "Inspired by the works of Robert Edward Grant. Independent private study instrument.";
 const DEFAULT_START_DATE = "2026-05-23";
-const VOICE_VERSION = "22";
+const VOICE_VERSION = "23";
 const VOICE_BASE = "./voice/audio/";
 
 const VOICE_GUIDES = {
@@ -473,6 +473,7 @@ const state = {
   practiceSearch: "",
   filters: { type: "all", gate: "all", practice: "all" },
   wheelMode: "today",
+  wheelSpinning: false,
   guideInput: "",
   guideMode: "reflect",
   guideOutput: "",
@@ -854,7 +855,7 @@ function renderWheelView() {
             ].map(([mode, label]) => `
               <button class="ghost-button ${state.wheelMode === mode ? "selected" : ""}" type="button" data-action="set-wheel-mode" data-mode="${mode}">${label}</button>
             `).join("")}
-            <button class="ghost-button" type="button" data-action="spin-wheel">Spin</button>
+            <button class="ghost-button" type="button" data-action="spin-wheel" ${state.wheelSpinning ? "disabled" : ""}>${state.wheelSpinning ? "Spinning" : "Spin"}</button>
           </div>
         </div>
         ${renderWheel({ compact: false })}
@@ -1595,6 +1596,7 @@ function renderWheel({ compact }) {
   const cx = 360;
   const cy = 360;
   const segmentAngle = 360 / GATES.length;
+  const starCount = compact ? 26 : 46;
 
   const segments = GATES.map((gate, index) => {
     const start = -90 + index * segmentAngle + 1.2;
@@ -1615,6 +1617,21 @@ function renderWheel({ compact }) {
     `;
   }).join("");
 
+  const stars = Array.from({ length: starCount }, (_, index) => {
+    const angle = (index * 137.508 + selected.id * 4.25) % 360;
+    const distance = compact ? 102 + ((index * 37) % 222) : 94 + ((index * 43) % 250);
+    const point = polar(cx, cy, distance, angle);
+    const size = index % 9 === 0 ? 2.1 : index % 4 === 0 ? 1.35 : 0.82;
+    const tone = index % 5 === 0 ? "gold" : index % 3 === 0 ? "teal" : "blue";
+    const delay = -((index % 11) * 0.74).toFixed(2);
+    const drift = index % 2 === 0 ? 6 + (index % 7) : -(5 + (index % 6));
+    const xOne = drift;
+    const yOne = Number((-drift * 0.35).toFixed(2));
+    const xTwo = Number((-drift * 0.45).toFixed(2));
+    const yTwo = Number((drift * 0.22).toFixed(2));
+    return `<circle class="wheel-star ${tone}" cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${size}" style="--star-delay:${delay}s; --star-x:${xOne}px; --star-y:${yOne}px; --star-x2:${xTwo}px; --star-y2:${yTwo}px"></circle>`;
+  }).join("");
+
   const marks = CORRIDORS.map((corridor, index) => {
     const angle = -90 + index * (360 / CORRIDORS.length);
     const inner = polar(cx, cy, compact ? 160 : 174, angle);
@@ -1627,13 +1644,16 @@ function renderWheel({ compact }) {
   }).join("");
 
   return `
-    <svg class="harmonic-wheel ${compact ? "compact" : ""}" viewBox="0 0 720 720" role="img" aria-label="Harmonic Compass wheel with 24 original gates">
+    <svg class="harmonic-wheel ${compact ? "compact" : ""} ${state.wheelSpinning ? "is-spinning" : ""}" viewBox="0 0 720 720" role="img" aria-label="Harmonic Compass wheel with 24 original gates">
+      <g class="wheel-stars" aria-hidden="true">${stars}</g>
+      <circle class="spectral-ring spectral-ring-outer" cx="${cx}" cy="${cy}" r="312"></circle>
+      <circle class="spectral-ring spectral-ring-inner" cx="${cx}" cy="${cy}" r="246"></circle>
       <circle class="wheel-grid" cx="${cx}" cy="${cy}" r="304"></circle>
       <circle class="wheel-grid inner" cx="${cx}" cy="${cy}" r="234"></circle>
       <circle class="gold-ring" cx="${cx}" cy="${cy}" r="168"></circle>
       <ellipse class="orbit orbit-one" cx="${cx}" cy="${cy}" rx="260" ry="76" transform="rotate(-22 ${cx} ${cy})"></ellipse>
       <ellipse class="orbit orbit-two" cx="${cx}" cy="${cy}" rx="260" ry="76" transform="rotate(44 ${cx} ${cy})"></ellipse>
-      <g>${segments}</g>
+      <g class="segment-ring">${segments}</g>
       <g>${marks}</g>
       <g class="center-seal">
         <circle cx="${cx}" cy="${cy}" r="92"></circle>
@@ -2067,10 +2087,17 @@ document.addEventListener("click", (event) => {
   }
   if (action === "toggle-practice") markPractice(target.dataset.practice);
   if (action === "spin-wheel") {
-    const gate = GATES[Math.floor(Math.random() * GATES.length)];
-    state.selectedGateId = gate.id;
-    state.selectedPracticeId = gate.practices[0].id;
+    if (state.wheelSpinning) return;
+    state.wheelSpinning = true;
     render();
+    window.setTimeout(() => {
+      const gate = GATES[Math.floor(Math.random() * GATES.length)];
+      state.selectedGateId = gate.id;
+      state.selectedPracticeId = gate.practices[0].id;
+      state.wheelSpinning = false;
+      toast(`Gate ${gate.id}: ${gate.title}`);
+      render();
+    }, 1280);
   }
   if (action === "set-wheel-mode") {
     state.wheelMode = target.dataset.mode || "today";

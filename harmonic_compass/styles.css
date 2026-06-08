@@ -391,6 +391,14 @@ textarea:focus-visible,
   transform: translateY(-1px);
 }
 
+.primary-button:disabled,
+.ghost-button:disabled,
+.danger-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
 .ghost-button:hover {
   border-color: rgba(118, 214, 255, 0.34);
   background: rgba(118, 214, 255, 0.075);
@@ -889,10 +897,43 @@ textarea:focus-visible,
   pointer-events: none;
   border: 1px solid rgba(247, 213, 142, 0.16);
   border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(247, 213, 142, 0.11), transparent 9%),
+    conic-gradient(from 18deg, transparent 0 8%, rgba(118, 214, 255, 0.11) 12%, transparent 17% 29%, rgba(247, 213, 142, 0.12) 34%, transparent 40% 57%, rgba(140, 239, 216, 0.08) 63%, transparent 70% 100%);
   box-shadow:
     0 0 0 46px rgba(118, 214, 255, 0.018),
     0 0 0 96px rgba(247, 213, 142, 0.012),
     inset 0 0 90px rgba(118, 214, 255, 0.08);
+}
+
+.wheel-constellation::before,
+.wheel-constellation::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.wheel-constellation::before {
+  border: 1px solid rgba(118, 214, 255, 0.12);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(247, 213, 142, 0.56) 0 1px, transparent 2px),
+    radial-gradient(circle at 80% 52%, rgba(118, 214, 255, 0.42) 0 1px, transparent 2px),
+    radial-gradient(circle at 20% 68%, rgba(140, 239, 216, 0.34) 0 1px, transparent 2px);
+  box-shadow:
+    inset 0 0 48px rgba(118, 214, 255, 0.055),
+    0 0 68px rgba(118, 214, 255, 0.055);
+  opacity: 0.78;
+}
+
+.wheel-constellation::after {
+  inset: 16%;
+  border: 1px solid rgba(247, 213, 142, 0.12);
+  background:
+    conic-gradient(from 0deg, transparent 0 16%, rgba(247, 213, 142, 0.22) 18%, transparent 22% 48%, rgba(118, 214, 255, 0.18) 51%, transparent 55% 100%);
+  filter: blur(0.3px);
+  opacity: 0.56;
 }
 
 .cosmic-wheel-panel .harmonic-wheel {
@@ -1322,7 +1363,58 @@ blockquote {
   display: block;
   filter:
     drop-shadow(0 34px 70px rgba(0, 0, 0, 0.58))
-    drop-shadow(0 0 32px rgba(118, 214, 255, 0.10));
+    drop-shadow(0 0 32px rgba(118, 214, 255, 0.10))
+    drop-shadow(0 0 64px rgba(247, 213, 142, 0.07));
+}
+
+.wheel-stars,
+.spectral-ring,
+.wheel-grid,
+.gold-ring,
+.orbit,
+.segment-ring,
+.center-seal {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.wheel-star {
+  fill: rgba(251, 243, 230, 0.62);
+  opacity: 0.58;
+  filter: drop-shadow(0 0 8px rgba(251, 243, 230, 0.28));
+}
+
+.wheel-star.gold {
+  fill: rgba(247, 213, 142, 0.88);
+  filter: drop-shadow(0 0 10px rgba(247, 213, 142, 0.48));
+}
+
+.wheel-star.blue {
+  fill: rgba(118, 214, 255, 0.76);
+  filter: drop-shadow(0 0 9px rgba(118, 214, 255, 0.34));
+}
+
+.wheel-star.teal {
+  fill: rgba(140, 239, 216, 0.72);
+  filter: drop-shadow(0 0 9px rgba(140, 239, 216, 0.30));
+}
+
+.spectral-ring {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.62;
+  filter: drop-shadow(0 0 13px rgba(118, 214, 255, 0.13));
+}
+
+.spectral-ring-outer {
+  stroke: rgba(118, 214, 255, 0.20);
+  stroke-dasharray: 1 18 58 26;
+}
+
+.spectral-ring-inner {
+  stroke: rgba(247, 213, 142, 0.22);
+  stroke-dasharray: 70 18 1 22;
 }
 
 .wheel-grid {
@@ -1368,7 +1460,7 @@ blockquote {
   fill: rgba(10, 29, 48, 0.62);
   stroke: rgba(220, 235, 255, 0.18);
   stroke-width: 1;
-  transition: fill 170ms ease, stroke 170ms ease, filter 170ms ease;
+  transition: fill 170ms ease, stroke 170ms ease, filter 170ms ease, opacity 170ms ease;
 }
 
 .wheel-segment text {
@@ -1383,6 +1475,10 @@ blockquote {
   fill: rgba(231, 173, 69, 0.34);
   stroke: rgba(247, 213, 142, 0.88);
   filter: drop-shadow(0 0 13px rgba(231, 173, 69, 0.42));
+}
+
+.wheel-segment.selected text {
+  fill: var(--gold-soft);
 }
 
 .wheel-segment.today path {
@@ -1892,9 +1988,58 @@ textarea {
     animation: auroraTurn 32s ease-in-out infinite alternate;
   }
 
+  .cosmic-wheel-panel::before {
+    animation: starMapDrift 34s linear infinite;
+  }
+
+  .cosmic-wheel-panel::after {
+    animation: auroraSweep 22s ease-in-out infinite alternate;
+  }
+
   .wheel-panel::after,
   .wheel-stage::after {
     animation: auroraTurn 26s ease-in-out infinite alternate;
+  }
+
+  .wheel-constellation {
+    animation: constellationTurn 96s linear infinite;
+  }
+
+  .wheel-constellation::before {
+    animation: constellationTurnReverse 116s linear infinite;
+  }
+
+  .wheel-constellation::after {
+    animation: prismSweep 18s ease-in-out infinite alternate;
+  }
+
+  .harmonic-wheel {
+    animation: wheelFloat 9s ease-in-out infinite;
+  }
+
+  .wheel-stars {
+    animation: starFieldTurn 78s linear infinite;
+  }
+
+  .wheel-star {
+    animation: starTwinkle 5.8s ease-in-out infinite;
+    animation-delay: var(--star-delay);
+  }
+
+  .spectral-ring-outer {
+    animation: ringTrace 21s linear infinite;
+  }
+
+  .spectral-ring-inner {
+    animation: ringTraceReverse 28s linear infinite;
+  }
+
+  .wheel-grid {
+    animation: gridBreath 12s ease-in-out infinite alternate;
+  }
+
+  .gold-ring {
+    animation: goldPulse 7s ease-in-out infinite alternate;
   }
 
   .orbit-one {
@@ -1903,6 +2048,152 @@ textarea {
 
   .orbit-two {
     animation: orbitTraceSoft 24s ease-in-out infinite alternate;
+  }
+
+  .center-seal {
+    animation: sealBreath 8s ease-in-out infinite;
+  }
+
+  .wheel-segment.selected path {
+    animation: selectedGateShimmer 3.6s ease-in-out infinite alternate;
+  }
+
+  .harmonic-wheel.is-spinning {
+    animation: wheelFloat 9s ease-in-out infinite, wheelIgnite 1280ms ease-out both;
+  }
+
+  .harmonic-wheel.is-spinning .segment-ring,
+  .harmonic-wheel.is-spinning .spectral-ring,
+  .harmonic-wheel.is-spinning .gold-ring,
+  .harmonic-wheel.is-spinning .wheel-grid {
+    animation: wheelSpinSweep 1280ms cubic-bezier(0.16, 0.84, 0.18, 1) both;
+  }
+
+  .harmonic-wheel.is-spinning .wheel-stars {
+    animation: wheelSpinSweep 1280ms cubic-bezier(0.16, 0.84, 0.18, 1) both;
+  }
+
+  .harmonic-wheel.is-spinning .orbit {
+    animation: orbitIgnition 1280ms cubic-bezier(0.16, 0.84, 0.18, 1) both;
+  }
+
+  .harmonic-wheel.is-spinning .center-seal {
+    animation: sealIgnition 1280ms ease-out both;
+  }
+
+  @keyframes starMapDrift {
+    0% {
+      background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+      opacity: 0.72;
+    }
+
+    50% {
+      opacity: 0.96;
+    }
+
+    100% {
+      background-position: 0 0, 0 0, 190px -95px, -130px 260px, 165px 330px;
+      opacity: 0.78;
+    }
+  }
+
+  @keyframes constellationTurn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes constellationTurnReverse {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
+
+  @keyframes prismSweep {
+    0% {
+      opacity: 0.30;
+      transform: rotate(-18deg) scale(0.96);
+    }
+
+    100% {
+      opacity: 0.68;
+      transform: rotate(22deg) scale(1.06);
+    }
+  }
+
+  @keyframes wheelFloat {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+      transform: translate3d(0, -8px, 0) scale(1.006);
+    }
+  }
+
+  @keyframes starFieldTurn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes starTwinkle {
+    0%,
+    100% {
+      opacity: 0.28;
+      transform: translate3d(0, 0, 0) scale(0.88);
+    }
+
+    45% {
+      opacity: 0.94;
+      transform: translate3d(var(--star-x), var(--star-y), 0) scale(1.42);
+    }
+
+    72% {
+      opacity: 0.54;
+      transform: translate3d(var(--star-x2), var(--star-y2), 0) scale(1.06);
+    }
+  }
+
+  @keyframes ringTrace {
+    to {
+      stroke-dashoffset: -440;
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes ringTraceReverse {
+    to {
+      stroke-dashoffset: 360;
+      transform: rotate(-360deg);
+    }
+  }
+
+  @keyframes gridBreath {
+    0% {
+      opacity: 0.58;
+      transform: scale(0.992);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1.006);
+    }
+  }
+
+  @keyframes goldPulse {
+    0% {
+      opacity: 0.58;
+      stroke-dashoffset: 0;
+      filter: drop-shadow(0 0 8px rgba(247, 213, 142, 0.18));
+    }
+
+    100% {
+      opacity: 0.98;
+      stroke-dashoffset: -34;
+      filter: drop-shadow(0 0 22px rgba(247, 213, 142, 0.42));
+    }
   }
 
   @keyframes orbitTrace {
@@ -1916,6 +2207,104 @@ textarea {
     to {
       stroke-dashoffset: 80;
       opacity: 0.46;
+    }
+  }
+
+  @keyframes sealBreath {
+    0%,
+    100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 0 rgba(247, 213, 142, 0));
+    }
+
+    50% {
+      transform: scale(1.018);
+      filter: drop-shadow(0 0 18px rgba(247, 213, 142, 0.22));
+    }
+  }
+
+  @keyframes selectedGateShimmer {
+    0% {
+      fill: rgba(231, 173, 69, 0.30);
+      filter: drop-shadow(0 0 12px rgba(231, 173, 69, 0.34));
+    }
+
+    100% {
+      fill: rgba(247, 213, 142, 0.46);
+      filter:
+        drop-shadow(0 0 18px rgba(231, 173, 69, 0.54))
+        drop-shadow(0 0 30px rgba(118, 214, 255, 0.18));
+    }
+  }
+
+  @keyframes wheelIgnite {
+    0% {
+      filter:
+        drop-shadow(0 34px 70px rgba(0, 0, 0, 0.58))
+        drop-shadow(0 0 32px rgba(118, 214, 255, 0.10));
+    }
+
+    58% {
+      filter:
+        drop-shadow(0 36px 78px rgba(0, 0, 0, 0.58))
+        drop-shadow(0 0 70px rgba(118, 214, 255, 0.32))
+        drop-shadow(0 0 88px rgba(247, 213, 142, 0.24));
+    }
+
+    100% {
+      filter:
+        drop-shadow(0 34px 70px rgba(0, 0, 0, 0.58))
+        drop-shadow(0 0 38px rgba(118, 214, 255, 0.14))
+        drop-shadow(0 0 64px rgba(247, 213, 142, 0.09));
+    }
+  }
+
+  @keyframes wheelSpinSweep {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    62% {
+      transform: rotate(660deg) scale(1.034);
+    }
+
+    100% {
+      transform: rotate(735deg) scale(1);
+    }
+  }
+
+  @keyframes orbitIgnition {
+    0% {
+      stroke-dashoffset: 0;
+      opacity: 0.50;
+      transform: rotate(0deg) scale(1);
+    }
+
+    58% {
+      stroke-dashoffset: -420;
+      opacity: 1;
+      transform: rotate(390deg) scale(1.05);
+    }
+
+    100% {
+      stroke-dashoffset: -520;
+      opacity: 0.72;
+      transform: rotate(540deg) scale(1);
+    }
+  }
+
+  @keyframes sealIgnition {
+    0% {
+      transform: scale(1);
+    }
+
+    48% {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 34px rgba(247, 213, 142, 0.44));
+    }
+
+    100% {
+      transform: scale(1);
     }
   }
 
