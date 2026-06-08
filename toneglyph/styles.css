@@ -139,7 +139,9 @@ button {
 .brand small,
 .render-status,
 .input-label,
-.color-row span {
+.color-row span,
+.select-row span,
+.range-grid span {
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.25;
@@ -215,7 +217,8 @@ button {
 .primary-action,
 .quiet-action,
 .tone-option,
-.palette-option {
+.palette-option,
+.family-option {
   min-height: 44px;
   border: 0;
   border-radius: 999px;
@@ -243,7 +246,7 @@ button {
   transform: translateX(-50%);
   width: min(1100px, calc(100vw - 28px));
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr 1.25fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   pointer-events: auto;
 }
@@ -304,6 +307,88 @@ textarea:focus {
 
 .quiet-action {
   border: 1px solid rgba(238, 245, 238, 0.12);
+}
+
+.family-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.family-option {
+  min-height: 38px;
+  padding: 0 7px;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.family-option.active {
+  color: #071016;
+  background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+}
+
+.select-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.select-row label,
+.range-grid label {
+  min-width: 0;
+}
+
+.select-row span,
+.range-grid span {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(238, 245, 238, 0.12);
+  border-radius: 12px;
+  color: var(--text);
+  background: rgba(238, 245, 238, 0.08);
+  padding: 0 10px;
+  outline: none;
+}
+
+.range-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 9px;
+}
+
+.range-grid label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 3px 7px;
+}
+
+.range-grid input {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--tone-b);
+}
+
+.range-grid output {
+  color: var(--tone-a);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.compact-row {
+  margin-top: 9px;
+}
+
+.compact-row .quiet-action {
+  min-height: 38px;
+  font-size: 0.76rem;
 }
 
 .option-grid {
@@ -443,18 +528,28 @@ body[data-mode="kasina"] .control-dock {
 
 body[data-mode="kasina"] .ritual-panel,
 body[data-mode="kasina"] .tone-panel,
-body[data-mode="kasina"] .color-panel {
+body[data-mode="kasina"] .color-panel,
+body[data-mode="kasina"] .creator-panel,
+body[data-mode="kasina"] .builder-panel {
   display: none;
 }
 
 body[data-mode="breath"] .ritual-panel,
-body[data-mode="play"] .ritual-panel {
+body[data-mode="breath"] .builder-panel,
+body[data-mode="play"] .ritual-panel,
+body[data-mode="play"] .builder-panel,
+body[data-mode="ritual"] .builder-panel,
+body[data-mode="glyph"] .ritual-panel {
   display: none;
 }
 
 body[data-mode="breath"] .control-dock,
 body[data-mode="play"] .control-dock {
-  grid-template-columns: 0.9fr 1.2fr 1fr;
+  grid-template-columns: 0.9fr 1.1fr 1fr;
+}
+
+body[data-mode="glyph"] .control-dock {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 @media (min-width: 1120px) {
@@ -487,7 +582,8 @@ body[data-mode="play"] .control-dock {
 
   body[data-mode="breath"] .control-dock,
   body[data-mode="play"] .control-dock,
-  body[data-mode="kasina"] .control-dock {
+  body[data-mode="kasina"] .control-dock,
+  body[data-mode="glyph"] .control-dock {
     width: 360px;
     grid-template-columns: 1fr;
   }
@@ -574,6 +670,8 @@ body[data-mode="play"] .control-dock {
   }
 
   .ritual-panel,
+  .creator-panel,
+  .builder-panel,
   .color-panel,
   .export-panel {
     grid-column: 1 / -1;
@@ -586,6 +684,21 @@ body[data-mode="play"] .control-dock {
 
   .option-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .family-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .family-option {
+    min-height: 36px;
+    padding: 0 4px;
+    font-size: 0.66rem;
+  }
+
+  .range-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .tone-option {
@@ -623,6 +736,10 @@ body[data-mode="play"] .control-dock {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .family-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .color-row {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -633,6 +750,11 @@ body[data-mode="play"] .control-dock {
 
   .tone-option {
     font-size: 0.68rem;
+  }
+
+  .select-row,
+  .range-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

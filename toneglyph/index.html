@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Tone Glyph - Living Metatron Cube</title>
-  <meta name="description" content="Tone Glyph is a living Metatron's Cube for gaze, breath, play, ritual, and personal glyph creation.">
+  <title>Tone Glyph - Living Glyph Creator</title>
+  <meta name="description" content="Tone Glyph is a living glyph creator for sacred geometry, tone, breath, ritual, and personal symbolic form.">
   <meta name="theme-color" content="#05070a">
   <link rel="canonical" href="https://coherence-nikolai.app/toneglyph/">
   <meta property="og:title" content="Tone Glyph">
-  <meta property="og:description" content="A living Metatron's Cube for breath, ritual, play, and personal glyph creation.">
+  <meta property="og:description" content="A living glyph creator for sacred geometry, breath, ritual, play, and personal symbolic form.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://coherence-nikolai.app/toneglyph/">
   <meta property="og:image" content="https://coherence-nikolai.app/toneglyph/icon.svg">
@@ -19,7 +19,7 @@
 <body data-mode="ritual" data-view="living">
   <main class="app-shell">
     <section class="stage" aria-label="Tone Glyph instrument">
-      <canvas id="glyph-canvas" class="glyph-canvas" aria-label="Interactive Metatron's Cube"></canvas>
+      <canvas id="glyph-canvas" class="glyph-canvas" aria-label="Interactive Tone Glyph creator"></canvas>
       <div class="orbital-shade" aria-hidden="true"></div>
     </section>
 
@@ -28,7 +28,7 @@
         <span class="brand-mark" aria-hidden="true">TG</span>
         <span>
           <strong>Tone Glyph</strong>
-          <small>Metatron ritual object</small>
+          <small>Living glyph creator</small>
         </span>
       </a>
       <div class="topbar-actions">
@@ -48,13 +48,45 @@
       <button class="mode-button" type="button" data-mode="glyph">Glyph</button>
     </nav>
 
-    <section class="control-dock" aria-label="Tone Glyph controls">
+    <section class="control-dock" aria-label="Tone Glyph creator controls">
       <div class="panel ritual-panel">
         <label class="input-label" for="intention-input">Intention</label>
         <textarea id="intention-input" rows="2" maxlength="160" placeholder="Name what this glyph is holding"></textarea>
         <div class="action-row">
           <button id="seal-button" class="primary-action" type="button">Seal Ritual</button>
           <button id="clear-button" class="quiet-action" type="button">Clear</button>
+        </div>
+      </div>
+
+      <div class="panel creator-panel">
+        <span class="input-label">Glyph</span>
+        <div id="family-options" class="family-grid" aria-label="Glyph families"></div>
+        <div class="select-row">
+          <label>
+            <span>Seed</span>
+            <select id="seed-select" aria-label="Glyph seed"></select>
+          </label>
+          <label>
+            <span>Action</span>
+            <select id="action-select" aria-label="Ritual action"></select>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel builder-panel">
+        <span class="input-label">Builder</span>
+        <div class="range-grid">
+          <label><span>Symmetry</span><input id="symmetry-range" type="range" min="3" max="12" step="1" value="6"><output id="symmetry-output">6</output></label>
+          <label><span>Density</span><input id="density-range" type="range" min="1" max="9" step="1" value="6"><output id="density-output">6</output></label>
+          <label><span>Orbits</span><input id="orbit-range" type="range" min="1" max="5" step="1" value="2"><output id="orbit-output">2</output></label>
+          <label><span>Depth</span><input id="depth-range" type="range" min="0" max="6" step="1" value="1"><output id="depth-output">1</output></label>
+          <label><span>Aura</span><input id="aura-range" type="range" min="1" max="9" step="1" value="5"><output id="aura-output">5</output></label>
+          <label><span>Breath</span><input id="breath-range" type="range" min="1" max="9" step="1" value="4"><output id="breath-output">4</output></label>
+        </div>
+        <div class="action-row compact-row">
+          <button id="variant-button" class="quiet-action" type="button">Variant</button>
+          <button id="clear-gesture-button" class="quiet-action" type="button">Clear Trace</button>
+          <button id="recipe-button" class="quiet-action" type="button">Recipe</button>
         </div>
       </div>
 

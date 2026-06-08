@@ -1,7 +1,7 @@
 {
   "name": "Tone Glyph",
   "short_name": "Tone Glyph",
-  "description": "A living Metatron's Cube for breath, ritual, play, and personal glyph creation.",
+  "description": "A living glyph creator for sacred geometry, tone, breath, ritual, and personal symbolic form.",
   "start_url": "/toneglyph/",
   "scope": "/toneglyph/",
   "display": "standalone",
