@@ -15,10 +15,16 @@
     >
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://coherence-nikolai.app/toneparadox/">
+    <meta name="theme-color" content="#080403">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tone Paradox">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Tone Paradox - Hold Both</title>
     <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
-    <script type="module" crossorigin src="./assets/index-4bp2qNJp.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-4WTPuDmG.css">
+    <link rel="apple-touch-icon" href="toneparadox-icon.svg">
+    <link rel="manifest" href="manifest.webmanifest">
+    <script type="module" crossorigin src="./assets/index-DIe7FuI4.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CHKFbJgS.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -35,7 +41,7 @@
         </header>
 
         <main class="landing-hero">
-          <div class="landing-glyph" aria-hidden="true">
+          <div class="landing-glyph landing-glyph-animated" aria-hidden="true">
             <svg viewBox="0 0 96 96" role="img">
               <defs>
                 <radialGradient id="glyphBg" cx="50%" cy="48%" r="72%">
@@ -72,12 +78,24 @@
               <rect x="5" y="5" width="86" height="86" rx="25" fill="url(#glyphBg)" opacity=".32"/>
               <circle cx="48" cy="48" r="34" fill="#d5b98a" opacity=".12" filter="url(#glyphGlow)"/>
               <circle cx="48" cy="48" r="28" fill="url(#glyphOrb)" opacity=".68"/>
-              <circle cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCream)" stroke-width="1.35" opacity=".72"/>
+              <circle class="glyph-focal-ring" cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCream)" stroke-width="1.35" opacity=".72"/>
               <circle cx="48" cy="48" r="27" fill="none" stroke="#fff7e8" stroke-width=".45" opacity=".34"/>
-              <ellipse cx="48" cy="48" rx="27" ry="8.4" fill="none" stroke="url(#glyphCopper)" stroke-width="2.7" opacity=".62" filter="url(#glyphGlow)"/>
-              <path d="M34 25C43 37 43 44 48 48C53 52 53 59 62 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
-              <path d="M62 25C53 37 53 44 48 48C43 52 43 59 34 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
+              <ellipse class="glyph-tube" cx="48" cy="48" rx="27" ry="8.4" fill="none" stroke="url(#glyphCopper)" stroke-width="2.7" opacity=".62" filter="url(#glyphGlow)"/>
+              <path class="glyph-hyper glyph-hyper-left" d="M34 25C43 37 43 44 48 48C53 52 53 59 62 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
+              <path class="glyph-hyper glyph-hyper-right" d="M62 25C53 37 53 44 48 48C43 52 43 59 34 71" fill="none" stroke="url(#glyphCream)" stroke-width="2.8" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
               <path d="M22 51C30 48 38 47 48 48C58 49 66 48 74 45" fill="none" stroke="#fff7e8" stroke-width="1.35" stroke-linecap="round" opacity=".54" filter="url(#glyphGlow)"/>
+              <g class="glyph-blue-orbs">
+                <circle class="glyph-blue-orb glyph-blue-orb-a" cx="39" cy="29" r="1.8" fill="#9df1ff"/>
+                <circle class="glyph-blue-orb glyph-blue-orb-b" cx="57" cy="67" r="1.6" fill="#9df1ff"/>
+              </g>
+              <g class="glyph-ring-runner">
+                <circle cx="76" cy="48" r="2.1" fill="#fff4cf" filter="url(#glyphGlow)"/>
+              </g>
+              <g class="glyph-sparkles">
+                <circle cx="48" cy="18" r="1.2" fill="#fff4cf"/>
+                <circle cx="71" cy="32" r=".9" fill="#fff4cf"/>
+                <circle cx="25" cy="62" r=".85" fill="#fff4cf"/>
+              </g>
               <circle cx="48" cy="48" r="8.4" fill="#070404" stroke="url(#glyphCream)" stroke-width="4.4" filter="url(#glyphGlow)"/>
             </svg>
           </div>
@@ -104,6 +122,7 @@
           <div id="centerLabel" class="center-label">+</div>
           <div id="labelTwo" class="polarity-label polarity-label-two">What is also true</div>
         </div>
+        <div id="meaningLayer" class="meaning-layer" aria-hidden="true"></div>
       </div>
 
       <header class="topbar">
@@ -148,6 +167,9 @@
           </span>
         </a>
         <div class="topbar-actions">
+          <button class="meaning-toggle-button" type="button" id="meaningToggleButton" aria-pressed="false">
+            Meanings
+          </button>
           <button class="view-reset-button" type="button" id="viewResetButton" aria-label="Reset view" title="Reset view">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M7.2 8.2A6.8 6.8 0 1 1 5.4 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -221,6 +243,20 @@
                 <label>
                   <input type="radio" name="practiceMode" value="breath">
                   <span>Breath</span>
+                </label>
+              </fieldset>
+            </div>
+
+            <div class="meaning-row">
+              <span class="field-caption">Visual layer</span>
+              <fieldset class="segmented-field compact meaning-field" aria-label="Visual layer">
+                <label>
+                  <input type="radio" name="meaningLayer" value="off" checked>
+                  <span>Pure</span>
+                </label>
+                <label>
+                  <input type="radio" name="meaningLayer" value="on">
+                  <span>Meanings</span>
                 </label>
               </fieldset>
             </div>
@@ -334,6 +370,9 @@
         <div class="about-tabs" role="tablist" aria-label="About Tone Paradox">
           <button type="button" class="about-tab is-active" data-about-tab="practice">Practice</button>
           <button type="button" class="about-tab" data-about-tab="breath">Breath</button>
+          <button type="button" class="about-tab" data-about-tab="library">Library</button>
+          <button type="button" class="about-tab" data-about-tab="journal">Journal</button>
+          <button type="button" class="about-tab" data-about-tab="plus">Plus</button>
         </div>
         <section class="about-panel is-active" data-about-panel="practice">
           <p>
@@ -363,6 +402,11 @@
             opposite can be held at the same time without collapsing either one.
           </p>
           <p>
+            In the geometry, the hyperboloid throat and focal ring are treated as the same contact radius:
+            a symbolic r=1 meeting where the closed, self-referential loop and the open field can be read
+            together. No gap is intended there; that contact is the point of the image.
+          </p>
+          <p>
             In practice, begin by naming what is present. Then name what is also true and possible,
             or what has not yet been given shape.
           </p>
@@ -388,6 +432,62 @@
             <li>Exhale: follow the copper toroidal loop.</li>
             <li>Rest: let the whole field settle.</li>
           </ul>
+        </section>
+        <section class="about-panel" data-about-panel="library" hidden>
+          <p>
+            Choose a paradox pair, then adjust the words before beginning. The library is not a diagnosis;
+            it is a set of symbolic entrances into the practice.
+          </p>
+          <div class="library-grid">
+            <button type="button" data-library-pair="Anxiety|Safety">Anxiety <span>Safety</span></button>
+            <button type="button" data-library-pair="Anger|Forgiveness">Anger <span>Forgiveness</span></button>
+            <button type="button" data-library-pair="Grief|Love">Grief <span>Love</span></button>
+            <button type="button" data-library-pair="Control|Trust">Control <span>Trust</span></button>
+            <button type="button" data-library-pair="Shame|Dignity">Shame <span>Dignity</span></button>
+            <button type="button" data-library-pair="Desire|Enoughness">Desire <span>Enoughness</span></button>
+            <button type="button" data-library-pair="Confusion|Clarity">Confusion <span>Clarity</span></button>
+            <button type="button" data-library-pair="Loneliness|Belonging">Loneliness <span>Belonging</span></button>
+          </div>
+        </section>
+        <section class="about-panel" data-about-panel="plus" hidden>
+          <p>
+            Tone Paradox Plus is the deeper instrument layer: study overlays, saved pattern memory,
+            richer guided audio, visual modes, and personal paradox decks. The complete core practice remains free.
+          </p>
+          <div class="plus-grid">
+            <article>
+              <strong>Meaning Layer</strong>
+              <span>Floating language for toroid, hyperboloid, and focal ring.</span>
+              <button type="button" data-plus-action="meanings">Turn on meanings</button>
+            </article>
+            <article>
+              <strong>Insight Memory</strong>
+              <span>Saved sessions, recurring pairs, and searchable reflection history.</span>
+              <button type="button" data-about-jump="journal">Open journal</button>
+            </article>
+            <article>
+              <strong>Guided Library</strong>
+              <span>Long-form audio, Tone family voices, and themed paradox sequences.</span>
+              <button type="button" data-plus-action="audio">Preview layer</button>
+            </article>
+            <article>
+              <strong>Study Notes</strong>
+              <span>Toroid, hyperboloid, focal ring, and r=1 contact language.</span>
+              <button type="button" data-plus-action="study">Show study map</button>
+            </article>
+            <article>
+              <strong>iPhone Plus</strong>
+              <span>Home Screen app mode, iCloud-ready memory, and premium visual themes.</span>
+              <button type="button" data-plus-action="iphone">Phone map</button>
+            </article>
+          </div>
+          <p class="plus-note" id="plusNote">Premium checkout is not active yet. This is the product-ready map.</p>
+        </section>
+        <section class="about-panel" data-about-panel="journal" hidden>
+          <p>
+            Local insight memory from this browser. On iPhone, this becomes the seed of the paid synced journal.
+          </p>
+          <div class="journal-list" id="journalList"></div>
         </section>
       </dialog>
     </div>

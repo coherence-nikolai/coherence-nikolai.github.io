@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Tone Paradox">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="48%" r="74%">
+      <stop offset="0" stop-color="#66543d"/>
+      <stop offset=".36" stop-color="#2b2118"/>
+      <stop offset=".74" stop-color="#100b0a"/>
+      <stop offset="1" stop-color="#070404"/>
+    </radialGradient>
+    <linearGradient id="cream" x1="118" x2="394" y1="100" y2="412">
+      <stop offset="0" stop-color="#fff9ec"/>
+      <stop offset=".52" stop-color="#e7d6b7"/>
+      <stop offset="1" stop-color="#fff2d7"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="176" x2="336" y1="88" y2="424">
+      <stop offset="0" stop-color="#9df1ff"/>
+      <stop offset=".52" stop-color="#69dfff"/>
+      <stop offset="1" stop-color="#d7fbff"/>
+    </linearGradient>
+    <linearGradient id="copper" x1="94" x2="418" y1="348" y2="164">
+      <stop offset="0" stop-color="#ff9140"/>
+      <stop offset=".52" stop-color="#e4aa67"/>
+      <stop offset="1" stop-color="#fff1be"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="132" fill="#080403"/>
+  <rect x="22" y="22" width="468" height="468" rx="118" fill="url(#bg)" opacity=".82"/>
+  <circle cx="256" cy="256" r="172" fill="#e7d6b7" opacity=".08" filter="url(#glow)"/>
+  <ellipse cx="256" cy="256" rx="178" ry="56" fill="none" stroke="url(#copper)" stroke-width="18" opacity=".84" filter="url(#glow)"/>
+  <path d="M174 130C222 202 222 236 256 256C290 276 290 310 338 382" fill="none" stroke="url(#blue)" stroke-width="14" stroke-linecap="round" opacity=".86" filter="url(#glow)"/>
+  <path d="M338 130C290 202 290 236 256 256C222 276 222 310 174 382" fill="none" stroke="url(#blue)" stroke-width="14" stroke-linecap="round" opacity=".86" filter="url(#glow)"/>
+  <circle cx="256" cy="256" r="58" fill="#070404" stroke="url(#cream)" stroke-width="23" filter="url(#glow)"/>
+  <circle cx="256" cy="256" r="88" fill="none" stroke="url(#cream)" stroke-width="6" opacity=".58"/>
+  <circle cx="256" cy="110" r="8" fill="#fff1be"/>
+  <circle cx="256" cy="402" r="8" fill="#fff1be"/>
+</svg>
