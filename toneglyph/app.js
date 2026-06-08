@@ -104,6 +104,7 @@
     activePulse: 0,
     activeNode: null,
     trueGlyph: false,
+    pan: { x: 0, y: 0 },
     family: "sacred",
     seed: "metatron",
     ritualAction: "seal",
@@ -375,6 +376,13 @@
 
   function resetRendererFront() {
     if (state.renderer && state.renderer.resetFrontFace) state.renderer.resetFrontFace();
+  }
+
+  function panGlyphBy(dx, dy, rect) {
+    if (!rect || !rect.width || !rect.height) return;
+    const scale = 6.55;
+    state.pan.x = clampFloat(state.pan.x + dx / rect.width * scale, -2.9, 2.9);
+    state.pan.y = clampFloat(state.pan.y + dy / rect.height * scale, -2.9, 2.9);
   }
 
   function sealRitual() {
@@ -659,6 +667,7 @@
     state.trueGlyph = Boolean(safe.trueGlyph);
     document.body.dataset.view = state.trueGlyph ? "true" : "living";
     state.sealedAt = safe.sealedAt || null;
+    state.pan = { x: 0, y: 0 };
     state.builder = {
       symmetry: clampNumber(safe.builder && safe.builder.symmetry, 3, 12, 6),
       density: clampNumber(safe.builder && safe.builder.density, 1, 9, 6),
@@ -695,6 +704,10 @@
     const number = Number(value);
     if (!Number.isFinite(number)) return fallback;
     return Math.max(min, Math.min(max, Math.round(number)));
+  }
+
+  function clampFloat(value, min, max) {
+    return Math.max(min, Math.min(max, value));
   }
 
   function showToast(message) {
@@ -1186,7 +1199,7 @@
         disposeObject(child);
       }
       this.buildObjects();
-      this.resetFrontFace();
+      this.resetOrientation();
 
       function disposeObject(object) {
         if (object.geometry) object.geometry.dispose();
@@ -1209,14 +1222,7 @@
         const dy = event.clientY - this.drag.y;
         if (Math.abs(dx) + Math.abs(dy) > 3) this.drag.moved = true;
         recordGesturePoint(event);
-        if (this.state.trueGlyph) {
-          this.drag.x = event.clientX;
-          this.drag.y = event.clientY;
-          return;
-        }
-        this.rotation.y += dx * 0.006;
-        this.rotation.x += dy * 0.004;
-        this.rotation.x = Math.max(0.15, Math.min(1.05, this.rotation.x));
+        panGlyphBy(dx, dy, this.canvas.getBoundingClientRect());
         this.drag.x = event.clientX;
         this.drag.y = event.clientY;
       });
@@ -1284,6 +1290,13 @@
     }
 
     resetFrontFace() {
+      this.resetOrientation();
+      this.state.pan.x = 0;
+      this.state.pan.y = 0;
+      this.drag.active = false;
+    }
+
+    resetOrientation() {
       this.rotation.x = 0;
       this.rotation.y = 0;
       this.rotation.z = 0;
@@ -1310,6 +1323,7 @@
       }
 
       this.group.rotation.set(trueGlyph ? 0 : this.rotation.x, trueGlyph ? 0 : this.rotation.y, trueGlyph ? 0 : this.rotation.z);
+      this.group.position.set(this.state.pan.x, -this.state.pan.y, 0);
       this.group.scale.setScalar(trueGlyph ? 1 : breath + sealPulse * 0.035);
 
       this.lineMeshes.forEach((mesh, index) => {
@@ -1346,7 +1360,7 @@
       this.model = model;
       this.state = appState;
       this.rotation = 0;
-      this.drag = { active: false, x: 0 };
+      this.drag = { active: false, x: 0, y: 0 };
     }
 
     init() {
@@ -1358,18 +1372,17 @@
 
     bindPointer() {
       this.canvas.addEventListener("pointerdown", (event) => {
-        this.drag = { active: true, x: event.clientX };
+        this.drag = { active: true, x: event.clientX, y: event.clientY };
         this.canvas.setPointerCapture(event.pointerId);
       });
       this.canvas.addEventListener("pointermove", (event) => {
         if (!this.drag.active) return;
+        const dx = event.clientX - this.drag.x;
+        const dy = event.clientY - this.drag.y;
         recordGesturePoint(event);
-        if (this.state.trueGlyph) {
-          this.drag.x = event.clientX;
-          return;
-        }
-        this.rotation += (event.clientX - this.drag.x) * 0.008;
+        panGlyphBy(dx, dy, this.canvas.getBoundingClientRect());
         this.drag.x = event.clientX;
+        this.drag.y = event.clientY;
       });
       this.canvas.addEventListener("pointerup", () => {
         this.drag.active = false;
@@ -1397,6 +1410,7 @@
         colors: this.state.colors,
         intention: "",
         rotation: this.state.trueGlyph ? 0 : this.rotation,
+        pan: this.state.pan,
         mode: this.state.mode,
         trueGlyph: this.state.trueGlyph,
         pulse: Math.max(0, 1 - (performance.now() - this.state.activePulse) / 1400),
@@ -1405,13 +1419,20 @@
     }
 
     resetFrontFace() {
+      this.resetOrientation();
+      this.state.pan.x = 0;
+      this.state.pan.y = 0;
+      this.drag.active = false;
+    }
+
+    resetOrientation() {
       this.rotation = 0;
       this.drag.active = false;
     }
 
     setModel(model) {
       this.model = model;
-      this.resetFrontFace();
+      this.resetOrientation();
     }
   }
 
@@ -1464,6 +1485,7 @@
     const circleRadius = scale * options.model.circleRadius;
     const timePulse = options.pulse || 0;
     const breath = options.trueGlyph ? 1 : 1 + (options.mode === "breath" ? 0.035 : 0.014) * Math.sin(Date.now() / 900);
+    const pan = options.pan || { x: 0, y: 0 };
 
     ctx.clearRect(0, 0, width, height);
     const bg = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(width, height) * 0.72);
@@ -1478,8 +1500,8 @@
       const x = node.x * Math.cos(angle) - node.y * Math.sin(angle);
       const y = node.x * Math.sin(angle) + node.y * Math.cos(angle);
       return {
-        x: cx + x * scale * breath,
-        y: cy + y * scale * breath,
+        x: cx + (x + pan.x) * scale * breath,
+        y: cy + (y + pan.y) * scale * breath,
         radius: node.radius || 1,
         ring: node.ring
       };
