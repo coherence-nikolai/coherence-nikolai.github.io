@@ -23,8 +23,8 @@
     <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="toneparadox-icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
-    <script type="module" crossorigin src="./assets/index-DMEGcSvV.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BkIiQFXo.css">
+    <script type="module" crossorigin src="./assets/index-Dgr84SKQ.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BIcGKVoI.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -73,29 +73,48 @@
                   <stop offset=".52" stop-color="#ffb14a"/>
                   <stop offset="1" stop-color="#ffe08a"/>
                 </linearGradient>
-                <filter id="glyphGlow" x="-70%" y="-70%" width="240%" height="240%">
-                  <feGaussianBlur stdDeviation="2" result="blur"/>
+                <filter id="glyphGlow" x="-90%" y="-90%" width="280%" height="280%">
+                  <feGaussianBlur stdDeviation="2.4" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="glyphHotGlow" x="-100%" y="-100%" width="300%" height="300%">
+                  <feGaussianBlur stdDeviation="4.2" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="glyphBlueGlow" x="-100%" y="-100%" width="300%" height="300%">
+                  <feGaussianBlur stdDeviation="3.4" result="blur"/>
                   <feMerge>
                     <feMergeNode in="blur"/>
                     <feMergeNode in="SourceGraphic"/>
                   </feMerge>
                 </filter>
               </defs>
-              <circle cx="48" cy="48" r="34" fill="#d5b98a" opacity=".12" filter="url(#glyphGlow)"/>
-              <circle cx="48" cy="48" r="28" fill="url(#glyphOrb)" opacity=".68"/>
+              <circle cx="48" cy="48" r="35.5" fill="#ffb14a" opacity=".10" filter="url(#glyphHotGlow)"/>
+              <circle cx="48" cy="48" r="28" fill="url(#glyphOrb)" opacity=".78"/>
+              <circle class="glyph-toroid-field" cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCopper)" stroke-width="8.8" opacity=".18" filter="url(#glyphHotGlow)"/>
+              <circle class="glyph-toroid-inner" cx="48" cy="48" r="22.4" fill="none" stroke="#fff0cc" stroke-width=".75" opacity=".28"/>
+              <circle class="glyph-toroid-outer" cx="48" cy="48" r="31.4" fill="none" stroke="#ff8b32" stroke-width=".8" opacity=".22"/>
               <circle class="glyph-focal-ring" cx="48" cy="48" r="27" fill="none" stroke="url(#glyphCream)" stroke-width="1.35" opacity=".72"/>
               <circle cx="48" cy="48" r="27" fill="none" stroke="#fff7e8" stroke-width=".45" opacity=".34"/>
-              <path class="glyph-tube" d="M73.4 38.8A27 27 0 0 1 43.3 74.6" fill="none" stroke="url(#glyphCopper)" stroke-width="6.8" stroke-linecap="round" opacity=".72" filter="url(#glyphGlow)"/>
-              <path class="glyph-tube-core" d="M75 48A27 27 0 0 1 57.2 73.4" fill="none" stroke="#ffd76f" stroke-width="2.1" stroke-linecap="round" opacity=".96" filter="url(#glyphGlow)"/>
-              <path class="glyph-hyper glyph-hyper-track" d="M34 22C43 34 43 44 48 48C53 52 53 62 62 74" fill="none" stroke="#7ee7ff" stroke-width="2.4" stroke-linecap="round" opacity=".86" filter="url(#glyphGlow)"/>
-              <path class="glyph-hyper glyph-hyper-right" d="M62 22C53 34 53 44 48 48C43 52 43 62 34 74" fill="none" stroke="#7ee7ff" stroke-width="2.4" stroke-linecap="round" opacity=".58" filter="url(#glyphGlow)"/>
-              <circle class="glyph-blue-orb glyph-blue-orb-a" r="2.45" fill="#9df1ff" filter="url(#glyphGlow)">
-                <animateMotion dur="5.8s" repeatCount="indefinite" path="M34 22C43 34 43 44 48 48C53 52 53 62 62 74"/>
+              <path class="glyph-tube-soft" d="M70.5 33A27 27 0 0 1 37.2 73.3" fill="none" stroke="#ff8b32" stroke-width="10.6" stroke-linecap="round" opacity=".24" filter="url(#glyphHotGlow)"/>
+              <path class="glyph-tube" d="M73.4 38.8A27 27 0 0 1 43.3 74.6" fill="none" stroke="url(#glyphCopper)" stroke-width="7.4" stroke-linecap="round" opacity=".84" filter="url(#glyphHotGlow)"/>
+              <path class="glyph-tube-core" d="M75 48A27 27 0 0 1 57.2 73.4" fill="none" stroke="#fff09a" stroke-width="2.4" stroke-linecap="round" opacity="1" filter="url(#glyphHotGlow)"/>
+              <path class="glyph-hyper glyph-hyper-track" d="M34 22C43 34 43 44 48 48C53 52 53 62 62 74" fill="none" stroke="#8ff2ff" stroke-width="2.8" stroke-linecap="round" opacity=".94" filter="url(#glyphBlueGlow)"/>
+              <path class="glyph-hyper glyph-hyper-right" d="M62 22C53 34 53 44 48 48C43 52 43 62 34 74" fill="none" stroke="#8ff2ff" stroke-width="2.8" stroke-linecap="round" opacity=".76" filter="url(#glyphBlueGlow)"/>
+              <circle class="glyph-blue-orb glyph-blue-orb-a" r="2.75" fill="#9df1ff" filter="url(#glyphBlueGlow)">
+                <animateMotion dur="7.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" path="M34 22C43 34 43 44 48 48C53 52 53 62 62 74C53 62 53 52 48 48C43 44 43 34 34 22"/>
               </circle>
-              <circle class="glyph-blue-orb glyph-blue-orb-b" r="2.45" fill="#9df1ff" filter="url(#glyphGlow)">
-                <animateMotion dur="5.8s" repeatCount="indefinite" path="M34 74C43 62 43 52 48 48C53 44 53 34 62 22"/>
+              <circle class="glyph-blue-orb glyph-blue-orb-b" r="2.75" fill="#9df1ff" filter="url(#glyphBlueGlow)">
+                <animateMotion dur="7.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines=".45 0 .55 1;.45 0 .55 1" path="M62 74C53 62 53 52 48 48C43 44 43 34 34 22C43 34 43 44 48 48C53 52 53 62 62 74"/>
               </circle>
-              <circle cx="48" cy="48" r="8.4" fill="#070404" stroke="#ffd76f" stroke-width="4.4" filter="url(#glyphGlow)"/>
+              <circle cx="48" cy="48" r="8.4" fill="#070404" stroke="#ffd76f" stroke-width="4.8" filter="url(#glyphHotGlow)"/>
             </svg>
           </div>
 
