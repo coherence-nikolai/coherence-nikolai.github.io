@@ -614,6 +614,10 @@ body[data-mode="glyph"] .control-dock {
     padding-right: 14px;
   }
 
+  .brand small {
+    display: none;
+  }
+
   .render-status {
     display: none;
   }
@@ -759,7 +763,7 @@ body[data-mode="glyph"] .control-dock {
 }
 
 @media (max-width: 360px) {
-  .brand small {
+  .brand strong {
     display: none;
   }
 

@@ -45,13 +45,14 @@
     },
     {
       id: "elemental",
-      label: "Elemental",
+      label: "3D Forms",
       seeds: [
-        { id: "fire", label: "Fire" },
-        { id: "earth", label: "Earth" },
-        { id: "air", label: "Air" },
-        { id: "water", label: "Water" },
-        { id: "ether", label: "Ether" }
+        { id: "pyramid", label: "Pyramid" },
+        { id: "fire", label: "Tetrahedron" },
+        { id: "earth", label: "Cube" },
+        { id: "air", label: "Octahedron" },
+        { id: "water", label: "Icosahedron" },
+        { id: "ether", label: "Dodecahedron" }
       ]
     },
     {
@@ -104,6 +105,7 @@
     activePulse: 0,
     activeNode: null,
     trueGlyph: false,
+    moveGlyph: false,
     pan: { x: 0, y: 0 },
     family: "sacred",
     seed: "metatron",
@@ -177,7 +179,9 @@
     refs.save = document.getElementById("save-button");
     refs.share = document.getElementById("share-button");
     refs.download = document.getElementById("download-button");
+    refs.form3d = document.getElementById("form3d-button");
     refs.trueView = document.getElementById("true-view-button");
+    refs.move = document.getElementById("move-button");
     refs.front = document.getElementById("front-button");
     refs.variant = document.getElementById("variant-button");
     refs.clearGesture = document.getElementById("clear-gesture-button");
@@ -211,7 +215,9 @@
     refs.save.addEventListener("click", saveGlyph);
     refs.share.addEventListener("click", shareGlyph);
     refs.download.addEventListener("click", downloadGlyph);
+    refs.form3d.addEventListener("click", activate3DForm);
     refs.trueView.addEventListener("click", () => setTrueGlyph(!state.trueGlyph));
+    refs.move.addEventListener("click", () => setMoveGlyph(!state.moveGlyph));
     refs.front.addEventListener("click", resetFrontFace);
     refs.seedSelect.addEventListener("change", () => {
       state.seed = refs.seedSelect.value;
@@ -355,6 +361,23 @@
     pulse(currentTone().freq, mode === "play" ? 0.1 : 0.055);
   }
 
+  function activate3DForm() {
+    const elemental = glyphFamilies.find((family) => family.id === "elemental");
+    state.mode = "glyph";
+    document.body.dataset.mode = state.mode;
+    state.family = "elemental";
+    if (!elemental.seeds.some((seed) => seed.id === state.seed)) state.seed = "earth";
+    state.trueGlyph = false;
+    document.body.dataset.view = "living";
+    state.moveGlyph = false;
+    state.builder.depth = Math.max(3, state.builder.depth);
+    state.builder.density = Math.max(5, state.builder.density);
+    state.builder.orbits = Math.max(2, state.builder.orbits);
+    buildSeedControls();
+    rebuildGlyph("3D form");
+    pulse(currentTone().freq * 1.22, 0.075);
+  }
+
   function setTrueGlyph(enabled) {
     state.trueGlyph = Boolean(enabled);
     document.body.dataset.view = state.trueGlyph ? "true" : "living";
@@ -366,7 +389,16 @@
     showToast(state.trueGlyph ? "True glyph" : "Living field");
   }
 
+  function setMoveGlyph(enabled) {
+    state.moveGlyph = Boolean(enabled);
+    state.activePulse = performance.now();
+    updateUI();
+    pulse(currentTone().freq * (state.moveGlyph ? 1.08 : 1.18), 0.045);
+    showToast(state.moveGlyph ? "Move glyph" : "Turn 3D");
+  }
+
   function resetFrontFace() {
+    state.moveGlyph = false;
     resetRendererFront();
     state.activePulse = performance.now();
     updateUI();
@@ -464,8 +496,13 @@
       button.classList.toggle("active", button.dataset.mode === state.mode);
     });
 
+    const is3DForm = state.family === "elemental" && !state.trueGlyph;
+    refs.form3d.classList.toggle("active", is3DForm);
+    refs.form3d.setAttribute("aria-pressed", is3DForm ? "true" : "false");
     refs.trueView.classList.toggle("active", state.trueGlyph);
     refs.trueView.setAttribute("aria-pressed", state.trueGlyph ? "true" : "false");
+    refs.move.classList.toggle("active", state.moveGlyph);
+    refs.move.setAttribute("aria-pressed", state.moveGlyph ? "true" : "false");
 
     Array.from(refs.familyOptions.children).forEach((button) => {
       button.classList.toggle("active", button.dataset.family === state.family);
@@ -492,7 +529,7 @@
     });
 
     const label = modeCopy[state.mode] || "Field";
-    refs.status.textContent = state.trueGlyph ? "True glyph" : currentSeed().label + " " + label;
+    refs.status.textContent = state.moveGlyph ? "Move glyph" : state.trueGlyph ? "True glyph" : currentSeed().label + " " + label;
   }
 
   function applyTheme() {
@@ -590,7 +627,7 @@
     }
     const defaults = {
       sacred: { symmetry: 6, density: 6, orbits: 2, depth: 1, aura: 5, breath: 4 },
-      elemental: { symmetry: 4, density: 5, orbits: 2, depth: 2, aura: 5, breath: 4 },
+      elemental: { symmetry: 4, density: 5, orbits: 2, depth: 4, aura: 5, breath: 4 },
       tone: { symmetry: 8, density: 6, orbits: 3, depth: 2, aura: 6, breath: 5 },
       ritual: { symmetry: 6, density: 5, orbits: 2, depth: 1, aura: 7, breath: 4 },
       motion: { symmetry: 9, density: 5, orbits: 3, depth: 3, aura: 6, breath: 6 }
@@ -666,6 +703,7 @@
     document.body.dataset.mode = state.mode;
     state.trueGlyph = Boolean(safe.trueGlyph);
     document.body.dataset.view = state.trueGlyph ? "true" : "living";
+    state.moveGlyph = false;
     state.sealedAt = safe.sealedAt || null;
     state.pan = { x: 0, y: 0 };
     state.builder = {
@@ -748,7 +786,7 @@
     if (seed === "torus") return createTorusGeometry(recipeState);
     if (seed === "mirror") return createMirrorGeometry(recipeState);
     if (seed === "gesture") return createGestureGeometry(recipeState);
-    if (["fire", "earth", "air", "water", "ether"].includes(seed)) return createElementalGeometry(recipeState);
+    if (["pyramid", "fire", "earth", "air", "water", "ether"].includes(seed)) return createElementalGeometry(recipeState);
     if (["harmonic", "octave", "chord"].includes(seed)) return createToneGeometry(recipeState);
     if (["seal", "release", "protect", "open", "remember"].includes(seed)) return createRitualGeometry(recipeState);
     return createRadialGeometry(recipeState, { id: seed, label: seedLabel(seed), symmetry: recipeState.builder.symmetry });
@@ -857,14 +895,131 @@
   }
 
   function createElementalGeometry(recipeState) {
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const cube = [
+      { x: -1, y: -1, z: -1 }, { x: 1, y: -1, z: -1 }, { x: 1, y: 1, z: -1 }, { x: -1, y: 1, z: -1 },
+      { x: -1, y: -1, z: 1 }, { x: 1, y: -1, z: 1 }, { x: 1, y: 1, z: 1 }, { x: -1, y: 1, z: 1 }
+    ];
+    const octa = [
+      { x: 1, y: 0, z: 0 }, { x: -1, y: 0, z: 0 }, { x: 0, y: 1, z: 0 },
+      { x: 0, y: -1, z: 0 }, { x: 0, y: 0, z: 1 }, { x: 0, y: 0, z: -1 }
+    ];
+    const icosa = [
+      { x: 0, y: 1, z: phi }, { x: 0, y: -1, z: phi }, { x: 0, y: 1, z: -phi }, { x: 0, y: -1, z: -phi },
+      { x: 1, y: phi, z: 0 }, { x: -1, y: phi, z: 0 }, { x: 1, y: -phi, z: 0 }, { x: -1, y: -phi, z: 0 },
+      { x: phi, y: 0, z: 1 }, { x: -phi, y: 0, z: 1 }, { x: phi, y: 0, z: -1 }, { x: -phi, y: 0, z: -1 }
+    ];
+    const dodeca = [
+      { x: -1, y: -1, z: -1 }, { x: -1, y: -1, z: 1 }, { x: -1, y: 1, z: -1 }, { x: -1, y: 1, z: 1 },
+      { x: 1, y: -1, z: -1 }, { x: 1, y: -1, z: 1 }, { x: 1, y: 1, z: -1 }, { x: 1, y: 1, z: 1 },
+      { x: 0, y: -1 / phi, z: -phi }, { x: 0, y: -1 / phi, z: phi }, { x: 0, y: 1 / phi, z: -phi }, { x: 0, y: 1 / phi, z: phi },
+      { x: -1 / phi, y: -phi, z: 0 }, { x: -1 / phi, y: phi, z: 0 }, { x: 1 / phi, y: -phi, z: 0 }, { x: 1 / phi, y: phi, z: 0 },
+      { x: -phi, y: 0, z: -1 / phi }, { x: -phi, y: 0, z: 1 / phi }, { x: phi, y: 0, z: -1 / phi }, { x: phi, y: 0, z: 1 / phi }
+    ];
     const configs = {
-      fire: { label: "Fire Tetra", symmetry: 3, orbits: 2, star: 2, phase: -Math.PI / 2 },
-      earth: { label: "Earth Cube", symmetry: 4, orbits: 2, star: 1, phase: Math.PI / 4 },
-      air: { label: "Air Octa", symmetry: 4, orbits: 3, star: 2, phase: -Math.PI / 2 },
-      water: { label: "Water Icosa", symmetry: 5, orbits: 3, star: 2, phase: -Math.PI / 2 },
-      ether: { label: "Ether Dodeca", symmetry: 5, orbits: 2, star: 2, phase: Math.PI / 10 }
+      pyramid: {
+        label: "Pyramid",
+        vertices: [
+          { x: -1, y: -0.72, z: -1 }, { x: 1, y: -0.72, z: -1 }, { x: 1, y: -0.72, z: 1 }, { x: -1, y: -0.72, z: 1 },
+          { x: 0, y: 1.24, z: 0 }
+        ],
+        edges: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 4], [2, 4], [3, 4]],
+        faces: [[0, 1, 2, 3], [0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]
+      },
+      fire: {
+        label: "Tetrahedron",
+        vertices: [{ x: 1, y: 1, z: 1 }, { x: -1, y: -1, z: 1 }, { x: -1, y: 1, z: -1 }, { x: 1, y: -1, z: -1 }],
+        faces: [[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]]
+      },
+      earth: {
+        label: "Cube",
+        vertices: cube,
+        faces: [[0, 1, 2, 3], [4, 7, 6, 5], [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0]]
+      },
+      air: {
+        label: "Octahedron",
+        vertices: octa,
+        faces: [[0, 2, 4], [2, 1, 4], [1, 3, 4], [3, 0, 4], [2, 0, 5], [1, 2, 5], [3, 1, 5], [0, 3, 5]]
+      },
+      water: { label: "Icosahedron", vertices: icosa },
+      ether: { label: "Dodecahedron", vertices: dodeca }
     };
-    return createRadialGeometry(recipeState, { id: recipeState.seed, ...configs[recipeState.seed] });
+    return createPolyhedronGeometry(recipeState, configs[recipeState.seed] || configs.earth);
+  }
+
+  function createPolyhedronGeometry(recipeState, config) {
+    const depth = 0.58 + recipeState.builder.depth * 0.19;
+    const yaw = recipeState.builder.variant * 0.055;
+    const cos = Math.cos(yaw);
+    const sin = Math.sin(yaw);
+    const raw = config.vertices.map((vertex) => {
+      const z = vertex.z * depth;
+      return {
+        x: vertex.x * cos + z * sin,
+        y: vertex.y,
+        z: -vertex.x * sin + z * cos
+      };
+    });
+    const maxRadius = Math.max(...raw.map((vertex) => Math.hypot(vertex.x, vertex.y, vertex.z)), 1);
+    const fit = 2.18 / maxRadius;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    raw.forEach((vertex, index) => {
+      nodes.push({
+        id: "solid-" + index,
+        ring: "solid",
+        x: vertex.x * fit,
+        y: vertex.y * fit,
+        z: vertex.z * fit,
+        radius: 1.08
+      });
+    });
+
+    const edgePairs = config.edges || shortestEdges(config.vertices);
+    const edgeKeys = new Set();
+    const lines = edgePairs.map(([from, to]) => {
+      edgeKeys.add(lineKey(from + 1, to + 1));
+      return { from: from + 1, to: to + 1, weight: 0.88, role: "solid-edge" };
+    });
+    if (recipeState.builder.density > 5) {
+      for (let index = 1; index < nodes.length; index += 1) lines.push({ from: 0, to: index, weight: 0.18, role: "center-spoke" });
+    }
+    if (recipeState.builder.density > 7) {
+      const keepEvery = Math.max(2, 12 - recipeState.builder.density);
+      for (let from = 1; from < nodes.length; from += 1) {
+        for (let to = from + 1; to < nodes.length; to += 1) {
+          if (edgeKeys.has(lineKey(from, to))) continue;
+          if ((from + to + recipeState.builder.variant) % keepEvery === 0) lines.push({ from, to, weight: 0.22, role: "solid-chord" });
+        }
+      }
+    }
+
+    const faces = (config.faces || []).map((face) => face.map((nodeIndex) => nodeIndex + 1));
+    const circles = [{ node: 0, radius: 0.36, weight: 0.5, role: "center" }];
+    for (let index = 1; index < nodes.length; index += 1) {
+      circles.push({ node: index, radius: 0.18 + recipeState.builder.aura * 0.015, weight: 0.28, role: "vertex" });
+    }
+    return normalizeModel({ id: recipeState.seed, label: config.label, family: "elemental", nodes, lines, faces, circles, circleRadius: 0.32 });
+  }
+
+  function shortestEdges(vertices) {
+    let shortest = Infinity;
+    const distances = [];
+    for (let from = 0; from < vertices.length; from += 1) {
+      for (let to = from + 1; to < vertices.length; to += 1) {
+        const distance = distance3(vertices[from], vertices[to]);
+        if (distance > 0.001) shortest = Math.min(shortest, distance);
+        distances.push({ from, to, distance });
+      }
+    }
+    return distances.filter((edge) => edge.distance <= shortest * 1.08).map((edge) => [edge.from, edge.to]);
+  }
+
+  function distance3(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+  }
+
+  function lineKey(from, to) {
+    return Math.min(from, to) + ":" + Math.max(from, to);
   }
 
   function createToneGeometry(recipeState) {
@@ -1055,6 +1210,9 @@
     model.circles = (model.circles && model.circles.length ? model.circles : [{ node: 0, radius: model.circleRadius || 1, weight: 0.4, role: "center" }])
       .filter((circle) => model.nodes[circle.node])
       .map((circle) => ({ node: circle.node, radius: circle.radius || model.circleRadius || 1, weight: circle.weight || 0.4, role: circle.role || "circle" }));
+    model.faces = (model.faces || [])
+      .map((face) => face.filter((nodeIndex) => model.nodes[nodeIndex]))
+      .filter((face) => face.length >= 3);
     model.circleRadius = model.circleRadius || 1;
     return model;
   }
@@ -1082,6 +1240,7 @@
       this.nodeMeshes = [];
       this.lineMeshes = [];
       this.ringMeshes = [];
+      this.faceMeshes = [];
       this.drag = { active: false, x: 0, y: 0, moved: false };
       this.rotation = { x: 0, y: 0, z: 0 };
       this.raycaster = null;
@@ -1130,6 +1289,34 @@
       const colors = this.state.colors;
       const nodeGeometry = new THREE.SphereGeometry(0.075, 28, 18);
       const centerGeometry = new THREE.SphereGeometry(0.12, 36, 24);
+
+      this.model.faces.forEach((face, index) => {
+        const vertices = [];
+        for (let faceIndex = 1; faceIndex < face.length - 1; faceIndex += 1) {
+          [face[0], face[faceIndex], face[faceIndex + 1]].forEach((nodeIndex) => {
+            const node = this.model.nodes[nodeIndex];
+            vertices.push(node.x, node.y, node.z);
+          });
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.computeVertexNormals();
+        const material = new THREE.MeshStandardMaterial({
+          color: colors[3],
+          emissive: colors[index % 2],
+          emissiveIntensity: 0.16,
+          transparent: true,
+          opacity: 0.08,
+          roughness: 0.5,
+          metalness: 0.18,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.userData = { face, index, baseOpacity: material.opacity };
+        this.faceMeshes.push(mesh);
+        this.group.add(mesh);
+      });
 
       this.model.lines.forEach((line, index) => {
         const from = this.model.nodes[line.from];
@@ -1194,6 +1381,7 @@
       this.nodeMeshes = [];
       this.lineMeshes = [];
       this.ringMeshes = [];
+      this.faceMeshes = [];
       while (this.group.children.length) {
         const child = this.group.children.pop();
         disposeObject(child);
@@ -1222,7 +1410,13 @@
         const dy = event.clientY - this.drag.y;
         if (Math.abs(dx) + Math.abs(dy) > 3) this.drag.moved = true;
         recordGesturePoint(event);
-        panGlyphBy(dx, dy, this.canvas.getBoundingClientRect());
+        if (this.state.moveGlyph || this.state.trueGlyph) {
+          panGlyphBy(dx, dy, this.canvas.getBoundingClientRect());
+        } else {
+          this.rotation.y += dx * 0.006;
+          this.rotation.x = clampFloat(this.rotation.x + dy * 0.006, -1.35, 1.35);
+          this.rotation.z += dx * 0.0008;
+        }
         this.drag.x = event.clientX;
         this.drag.y = event.clientY;
       });
@@ -1282,6 +1476,10 @@
         mesh.material.color.set(colors[1]);
         mesh.material.emissive.set(colors[1]);
       });
+      this.faceMeshes.forEach((mesh, index) => {
+        mesh.material.color.set(colors[3]);
+        mesh.material.emissive.set(colors[index % 2]);
+      });
       this.ringMeshes.forEach((mesh, index) => {
         const color = mesh.userData.circle && mesh.userData.circle.role === "center" ? colors[0] : colors[1];
         mesh.material.color.set(color);
@@ -1314,12 +1512,17 @@
       const mode = this.state.mode;
       const reduced = this.state.reducedMotion;
       const trueGlyph = this.state.trueGlyph;
+      const solidForm = this.model.family === "elemental";
       const breath = reduced || trueGlyph ? 1 : 1 + Math.sin(seconds * (mode === "breath" ? 1.35 : 0.45)) * (mode === "breath" ? 0.08 : 0.018);
       const sealPulse = this.state.sealedAt ? Math.max(0, 1 - (Date.now() - this.state.sealedAt) / 5200) : 0;
       const tapPulse = Math.max(0, 1 - (now - this.state.activePulse) / 1300);
 
       if (!this.drag.active && !reduced && !trueGlyph) {
         this.rotation.z += mode === "kasina" ? 0.00018 : 0.00042;
+        if (solidForm && !this.state.moveGlyph) {
+          this.rotation.y += 0.00072;
+          this.rotation.x += 0.00016;
+        }
       }
 
       this.group.rotation.set(trueGlyph ? 0 : this.rotation.x, trueGlyph ? 0 : this.rotation.y, trueGlyph ? 0 : this.rotation.z);
@@ -1330,6 +1533,11 @@
         const wave = reduced ? 0.25 : (Math.sin(seconds * 2.2 + index * 0.33) + 1) / 2;
         mesh.material.opacity = mesh.userData.baseOpacity + wave * 0.13 + tapPulse * 0.16;
         mesh.material.emissiveIntensity = 0.36 + wave * 0.5 + tapPulse * 0.7 + sealPulse * 0.4;
+      });
+
+      this.faceMeshes.forEach((mesh, index) => {
+        const wave = reduced || trueGlyph ? 0.25 : (Math.sin(seconds * 1.35 + index * 0.57) + 1) / 2;
+        mesh.material.opacity = mesh.userData.baseOpacity + wave * 0.035 + tapPulse * 0.055 + sealPulse * 0.04;
       });
 
       this.nodeMeshes.forEach((mesh, index) => {
@@ -1380,7 +1588,11 @@
         const dx = event.clientX - this.drag.x;
         const dy = event.clientY - this.drag.y;
         recordGesturePoint(event);
-        panGlyphBy(dx, dy, this.canvas.getBoundingClientRect());
+        if (this.state.moveGlyph || this.state.trueGlyph) {
+          panGlyphBy(dx, dy, this.canvas.getBoundingClientRect());
+        } else {
+          this.rotation += dx * 0.003 + dy * 0.001;
+        }
         this.drag.x = event.clientX;
         this.drag.y = event.clientY;
       });
