@@ -16,7 +16,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body data-mode="ritual" data-view="living">
+<body data-mode="ritual" data-view="living" data-control-tab="form">
   <main class="app-shell">
     <section class="stage" aria-label="Tone Glyph instrument">
       <canvas id="glyph-canvas" class="glyph-canvas" aria-label="Interactive Tone Glyph creator"></canvas>
@@ -51,6 +51,15 @@
     </nav>
 
     <section class="control-dock" aria-label="Tone Glyph creator controls">
+      <div id="control-tabs" class="control-tabs" aria-label="Creator sections">
+        <button class="control-tab" type="button" data-control-tab="form">Form</button>
+        <button class="control-tab" type="button" data-control-tab="matter">Matter</button>
+        <button class="control-tab" type="button" data-control-tab="tone">Tone</button>
+        <button class="control-tab" type="button" data-control-tab="motion">Motion</button>
+        <button class="control-tab" type="button" data-control-tab="ritual">Ritual</button>
+        <button class="control-tab" type="button" data-control-tab="layers">Layers</button>
+      </div>
+
       <div class="panel ritual-panel">
         <label class="input-label" for="intention-input">Intention</label>
         <textarea id="intention-input" rows="2" maxlength="160" placeholder="Name what this glyph is holding"></textarea>
@@ -75,6 +84,29 @@
         </div>
       </div>
 
+      <div class="panel instrument-panel">
+        <span class="input-label">Instrument</span>
+        <div class="select-row">
+          <label>
+            <span>Type</span>
+            <select id="shape-type-select" aria-label="Shape type"></select>
+          </label>
+          <label>
+            <span>Material</span>
+            <select id="material-select" aria-label="Material"></select>
+          </label>
+          <label>
+            <span>Motion</span>
+            <select id="motion-select" aria-label="Motion preset"></select>
+          </label>
+          <label>
+            <span>Zoom</span>
+            <input id="zoom-range" type="range" min="70" max="145" step="5" value="100">
+            <output id="zoom-output">1.00</output>
+          </label>
+        </div>
+      </div>
+
       <div class="panel builder-panel">
         <span class="input-label">Builder</span>
         <div class="range-grid">
@@ -92,6 +124,11 @@
         </div>
       </div>
 
+      <div class="panel layer-panel">
+        <span class="input-label">Layers</span>
+        <div id="layer-options" class="layer-grid" aria-label="Layer choices"></div>
+      </div>
+
       <div class="panel tone-panel">
         <span class="input-label">Tone</span>
         <div id="tone-options" class="option-grid" aria-label="Tone choices"></div>
@@ -106,6 +143,17 @@
           <label><span>Ground</span><input type="color" data-color-index="3" value="#8ea7ff"></label>
         </div>
         <div id="palette-options" class="palette-row" aria-label="Palette choices"></div>
+      </div>
+
+      <div class="panel premium-panel">
+        <span class="input-label">Premium Layer</span>
+        <div class="select-row">
+          <label>
+            <span>Pack</span>
+            <select id="premium-select" aria-label="Premium layer pack"></select>
+          </label>
+          <p id="premium-summary" class="premium-summary">Core creator</p>
+        </div>
       </div>
 
       <div class="panel export-panel">

@@ -214,6 +214,7 @@ button {
 }
 
 .mode-button,
+.control-tab,
 .primary-action,
 .quiet-action,
 .tone-option,
@@ -249,6 +250,30 @@ button {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   pointer-events: auto;
+}
+
+.control-tabs {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid rgba(238, 245, 238, 0.1);
+  border-radius: 16px;
+  background: rgba(5, 8, 11, 0.54);
+  backdrop-filter: blur(14px);
+}
+
+.control-tab {
+  min-height: 34px;
+  padding: 0 6px;
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+.control-tab.active {
+  color: #071016;
+  background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
 }
 
 .panel {
@@ -355,6 +380,42 @@ select {
   background: rgba(238, 245, 238, 0.08);
   padding: 0 10px;
   outline: none;
+}
+
+.select-row input[type="range"] {
+  width: 100%;
+}
+
+.layer-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.layer-toggle {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(238, 245, 238, 0.1);
+  border-radius: 999px;
+  background: rgba(238, 245, 238, 0.07);
+  padding: 0 8px;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.layer-toggle input {
+  accent-color: var(--tone-b);
+}
+
+.premium-summary {
+  align-self: end;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
 }
 
 .range-grid {
@@ -673,10 +734,45 @@ body[data-mode="glyph"] .control-dock {
     gap: 8px;
   }
 
+  .control-tabs {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .control-tab {
+    min-height: 36px;
+    padding: 0 3px;
+    font-size: 0.63rem;
+  }
+
+  .control-dock > .panel {
+    display: none;
+  }
+
+  body[data-control-tab="form"] .creator-panel,
+  body[data-control-tab="form"] .builder-panel,
+  body[data-control-tab="matter"] .instrument-panel,
+  body[data-control-tab="matter"] .color-panel,
+  body[data-control-tab="matter"] .premium-panel,
+  body[data-control-tab="tone"] .tone-panel,
+  body[data-control-tab="tone"] .color-panel,
+  body[data-control-tab="motion"] .instrument-panel,
+  body[data-control-tab="motion"] .layer-panel,
+  body[data-control-tab="ritual"] .ritual-panel,
+  body[data-control-tab="ritual"] .export-panel,
+  body[data-control-tab="layers"] .layer-panel,
+  body[data-control-tab="layers"] .premium-panel,
+  body[data-control-tab="layers"] .export-panel {
+    display: block;
+  }
+
   .ritual-panel,
   .creator-panel,
   .builder-panel,
   .color-panel,
+  .instrument-panel,
+  .layer-panel,
+  .premium-panel,
   .export-panel {
     grid-column: 1 / -1;
   }
@@ -703,6 +799,10 @@ body[data-mode="glyph"] .control-dock {
 
   .range-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .layer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .tone-option {
@@ -734,6 +834,10 @@ body[data-mode="glyph"] .control-dock {
 
   .tone-panel {
     grid-column: 1 / -1;
+  }
+
+  .control-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .option-grid {
