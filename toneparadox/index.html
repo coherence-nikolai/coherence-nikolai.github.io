@@ -23,8 +23,8 @@
     <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="toneparadox-icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
-    <script type="module" crossorigin src="./assets/index-0y43wJNK.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-B3OABgVB.css">
+    <script type="module" crossorigin src="./assets/index-C3hMfJFF.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DNSdXZbk.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -36,7 +36,7 @@
           </a>
           <div class="landing-nav" aria-label="Tone Paradox actions">
             <button class="landing-link" type="button" id="landingAboutButton">About</button>
-            <button class="landing-link primary-link" type="button" id="landingTopStart">Options</button>
+            <button class="landing-link primary-link" type="button" id="landingTopStart">Begin</button>
           </div>
         </header>
 
@@ -119,7 +119,7 @@
           </div>
 
           <div class="landing-actions">
-            <button class="landing-button primary" type="button" id="landingStartButton">Enter Paradox</button>
+            <button class="landing-button primary" type="button" id="landingStartButton">Enter Practice</button>
             <button class="landing-button ghost" type="button" id="landingAboutHeroButton">About the practice</button>
           </div>
           <p class="landing-copy">
@@ -180,6 +180,11 @@
           </span>
         </a>
         <div class="topbar-actions">
+          <div class="view-preset-group" aria-label="View presets">
+            <button class="view-preset-button is-active" type="button" data-view-preset="front">Front</button>
+            <button class="view-preset-button" type="button" data-view-preset="above">Above</button>
+            <button class="view-preset-button" type="button" data-view-preset="focal">Focal</button>
+          </div>
           <button class="meaning-toggle-button" type="button" id="meaningToggleButton" aria-pressed="false">
             Terms
           </button>
@@ -203,6 +208,23 @@
           <div class="sheet-handle" aria-hidden="true"></div>
           <form id="setupForm">
             <h1 id="setupTitle">What are you holding?</h1>
+            <ol class="setup-sequence" aria-label="Practice sequence">
+              <li>
+                <span>01</span>
+                <strong>Present</strong>
+                <small>Name what already has shape.</small>
+              </li>
+              <li>
+                <span>02</span>
+                <strong>Opposite</strong>
+                <small>Name what has not yet been given shape.</small>
+              </li>
+              <li>
+                <span>03</span>
+                <strong>Hold Both</strong>
+                <small>Let the moving field carry both.</small>
+              </li>
+            </ol>
 
             <fieldset class="segmented-field" aria-label="Tone">
               <label>
@@ -242,8 +264,8 @@
             </div>
 
             <p class="practice-hint">
-              Copper is the conscious, self-referential loop of what is already formed. Blue is the
-              unconscious/open field of what has not yet been given shape. The practice is to observe both.
+              Copper carries the conscious, self-referential loop of what is formed. Blue carries the
+              unformed opposite or wider field. Gold marks the contact where both can be observed without choosing.
             </p>
 
             <div class="mode-row">
@@ -347,7 +369,7 @@
               </div>
             </div>
 
-            <button class="primary-button" type="submit">Begin</button>
+            <button class="primary-button" type="submit">Enter Practice</button>
           </form>
         </section>
 
