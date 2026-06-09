@@ -613,6 +613,27 @@ body[data-mode="glyph"] .control-dock {
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.control-dock > .panel {
+  display: none;
+}
+
+body[data-control-tab="form"] .creator-panel,
+body[data-control-tab="form"] .builder-panel,
+body[data-control-tab="matter"] .instrument-panel,
+body[data-control-tab="matter"] .color-panel,
+body[data-control-tab="matter"] .premium-panel,
+body[data-control-tab="tone"] .tone-panel,
+body[data-control-tab="tone"] .color-panel,
+body[data-control-tab="motion"] .instrument-panel,
+body[data-control-tab="motion"] .layer-panel,
+body[data-control-tab="ritual"] .ritual-panel,
+body[data-control-tab="ritual"] .export-panel,
+body[data-control-tab="layers"] .layer-panel,
+body[data-control-tab="layers"] .premium-panel,
+body[data-control-tab="layers"] .export-panel {
+  display: block;
+}
+
 @media (min-width: 1120px) {
   .stage {
     padding: 92px 320px 118px 24px;
@@ -743,27 +764,6 @@ body[data-mode="glyph"] .control-dock {
     min-height: 36px;
     padding: 0 3px;
     font-size: 0.63rem;
-  }
-
-  .control-dock > .panel {
-    display: none;
-  }
-
-  body[data-control-tab="form"] .creator-panel,
-  body[data-control-tab="form"] .builder-panel,
-  body[data-control-tab="matter"] .instrument-panel,
-  body[data-control-tab="matter"] .color-panel,
-  body[data-control-tab="matter"] .premium-panel,
-  body[data-control-tab="tone"] .tone-panel,
-  body[data-control-tab="tone"] .color-panel,
-  body[data-control-tab="motion"] .instrument-panel,
-  body[data-control-tab="motion"] .layer-panel,
-  body[data-control-tab="ritual"] .ritual-panel,
-  body[data-control-tab="ritual"] .export-panel,
-  body[data-control-tab="layers"] .layer-panel,
-  body[data-control-tab="layers"] .premium-panel,
-  body[data-control-tab="layers"] .export-panel {
-    display: block;
   }
 
   .ritual-panel,

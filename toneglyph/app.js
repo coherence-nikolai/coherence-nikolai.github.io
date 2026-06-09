@@ -80,6 +80,15 @@
     glyph: "Create"
   };
 
+  const controlTabCopy = {
+    form: "Form",
+    matter: "Matter",
+    tone: "Tone",
+    motion: "Motion",
+    ritual: "Ritual",
+    layers: "Layers"
+  };
+
   const glyphFamilies = [
     {
       id: "sacred",
@@ -501,10 +510,11 @@
   }
 
   function setControlTab(tab) {
-    if (!["form", "matter", "tone", "motion", "ritual", "layers"].includes(tab)) return;
+    if (!controlTabCopy[tab]) return;
     state.controlTab = tab;
     document.body.dataset.controlTab = tab;
     updateUI();
+    showToast(controlTabCopy[tab] + " controls");
   }
 
   function activate3DForm() {
@@ -686,7 +696,9 @@
       button.classList.toggle("active", button.dataset.mode === state.mode);
     });
     refs.controlTabs.forEach((button) => {
-      button.classList.toggle("active", button.dataset.controlTab === state.controlTab);
+      const isActive = button.dataset.controlTab === state.controlTab;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
 
     const is3DForm = state.family === "elemental" && !state.trueGlyph;
