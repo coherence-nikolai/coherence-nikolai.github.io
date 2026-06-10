@@ -127,7 +127,27 @@
         { id: "metatron", label: "Metatron" },
         { id: "seed", label: "Seed" },
         { id: "flower", label: "Flower" },
-        { id: "vesica", label: "Vesica" }
+        { id: "vesica", label: "Vesica" },
+        { id: "sri-yantra", label: "Sri Yantra" },
+        { id: "fruit-life", label: "Fruit of Life" },
+        { id: "egg-life", label: "Egg of Life" },
+        { id: "tree-life", label: "Tree of Life" },
+        { id: "golden-spiral", label: "Golden Spiral" },
+        { id: "golden-grid", label: "Golden Grid" },
+        { id: "vesica-chain", label: "Vesica Chain" },
+        { id: "trinity-knot", label: "Trinity Knot" },
+        { id: "labyrinth", label: "Labyrinth" },
+        { id: "solar-cross", label: "Solar Cross" },
+        { id: "lunar-gate", label: "Lunar Gate" },
+        { id: "pentagram", label: "Pentagram" },
+        { id: "hexagram", label: "Hexagram" },
+        { id: "heptagram", label: "Heptagram" },
+        { id: "octagram", label: "Octagram" },
+        { id: "enneagram", label: "Enneagram" },
+        { id: "mandala-rose", label: "Mandala Rose" },
+        { id: "torus-seal", label: "Torus Seal" },
+        { id: "infinity-knot", label: "Infinity Knot" },
+        { id: "compass-rose", label: "Compass Rose" }
       ]
     },
     {
@@ -261,6 +281,9 @@
     refs.toneOptions = document.getElementById("tone-options");
     refs.familyOptions = document.getElementById("family-options");
     refs.seedSelect = document.getElementById("seed-select");
+    refs.seedSearch = document.getElementById("seed-search");
+    refs.seedOptions = document.getElementById("seed-options");
+    refs.seedLibraryCount = document.getElementById("seed-library-count");
     refs.actionSelect = document.getElementById("action-select");
     refs.paletteOptions = document.getElementById("palette-options");
     refs.shapeType = document.getElementById("shape-type-select");
@@ -345,8 +368,10 @@
     refs.move.addEventListener("click", () => setMoveGlyph(!state.moveGlyph));
     refs.front.addEventListener("click", resetFrontFace);
     refs.seedSelect.addEventListener("change", () => {
-      state.seed = refs.seedSelect.value;
-      rebuildGlyph("Seed: " + currentSeed().label);
+      selectSeed(refs.seedSelect.value);
+    });
+    refs.seedSearch.addEventListener("input", () => {
+      filterSeedOptions(refs.seedSearch.value);
     });
     refs.actionSelect.addEventListener("change", () => {
       state.ritualAction = refs.actionSelect.value;
@@ -409,13 +434,49 @@
 
   function buildSeedControls() {
     refs.seedSelect.innerHTML = "";
-    currentFamily().seeds.forEach((seed) => {
+    refs.seedOptions.innerHTML = "";
+    const seeds = currentFamily().seeds;
+    refs.seedLibraryCount.textContent = seeds.length + " seeds";
+    refs.seedSearch.placeholder = state.family === "sacred" ? "Search sacred seeds" : "Search " + currentFamily().label.toLowerCase();
+    refs.seedSearch.value = "";
+    seeds.forEach((seed) => {
       const option = document.createElement("option");
       option.value = seed.id;
       option.textContent = seed.label;
       refs.seedSelect.append(option);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "seed-option";
+      button.textContent = seed.label;
+      button.dataset.seedOption = seed.id;
+      button.addEventListener("click", () => selectSeed(seed.id));
+      refs.seedOptions.append(button);
     });
     refs.seedSelect.value = state.seed;
+    filterSeedOptions("");
+  }
+
+  function selectSeed(seedId) {
+    if (!currentFamily().seeds.some((seed) => seed.id === seedId)) return;
+    state.seed = seedId;
+    refs.seedSelect.value = state.seed;
+    state.sealedAt = null;
+    state.sealSignature = null;
+    filterSeedOptions(refs.seedSearch.value);
+    rebuildGlyph("Seed: " + currentSeed().label);
+  }
+
+  function filterSeedOptions(query) {
+    const value = (query || "").trim().toLowerCase();
+    let visible = 0;
+    Array.from(refs.seedOptions.children).forEach((button) => {
+      const matches = !value || button.textContent.toLowerCase().includes(value);
+      button.style.display = matches ? "" : "none";
+      button.classList.toggle("active", button.dataset.seedOption === state.seed);
+      if (matches) visible += 1;
+    });
+    refs.seedLibraryCount.textContent = visible + " of " + currentFamily().seeds.length;
   }
 
   function buildActionControls() {
@@ -793,6 +854,7 @@
     });
 
     refs.seedSelect.value = state.seed;
+    filterSeedOptions(refs.seedSearch.value);
     refs.actionSelect.value = state.ritualAction;
 
     Object.keys(refs.ranges).forEach((key) => {
@@ -1178,6 +1240,7 @@
     if (seed === "seed") return createSeedGeometry(recipeState);
     if (seed === "flower") return createFlowerGeometry(recipeState);
     if (seed === "vesica") return createVesicaGeometry(recipeState);
+    if (recipeState.family === "sacred") return createSacredGeometry(recipeState);
     if (seed === "spiral") return createSpiralGeometry(recipeState);
     if (seed === "torus") return createTorusGeometry(recipeState);
     if (seed === "mirror") return createMirrorGeometry(recipeState);
@@ -1288,6 +1351,119 @@
       { node: 4, radius: 0.5, weight: 0.45, role: "center" }
     ];
     return normalizeModel({ id: "vesica", label: "Vesica", family: "sacred", nodes, lines, circles, circleRadius: 1 });
+  }
+
+  function createSacredGeometry(recipeState) {
+    if (recipeState.seed === "sri-yantra") return createSriYantraGeometry(recipeState);
+    if (recipeState.seed === "tree-life") return createTreeOfLifeGeometry(recipeState);
+    if (recipeState.seed === "vesica-chain") return createVesicaChainGeometry(recipeState);
+    if (recipeState.seed === "golden-spiral" || recipeState.seed === "labyrinth") {
+      const model = createSpiralGeometry({ ...recipeState, seed: "spiral" });
+      model.id = recipeState.seed;
+      model.label = seedLabel(recipeState.seed);
+      model.family = "sacred";
+      if (recipeState.seed === "labyrinth") {
+        model.circles.push({ node: 0, radius: 1.28, weight: 0.34, role: "labyrinth-wall" });
+        model.circles.push({ node: 0, radius: 1.88, weight: 0.28, role: "labyrinth-wall" });
+      }
+      return model;
+    }
+    if (recipeState.seed === "torus-seal") {
+      const model = createTorusGeometry({ ...recipeState, seed: "torus", builder: { ...recipeState.builder, orbits: Math.max(3, recipeState.builder.orbits) } });
+      model.id = "torus-seal";
+      model.label = "Torus Seal";
+      model.family = "sacred";
+      return model;
+    }
+
+    const configs = {
+      "fruit-life": { symmetry: 6, orbits: 2, star: 2, circles: 13, phase: -Math.PI / 2 },
+      "egg-life": { symmetry: 8, orbits: 1, star: 3, phase: Math.PI / 8 },
+      "golden-grid": { symmetry: 4, orbits: 4, star: 2, phase: Math.PI / 4 },
+      "trinity-knot": { symmetry: 3, orbits: 3, star: 1, phase: -Math.PI / 2 },
+      "solar-cross": { symmetry: 4, orbits: 3, star: 2, phase: 0 },
+      "lunar-gate": { symmetry: 8, orbits: 2, star: 3, phase: Math.PI / 8 },
+      pentagram: { symmetry: 5, orbits: 2, star: 2, phase: -Math.PI / 2 },
+      hexagram: { symmetry: 6, orbits: 2, star: 2, phase: -Math.PI / 2 },
+      heptagram: { symmetry: 7, orbits: 2, star: 3, phase: -Math.PI / 2 },
+      octagram: { symmetry: 8, orbits: 2, star: 3, phase: -Math.PI / 2 },
+      enneagram: { symmetry: 9, orbits: 2, star: 4, phase: -Math.PI / 2 },
+      "mandala-rose": { symmetry: 12, orbits: 3, star: 5, phase: -Math.PI / 2 },
+      "infinity-knot": { symmetry: 8, orbits: 2, star: 3, phase: Math.PI / 8 },
+      "compass-rose": { symmetry: 16, orbits: 2, star: 7, phase: -Math.PI / 2 }
+    };
+    const config = configs[recipeState.seed] || { symmetry: recipeState.builder.symmetry, orbits: recipeState.builder.orbits, star: 2 };
+    const model = createRadialGeometry(recipeState, { id: recipeState.seed, label: seedLabel(recipeState.seed), ...config });
+    if (recipeState.seed === "lunar-gate") {
+      model.circles.push({ node: 0, radius: 1.34, weight: 0.34, role: "lunar-arc" });
+    }
+    if (recipeState.seed === "infinity-knot") {
+      model.lines.push(...model.nodes.slice(1, 9).map((_, index) => ({ from: index + 1, to: ((index + 4) % 8) + 1, weight: 0.3, role: "cross-knot" })));
+    }
+    return normalizeModel(model);
+  }
+
+  function createSriYantraGeometry(recipeState) {
+    const nodes = [{ id: "bindu", ring: "center", x: 0, y: 0, z: 0 }];
+    const lines = [];
+    const faces = [];
+    for (let layer = 0; layer < 9; layer += 1) {
+      const up = layer % 2 === 0;
+      const radius = 0.58 + layer * 0.18;
+      const yShift = (layer - 4) * 0.035;
+      const group = [];
+      for (let i = 0; i < 3; i += 1) {
+        const angle = (up ? -Math.PI / 2 : Math.PI / 2) + i * Math.PI * 2 / 3;
+        const index = nodes.length;
+        group.push(index);
+        nodes.push({
+          id: "tri-" + layer + "-" + i,
+          ring: up ? "up-triangle" : "down-triangle",
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius + yShift,
+          z: zFromDepth(recipeState, layer / 9)
+        });
+      }
+      lines.push(...ringLines(nodes, group, layer < 3 ? 0.72 : 0.54));
+      faces.push(group);
+      group.forEach((nodeIndex) => lines.push({ from: 0, to: nodeIndex, weight: 0.18, role: "bindu-ray" }));
+    }
+    const circles = [
+      { node: 0, radius: 0.36, weight: 0.62, role: "bindu" },
+      { node: 0, radius: 1.12, weight: 0.44, role: "yantra-ring" },
+      { node: 0, radius: 1.78, weight: 0.34, role: "yantra-ring" }
+    ];
+    return normalizeModel({ id: "sri-yantra", label: "Sri Yantra", family: "sacred", nodes, lines, faces, circles, circleRadius: 0.52 });
+  }
+
+  function createTreeOfLifeGeometry(recipeState) {
+    const positions = [
+      [0, 2.1], [-0.72, 1.36], [0.72, 1.36], [0, 0.82], [-0.72, 0.08],
+      [0.72, 0.08], [0, -0.42], [-0.72, -1.12], [0.72, -1.12], [0, -1.86]
+    ];
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0.82, z: 0 }];
+    positions.forEach(([x, y], index) => nodes.push({ id: "sphere-" + index, ring: "tree", x, y, z: zFromDepth(recipeState, index / 10), radius: index === 0 || index === 9 ? 1.16 : 1 }));
+    const pairs = [[1, 2], [1, 3], [1, 4], [2, 4], [2, 5], [3, 4], [3, 6], [4, 5], [4, 6], [4, 7], [5, 7], [5, 8], [6, 7], [6, 9], [7, 8], [7, 9], [7, 10], [8, 10], [9, 10]];
+    const lines = pairs.map(([from, to]) => ({ from, to, weight: 0.58, role: "path" }));
+    const circles = nodes.map((node, index) => ({ node: index, radius: index === 0 ? 0.34 : 0.22, weight: 0.42, role: "sephira" }));
+    return normalizeModel({ id: "tree-life", label: "Tree of Life", family: "sacred", nodes, lines, circles, circleRadius: 0.4 });
+  }
+
+  function createVesicaChainGeometry(recipeState) {
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    const count = Math.max(5, recipeState.builder.symmetry);
+    for (let index = 0; index < count; index += 1) {
+      const x = (index - (count - 1) / 2) * 0.48;
+      nodes.push({ id: "chain-" + index, ring: "vesica-chain", x, y: Math.sin(index * Math.PI) * 0.08, z: zFromDepth(recipeState, index / count) });
+    }
+    const lines = [];
+    for (let index = 1; index < nodes.length - 1; index += 1) {
+      lines.push({ from: index, to: index + 1, weight: 0.7, role: "chain" });
+      lines.push({ from: 0, to: index, weight: 0.22, role: "center-link" });
+    }
+    const circles = nodes.slice(1).map((_, index) => ({ node: index + 1, radius: 0.74, weight: 0.72, role: "vesica" }));
+    circles.push({ node: 0, radius: 0.4, weight: 0.4, role: "center" });
+    return normalizeModel({ id: "vesica-chain", label: "Vesica Chain", family: "sacred", nodes, lines, circles, circleRadius: 0.72 });
   }
 
   function createElementalGeometry(recipeState) {

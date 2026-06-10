@@ -87,8 +87,16 @@
       <div class="panel creator-panel">
         <span class="input-label">Glyph</span>
         <div id="family-options" class="family-grid" aria-label="Glyph families"></div>
+        <div class="seed-library-head">
+          <label class="seed-search-label" for="seed-search">
+            <span>Seed Library</span>
+            <input id="seed-search" type="search" placeholder="Search sacred seeds" autocomplete="off">
+          </label>
+          <p id="seed-library-count" class="seed-library-count">0 seeds</p>
+        </div>
+        <div id="seed-options" class="seed-grid" aria-label="Seed library"></div>
         <div class="select-row">
-          <label>
+          <label class="native-seed-select">
             <span>Seed</span>
             <select id="seed-select" aria-label="Glyph seed"></select>
           </label>
@@ -190,6 +198,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="./app.js?v=20260610-living-ritual" defer></script>
+  <script src="./app.js?v=20260610-sacred-seeds" defer></script>
 </body>
 </html>
