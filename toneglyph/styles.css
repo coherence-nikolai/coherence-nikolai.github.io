@@ -943,15 +943,15 @@ body[data-control-tab="save"] .export-panel {
   .app-shell {
     min-height: 100svh;
     overflow: visible;
-    padding: 0 9px 16px;
+    padding: 0 9px max(10px, env(safe-area-inset-bottom));
   }
 
   .stage {
     position: relative;
     inset: auto;
-    height: 410px;
-    min-height: 410px;
-    padding: 84px 0 10px;
+    height: max(520px, calc(100svh - 190px));
+    min-height: max(520px, calc(100svh - 190px));
+    padding: 84px 0 0;
   }
 
   body:not([data-action="none"]) .stage {
@@ -998,7 +998,7 @@ body[data-control-tab="save"] .export-panel {
     bottom: auto;
     transform: none;
     width: 100%;
-    margin: 0 0 8px;
+    margin: 0 0 7px;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 5px;
     padding: 6px;
@@ -1017,7 +1017,7 @@ body[data-control-tab="save"] .export-panel {
     bottom: auto;
     transform: none;
     width: 100%;
-    margin: 0 0 8px;
+    margin: 0 0 7px;
   }
 
   .stage-hint {
@@ -1026,7 +1026,7 @@ body[data-control-tab="save"] .export-panel {
     bottom: auto;
     transform: none;
     width: 100%;
-    margin: -2px 0 10px;
+    margin: -1px 0 0;
   }
 
   .control-dock,
@@ -1122,8 +1122,8 @@ body[data-control-tab="save"] .export-panel {
 
 @media (max-width: 430px) {
   .stage {
-    height: 382px;
-    min-height: 382px;
+    height: max(520px, calc(100svh - 190px));
+    min-height: max(520px, calc(100svh - 190px));
   }
 
   body:not([data-action="none"]) .stage {

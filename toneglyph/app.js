@@ -2408,10 +2408,11 @@
       const height = Math.max(1, Math.floor(rect.height));
       this.renderer.setSize(width, height, false);
       this.perspectiveCamera.aspect = width / height;
+      this.perspectiveCamera.position.z = 10.4 * Math.max(1, 0.92 / this.perspectiveCamera.aspect);
       this.perspectiveCamera.updateProjectionMatrix();
 
       const aspect = width / height;
-      const viewHeight = 6.55;
+      const viewHeight = 6.55 * Math.max(1, 0.92 / aspect);
       const viewWidth = viewHeight * aspect;
       this.orthographicCamera.left = -viewWidth / 2;
       this.orthographicCamera.right = viewWidth / 2;
