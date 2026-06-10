@@ -1,19 +1,33 @@
 :root {
   color-scheme: dark;
-  --bg: #05070a;
-  --bg-soft: #0a1015;
-  --text: #eef5ee;
-  --muted: rgba(238, 245, 238, 0.68);
-  --line: rgba(238, 245, 238, 0.16);
-  --glass: rgba(6, 11, 14, 0.72);
-  --glass-strong: rgba(9, 16, 20, 0.88);
-  --tone-a: #f6d27a;
-  --tone-b: #66e2cf;
-  --tone-c: #f08a7e;
-  --tone-d: #8ea7ff;
-  --danger: #ff9f8f;
+  --ink: #0b0707;
+  --ink-2: #130d0c;
+  --ink-3: #211715;
+  --parchment: #f2eadf;
+  --bone: var(--parchment);
+  --muted: rgba(242, 234, 223, 0.64);
+  --faint: rgba(242, 234, 223, 0.36);
+  --hairline: rgba(242, 234, 223, 0.13);
+  --gold: #e8d7b2;
+  --amber: #bd8d64;
+  --rose: #b98574;
+  --teal: #86bdb4;
+  --bg: #050303;
+  --bg-soft: var(--ink-2);
+  --text: var(--bone);
+  --line: var(--hairline);
+  --glass: rgba(11, 7, 7, 0.68);
+  --glass-strong: rgba(19, 13, 12, 0.88);
+  --tone-a: var(--gold);
+  --tone-b: var(--teal);
+  --tone-c: var(--rose);
+  --tone-d: #6f5f50;
+  --danger: #c98578;
   --shadow: rgba(0, 0, 0, 0.46);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --display: "Iowan Old Style", "IowanOldStyle-Roman", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --body: Avenir, "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
+  --mono: "SFMono-Regular", "Menlo", "Consolas", monospace;
+  font-family: var(--body);
 }
 
 * {
@@ -31,6 +45,9 @@ body {
 
 body {
   overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(134, 189, 180, 0.10), transparent 23rem),
+    linear-gradient(180deg, #120908 0%, var(--ink) 58%, #050303 100%);
   touch-action: none;
 }
 
@@ -50,10 +67,10 @@ button {
   min-height: 100svh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 52% 42%, rgba(102, 226, 207, 0.15), transparent 24rem),
-    radial-gradient(circle at 72% 18%, rgba(240, 138, 126, 0.13), transparent 20rem),
-    radial-gradient(circle at 28% 78%, rgba(246, 210, 122, 0.11), transparent 22rem),
-    linear-gradient(140deg, #030405 0%, #071016 48%, #090707 100%);
+    radial-gradient(circle at 18% 8%, rgba(134, 189, 180, 0.10), transparent 23rem),
+    radial-gradient(circle at 52% 18%, rgba(189, 141, 100, 0.20), transparent 31rem),
+    radial-gradient(circle at 50% 52%, rgba(232, 215, 178, 0.10), transparent 34rem),
+    linear-gradient(180deg, #120908 0%, var(--ink) 58%, #050303 100%);
 }
 
 .stage {
@@ -83,8 +100,8 @@ button {
   inset: 12%;
   border-radius: 999px;
   background:
-    radial-gradient(circle, rgba(238, 245, 238, 0.05), transparent 48%),
-    conic-gradient(from 20deg, rgba(246, 210, 122, 0.08), rgba(102, 226, 207, 0.04), rgba(240, 138, 126, 0.08), rgba(246, 210, 122, 0.08));
+    radial-gradient(circle, rgba(242, 234, 223, 0.055), transparent 48%),
+    conic-gradient(from 20deg, rgba(232, 215, 178, 0.08), rgba(134, 189, 180, 0.04), rgba(185, 133, 116, 0.08), rgba(232, 215, 178, 0.08));
   filter: blur(42px);
   opacity: 0.88;
 }
@@ -117,11 +134,11 @@ button {
   height: 42px;
   display: inline-grid;
   place-items: center;
-  border: 1px solid rgba(246, 210, 122, 0.42);
+  border: 1px solid rgba(232, 215, 178, 0.42);
   border-radius: 50%;
-  color: var(--tone-a);
-  background: radial-gradient(circle, rgba(246, 210, 122, 0.16), rgba(6, 11, 14, 0.42));
-  box-shadow: 0 0 32px rgba(246, 210, 122, 0.16);
+  color: var(--gold);
+  background: radial-gradient(circle, rgba(232, 215, 178, 0.16), rgba(11, 7, 7, 0.44));
+  box-shadow: 0 0 34px rgba(232, 215, 178, 0.18);
   font-size: 0.78rem;
   font-weight: 800;
 }
@@ -132,8 +149,14 @@ button {
 }
 
 .brand strong {
-  font-size: 1.02rem;
+  color: #f0ddc7;
+  font-family: var(--display);
+  font-size: 1.08rem;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.1;
+  text-shadow: 0 0 18px rgba(232, 215, 178, 0.22);
+  text-transform: uppercase;
 }
 
 .brand small,
@@ -224,9 +247,9 @@ button {
   gap: 8px;
   width: min(520px, calc(100vw - 28px));
   padding: 7px;
-  border: 1px solid rgba(238, 245, 238, 0.12);
+  border: 1px solid rgba(242, 234, 223, 0.12);
   border-radius: 999px;
-  background: rgba(5, 8, 11, 0.62);
+  background: rgba(11, 7, 7, 0.62);
   box-shadow: 0 18px 56px var(--shadow);
   backdrop-filter: blur(18px);
 }
@@ -250,7 +273,9 @@ button {
 .action-button {
   min-height: 42px;
   padding: 0 12px;
-  border: 1px solid rgba(238, 245, 238, 0.1);
+  border: 1px solid rgba(242, 234, 223, 0.1);
+  color: rgba(242, 234, 223, 0.78);
+  background: rgba(242, 234, 223, 0.055);
   font-size: 0.82rem;
   font-weight: 760;
 }
@@ -263,9 +288,10 @@ button {
 .mode-button.active,
 .action-button.active,
 .primary-action-button {
-  color: #071016;
-  background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
-  box-shadow: 0 0 32px rgba(102, 226, 207, 0.2);
+  color: #120908;
+  border-color: rgba(232, 215, 178, 0.36);
+  background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(134, 189, 180, 0.78));
+  box-shadow: 0 0 32px rgba(232, 215, 178, 0.18);
 }
 
 .control-dock {
@@ -292,33 +318,37 @@ button {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 14px;
-  border: 1px solid rgba(238, 245, 238, 0.1);
+  border: 1px solid rgba(242, 234, 223, 0.1);
   border-radius: 18px;
-  background: rgba(5, 8, 11, 0.48);
+  background: rgba(11, 7, 7, 0.48);
 }
 
 .drawer-kicker {
   margin: 0 0 3px;
-  color: rgba(246, 210, 122, 0.7);
+  color: rgba(232, 215, 178, 0.7);
+  font-family: var(--mono);
   font-size: 0.66rem;
   font-weight: 760;
-  letter-spacing: 0.16em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .drawer-head h2 {
   margin: 0;
-  color: var(--text);
-  font-size: 1.32rem;
+  color: var(--bone);
+  font-family: var(--display);
+  font-size: 1.55rem;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.1;
 }
 
 .drawer-close {
   min-height: 36px;
-  border: 1px solid rgba(238, 245, 238, 0.12);
+  border: 1px solid rgba(242, 234, 223, 0.12);
   border-radius: 999px;
-  color: var(--muted);
-  background: rgba(238, 245, 238, 0.05);
+  color: rgba(242, 234, 223, 0.72);
+  background: rgba(242, 234, 223, 0.05);
   padding: 0 12px;
   cursor: pointer;
 }
@@ -343,7 +373,7 @@ button {
   transform: translateX(-50%);
   width: min(420px, calc(100vw - 32px));
   margin: 0;
-  color: var(--muted);
+  color: rgba(242, 234, 223, 0.62);
   font-size: 0.78rem;
   text-align: center;
   pointer-events: none;
