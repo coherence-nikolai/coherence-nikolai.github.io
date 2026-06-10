@@ -192,6 +192,7 @@
     tone: "calm",
     colors: toneProfiles[0].colors.slice(),
     sealedAt: null,
+    sealSignature: null,
     activePulse: 0,
     activeNode: null,
     trueGlyph: false,
@@ -317,6 +318,7 @@
     refs.intention.addEventListener("input", () => {
       state.intention = refs.intention.value.trim();
       state.sealedAt = null;
+      state.sealSignature = null;
       updateUI();
     });
 
@@ -325,6 +327,7 @@
         const index = Number(input.dataset.colorIndex);
         state.colors[index] = input.value;
         state.sealedAt = null;
+        state.sealSignature = null;
         applyTheme();
         updateUI();
       });
@@ -490,6 +493,7 @@
         state.tone = tone.id;
         state.colors = tone.colors.slice();
         state.sealedAt = null;
+        state.sealSignature = null;
         applyTheme();
         updateUI();
         pulse(tone.freq, 0.11);
@@ -516,6 +520,7 @@
       button.addEventListener("click", () => {
         state.colors = palette.slice();
         state.sealedAt = null;
+        state.sealSignature = null;
         applyTheme();
         updateUI();
         pulse(currentTone().freq * 1.5, 0.08);
@@ -672,6 +677,7 @@
   function sealRitual() {
     state.intention = refs.intention.value.trim();
     state.sealedAt = Date.now();
+    state.sealSignature = createSealSignature();
     state.activePulse = performance.now();
     rebuildGlyph();
     updateUI();
@@ -682,6 +688,7 @@
   function clearRitual() {
     state.intention = "";
     state.sealedAt = null;
+    state.sealSignature = null;
     refs.intention.value = "";
     updateUI();
     showToast("Field cleared");
@@ -691,7 +698,7 @@
     const record = {
       id: String(Date.now()),
       createdAt: new Date().toISOString(),
-      schemaVersion: 3,
+      schemaVersion: 4,
       intention: state.intention,
       tone: state.tone,
       colors: state.colors.slice(),
@@ -994,9 +1001,23 @@
     buildSeedControls();
   }
 
+  function createSealSignature() {
+    const text = (state.intention || currentAction().label || "Tone Glyph").trim();
+    const charTotal = text.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
+    const ringCount = 1 + (charTotal % 3);
+    const notchCount = 6 + (charTotal % 7);
+    return {
+      ringCount,
+      notchCount,
+      seed: charTotal % 360,
+      sealedLabel: currentAction().label,
+      createdAt: new Date().toISOString()
+    };
+  }
+
   function createRecipeSnapshot() {
     return {
-      schemaVersion: 3,
+      schemaVersion: 4,
       id: String(Date.now()),
       createdAt: new Date().toISOString(),
       family: state.family,
@@ -1014,6 +1035,7 @@
       layers: { ...state.layers },
       premiumPack: state.premiumPack,
       sealedAt: state.sealedAt,
+      sealSignature: state.sealSignature ? { ...state.sealSignature } : null,
       builder: { ...state.builder },
       gesture: state.gesture.slice(-120)
     };
@@ -1066,6 +1088,7 @@
     document.body.dataset.view = state.trueGlyph ? "true" : "living";
     state.moveGlyph = false;
     state.sealedAt = safe.sealedAt || null;
+    state.sealSignature = safe.sealSignature && typeof safe.sealSignature === "object" ? { ...safe.sealSignature } : null;
     state.pan = { x: 0, y: 0 };
     state.builder = {
       symmetry: clampNumber(safe.builder && safe.builder.symmetry, 3, 12, 6),
@@ -2059,6 +2082,7 @@
         zoom: this.state.zoom,
         mode: this.state.mode,
         trueGlyph: this.state.trueGlyph,
+        sealSignature: this.state.sealSignature,
         pulse: Math.max(0, 1 - (performance.now() - this.state.activePulse) / 1400),
         wallpaper: false
       });
@@ -2110,6 +2134,7 @@
       zoom: state.zoom,
       mode: state.mode,
       trueGlyph: state.trueGlyph,
+      sealSignature: state.sealSignature,
       pulse: state.sealedAt ? 0.8 : 0.36,
       wallpaper
     });
@@ -2249,6 +2274,39 @@
       ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
       ctx.fill();
     });
+
+    if (options.sealSignature || state.sealSignature) {
+      const signature = options.sealSignature || state.sealSignature;
+      const ringCount = Math.max(1, signature.ringCount || 1);
+      const notchCount = Math.max(3, signature.notchCount || 6);
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (let ringIndex = 0; ringIndex < ringCount; ringIndex += 1) {
+        ctx.beginPath();
+        ctx.arc(cx + pan.x * scale, cy + pan.y * scale, scale * (1.14 + ringIndex * 0.1), 0, Math.PI * 2);
+        ctx.strokeStyle = alpha(toneFamilyPalette.gold, 0.12 + ringIndex * 0.035 + timePulse * 0.08);
+        ctx.lineWidth = Math.max(1, scale * 0.004);
+        ctx.shadowColor = toneFamilyPalette.gold;
+        ctx.shadowBlur = 18 * material.glow;
+        ctx.stroke();
+      }
+      for (let notchIndex = 0; notchIndex < notchCount; notchIndex += 1) {
+        const angle = (notchIndex / notchCount) * Math.PI * 2 + ((signature.seed || 0) * Math.PI) / 180;
+        const inner = scale * 1.18;
+        const outer = scale * 1.27;
+        const x1 = cx + pan.x * scale + Math.cos(angle) * inner;
+        const y1 = cy + pan.y * scale + Math.sin(angle) * inner;
+        const x2 = cx + pan.x * scale + Math.cos(angle) * outer;
+        const y2 = cy + pan.y * scale + Math.sin(angle) * outer;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = alpha(toneFamilyPalette.parchment, 0.34);
+        ctx.lineWidth = Math.max(1, scale * 0.006);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     ctx.restore();
 
     if (options.intention) {
