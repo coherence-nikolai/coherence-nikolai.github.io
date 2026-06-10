@@ -24,6 +24,17 @@
     ["#f6d27a", "#f08a7e", "#d8ffb6", "#21150f"]
   ];
 
+  const toneFamilyPalette = {
+    ink: "#0b0707",
+    inkSoft: "#130d0c",
+    parchment: "#f2eadf",
+    gold: "#e8d7b2",
+    amber: "#bd8d64",
+    rose: "#b98574",
+    teal: "#86bdb4",
+    shadow: "#050303"
+  };
+
   const shapeTypes = [
     { id: "living", label: "Living", faces: true, particles: true, rings: true, breath: 1.12 },
     { id: "solid", label: "Solid", faces: true, particles: false, rings: true, breath: 0.72 },
@@ -858,6 +869,35 @@
     };
   }
 
+  function averageLineDepth(model, line) {
+    const from = model.nodes[line.from] || { z: 0 };
+    const to = model.nodes[line.to] || { z: 0 };
+    return ((from.z || 0) + (to.z || 0)) / 2;
+  }
+
+  function glyphLineStyle(model, line, index, settings) {
+    const depth = averageLineDepth(model, line);
+    const isPrimary = line.weight >= 0.58 || line.role === "edge";
+    const isBack = depth < -0.12;
+    const color = isPrimary ? toneFamilyPalette.gold : isBack ? toneFamilyPalette.teal : toneFamilyPalette.parchment;
+    const opacityBase = isBack ? 0.08 : isPrimary ? 0.22 : 0.14;
+    return {
+      color,
+      emissive: isPrimary ? toneFamilyPalette.gold : toneFamilyPalette.teal,
+      opacity: (opacityBase + line.weight * 0.18) * settings.lineOpacity,
+      radius: (0.004 + line.weight * (isPrimary ? 0.006 : 0.004)) * settings.thickness,
+      travelPhase: index * 0.33 + Math.abs(depth) * 1.7
+    };
+  }
+
+  function glyphNodeStyle(node, index) {
+    const isCenter = index === 0 || node.ring === "center";
+    return {
+      color: isCenter ? toneFamilyPalette.gold : index % 3 === 0 ? toneFamilyPalette.rose : toneFamilyPalette.teal,
+      scale: isCenter ? 1.22 : Math.max(0.7, Math.min(1.55, node.radius || 1))
+    };
+  }
+
   function loadSaves() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -1653,33 +1693,35 @@
       this.model.lines.forEach((line, index) => {
         const from = this.model.nodes[line.from];
         const to = this.model.nodes[line.to];
+        const style = glyphLineStyle(this.model, line, index, settings);
         const material = new THREE.MeshStandardMaterial({
-          color: colors[1],
-          emissive: colors[1],
-          emissiveIntensity: 0.48,
+          color: style.color,
+          emissive: style.emissive,
+          emissiveIntensity: 0.42,
           transparent: true,
-          opacity: (0.12 + line.weight * 0.2) * materialProfile.line,
+          opacity: style.opacity,
           roughness: materialProfile.roughness,
           metalness: materialProfile.metalness
         });
-        const mesh = makeCylinderBetween(THREE, point(from), point(to), (0.004 + line.weight * 0.004) * materialProfile.thickness, material);
-        mesh.userData = { line, index, baseOpacity: material.opacity };
+        const mesh = makeCylinderBetween(THREE, point(from), point(to), style.radius, material);
+        mesh.userData = { line, index, baseOpacity: material.opacity, travelPhase: style.travelPhase };
         this.lineMeshes.push(mesh);
         this.group.add(mesh);
       });
 
       this.model.nodes.forEach((node, index) => {
         const isCenter = index === 0 || node.ring === "center";
+        const style = glyphNodeStyle(node, index);
         const material = new THREE.MeshStandardMaterial({
-          color: isCenter ? colors[0] : index % 3 === 0 ? colors[2] : colors[1],
-          emissive: isCenter ? colors[0] : index % 3 === 0 ? colors[2] : colors[1],
+          color: style.color,
+          emissive: style.color,
           emissiveIntensity: (isCenter ? 1.3 : 0.9) * materialProfile.glow,
           roughness: materialProfile.roughness,
           metalness: materialProfile.metalness
         });
         const mesh = new THREE.Mesh(isCenter ? centerGeometry : nodeGeometry, material);
         mesh.position.copy(point(node));
-        mesh.scale.setScalar(Math.max(0.7, Math.min(1.6, node.radius || 1)));
+        mesh.scale.setScalar(style.scale);
         mesh.userData = { node, index, baseScale: mesh.scale.x };
         this.nodeMeshes.push(mesh);
         this.group.add(mesh);
@@ -1830,14 +1872,16 @@
 
     updateTheme() {
       const colors = this.state.colors;
+      const settings = renderSettings();
       this.nodeMeshes.forEach((mesh, index) => {
-        const color = index === 0 || mesh.userData.node.ring === "center" ? colors[0] : index % 3 === 0 ? colors[2] : colors[1];
-        mesh.material.color.set(color);
-        mesh.material.emissive.set(color);
+        const style = glyphNodeStyle(mesh.userData.node, index);
+        mesh.material.color.set(style.color);
+        mesh.material.emissive.set(style.color);
       });
-      this.lineMeshes.forEach((mesh) => {
-        mesh.material.color.set(colors[1]);
-        mesh.material.emissive.set(colors[1]);
+      this.lineMeshes.forEach((mesh, index) => {
+        const style = glyphLineStyle(this.model, mesh.userData.line, index, settings);
+        mesh.material.color.set(style.color);
+        mesh.material.emissive.set(style.emissive);
       });
       this.faceMeshes.forEach((mesh, index) => {
         mesh.material.color.set(colors[3]);
@@ -1903,9 +1947,10 @@
       this.group.scale.setScalar((trueGlyph ? 1 : breath + sealPulse * 0.035) * this.state.zoom);
 
       this.lineMeshes.forEach((mesh, index) => {
-        const wave = reduced ? 0.25 : (Math.sin(seconds * (2.2 + motion.spiral * 0.35) + index * 0.33) + 1) / 2;
-        mesh.material.opacity = mesh.userData.baseOpacity + wave * 0.13 * settings.lineOpacity + tapPulse * 0.16;
-        mesh.material.emissiveIntensity = (0.36 + wave * 0.5 + tapPulse * 0.7 + sealPulse * 0.4) * settings.glow;
+        const phase = mesh.userData.travelPhase || index * 0.33;
+        const wave = reduced ? 0.25 : (Math.sin(seconds * (2.2 + motion.spiral * 0.35) + phase) + 1) / 2;
+        mesh.material.opacity = mesh.userData.baseOpacity + wave * 0.11 * settings.lineOpacity + tapPulse * 0.16;
+        mesh.material.emissiveIntensity = (0.32 + wave * 0.54 + tapPulse * 0.7 + sealPulse * 0.48) * settings.glow;
       });
 
       this.faceMeshes.forEach((mesh, index) => {
@@ -2157,12 +2202,16 @@
       const from = projected[line.from];
       const to = projected[line.to];
       const linePulse = options.trueGlyph ? 0.35 : (Math.sin(Date.now() / 520 + index * 0.48) + 1) / 2;
+      const style = glyphLineStyle(options.model, line, index, {
+        lineOpacity: material.line,
+        thickness: material.thickness
+      });
       ctx.beginPath();
       ctx.moveTo(from.x, from.y);
       ctx.lineTo(to.x, to.y);
-      ctx.lineWidth = Math.max(0.8, scale * 0.0045 * (0.75 + line.weight) * material.thickness);
-      ctx.strokeStyle = alpha(colors[1], (0.14 + line.weight * 0.15 + linePulse * 0.06 + timePulse * 0.12) * material.line);
-      ctx.shadowColor = colors[1];
+      ctx.lineWidth = Math.max(0.8, scale * style.radius * 1.12);
+      ctx.strokeStyle = alpha(style.color, style.opacity + linePulse * 0.08 + timePulse * 0.12);
+      ctx.shadowColor = style.emissive;
       ctx.shadowBlur = (12 + timePulse * 18) * material.glow;
       ctx.stroke();
     });
