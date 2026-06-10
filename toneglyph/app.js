@@ -74,6 +74,24 @@
     { id: "intention", label: "Intention", defaultOn: false }
   ];
 
+  const seedCategoryLabels = {
+    all: "All",
+    core: "Core",
+    life: "Life",
+    yantra: "Yantra",
+    stars: "Stars",
+    paths: "Paths",
+    platonic: "Platonic",
+    pyramids: "Pyramids",
+    curved: "Curved",
+    lattices: "Lattices",
+    temples: "Temples",
+    harmonic: "Harmonic",
+    ritual: "Ritual",
+    motion: "Motion",
+    gates: "Gates"
+  };
+
   const premiumPacks = [
     { id: "core", label: "Core creator", summary: "Base glyph, tone, colour, depth, save and share." },
     { id: "crystal", label: "Crystal solids", summary: "Glass/crystal forms with bright faces and particle aura.", shapeType: "solid", material: "crystal", layers: { faces: true, particles: true } },
@@ -124,73 +142,88 @@
       id: "sacred",
       label: "Sacred",
       seeds: [
-        { id: "metatron", label: "Metatron" },
-        { id: "seed", label: "Seed" },
-        { id: "flower", label: "Flower" },
-        { id: "vesica", label: "Vesica" },
-        { id: "sri-yantra", label: "Sri Yantra" },
-        { id: "fruit-life", label: "Fruit of Life" },
-        { id: "egg-life", label: "Egg of Life" },
-        { id: "tree-life", label: "Tree of Life" },
-        { id: "golden-spiral", label: "Golden Spiral" },
-        { id: "golden-grid", label: "Golden Grid" },
-        { id: "vesica-chain", label: "Vesica Chain" },
-        { id: "trinity-knot", label: "Trinity Knot" },
-        { id: "labyrinth", label: "Labyrinth" },
-        { id: "solar-cross", label: "Solar Cross" },
-        { id: "lunar-gate", label: "Lunar Gate" },
-        { id: "pentagram", label: "Pentagram" },
-        { id: "hexagram", label: "Hexagram" },
-        { id: "heptagram", label: "Heptagram" },
-        { id: "octagram", label: "Octagram" },
-        { id: "enneagram", label: "Enneagram" },
-        { id: "mandala-rose", label: "Mandala Rose" },
-        { id: "torus-seal", label: "Torus Seal" },
-        { id: "infinity-knot", label: "Infinity Knot" },
-        { id: "compass-rose", label: "Compass Rose" }
+        { id: "metatron", label: "Metatron", category: "core", summary: "The complete lattice: circles, nodes, and every line held in one field." },
+        { id: "seed", label: "Seed", category: "life", summary: "Six-petal origin pattern for simple kasina and breath work." },
+        { id: "flower", label: "Flower", category: "life", summary: "A growing field of interlocking circles for expansion and harmony." },
+        { id: "vesica", label: "Vesica", category: "life", summary: "Two circles meeting as a lens, threshold, or opening." },
+        { id: "sri-yantra", label: "Sri Yantra", category: "yantra", summary: "Nested triangles around a bindu point for focused ritual work." },
+        { id: "fruit-life", label: "Fruit of Life", category: "life", summary: "A fuller life-field with balanced outer orbits and seed centers." },
+        { id: "egg-life", label: "Egg of Life", category: "life", summary: "A compact generative form that feels held and embryonic." },
+        { id: "tree-life", label: "Tree of Life", category: "paths", summary: "A path glyph with spheres and channels for intention mapping." },
+        { id: "golden-spiral", label: "Golden Spiral", category: "paths", summary: "A spiral route for attention, unwinding, and return." },
+        { id: "golden-grid", label: "Golden Grid", category: "core", summary: "A square-harmonic grid with balanced cross lines." },
+        { id: "vesica-chain", label: "Vesica Chain", category: "life", summary: "A linked sequence of lenses for flow, choice, and transition." },
+        { id: "trinity-knot", label: "Trinity Knot", category: "paths", summary: "A threefold knot for joining body, tone, and intention." },
+        { id: "labyrinth", label: "Labyrinth", category: "paths", summary: "A walking-inward field for slow ritual movement." },
+        { id: "solar-cross", label: "Solar Cross", category: "core", summary: "A centered cross-form for orientation and charge." },
+        { id: "lunar-gate", label: "Lunar Gate", category: "gates", summary: "An arced gate for softer, reflective glyphs." },
+        { id: "pentagram", label: "Pentagram", category: "stars", summary: "A five-point star seal with compact protective geometry." },
+        { id: "hexagram", label: "Hexagram", category: "stars", summary: "Two interlaced triangles for balance and polarity." },
+        { id: "heptagram", label: "Heptagram", category: "stars", summary: "A seven-point star with an unusual, mystical rhythm." },
+        { id: "octagram", label: "Octagram", category: "stars", summary: "An eight-point compass star for direction and structure." },
+        { id: "enneagram", label: "Enneagram", category: "stars", summary: "A ninefold orbit for pattern, movement, and return." },
+        { id: "mandala-rose", label: "Mandala Rose", category: "stars", summary: "A twelvefold rose for ornamental, wallpaper-like glyphs." },
+        { id: "torus-seal", label: "Torus Seal", category: "gates", summary: "A ringed field that suggests circulation and containment." },
+        { id: "infinity-knot", label: "Infinity Knot", category: "paths", summary: "A crossing knot for continuity, binding, and release." },
+        { id: "compass-rose", label: "Compass Rose", category: "stars", summary: "A many-point navigator for direction and choice." }
       ]
     },
     {
       id: "elemental",
       label: "3D Forms",
       seeds: [
-        { id: "merkaba", label: "Merkaba" },
-        { id: "pyramid", label: "Pyramid" },
-        { id: "fire", label: "Tetrahedron" },
-        { id: "earth", label: "Cube" },
-        { id: "air", label: "Octahedron" },
-        { id: "water", label: "Icosahedron" },
-        { id: "ether", label: "Dodecahedron" }
+        { id: "merkaba", label: "Merkaba", category: "platonic", summary: "Two interlocked tetrahedra with a strong living-star depth." },
+        { id: "pyramid", label: "Pyramid", category: "pyramids", summary: "A square-base pyramid for grounded intention and ascent." },
+        { id: "fire", label: "Tetrahedron", category: "platonic", summary: "The simplest fire solid: four triangular faces." },
+        { id: "earth", label: "Cube", category: "platonic", summary: "A stable hexahedron for structure, matter, and containment." },
+        { id: "air", label: "Octahedron", category: "platonic", summary: "An eight-face diamond form with a clean central axis." },
+        { id: "water", label: "Icosahedron", category: "platonic", summary: "A twenty-face water solid with flowing triangulation." },
+        { id: "ether", label: "Dodecahedron", category: "platonic", summary: "A twelve-face ether solid with a more mysterious body." },
+        { id: "sphere", label: "Sphere", category: "curved", summary: "A latitude-longitude globe for whole-field meditation." },
+        { id: "geodesic", label: "Geodesic Sphere", category: "curved", summary: "A faceted sphere with geodesic chords and star-like depth." },
+        { id: "cone", label: "Cone", category: "curved", summary: "A circular base rising to a single point of attention." },
+        { id: "cylinder", label: "Cylinder", category: "curved", summary: "Two rings joined as a column, vessel, or tone chamber." },
+        { id: "torus-knot", label: "Torus Knot", category: "curved", summary: "A looping 3D knot that feels alive and continuously turning." },
+        { id: "double-pyramid", label: "Double Pyramid", category: "pyramids", summary: "A mirrored pyramid form for above-below symmetry." },
+        { id: "star-tetra", label: "Star Tetra", category: "pyramids", summary: "A sharper stellated tetra form for radiant glyphs." },
+        { id: "diamond", label: "Diamond", category: "pyramids", summary: "A crystalline octa-like body for clear, vertical focus." },
+        { id: "triangular-prism", label: "Triangular Prism", category: "lattices", summary: "A three-sided prism with simple architectural edges." },
+        { id: "hex-prism", label: "Hexagonal Prism", category: "lattices", summary: "A six-sided prism for honeycomb and temple-column shapes." },
+        { id: "crystal-lattice", label: "Crystal Lattice", category: "lattices", summary: "A 3D grid of luminous nodes and structural channels." },
+        { id: "temple-grid", label: "Temple Grid", category: "temples", summary: "A sacred architecture frame with pillars, roof, and chamber." },
+        { id: "obelisk", label: "Obelisk", category: "temples", summary: "A tall tapering pillar for vertical ritual presence." },
+        { id: "octagonal-gate", label: "Octagonal Gate", category: "temples", summary: "An eight-sided threshold form for portal-like glyphs." },
+        { id: "spiral-column", label: "Spiral Column", category: "temples", summary: "A rising helix around a central column." }
       ]
     },
     {
       id: "tone",
       label: "Tone",
       seeds: [
-        { id: "harmonic", label: "Harmonic" },
-        { id: "octave", label: "Octave" },
-        { id: "chord", label: "Chord" }
+        { id: "harmonic", label: "Harmonic", category: "harmonic", summary: "Tone-derived symmetry based on the chosen frequency." },
+        { id: "octave", label: "Octave", category: "harmonic", summary: "Eightfold resonance for steady breath and listening." },
+        { id: "chord", label: "Chord", category: "harmonic", summary: "A triadic tone glyph for compact musical structure." }
       ]
     },
     {
       id: "ritual",
       label: "Ritual",
       seeds: [
-        { id: "seal", label: "Seal" },
-        { id: "release", label: "Release" },
-        { id: "protect", label: "Protect" },
-        { id: "open", label: "Open" },
-        { id: "remember", label: "Remember" }
+        { id: "seal", label: "Seal", category: "ritual", summary: "A closing and holding form for completed intention." },
+        { id: "release", label: "Release", category: "ritual", summary: "A loosening pattern with outward movement." },
+        { id: "protect", label: "Protect", category: "ritual", summary: "A denser boundary form for guarding the field." },
+        { id: "open", label: "Open", category: "ritual", summary: "A wider gate form for invitation and beginning." },
+        { id: "remember", label: "Remember", category: "ritual", summary: "A sevenfold recall glyph for returning to a chosen tone." }
       ]
     },
     {
       id: "motion",
       label: "Motion",
       seeds: [
-        { id: "spiral", label: "Spiral" },
-        { id: "torus", label: "Torus" },
-        { id: "mirror", label: "Mirror" },
-        { id: "gesture", label: "Gesture" }
+        { id: "spiral", label: "Spiral", category: "motion", summary: "A moving path form that unfurls as it turns." },
+        { id: "torus", label: "Torus", category: "motion", summary: "A ring-field for circulation and orbit." },
+        { id: "mirror", label: "Mirror", category: "motion", summary: "A reflected glyph for symmetry play and inversion." },
+        { id: "gesture", label: "Gesture", category: "motion", summary: "Draw directly on the field to make a personal trace." }
       ]
     }
   ];
@@ -226,6 +259,7 @@
     pan: { x: 0, y: 0 },
     family: "sacred",
     seed: "metatron",
+    seedCategory: "all",
     ritualAction: "seal",
     builder: {
       symmetry: 6,
@@ -281,9 +315,10 @@
     refs.toneOptions = document.getElementById("tone-options");
     refs.familyOptions = document.getElementById("family-options");
     refs.seedSelect = document.getElementById("seed-select");
-    refs.seedSearch = document.getElementById("seed-search");
+    refs.seedCategories = document.getElementById("seed-categories");
     refs.seedOptions = document.getElementById("seed-options");
     refs.seedLibraryCount = document.getElementById("seed-library-count");
+    refs.exploreSeed = document.getElementById("explore-seed-button");
     refs.actionSelect = document.getElementById("action-select");
     refs.paletteOptions = document.getElementById("palette-options");
     refs.shapeType = document.getElementById("shape-type-select");
@@ -370,9 +405,7 @@
     refs.seedSelect.addEventListener("change", () => {
       selectSeed(refs.seedSelect.value);
     });
-    refs.seedSearch.addEventListener("input", () => {
-      filterSeedOptions(refs.seedSearch.value);
-    });
+    refs.exploreSeed.addEventListener("click", exploreNextSeed);
     refs.actionSelect.addEventListener("change", () => {
       state.ritualAction = refs.actionSelect.value;
       applyActionDefaults();
@@ -424,6 +457,7 @@
       button.addEventListener("click", () => {
         state.family = family.id;
         state.seed = family.seeds[0].id;
+        state.seedCategory = "all";
         buildSeedControls();
         applyFamilyDefaults();
         rebuildGlyph("Family: " + family.label);
@@ -434,11 +468,21 @@
 
   function buildSeedControls() {
     refs.seedSelect.innerHTML = "";
+    refs.seedCategories.innerHTML = "";
     refs.seedOptions.innerHTML = "";
     const seeds = currentFamily().seeds;
-    refs.seedLibraryCount.textContent = seeds.length + " seeds";
-    refs.seedSearch.placeholder = state.family === "sacred" ? "Search sacred seeds" : "Search " + currentFamily().label.toLowerCase();
-    refs.seedSearch.value = "";
+    refs.seedLibraryCount.textContent = seeds.length + " shapes";
+    const categories = seedCategoriesForCurrentFamily();
+    if (state.seedCategory !== "all" && !categories.includes(state.seedCategory)) state.seedCategory = "all";
+    categories.forEach((category) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "seed-category";
+      button.textContent = seedCategoryLabel(category);
+      button.dataset.seedCategory = category;
+      button.addEventListener("click", () => selectSeedCategory(category));
+      refs.seedCategories.append(button);
+    });
     seeds.forEach((seed) => {
       const option = document.createElement("option");
       option.value = seed.id;
@@ -447,36 +491,89 @@
 
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "seed-option";
-      button.textContent = seed.label;
+      button.className = "seed-option seed-card";
+      button.dataset.seedCardCategory = seed.category || "core";
       button.dataset.seedOption = seed.id;
-      button.addEventListener("click", () => selectSeed(seed.id));
+      const meta = document.createElement("span");
+      meta.className = "seed-card-meta";
+      meta.textContent = seedCategoryLabel(seed.category || "core");
+      const title = document.createElement("strong");
+      title.textContent = seed.label;
+      const summary = document.createElement("span");
+      summary.className = "seed-card-summary";
+      summary.textContent = seed.summary || "A living glyph shape for tone, breath, and ritual.";
+      button.append(meta, title, summary);
+      button.addEventListener("click", () => selectSeed(seed.id, { keepCategory: true }));
       refs.seedOptions.append(button);
     });
     refs.seedSelect.value = state.seed;
-    filterSeedOptions("");
+    filterSeedOptions();
   }
 
-  function selectSeed(seedId) {
-    if (!currentFamily().seeds.some((seed) => seed.id === seedId)) return;
+  function seedCategoriesForCurrentFamily() {
+    const categories = currentFamily().seeds.reduce((set, seed) => {
+      set.add(seed.category || "core");
+      return set;
+    }, new Set());
+    return ["all"].concat(Array.from(categories));
+  }
+
+  function seedCategoryLabel(category) {
+    return seedCategoryLabels[category] || category.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
+
+  function selectSeedCategory(category) {
+    const categories = seedCategoriesForCurrentFamily();
+    state.seedCategory = categories.includes(category) ? category : "all";
+    filterSeedOptions();
+    const visibleSeed = visibleSeedsForCategory()[0];
+    if (visibleSeed && !visibleSeedsForCategory().some((seed) => seed.id === state.seed)) {
+      selectSeed(visibleSeed.id, { keepCategory: true });
+    } else {
+      updateUI();
+      showToast(seedCategoryLabel(state.seedCategory));
+    }
+  }
+
+  function visibleSeedsForCategory() {
+    const category = state.seedCategory || "all";
+    return currentFamily().seeds.filter((seed) => category === "all" || (seed.category || "core") === category);
+  }
+
+  function selectSeed(seedId, options) {
+    const seed = currentFamily().seeds.find((item) => item.id === seedId);
+    if (!seed) return;
     state.seed = seedId;
     refs.seedSelect.value = state.seed;
     state.sealedAt = null;
     state.sealSignature = null;
-    filterSeedOptions(refs.seedSearch.value);
+    if (!options || !options.keepCategory) state.seedCategory = seed.category || "core";
+    filterSeedOptions();
     rebuildGlyph("Seed: " + currentSeed().label);
   }
 
-  function filterSeedOptions(query) {
-    const value = (query || "").trim().toLowerCase();
+  function filterSeedOptions() {
+    const category = state.seedCategory || "all";
     let visible = 0;
+    Array.from(refs.seedCategories.children).forEach((button) => {
+      button.classList.toggle("active", button.dataset.seedCategory === category);
+      button.setAttribute("aria-pressed", button.dataset.seedCategory === category ? "true" : "false");
+    });
     Array.from(refs.seedOptions.children).forEach((button) => {
-      const matches = !value || button.textContent.toLowerCase().includes(value);
+      const matches = category === "all" || button.dataset.seedCardCategory === category;
       button.style.display = matches ? "" : "none";
       button.classList.toggle("active", button.dataset.seedOption === state.seed);
       if (matches) visible += 1;
     });
-    refs.seedLibraryCount.textContent = visible + " of " + currentFamily().seeds.length;
+    refs.seedLibraryCount.textContent = visible + " of " + currentFamily().seeds.length + " shapes";
+  }
+
+  function exploreNextSeed() {
+    const seeds = visibleSeedsForCategory();
+    if (!seeds.length) return;
+    const currentIndex = seeds.findIndex((seed) => seed.id === state.seed);
+    const nextSeed = seeds[(currentIndex + 1) % seeds.length];
+    selectSeed(nextSeed.id, { keepCategory: true });
   }
 
   function buildActionControls() {
@@ -854,7 +951,7 @@
     });
 
     refs.seedSelect.value = state.seed;
-    filterSeedOptions(refs.seedSearch.value);
+    filterSeedOptions();
     refs.actionSelect.value = state.ritualAction;
 
     Object.keys(refs.ranges).forEach((key) => {
@@ -1245,7 +1342,7 @@
     if (seed === "torus") return createTorusGeometry(recipeState);
     if (seed === "mirror") return createMirrorGeometry(recipeState);
     if (seed === "gesture") return createGestureGeometry(recipeState);
-    if (["merkaba", "pyramid", "fire", "earth", "air", "water", "ether"].includes(seed)) return createElementalGeometry(recipeState);
+    if (recipeState.family === "elemental") return createElementalGeometry(recipeState);
     if (["harmonic", "octave", "chord"].includes(seed)) return createToneGeometry(recipeState);
     if (["seal", "release", "protect", "open", "remember"].includes(seed)) return createRitualGeometry(recipeState);
     return createRadialGeometry(recipeState, { id: seed, label: seedLabel(seed), symmetry: recipeState.builder.symmetry });
@@ -1490,6 +1587,17 @@
     ];
     const tetraA = [{ x: 1, y: 1, z: 1 }, { x: -1, y: -1, z: 1 }, { x: -1, y: 1, z: -1 }, { x: 1, y: -1, z: -1 }];
     const tetraB = [{ x: -1, y: -1, z: -1 }, { x: 1, y: 1, z: -1 }, { x: 1, y: -1, z: 1 }, { x: -1, y: 1, z: 1 }];
+    if (recipeState.seed === "sphere") return createSphereFormGeometry(recipeState, { id: "sphere", label: "Sphere", geodesic: false });
+    if (recipeState.seed === "geodesic") return createSphereFormGeometry(recipeState, { id: "geodesic", label: "Geodesic Sphere", geodesic: true });
+    if (recipeState.seed === "cone") return createConeFormGeometry(recipeState);
+    if (recipeState.seed === "cylinder") return createCylinderFormGeometry(recipeState);
+    if (recipeState.seed === "torus-knot") return createTorusKnotFormGeometry(recipeState);
+    if (recipeState.seed === "triangular-prism") return createPrismFormGeometry(recipeState, { id: "triangular-prism", label: "Triangular Prism", sides: 3 });
+    if (recipeState.seed === "hex-prism") return createPrismFormGeometry(recipeState, { id: "hex-prism", label: "Hexagonal Prism", sides: 6 });
+    if (recipeState.seed === "crystal-lattice") return createCrystalLatticeFormGeometry(recipeState);
+    if (recipeState.seed === "temple-grid") return createTempleGridFormGeometry(recipeState);
+    if (recipeState.seed === "octagonal-gate") return createPrismFormGeometry(recipeState, { id: "octagonal-gate", label: "Octagonal Gate", sides: 8, open: true });
+    if (recipeState.seed === "spiral-column") return createSpiralColumnFormGeometry(recipeState);
     const configs = {
       merkaba: {
         label: "Merkaba",
@@ -1505,6 +1613,37 @@
         ],
         edges: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 4], [2, 4], [3, 4]],
         faces: [[0, 1, 2, 3], [0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]
+      },
+      "double-pyramid": {
+        label: "Double Pyramid",
+        vertices: [
+          { x: -1, y: 0, z: -1 }, { x: 1, y: 0, z: -1 }, { x: 1, y: 0, z: 1 }, { x: -1, y: 0, z: 1 },
+          { x: 0, y: 1.35, z: 0 }, { x: 0, y: -1.35, z: 0 }
+        ],
+        edges: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5]],
+        faces: [[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4], [1, 0, 5], [2, 1, 5], [3, 2, 5], [0, 3, 5]]
+      },
+      "star-tetra": {
+        label: "Star Tetra",
+        vertices: tetraA.map((vertex) => ({ x: vertex.x * 1.1, y: vertex.y * 1.1, z: vertex.z * 1.1 })).concat(tetraB.map((vertex) => ({ x: vertex.x * 1.1, y: vertex.y * 1.1, z: vertex.z * 1.1 }))),
+        edges: [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3], [4, 5], [4, 6], [4, 7], [5, 6], [5, 7], [6, 7], [0, 4], [1, 5], [2, 6], [3, 7]],
+        faces: [[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3], [4, 5, 6], [4, 5, 7], [4, 6, 7], [5, 6, 7]]
+      },
+      diamond: {
+        label: "Diamond",
+        vertices: [{ x: 0, y: 1.45, z: 0 }, { x: -1, y: 0, z: -1 }, { x: 1, y: 0, z: -1 }, { x: 1, y: 0, z: 1 }, { x: -1, y: 0, z: 1 }, { x: 0, y: -1.45, z: 0 }],
+        edges: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [2, 3], [3, 4], [4, 1], [5, 1], [5, 2], [5, 3], [5, 4]],
+        faces: [[0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1], [5, 2, 1], [5, 3, 2], [5, 4, 3], [5, 1, 4]]
+      },
+      obelisk: {
+        label: "Obelisk",
+        vertices: [
+          { x: -0.65, y: -1.2, z: -0.65 }, { x: 0.65, y: -1.2, z: -0.65 }, { x: 0.65, y: -1.2, z: 0.65 }, { x: -0.65, y: -1.2, z: 0.65 },
+          { x: -0.42, y: 0.75, z: -0.42 }, { x: 0.42, y: 0.75, z: -0.42 }, { x: 0.42, y: 0.75, z: 0.42 }, { x: -0.42, y: 0.75, z: 0.42 },
+          { x: 0, y: 1.52, z: 0 }
+        ],
+        edges: [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7], [4, 8], [5, 8], [6, 8], [7, 8]],
+        faces: [[0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [4, 5, 8], [5, 6, 8], [6, 7, 8], [7, 4, 8]]
       },
       fire: {
         label: "Tetrahedron",
@@ -1525,6 +1664,206 @@
       ether: { label: "Dodecahedron", vertices: dodeca }
     };
     return createPolyhedronGeometry(recipeState, configs[recipeState.seed] || configs.earth);
+  }
+
+  function createSphereFormGeometry(recipeState, config) {
+    const latitudes = config.geodesic ? 5 : 4;
+    const segments = config.geodesic ? 12 : 10;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    const rings = [];
+    for (let lat = 1; lat < latitudes; lat += 1) {
+      const v = lat / latitudes;
+      const theta = -Math.PI / 2 + v * Math.PI;
+      const radius = Math.cos(theta);
+      const y = Math.sin(theta);
+      const group = [];
+      for (let index = 0; index < segments; index += 1) {
+        const angle = index / segments * Math.PI * 2 + recipeState.builder.variant * 0.025;
+        const nodeIndex = nodes.length;
+        group.push(nodeIndex);
+        nodes.push({
+          id: config.id + "-" + lat + "-" + index,
+          ring: "sphere-" + lat,
+          x: Math.cos(angle) * radius * 1.55,
+          y: y * 1.55,
+          z: Math.sin(angle) * radius * (0.68 + recipeState.builder.depth * 0.13),
+          radius: lat === Math.ceil(latitudes / 2) ? 1.06 : 0.9
+        });
+      }
+      rings.push(group);
+    }
+    const topIndex = nodes.length;
+    nodes.push({ id: "north", ring: "pole", x: 0, y: 1.72, z: 0, radius: 1.1 });
+    const bottomIndex = nodes.length;
+    nodes.push({ id: "south", ring: "pole", x: 0, y: -1.72, z: 0, radius: 1.1 });
+    let lines = [];
+    rings.forEach((group) => { lines = lines.concat(ringLines(nodes, group, 0.62)); });
+    rings[0].forEach((nodeIndex) => lines.push({ from: bottomIndex, to: nodeIndex, weight: 0.44, role: "meridian" }));
+    rings[rings.length - 1].forEach((nodeIndex) => lines.push({ from: topIndex, to: nodeIndex, weight: 0.44, role: "meridian" }));
+    for (let ringIndex = 1; ringIndex < rings.length; ringIndex += 1) {
+      rings[ringIndex].forEach((nodeIndex, index) => {
+        lines.push({ from: nodeIndex, to: rings[ringIndex - 1][index], weight: 0.38, role: "meridian" });
+        if (config.geodesic) lines.push({ from: nodeIndex, to: rings[ringIndex - 1][(index + 1) % segments], weight: 0.28, role: "geodesic" });
+      });
+    }
+    if (config.geodesic) lines = lines.concat(chordLines(nodes, rings[Math.floor(rings.length / 2)], 3, 0.28));
+    const faces = [];
+    for (let ringIndex = 1; ringIndex < rings.length; ringIndex += 1) {
+      const lower = rings[ringIndex - 1];
+      const upper = rings[ringIndex];
+      lower.forEach((nodeIndex, index) => faces.push([nodeIndex, lower[(index + 1) % segments], upper[(index + 1) % segments], upper[index]]));
+    }
+    const circles = [
+      { node: 0, radius: 1.55, weight: 0.34, role: "equator" },
+      { node: topIndex, radius: 0.22, weight: 0.32, role: "pole" },
+      { node: bottomIndex, radius: 0.22, weight: 0.32, role: "pole" }
+    ];
+    return normalizeModel({ id: config.id, label: config.label, family: "elemental", nodes, lines, faces, circles, circleRadius: 0.34 });
+  }
+
+  function createConeFormGeometry(recipeState) {
+    const sides = Math.max(12, recipeState.builder.symmetry + 5);
+    const nodes = [{ id: "center", ring: "center", x: 0, y: -0.18, z: 0 }];
+    const base = [];
+    for (let index = 0; index < sides; index += 1) {
+      const angle = index / sides * Math.PI * 2;
+      const nodeIndex = nodes.length;
+      base.push(nodeIndex);
+      nodes.push({ id: "base-" + index, ring: "base", x: Math.cos(angle) * 1.38, y: -1.05, z: Math.sin(angle) * (0.64 + recipeState.builder.depth * 0.11), radius: 0.86 });
+    }
+    const apex = nodes.length;
+    nodes.push({ id: "apex", ring: "apex", x: 0, y: 1.45, z: 0, radius: 1.18 });
+    const lines = ringLines(nodes, base, 0.74).concat(base.map((nodeIndex) => ({ from: nodeIndex, to: apex, weight: 0.58, role: "cone-side" })));
+    if (recipeState.builder.density > 5) base.forEach((nodeIndex, index) => {
+      if (index % 2 === 0) lines.push({ from: 0, to: nodeIndex, weight: 0.24, role: "base-ray" });
+    });
+    const faces = base.map((nodeIndex, index) => [nodeIndex, base[(index + 1) % base.length], apex]);
+    const circles = [{ node: 0, radius: 1.38, weight: 0.52, role: "base" }, { node: apex, radius: 0.2, weight: 0.36, role: "apex" }];
+    return normalizeModel({ id: "cone", label: "Cone", family: "elemental", nodes, lines, faces, circles, circleRadius: 0.32 });
+  }
+
+  function createCylinderFormGeometry(recipeState) {
+    const sides = Math.max(12, recipeState.builder.symmetry + 5);
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    const top = [];
+    const bottom = [];
+    for (let level = 0; level < 2; level += 1) {
+      const group = level === 0 ? bottom : top;
+      const y = level === 0 ? -1.08 : 1.08;
+      for (let index = 0; index < sides; index += 1) {
+        const angle = index / sides * Math.PI * 2;
+        const nodeIndex = nodes.length;
+        group.push(nodeIndex);
+        nodes.push({ id: (level ? "top-" : "bottom-") + index, ring: level ? "top" : "bottom", x: Math.cos(angle) * 1.24, y, z: Math.sin(angle) * (0.6 + recipeState.builder.depth * 0.1), radius: 0.86 });
+      }
+    }
+    let lines = ringLines(nodes, bottom, 0.72).concat(ringLines(nodes, top, 0.72));
+    bottom.forEach((nodeIndex, index) => lines.push({ from: nodeIndex, to: top[index], weight: 0.52, role: "column" }));
+    if (recipeState.builder.density > 6) bottom.forEach((nodeIndex, index) => lines.push({ from: nodeIndex, to: top[(index + 2) % top.length], weight: 0.22, role: "helical-brace" }));
+    const faces = bottom.map((nodeIndex, index) => [nodeIndex, bottom[(index + 1) % sides], top[(index + 1) % sides], top[index]]);
+    const circles = [{ node: 0, radius: 1.24, weight: 0.42, role: "midline" }];
+    return normalizeModel({ id: "cylinder", label: "Cylinder", family: "elemental", nodes, lines, faces, circles, circleRadius: 0.32 });
+  }
+
+  function createPrismFormGeometry(recipeState, config) {
+    const sides = config.sides;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    const front = [];
+    const back = [];
+    for (let depthIndex = 0; depthIndex < 2; depthIndex += 1) {
+      const group = depthIndex === 0 ? front : back;
+      const z = depthIndex === 0 ? -0.72 - recipeState.builder.depth * 0.08 : 0.72 + recipeState.builder.depth * 0.08;
+      for (let index = 0; index < sides; index += 1) {
+        const angle = -Math.PI / 2 + index / sides * Math.PI * 2;
+        const nodeIndex = nodes.length;
+        group.push(nodeIndex);
+        nodes.push({ id: (depthIndex ? "back-" : "front-") + index, ring: "prism", x: Math.cos(angle) * 1.28, y: Math.sin(angle) * 1.28, z, radius: sides >= 8 ? 0.82 : 0.95 });
+      }
+    }
+    let lines = ringLines(nodes, front, 0.74).concat(ringLines(nodes, back, 0.58));
+    front.forEach((nodeIndex, index) => lines.push({ from: nodeIndex, to: back[index], weight: 0.5, role: "depth-edge" }));
+    if (recipeState.builder.density > 6 && !config.open) lines = lines.concat(chordLines(nodes, front, Math.max(2, Math.floor(sides / 2)), 0.24));
+    const faces = config.open ? [] : front.map((nodeIndex, index) => [nodeIndex, front[(index + 1) % sides], back[(index + 1) % sides], back[index]]);
+    const circles = [{ node: 0, radius: 1.32, weight: 0.36, role: config.open ? "gate" : "prism" }];
+    return normalizeModel({ id: config.id, label: config.label, family: "elemental", nodes, lines, faces, circles, circleRadius: 0.32 });
+  }
+
+  function createTorusKnotFormGeometry(recipeState) {
+    const count = 36 + recipeState.builder.density * 4;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    for (let index = 0; index < count; index += 1) {
+      const t = index / count * Math.PI * 2;
+      const p = 2;
+      const q = 3;
+      const r = 1.05 + 0.36 * Math.cos(q * t);
+      nodes.push({
+        id: "knot-" + index,
+        ring: "torus-knot",
+        x: r * Math.cos(p * t),
+        y: r * Math.sin(p * t),
+        z: 0.72 * Math.sin(q * t) + zFromDepth(recipeState, index / count) * 0.5,
+        radius: index % 6 === 0 ? 1.06 : 0.8
+      });
+    }
+    const knot = nodes.slice(1).map((_, index) => index + 1);
+    let lines = ringLines(nodes, knot, 0.76);
+    for (let index = 1; index < knot.length; index += Math.max(4, 11 - recipeState.builder.density)) lines.push({ from: 0, to: index, weight: 0.22, role: "knot-spoke" });
+    const circles = [{ node: 0, radius: 1.24, weight: 0.38, role: "torus-knot-field" }];
+    return normalizeModel({ id: "torus-knot", label: "Torus Knot", family: "elemental", nodes, lines, circles, circleRadius: 0.34 });
+  }
+
+  function createCrystalLatticeFormGeometry(recipeState) {
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    const grid = new Map();
+    const span = recipeState.builder.density > 6 ? [-1, 0, 1] : [-1, 1];
+    span.forEach((x) => span.forEach((y) => span.forEach((z) => {
+      const index = nodes.length;
+      grid.set(x + "," + y + "," + z, index);
+      nodes.push({ id: "crystal-" + index, ring: "lattice", x: x * 0.92, y: y * 0.92, z: z * (0.58 + recipeState.builder.depth * 0.12), radius: Math.abs(x) + Math.abs(y) + Math.abs(z) <= 1 ? 1.08 : 0.8 });
+    })));
+    const lines = [];
+    nodes.forEach((node, index) => {
+      if (index === 0) return;
+      if (recipeState.builder.density > 4) lines.push({ from: 0, to: index, weight: 0.16, role: "core-channel" });
+      for (let other = index + 1; other < nodes.length; other += 1) {
+        const distance = distanceBetween(node, nodes[other]);
+        if (distance < 1.18) lines.push({ from: index, to: other, weight: 0.5, role: "lattice-edge" });
+      }
+    });
+    const circles = [{ node: 0, radius: 0.48, weight: 0.42, role: "core" }];
+    return normalizeModel({ id: "crystal-lattice", label: "Crystal Lattice", family: "elemental", nodes, lines, circles, circleRadius: 0.28 });
+  }
+
+  function createTempleGridFormGeometry(recipeState) {
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    const coords = [
+      [-1.25, -1.1, -0.5], [-0.42, -1.1, -0.5], [0.42, -1.1, -0.5], [1.25, -1.1, -0.5],
+      [-1.25, 0.92, -0.5], [-0.42, 1.12, -0.5], [0.42, 1.12, -0.5], [1.25, 0.92, -0.5],
+      [-1.5, -1.16, 0.58], [1.5, -1.16, 0.58], [-1.16, 1.18, 0.58], [1.16, 1.18, 0.58],
+      [0, 1.62, 0.1]
+    ];
+    coords.forEach(([x, y, z], index) => nodes.push({ id: "temple-" + index, ring: "temple", x, y, z: z * (0.8 + recipeState.builder.depth * 0.08), radius: index === 12 ? 1.15 : 0.88 }));
+    const pairs = [[1, 2], [2, 3], [3, 4], [5, 6], [6, 7], [7, 8], [1, 5], [2, 6], [3, 7], [4, 8], [9, 10], [11, 12], [9, 11], [10, 12], [5, 13], [6, 13], [7, 13], [8, 13], [1, 9], [4, 10], [5, 11], [8, 12]];
+    const lines = pairs.map(([from, to]) => ({ from, to, weight: 0.62, role: "temple-edge" }));
+    if (recipeState.builder.density > 6) [[1, 13], [4, 13], [9, 13], [10, 13]].forEach(([from, to]) => lines.push({ from, to, weight: 0.26, role: "temple-ray" }));
+    const faces = [[1, 2, 6, 5], [3, 4, 8, 7], [5, 6, 13], [7, 8, 13], [9, 10, 12, 11]];
+    const circles = [{ node: 0, radius: 1.55, weight: 0.32, role: "temple-field" }];
+    return normalizeModel({ id: "temple-grid", label: "Temple Grid", family: "elemental", nodes, lines, faces, circles, circleRadius: 0.32 });
+  }
+
+  function createSpiralColumnFormGeometry(recipeState) {
+    const count = 28 + recipeState.builder.density * 3;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0 }];
+    for (let index = 0; index < count; index += 1) {
+      const t = index / (count - 1);
+      const angle = t * Math.PI * 2 * (2.2 + recipeState.builder.orbits * 0.25);
+      nodes.push({ id: "column-" + index, ring: "spiral-column", x: Math.cos(angle) * 0.86, y: -1.42 + t * 2.84, z: Math.sin(angle) * (0.52 + recipeState.builder.depth * 0.1), radius: index % 5 === 0 ? 1 : 0.78 });
+    }
+    const path = nodes.slice(1).map((_, index) => index + 1);
+    const lines = ringLines(nodes, path, 0.68);
+    for (let index = 1; index < path.length - 6; index += 4) lines.push({ from: index, to: index + 6, weight: 0.28, role: "spiral-brace" });
+    const circles = [{ node: 0, radius: 0.92, weight: 0.35, role: "column-field" }];
+    return normalizeModel({ id: "spiral-column", label: "Spiral Column", family: "elemental", nodes, lines, circles, circleRadius: 0.34 });
   }
 
   function createPolyhedronGeometry(recipeState, config) {

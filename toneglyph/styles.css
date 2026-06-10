@@ -486,75 +486,119 @@ textarea:focus {
 .seed-library-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
+  align-items: center;
   gap: 10px;
   margin-top: 10px;
 }
 
-.seed-search-label {
-  min-width: 0;
-}
-
-.seed-search-label span,
+.seed-library-title,
 .seed-library-count {
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 750;
 }
 
-.seed-search-label span {
+.seed-library-title {
   display: block;
   margin-bottom: 5px;
 }
 
 .seed-library-count {
-  margin: 0 0 11px;
+  margin: 0;
   white-space: nowrap;
 }
 
-#seed-search {
-  width: 100%;
-  min-height: 40px;
-  border: 1px solid rgba(242, 234, 223, 0.12);
-  border-radius: 12px;
-  color: var(--text);
-  background: rgba(242, 234, 223, 0.06);
-  outline: none;
+.explore-seed-button {
+  min-height: 36px;
+  flex: 0 0 auto;
   padding: 0 12px;
+  font-size: 0.72rem;
 }
 
-#seed-search:focus {
-  border-color: rgba(232, 215, 178, 0.42);
-  box-shadow: 0 0 0 3px rgba(232, 215, 178, 0.11);
+.seed-category-row {
+  display: flex;
+  gap: 7px;
+  margin-top: 9px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.seed-category {
+  flex: 0 0 auto;
+  min-height: 34px;
+  border: 1px solid rgba(242, 234, 223, 0.1);
+  border-radius: 999px;
+  color: rgba(242, 234, 223, 0.74);
+  background: rgba(242, 234, 223, 0.055);
+  cursor: pointer;
+  padding: 0 11px;
+  font-size: 0.7rem;
+  font-weight: 760;
+}
+
+.seed-category.active {
+  color: #120908;
+  border-color: rgba(232, 215, 178, 0.34);
+  background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(134, 189, 180, 0.78));
 }
 
 .seed-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 7px;
-  max-height: 214px;
+  max-height: 258px;
   margin-top: 8px;
   overflow: auto;
   padding-right: 3px;
 }
 
 .seed-option {
-  min-height: 38px;
+  display: grid;
+  gap: 4px;
+  min-height: 76px;
   border: 1px solid rgba(242, 234, 223, 0.1);
-  border-radius: 12px;
+  border-radius: 13px;
   color: rgba(242, 234, 223, 0.78);
   background: rgba(242, 234, 223, 0.055);
   cursor: pointer;
-  padding: 0 9px;
-  font-size: 0.72rem;
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.seed-card-meta {
+  color: rgba(232, 215, 178, 0.7);
+  font-family: var(--mono);
+  font-size: 0.58rem;
   font-weight: 760;
-  line-height: 1.1;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.seed-option strong {
+  color: var(--bone);
+  font-size: 0.82rem;
+  font-weight: 820;
+  line-height: 1.08;
+}
+
+.seed-card-summary {
+  color: rgba(242, 234, 223, 0.58);
+  font-size: 0.68rem;
+  font-weight: 560;
+  line-height: 1.22;
 }
 
 .seed-option.active {
   color: #120908;
   border-color: rgba(232, 215, 178, 0.36);
   background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(185, 133, 116, 0.78));
+}
+
+.seed-option.active .seed-card-meta,
+.seed-option.active strong,
+.seed-option.active .seed-card-summary {
+  color: #120908;
 }
 
 .native-seed-select {
@@ -859,15 +903,25 @@ body[data-control-tab="save"] .export-panel {
     border-radius: 999px;
   }
 
-  .control-dock {
+  .action-rail {
     left: auto;
     right: 22px;
     top: 154px;
+    bottom: auto;
+    transform: none;
+    width: 460px;
+    border-radius: 999px;
+  }
+
+  .control-dock {
+    left: auto;
+    right: 22px;
+    top: 226px;
     bottom: 22px;
     transform: none;
     width: 460px;
     grid-template-columns: 1fr;
-    max-height: calc(100svh - 176px);
+    max-height: calc(100svh - 248px);
     overflow: auto;
   }
 
@@ -987,6 +1041,16 @@ body[data-control-tab="save"] .export-panel {
     gap: 8px;
   }
 
+  body:not([data-action="none"]) .toast {
+    top: max(12px, env(safe-area-inset-top));
+    bottom: auto;
+    transform: translate(-50%, -130%);
+  }
+
+  body:not([data-action="none"]) .toast.visible {
+    transform: translate(-50%, 0);
+  }
+
   .control-tabs {
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 4px;
@@ -1030,7 +1094,7 @@ body[data-control-tab="save"] .export-panel {
   }
 
   .seed-grid {
-    max-height: 188px;
+    max-height: 310px;
   }
 
   .range-grid {
@@ -1100,7 +1164,7 @@ body[data-control-tab="save"] .export-panel {
 
   .seed-grid {
     grid-template-columns: 1fr;
-    max-height: 176px;
+    max-height: 300px;
   }
 
   .color-row {

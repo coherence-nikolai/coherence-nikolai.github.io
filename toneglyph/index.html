@@ -88,13 +88,14 @@
         <span class="input-label">Glyph</span>
         <div id="family-options" class="family-grid" aria-label="Glyph families"></div>
         <div class="seed-library-head">
-          <label class="seed-search-label" for="seed-search">
-            <span>Seed Library</span>
-            <input id="seed-search" type="search" placeholder="Search sacred seeds" autocomplete="off">
-          </label>
-          <p id="seed-library-count" class="seed-library-count">0 seeds</p>
+          <div>
+            <span class="seed-library-title">Shape Library</span>
+            <p id="seed-library-count" class="seed-library-count">0 shapes</p>
+          </div>
+          <button id="explore-seed-button" class="quiet-action explore-seed-button" type="button">Explore Next</button>
         </div>
-        <div id="seed-options" class="seed-grid" aria-label="Seed library"></div>
+        <div id="seed-categories" class="seed-category-row" aria-label="Shape discovery categories"></div>
+        <div id="seed-options" class="seed-grid" aria-label="Shape library"></div>
         <div class="select-row">
           <label class="native-seed-select">
             <span>Seed</span>
@@ -198,6 +199,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="./app.js?v=20260610-sacred-seeds" defer></script>
+  <script src="./app.js?v=20260610-discovery-shapes" defer></script>
 </body>
 </html>
