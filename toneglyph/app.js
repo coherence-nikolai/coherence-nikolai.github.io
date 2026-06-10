@@ -86,7 +86,26 @@
     tone: "Tone",
     motion: "Motion",
     ritual: "Ritual",
-    layers: "Layers"
+    layers: "Layers",
+    save: "Save"
+  };
+
+  const actionCopy = {
+    none: { label: "Tone Glyph", tab: "form" },
+    tune: { label: "Tune", tab: "tone" },
+    shape: { label: "Shape", tab: "form" },
+    seal: { label: "Seal", tab: "ritual" },
+    save: { label: "Save", tab: "save" }
+  };
+
+  const tabToAction = {
+    form: "shape",
+    matter: "tune",
+    tone: "tune",
+    motion: "shape",
+    ritual: "seal",
+    layers: "shape",
+    save: "save"
   };
 
   const glyphFamilies = [
@@ -157,6 +176,7 @@
   const state = {
     mode: "ritual",
     controlTab: "form",
+    activeAction: "none",
     intention: "",
     tone: "calm",
     colors: toneProfiles[0].colors.slice(),
@@ -219,6 +239,11 @@
     refs.status = document.getElementById("render-status");
     refs.toast = document.getElementById("toast");
     refs.modeButtons = Array.from(document.querySelectorAll(".mode-button[data-mode]"));
+    refs.actionButtons = Array.from(document.querySelectorAll("[data-action-button]"));
+    refs.controlDrawer = document.getElementById("control-drawer");
+    refs.drawerTitle = document.getElementById("drawer-title");
+    refs.drawerClose = document.getElementById("drawer-close-button");
+    refs.stageHint = document.getElementById("stage-hint");
     refs.controlTabs = Array.from(document.querySelectorAll(".control-tab[data-control-tab]"));
     refs.intention = document.getElementById("intention-input");
     refs.toneOptions = document.getElementById("tone-options");
@@ -270,6 +295,10 @@
     refs.modeButtons.forEach((button) => {
       button.addEventListener("click", () => setMode(button.dataset.mode));
     });
+    refs.actionButtons.forEach((button) => {
+      button.addEventListener("click", () => setActiveAction(button.dataset.actionButton));
+    });
+    refs.drawerClose.addEventListener("click", () => setActiveAction("none"));
     refs.controlTabs.forEach((button) => {
       button.addEventListener("click", () => setControlTab(button.dataset.controlTab));
     });
@@ -509,10 +538,24 @@
     pulse(currentTone().freq, mode === "play" ? 0.1 : 0.055);
   }
 
+  function setActiveAction(action) {
+    if (!actionCopy[action]) return;
+    state.activeAction = action;
+    document.body.dataset.action = action;
+    if (action !== "none") {
+      state.controlTab = actionCopy[action].tab;
+      document.body.dataset.controlTab = state.controlTab;
+    }
+    updateUI();
+    if (action !== "none") showToast(actionCopy[action].label);
+  }
+
   function setControlTab(tab) {
     if (!controlTabCopy[tab]) return;
     state.controlTab = tab;
+    state.activeAction = tabToAction[tab] || state.activeAction || "shape";
     document.body.dataset.controlTab = tab;
+    document.body.dataset.action = state.activeAction;
     updateUI();
     showToast(controlTabCopy[tab] + " controls");
   }
@@ -700,6 +743,14 @@
       button.classList.toggle("active", isActive);
       button.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
+    refs.actionButtons.forEach((button) => {
+      const isActive = button.dataset.actionButton === state.activeAction;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-expanded", isActive ? "true" : "false");
+    });
+    const drawerOpen = state.activeAction !== "none";
+    refs.controlDrawer.hidden = !drawerOpen;
+    refs.drawerTitle.textContent = drawerOpen ? actionCopy[state.activeAction].label : "Tone Glyph";
 
     const is3DForm = state.family === "elemental" && !state.trueGlyph;
     refs.form3d.classList.toggle("active", is3DForm);

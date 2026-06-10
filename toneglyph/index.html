@@ -16,7 +16,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css?v=20260609-tabs">
 </head>
-<body data-mode="ritual" data-view="living" data-control-tab="form">
+<body data-mode="ritual" data-view="living" data-control-tab="form" data-action="none">
   <main class="app-shell">
     <section class="stage" aria-label="Tone Glyph instrument">
       <canvas id="glyph-canvas" class="glyph-canvas" aria-label="Interactive Tone Glyph creator"></canvas>
@@ -50,7 +50,22 @@
       <button class="mode-button" type="button" data-mode="glyph">Glyph</button>
     </nav>
 
-    <section class="control-dock" aria-label="Tone Glyph creator controls">
+    <nav id="action-rail" class="action-rail" aria-label="Tone Glyph actions">
+      <button class="action-button" type="button" data-action-button="tune" aria-expanded="false">Tune</button>
+      <button class="action-button" type="button" data-action-button="shape" aria-expanded="false">Shape</button>
+      <button class="action-button primary-action-button" type="button" data-action-button="seal" aria-expanded="false">Seal</button>
+      <button class="action-button" type="button" data-action-button="save" aria-expanded="false">Save</button>
+    </nav>
+    <p id="stage-hint" class="stage-hint">Drag to turn. Hold to listen. Seal when it feels right.</p>
+
+    <section id="control-drawer" class="control-dock" aria-label="Tone Glyph creator controls" hidden>
+      <div class="drawer-head">
+        <div>
+          <p class="drawer-kicker">Tone Glyph</p>
+          <h2 id="drawer-title">Tune</h2>
+        </div>
+        <button id="drawer-close-button" class="drawer-close" type="button" aria-label="Close controls">Close</button>
+      </div>
       <div id="control-tabs" class="control-tabs" aria-label="Creator sections">
         <button class="control-tab" type="button" data-control-tab="form">Form</button>
         <button class="control-tab" type="button" data-control-tab="matter">Matter</button>
