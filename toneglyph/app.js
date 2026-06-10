@@ -542,10 +542,8 @@
     if (!actionCopy[action]) return;
     state.activeAction = action;
     document.body.dataset.action = action;
-    if (action !== "none") {
-      state.controlTab = actionCopy[action].tab;
-      document.body.dataset.controlTab = state.controlTab;
-    }
+    state.controlTab = actionCopy[action].tab;
+    document.body.dataset.controlTab = state.controlTab;
     updateUI();
     if (action !== "none") showToast(actionCopy[action].label);
   }
