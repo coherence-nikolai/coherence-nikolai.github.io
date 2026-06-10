@@ -172,10 +172,16 @@
       </div>
 
       <div class="panel export-panel">
+        <div class="export-grid" aria-label="Export formats">
+          <button class="primary-action" type="button" data-export-format="card">Ritual Card</button>
+          <button class="quiet-action" type="button" data-export-format="wallpaper">Wallpaper</button>
+          <button class="quiet-action" type="button" data-export-format="square">Square</button>
+          <button class="quiet-action" type="button" data-export-format="transparent">Transparent</button>
+          <button id="export-recipe-button" class="quiet-action" type="button" data-export-format="recipe">Recipe</button>
+        </div>
         <div class="action-row">
           <button id="save-button" class="primary-action" type="button">Save Glyph</button>
-          <button id="share-button" class="quiet-action" type="button">Share</button>
-          <button id="download-button" class="quiet-action" type="button">Download</button>
+          <button id="share-button" class="quiet-action" type="button">Share Card</button>
         </div>
         <div id="saved-glyphs" class="saved-glyphs" aria-label="Saved glyphs"></div>
       </div>

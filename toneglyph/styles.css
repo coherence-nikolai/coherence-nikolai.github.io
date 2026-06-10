@@ -436,6 +436,18 @@ textarea:focus {
   margin-top: 10px;
 }
 
+.export-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.export-grid .primary-action,
+.export-grid .quiet-action {
+  min-height: 42px;
+  font-size: 0.78rem;
+}
+
 .primary-action,
 .quiet-action {
   flex: 1 1 auto;
@@ -445,12 +457,12 @@ textarea:focus {
 }
 
 .primary-action {
-  color: #071016;
-  background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+  color: #120908;
+  background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(134, 189, 180, 0.78));
 }
 
 .quiet-action {
-  border: 1px solid rgba(238, 245, 238, 0.12);
+  border: 1px solid rgba(242, 234, 223, 0.12);
 }
 
 .family-grid {

@@ -292,7 +292,7 @@
     refs.clear = document.getElementById("clear-button");
     refs.save = document.getElementById("save-button");
     refs.share = document.getElementById("share-button");
-    refs.download = document.getElementById("download-button");
+    refs.exportButtons = Array.from(document.querySelectorAll("[data-export-format]"));
     refs.form3d = document.getElementById("form3d-button");
     refs.trueView = document.getElementById("true-view-button");
     refs.move = document.getElementById("move-button");
@@ -337,7 +337,9 @@
     refs.clear.addEventListener("click", clearRitual);
     refs.save.addEventListener("click", saveGlyph);
     refs.share.addEventListener("click", shareGlyph);
-    refs.download.addEventListener("click", downloadGlyph);
+    refs.exportButtons.forEach((button) => {
+      button.addEventListener("click", () => exportGlyph(button.dataset.exportFormat));
+    });
     refs.form3d.addEventListener("click", activate3DForm);
     refs.trueView.addEventListener("click", () => setTrueGlyph(!state.trueGlyph));
     refs.move.addEventListener("click", () => setMoveGlyph(!state.moveGlyph));
@@ -713,8 +715,8 @@
   }
 
   async function shareGlyph() {
-    const blob = await createGlyphBlob("square");
-    const file = new File([blob], "tone-glyph.png", { type: "image/png" });
+    const blob = await createGlyphBlob("card");
+    const file = new File([blob], "tone-glyph-ritual-card.png", { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
         title: "Tone Glyph",
@@ -723,14 +725,24 @@
       });
       return;
     }
-    downloadBlob(blob, "tone-glyph.png");
-    showToast("Image downloaded");
+    downloadBlob(blob, "tone-glyph-ritual-card.png");
+    showToast("Ritual card downloaded");
   }
 
-  async function downloadGlyph() {
-    const blob = await createGlyphBlob("wallpaper");
-    downloadBlob(blob, "tone-glyph-wallpaper.png");
-    showToast("Wallpaper downloaded");
+  async function exportGlyph(format) {
+    if (format === "recipe") {
+      downloadRecipe();
+      return;
+    }
+    const blob = await createGlyphBlob(format);
+    const filenames = {
+      card: "tone-glyph-ritual-card.png",
+      wallpaper: "tone-glyph-wallpaper.png",
+      square: "tone-glyph-square.png",
+      transparent: "tone-glyph-transparent.png"
+    };
+    downloadBlob(blob, filenames[format] || "tone-glyph.png");
+    showToast((format === "card" ? "Ritual card" : format.charAt(0).toUpperCase() + format.slice(1)) + " downloaded");
   }
 
   function downloadRecipe() {
@@ -2119,9 +2131,15 @@
 
   function createGlyphBlob(format) {
     const canvas = document.createElement("canvas");
-    const wallpaper = format === "wallpaper";
-    canvas.width = wallpaper ? 1080 : 1200;
-    canvas.height = wallpaper ? 1920 : 1200;
+    const sizes = {
+      card: { width: 1200, height: 1600, wallpaper: false, transparent: false },
+      wallpaper: { width: 1080, height: 1920, wallpaper: true, transparent: false },
+      square: { width: 1200, height: 1200, wallpaper: false, transparent: false },
+      transparent: { width: 1200, height: 1200, wallpaper: false, transparent: true }
+    };
+    const size = sizes[format] || sizes.square;
+    canvas.width = size.width;
+    canvas.height = size.height;
     const ctx = canvas.getContext("2d");
     drawGlyph2D(ctx, canvas.width, canvas.height, {
       model: geometry,
@@ -2136,7 +2154,9 @@
       trueGlyph: state.trueGlyph,
       sealSignature: state.sealSignature,
       pulse: state.sealedAt ? 0.8 : 0.36,
-      wallpaper
+      wallpaper: size.wallpaper,
+      transparent: size.transparent,
+      artifact: format
     });
     return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
   }
@@ -2169,12 +2189,14 @@
     const pan = options.pan || { x: 0, y: 0 };
 
     ctx.clearRect(0, 0, width, height);
-    const bg = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(width, height) * 0.72);
-    bg.addColorStop(0, mix(colors[1], "#05070a", layers.toneField ? 0.78 : 0.9));
-    bg.addColorStop(0.38, mix(colors[3], "#05070a", layers.toneField ? 0.86 : 0.94));
-    bg.addColorStop(1, "#05070a");
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, width, height);
+    if (!options.transparent) {
+      const bg = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(width, height) * 0.72);
+      bg.addColorStop(0, mix(toneFamilyPalette.gold, toneFamilyPalette.ink, layers.toneField ? 0.78 : 0.9));
+      bg.addColorStop(0.38, mix(toneFamilyPalette.teal, toneFamilyPalette.ink, layers.toneField ? 0.86 : 0.94));
+      bg.addColorStop(1, toneFamilyPalette.shadow);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
+    }
 
     const projected = options.model.nodes.map((node) => {
       const angle = options.rotation || 0;
