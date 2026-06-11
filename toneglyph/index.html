@@ -14,7 +14,7 @@
   <meta property="og:image" content="https://coherence-nikolai.app/toneglyph/icon.svg">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css?v=20260610-mobile-stage">
+  <link rel="stylesheet" href="./styles.css?v=20260611-studio-phases">
 </head>
 <body data-mode="ritual" data-view="living" data-control-tab="form" data-action="none">
   <main class="app-shell">
@@ -78,6 +78,28 @@
       <div class="panel ritual-panel">
         <label class="input-label" for="intention-input">Intention</label>
         <textarea id="intention-input" rows="2" maxlength="160" placeholder="Name what this glyph is holding"></textarea>
+        <div class="studio-block">
+          <span class="input-label">Meaning Tags</span>
+          <div id="meaning-tag-options" class="chip-grid" aria-label="Meaning tags"></div>
+        </div>
+        <div class="studio-block">
+          <span class="input-label">Emotional Resonance</span>
+          <div id="emotion-ranges" class="range-grid compact-ranges" aria-label="Emotional resonance"></div>
+        </div>
+        <div class="studio-block">
+          <label class="input-label" for="journal-input">Glyph Journal</label>
+          <textarea id="journal-input" rows="3" maxlength="420" placeholder="Record what this glyph means, changes, or helps you remember"></textarea>
+        </div>
+        <div class="studio-block reflection-card">
+          <span id="reflection-prompt">What is this glyph protecting or clarifying?</span>
+          <button id="reflection-next-button" class="quiet-action" type="button">Prompt</button>
+        </div>
+        <div class="select-row studio-block">
+          <label>
+            <span>Breath</span>
+            <select id="breath-pattern-select" aria-label="Breath pattern"></select>
+          </label>
+        </div>
         <div class="action-row">
           <button id="seal-button" class="primary-action" type="button">Seal Ritual</button>
           <button id="clear-button" class="quiet-action" type="button">Clear</button>
@@ -129,6 +151,27 @@
             <output id="zoom-output">1.00</output>
           </label>
         </div>
+        <div class="studio-block">
+          <span class="input-label">Scene</span>
+          <div class="select-row">
+            <label>
+              <span>Background</span>
+              <select id="scene-preset-select" aria-label="Background scene"></select>
+            </label>
+            <label>
+              <span>Orbs</span>
+              <select id="particle-motion-select" aria-label="Tiny orb motion"></select>
+            </label>
+          </div>
+          <div class="range-grid compact-ranges">
+            <label><span>Intensity</span><input id="scene-intensity-range" type="range" min="1" max="9" step="1" value="5"><output id="scene-intensity-output">5</output></label>
+            <label><span>Motion</span><input id="scene-motion-range" type="range" min="0" max="9" step="1" value="3"><output id="scene-motion-output">3</output></label>
+            <label><span>Grain</span><input id="scene-grain-range" type="range" min="0" max="9" step="1" value="3"><output id="scene-grain-output">3</output></label>
+            <label><span>Density</span><input id="particle-density-range" type="range" min="1" max="9" step="1" value="5"><output id="particle-density-output">5</output></label>
+            <label><span>Speed</span><input id="particle-speed-range" type="range" min="1" max="9" step="1" value="4"><output id="particle-speed-output">4</output></label>
+            <label><span>Trails</span><input id="particle-trails-range" type="range" min="0" max="9" step="1" value="2"><output id="particle-trails-output">2</output></label>
+          </div>
+        </div>
       </div>
 
       <div class="panel builder-panel">
@@ -146,6 +189,39 @@
           <button id="clear-gesture-button" class="quiet-action" type="button">Clear Trace</button>
           <button id="recipe-button" class="quiet-action" type="button">Recipe</button>
         </div>
+        <div class="studio-block custom-builder-panel">
+          <span class="input-label">Custom Glyph</span>
+          <div id="primitive-options" class="chip-grid" aria-label="Add primitive shapes"></div>
+          <div class="select-row compact-select-row">
+            <label>
+              <span>Repeat</span>
+              <select id="custom-symmetry-select" aria-label="Custom glyph repeat">
+                <option value="free">Free</option>
+                <option value="radial-3">Radial 3</option>
+                <option value="radial-4">Radial 4</option>
+                <option value="radial-6">Radial 6</option>
+                <option value="radial-8">Radial 8</option>
+              </select>
+            </label>
+            <label>
+              <span>Mirror</span>
+              <select id="custom-mirror-select" aria-label="Custom glyph mirror">
+                <option value="none">None</option>
+                <option value="vertical">Vertical</option>
+                <option value="horizontal">Horizontal</option>
+                <option value="both">Both</option>
+              </select>
+            </label>
+          </div>
+          <div class="action-row compact-row">
+            <span id="custom-layer-count" class="studio-count">0 layers</span>
+            <button id="clear-custom-button" class="quiet-action" type="button">Clear Custom</button>
+          </div>
+        </div>
+        <div id="symbol-context-panel" class="studio-block context-panel">
+          <span class="input-label">Symbol Context</span>
+          <div id="symbol-context-options" class="context-list" aria-label="Symbol context library"></div>
+        </div>
       </div>
 
       <div class="panel layer-panel">
@@ -156,15 +232,41 @@
       <div class="panel tone-panel">
         <span class="input-label">Tone</span>
         <div id="tone-options" class="option-grid" aria-label="Tone choices"></div>
+        <div class="studio-block sound-panel">
+          <span class="input-label">Sound Glyph</span>
+          <div class="select-row">
+            <label>
+              <span>Preset</span>
+              <select id="sound-preset-select" aria-label="Sound preset"></select>
+            </label>
+            <label>
+              <span>Hz</span>
+              <input id="sound-frequency-range" type="range" min="110" max="963" step="1" value="196">
+              <output id="sound-frequency-output">196</output>
+            </label>
+          </div>
+          <div class="range-grid compact-ranges">
+            <label><span>Volume</span><input id="sound-volume-range" type="range" min="1" max="9" step="1" value="5"><output id="sound-volume-output">5</output></label>
+          </div>
+          <div class="action-row compact-row">
+            <button id="play-sound-button" class="primary-action" type="button">Play Tone</button>
+            <label class="upload-action">
+              <span>Upload</span>
+              <input id="sound-upload-input" type="file" accept="audio/*">
+            </label>
+            <button id="record-sound-button" class="quiet-action" type="button">Record</button>
+          </div>
+          <p id="sound-source-label" class="premium-summary">Current tone oscillator</p>
+        </div>
       </div>
 
       <div class="panel color-panel">
         <span class="input-label">Colours</span>
         <div class="color-row" aria-label="Chosen colours">
           <label><span>Core</span><input type="color" data-color-index="0" value="#f6d27a"></label>
-          <label><span>Line</span><input type="color" data-color-index="1" value="#66e2cf"></label>
+          <label><span>Line</span><input type="color" data-color-index="1" value="#d09a50"></label>
           <label><span>Aura</span><input type="color" data-color-index="2" value="#f08a7e"></label>
-          <label><span>Ground</span><input type="color" data-color-index="3" value="#8ea7ff"></label>
+          <label><span>Ground</span><input type="color" data-color-index="3" value="#7a4d2c"></label>
         </div>
         <div id="palette-options" class="palette-row" aria-label="Palette choices"></div>
       </div>
@@ -199,6 +301,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="./app.js?v=20260611-crop-glyphs" defer></script>
+  <script src="./app.js?v=20260611-studio-phases" defer></script>
 </body>
 </html>

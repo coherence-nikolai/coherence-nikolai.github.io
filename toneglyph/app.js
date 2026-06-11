@@ -7,31 +7,31 @@
   const MOTION_QUERY = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   const toneProfiles = [
-    { id: "calm", label: "Calm", freq: 196, colors: ["#f6d27a", "#66e2cf", "#8ea7ff", "#1f4f4a"] },
-    { id: "clarity", label: "Clarity", freq: 261.63, colors: ["#f8f3dc", "#8ee8ff", "#f6d27a", "#274869"] },
-    { id: "love", label: "Love", freq: 329.63, colors: ["#ffd0cc", "#f08a7e", "#f6d27a", "#6d3146"] },
-    { id: "protect", label: "Guard", freq: 174, colors: ["#d9e7ff", "#8ea7ff", "#66e2cf", "#17243f"] },
-    { id: "focus", label: "Focus", freq: 220, colors: ["#f6d27a", "#f2f7ee", "#66e2cf", "#233326"] },
-    { id: "renewal", label: "Renew", freq: 293.66, colors: ["#b8f4b3", "#66e2cf", "#f6d27a", "#153d31"] }
+    { id: "calm", label: "Calm", freq: 196, colors: ["#f4d890", "#d9a85f", "#c77c63", "#2a1710"] },
+    { id: "clarity", label: "Clarity", freq: 261.63, colors: ["#fff0c8", "#e5bd71", "#c58b54", "#2b1b14"] },
+    { id: "love", label: "Love", freq: 329.63, colors: ["#ffd2bd", "#c77c63", "#e8c46d", "#3b1a17"] },
+    { id: "protect", label: "Guard", freq: 174, colors: ["#f1d38a", "#9f7248", "#d6a65d", "#17100d"] },
+    { id: "focus", label: "Focus", freq: 220, colors: ["#f8e0a0", "#c8914f", "#f4efe2", "#241810"] },
+    { id: "renewal", label: "Renew", freq: 293.66, colors: ["#f2d288", "#b98245", "#d09a50", "#1e160f"] }
   ];
 
   const palettes = [
-    ["#f6d27a", "#66e2cf", "#f08a7e", "#8ea7ff"],
-    ["#f8f3dc", "#80e7ff", "#d8ffb6", "#223a57"],
-    ["#ffc4b8", "#f08a7e", "#f6d27a", "#5e2940"],
-    ["#a9ffe8", "#66e2cf", "#f7e6a2", "#183a3f"],
-    ["#d9e7ff", "#8ea7ff", "#f2f7ee", "#1f2f4f"],
-    ["#f6d27a", "#f08a7e", "#d8ffb6", "#21150f"]
+    ["#f4d890", "#d9a85f", "#c77c63", "#2a1710"],
+    ["#fff0c8", "#e5bd71", "#b98245", "#20140d"],
+    ["#ffd2bd", "#c77c63", "#e8c46d", "#3b1a17"],
+    ["#f1d38a", "#9f7248", "#d6a65d", "#17100d"],
+    ["#f4efe2", "#d09a50", "#b98c5a", "#1c1510"],
+    ["#f2d288", "#b98245", "#bc7566", "#21150f"]
   ];
 
   const toneFamilyPalette = {
     ink: "#0b0707",
     inkSoft: "#130d0c",
-    parchment: "#f2eadf",
-    gold: "#e8d7b2",
-    amber: "#bd8d64",
-    rose: "#b98574",
-    teal: "#86bdb4",
+    parchment: "#f4efe2",
+    gold: "#e8c46d",
+    amber: "#b98245",
+    rose: "#bc7566",
+    teal: "#d09a50",
     shadow: "#050303"
   };
 
@@ -45,15 +45,15 @@
 
   const materialProfiles = [
     { id: "gold", label: "Gold", line: 1, face: 0.14, glow: 1.1, metalness: 0.62, roughness: 0.24, thickness: 1.2, particle: 1, palette: null },
-    { id: "glass", label: "Glass", line: 0.82, face: 0.11, glow: 0.86, metalness: 0.12, roughness: 0.08, thickness: 0.9, particle: 0.8, palette: ["#f8f3dc", "#8ee8ff", "#d9e7ff", "#1f4f4a"] },
-    { id: "crystal", label: "Crystal", line: 0.95, face: 0.16, glow: 1.3, metalness: 0.28, roughness: 0.12, thickness: 1, particle: 1.25, palette: ["#f8f3dc", "#80e7ff", "#ffc4ff", "#223a57"] },
-    { id: "ink", label: "Ink", line: 0.72, face: 0.04, glow: 0.22, metalness: 0.02, roughness: 0.8, thickness: 0.82, particle: 0.35, palette: ["#f2f7ee", "#121619", "#8ea7ff", "#05070a"] },
-    { id: "neon", label: "Neon", line: 1.18, face: 0.08, glow: 1.55, metalness: 0.2, roughness: 0.18, thickness: 1.35, particle: 1.5, palette: ["#f6d27a", "#66e2cf", "#f08a7e", "#14144a"] },
-    { id: "stone", label: "Stone", line: 0.68, face: 0.18, glow: 0.42, metalness: 0.05, roughness: 0.84, thickness: 1.05, particle: 0.45, palette: ["#d8ffb6", "#aeb9a7", "#f6d27a", "#273024"] },
-    { id: "pearl", label: "Pearl", line: 0.9, face: 0.18, glow: 0.98, metalness: 0.18, roughness: 0.18, thickness: 0.95, particle: 1.05, palette: ["#f8f3dc", "#ffd0cc", "#8ee8ff", "#30334f"] },
+    { id: "glass", label: "Glass", line: 0.82, face: 0.11, glow: 0.86, metalness: 0.12, roughness: 0.08, thickness: 0.9, particle: 0.8, palette: ["#fff0c8", "#d09a50", "#f4efe2", "#231812"] },
+    { id: "crystal", label: "Crystal", line: 0.95, face: 0.16, glow: 1.3, metalness: 0.28, roughness: 0.12, thickness: 1, particle: 1.25, palette: ["#fff0c8", "#e5bd71", "#ffd2bd", "#2b1b14"] },
+    { id: "ink", label: "Ink", line: 0.72, face: 0.04, glow: 0.22, metalness: 0.02, roughness: 0.8, thickness: 0.82, particle: 0.35, palette: ["#f4efe2", "#17120e", "#b98245", "#050303"] },
+    { id: "neon", label: "Neon", line: 1.18, face: 0.08, glow: 1.55, metalness: 0.2, roughness: 0.18, thickness: 1.35, particle: 1.5, palette: ["#f6d27a", "#e8c46d", "#bc7566", "#24100d"] },
+    { id: "stone", label: "Stone", line: 0.68, face: 0.18, glow: 0.42, metalness: 0.05, roughness: 0.84, thickness: 1.05, particle: 0.45, palette: ["#d09a50", "#a98a60", "#e8c46d", "#241b12"] },
+    { id: "pearl", label: "Pearl", line: 0.9, face: 0.18, glow: 0.98, metalness: 0.18, roughness: 0.18, thickness: 0.95, particle: 1.05, palette: ["#fff0c8", "#ffd2bd", "#d09a50", "#2c2118"] },
     { id: "fire", label: "Fire", line: 1.12, face: 0.12, glow: 1.45, metalness: 0.16, roughness: 0.3, thickness: 1.22, particle: 1.35, palette: ["#f6d27a", "#f08a7e", "#ffc24d", "#331411"] },
-    { id: "water", label: "Water", line: 0.96, face: 0.13, glow: 1.05, metalness: 0.08, roughness: 0.12, thickness: 0.9, particle: 1.1, palette: ["#d9e7ff", "#66e2cf", "#8ea7ff", "#102d3a"] },
-    { id: "shadow", label: "Shadow", line: 0.6, face: 0.09, glow: 0.3, metalness: 0.1, roughness: 0.56, thickness: 1.05, particle: 0.55, palette: ["#d9e7ff", "#5d6b83", "#8ea7ff", "#05070a"] }
+    { id: "water", label: "Water", line: 0.96, face: 0.13, glow: 1.05, metalness: 0.08, roughness: 0.12, thickness: 0.9, particle: 1.1, palette: ["#f4efe2", "#d09a50", "#c58b54", "#17100d"] },
+    { id: "shadow", label: "Shadow", line: 0.6, face: 0.09, glow: 0.3, metalness: 0.1, roughness: 0.56, thickness: 1.05, particle: 0.55, palette: ["#f1d38a", "#6f5235", "#b98245", "#050303"] }
   ];
 
   const motionPresets = [
@@ -72,6 +72,93 @@
     { id: "particles", label: "Particles", defaultOn: true },
     { id: "toneField", label: "Tone Field", defaultOn: true },
     { id: "intention", label: "Intention", defaultOn: false }
+  ];
+
+  const meaningTagOptions = [
+    { id: "protection", label: "Protection" },
+    { id: "clarity", label: "Clarity" },
+    { id: "healing", label: "Healing" },
+    { id: "transformation", label: "Transform" },
+    { id: "return", label: "Return" },
+    { id: "devotion", label: "Devotion" },
+    { id: "release", label: "Release" },
+    { id: "integration", label: "Integrate" }
+  ];
+
+  const emotionOptions = [
+    { id: "peace", label: "Peace", defaultValue: 5 },
+    { id: "joy", label: "Joy", defaultValue: 5 },
+    { id: "courage", label: "Courage", defaultValue: 5 },
+    { id: "grief", label: "Grief", defaultValue: 3 },
+    { id: "anxiety", label: "Anxiety", defaultValue: 2 }
+  ];
+
+  const scenePresets = [
+    { id: "void", label: "Void", ink: "#0b0707", mid: "#21120f", glow: "#d09a50", accent: "#e8c46d" },
+    { id: "aurora", label: "Aurora", ink: "#120807", mid: "#3b1f12", glow: "#e8c46d", accent: "#bc7566" },
+    { id: "crop-field", label: "Crop Field", ink: "#130d09", mid: "#2a1d12", glow: "#b98c5a", accent: "#f1d38a" },
+    { id: "starfield", label: "Starfield", ink: "#050303", mid: "#14100d", glow: "#f4efe2", accent: "#e8c46d" },
+    { id: "temple-smoke", label: "Temple Smoke", ink: "#100807", mid: "#2d1810", glow: "#b98245", accent: "#f4efe2" },
+    { id: "paper-ink", label: "Paper Ink", ink: "#ece2cf", mid: "#cdbf9f", glow: "#8c7250", accent: "#15120e" },
+    { id: "water-veil", label: "Water Veil", ink: "#0c0a08", mid: "#241911", glow: "#d09a50", accent: "#fff0c8" },
+    { id: "dawn", label: "Dawn", ink: "#1d1418", mid: "#5e2940", glow: "#ffd2bd", accent: "#e8c46d" },
+    { id: "obsidian", label: "Obsidian", ink: "#030303", mid: "#0f0b08", glow: "#6f5235", accent: "#f1d38a" },
+    { id: "transparent", label: "Transparent", ink: "#000000", mid: "#000000", glow: "#d09a50", accent: "#e8c46d" }
+  ];
+
+  const particleMotionOptions = [
+    { id: "still", label: "Still" },
+    { id: "drift", label: "Drift" },
+    { id: "orbit", label: "Orbit" },
+    { id: "breath", label: "Breath" },
+    { id: "spark", label: "Spark" },
+    { id: "comet", label: "Comet" },
+    { id: "tone-sync", label: "Tone Sync" },
+    { id: "node-magnet", label: "Node Magnet" }
+  ];
+
+  const soundPresets = [
+    { id: "tone", label: "Current Tone", frequency: null },
+    { id: "solfeggio-396", label: "396 Hz", frequency: 396 },
+    { id: "solfeggio-432", label: "432 Hz", frequency: 432 },
+    { id: "solfeggio-528", label: "528 Hz", frequency: 528 },
+    { id: "solfeggio-639", label: "639 Hz", frequency: 639 },
+    { id: "solfeggio-741", label: "741 Hz", frequency: 741 },
+    { id: "solfeggio-852", label: "852 Hz", frequency: 852 },
+    { id: "custom", label: "Custom", frequency: null }
+  ];
+
+  const breathPatterns = [
+    { id: "free", label: "Free Breath", rate: 0.45, depth: 1 },
+    { id: "box", label: "Box 4-4-4-4", rate: 0.34, depth: 0.88 },
+    { id: "release-448", label: "Release 4-4-8", rate: 0.28, depth: 1.22 },
+    { id: "coherent", label: "Coherent 5-5", rate: 0.2, depth: 1.08 },
+    { id: "kasina", label: "Kasina Still", rate: 0.12, depth: 0.46 }
+  ];
+
+  const reflectionPrompts = [
+    "What is this glyph protecting or clarifying?",
+    "Where does this symbol live in the body?",
+    "What feeling should soften when this glyph is revisited?",
+    "What colour feels like the truest part of this glyph?",
+    "What should this glyph help you remember?"
+  ];
+
+  const symbolContextItems = [
+    { id: "spiral", label: "Spiral", summary: "A path of return, growth, unwinding, and re-entry." },
+    { id: "eye", label: "Eye", summary: "Witnessing, attention, perception, and protection." },
+    { id: "ankh", label: "Ankh", summary: "Life-force, continuity, and threshold imagery." },
+    { id: "labyrinth", label: "Labyrinth", summary: "A slow inward path for reflection and ritual walking." },
+    { id: "tree", label: "Tree", summary: "Root, branch, lineage, and layered ascent." },
+    { id: "caduceus", label: "Caduceus", summary: "Twin currents, balance, and a central channel." }
+  ];
+
+  const primitiveOptions = [
+    { id: "circle", label: "Circle" },
+    { id: "line", label: "Line" },
+    { id: "triangle", label: "Triangle" },
+    { id: "spiral", label: "Spiral" },
+    { id: "curve", label: "Curve" }
   ];
 
   const seedCategoryLabels = {
@@ -229,6 +316,13 @@
       ]
     },
     {
+      id: "custom",
+      label: "Custom",
+      seeds: [
+        { id: "personal-glyph", label: "Personal Glyph", category: "core", summary: "A user-built glyph made from circles, lines, triangles, spirals, curves, symmetry, and mirror rules." }
+      ]
+    },
+    {
       id: "tone",
       label: "Tone",
       seeds: [
@@ -289,6 +383,17 @@
     layers: Object.fromEntries(layerOptions.map((layer) => [layer.id, layer.defaultOn])),
     premiumPack: "core",
     pan: { x: 0, y: 0 },
+    meaning: {
+      tags: [],
+      emotions: Object.fromEntries(emotionOptions.map((emotion) => [emotion.id, emotion.defaultValue]))
+    },
+    journal: "",
+    scene: { preset: "void", intensity: 5, motion: 3, grain: 3 },
+    particles: { motion: "drift", density: 5, speed: 4, trails: 2 },
+    sound: { preset: "tone", frequency: toneProfiles[0].freq, volume: 5, uploadedName: "", recordedName: "" },
+    breathPattern: "free",
+    reflectionIndex: 0,
+    customGlyph: { symmetry: "free", mirror: "none", layers: [] },
     family: "sacred",
     seed: "metatron",
     seedCategory: "all",
@@ -326,6 +431,7 @@
     buildPremiumControls();
     buildToneControls();
     buildPaletteControls();
+    buildStudioControls();
     bindControls();
     applyTheme();
     updateUI();
@@ -344,6 +450,12 @@
     refs.stageHint = document.getElementById("stage-hint");
     refs.controlTabs = Array.from(document.querySelectorAll(".control-tab[data-control-tab]"));
     refs.intention = document.getElementById("intention-input");
+    refs.meaningTags = document.getElementById("meaning-tag-options");
+    refs.emotionRanges = document.getElementById("emotion-ranges");
+    refs.journal = document.getElementById("journal-input");
+    refs.reflectionPrompt = document.getElementById("reflection-prompt");
+    refs.reflectionNext = document.getElementById("reflection-next-button");
+    refs.breathPattern = document.getElementById("breath-pattern-select");
     refs.toneOptions = document.getElementById("tone-options");
     refs.familyOptions = document.getElementById("family-options");
     refs.seedSelect = document.getElementById("seed-select");
@@ -358,6 +470,23 @@
     refs.motion = document.getElementById("motion-select");
     refs.zoom = document.getElementById("zoom-range");
     refs.zoomOutput = document.getElementById("zoom-output");
+    refs.scenePreset = document.getElementById("scene-preset-select");
+    refs.particleMotion = document.getElementById("particle-motion-select");
+    refs.soundPreset = document.getElementById("sound-preset-select");
+    refs.soundFrequency = document.getElementById("sound-frequency-range");
+    refs.soundFrequencyOutput = document.getElementById("sound-frequency-output");
+    refs.soundVolume = document.getElementById("sound-volume-range");
+    refs.soundVolumeOutput = document.getElementById("sound-volume-output");
+    refs.soundPlay = document.getElementById("play-sound-button");
+    refs.soundUpload = document.getElementById("sound-upload-input");
+    refs.soundRecord = document.getElementById("record-sound-button");
+    refs.soundSource = document.getElementById("sound-source-label");
+    refs.primitiveOptions = document.getElementById("primitive-options");
+    refs.customSymmetry = document.getElementById("custom-symmetry-select");
+    refs.customMirror = document.getElementById("custom-mirror-select");
+    refs.customLayerCount = document.getElementById("custom-layer-count");
+    refs.clearCustom = document.getElementById("clear-custom-button");
+    refs.symbolContext = document.getElementById("symbol-context-options");
     refs.layerOptions = document.getElementById("layer-options");
     refs.premium = document.getElementById("premium-select");
     refs.premiumSummary = document.getElementById("premium-summary");
@@ -369,6 +498,26 @@
       depth: document.getElementById("depth-range"),
       aura: document.getElementById("aura-range"),
       breath: document.getElementById("breath-range")
+    };
+    refs.sceneRanges = {
+      intensity: document.getElementById("scene-intensity-range"),
+      motion: document.getElementById("scene-motion-range"),
+      grain: document.getElementById("scene-grain-range")
+    };
+    refs.sceneOutputs = {
+      intensity: document.getElementById("scene-intensity-output"),
+      motion: document.getElementById("scene-motion-output"),
+      grain: document.getElementById("scene-grain-output")
+    };
+    refs.particleRanges = {
+      density: document.getElementById("particle-density-range"),
+      speed: document.getElementById("particle-speed-range"),
+      trails: document.getElementById("particle-trails-range")
+    };
+    refs.particleOutputs = {
+      density: document.getElementById("particle-density-output"),
+      speed: document.getElementById("particle-speed-output"),
+      trails: document.getElementById("particle-trails-output")
     };
     refs.outputs = {
       symmetry: document.getElementById("symmetry-output"),
@@ -410,6 +559,21 @@
       state.sealedAt = null;
       state.sealSignature = null;
       updateUI();
+    });
+    refs.journal.addEventListener("input", () => {
+      state.journal = refs.journal.value.trim();
+      updateUI();
+    });
+    refs.reflectionNext.addEventListener("click", () => {
+      state.reflectionIndex = (state.reflectionIndex + 1) % reflectionPrompts.length;
+      updateUI();
+      showToast("Reflection prompt");
+    });
+    refs.breathPattern.addEventListener("change", () => {
+      state.breathPattern = breathPatterns.some((pattern) => pattern.id === refs.breathPattern.value) ? refs.breathPattern.value : "free";
+      state.activePulse = performance.now();
+      updateUI();
+      showToast("Breath: " + currentBreathPattern().label);
     });
 
     refs.colorInputs.forEach((input) => {
@@ -456,6 +620,47 @@
       state.zoom = Number(refs.zoom.value) / 100;
       updateUI();
     });
+    refs.scenePreset.addEventListener("change", () => {
+      state.scene.preset = scenePresets.some((scene) => scene.id === refs.scenePreset.value) ? refs.scenePreset.value : "void";
+      applyTheme();
+      updateUI();
+      showToast("Scene: " + currentScene().label);
+    });
+    refs.particleMotion.addEventListener("change", () => {
+      state.particles.motion = particleMotionOptions.some((mode) => mode.id === refs.particleMotion.value) ? refs.particleMotion.value : "drift";
+      state.activePulse = performance.now();
+      updateUI();
+      showToast("Orbs: " + currentParticleMotion().label);
+    });
+    Object.keys(refs.sceneRanges).forEach((key) => {
+      refs.sceneRanges[key].addEventListener("input", () => {
+        state.scene[key] = Number(refs.sceneRanges[key].value);
+        applyTheme();
+        updateUI();
+      });
+    });
+    Object.keys(refs.particleRanges).forEach((key) => {
+      refs.particleRanges[key].addEventListener("input", () => {
+        state.particles[key] = Number(refs.particleRanges[key].value);
+        updateUI();
+      });
+    });
+    refs.soundPreset.addEventListener("change", () => {
+      setSoundPreset(refs.soundPreset.value);
+    });
+    refs.soundFrequency.addEventListener("input", () => {
+      state.sound.frequency = Number(refs.soundFrequency.value);
+      const matchedPreset = soundPresets.find((preset) => preset.frequency === state.sound.frequency);
+      state.sound.preset = matchedPreset ? matchedPreset.id : "custom";
+      updateUI();
+    });
+    refs.soundVolume.addEventListener("input", () => {
+      state.sound.volume = Number(refs.soundVolume.value);
+      updateUI();
+    });
+    refs.soundPlay.addEventListener("click", () => playSoundGlyph());
+    refs.soundUpload.addEventListener("change", () => handleSoundUpload(refs.soundUpload.files && refs.soundUpload.files[0]));
+    refs.soundRecord.addEventListener("click", () => recordSoundGlyph());
     refs.premium.addEventListener("change", () => applyPremiumPack(refs.premium.value));
     Object.keys(refs.ranges).forEach((key) => {
       refs.ranges[key].addEventListener("input", () => {
@@ -470,6 +675,21 @@
     refs.clearGesture.addEventListener("click", () => {
       state.gesture = [];
       rebuildGlyph("Trace cleared");
+    });
+    refs.customSymmetry.addEventListener("change", () => {
+      state.customGlyph.symmetry = refs.customSymmetry.value;
+      rebuildGlyph("Custom repeat");
+    });
+    refs.customMirror.addEventListener("change", () => {
+      state.customGlyph.mirror = refs.customMirror.value;
+      rebuildGlyph("Custom mirror");
+    });
+    refs.clearCustom.addEventListener("click", () => {
+      state.customGlyph.layers = [];
+      state.family = "custom";
+      state.seed = "personal-glyph";
+      buildSeedControls();
+      rebuildGlyph("Custom cleared");
     });
     refs.recipe.addEventListener("click", downloadRecipe);
 
@@ -684,6 +904,7 @@
       button.addEventListener("click", () => {
         state.tone = tone.id;
         state.colors = tone.colors.slice();
+        if (state.sound.preset === "tone") state.sound.frequency = tone.freq;
         state.sealedAt = null;
         state.sealSignature = null;
         applyTheme();
@@ -719,6 +940,218 @@
       });
       refs.paletteOptions.append(button);
     });
+  }
+
+  function buildStudioControls() {
+    refs.meaningTags.innerHTML = "";
+    meaningTagOptions.forEach((tag) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "studio-chip meaning-chip";
+      button.textContent = tag.label;
+      button.dataset.meaningTag = tag.id;
+      button.addEventListener("click", () => toggleMeaningTag(tag.id));
+      refs.meaningTags.append(button);
+    });
+
+    refs.emotionRanges.innerHTML = "";
+    emotionOptions.forEach((emotion) => {
+      const label = document.createElement("label");
+      const text = document.createElement("span");
+      text.textContent = emotion.label;
+      const input = document.createElement("input");
+      input.id = "emotion-" + emotion.id + "-range";
+      input.type = "range";
+      input.min = "0";
+      input.max = "9";
+      input.step = "1";
+      input.value = state.meaning.emotions[emotion.id] || emotion.defaultValue;
+      const output = document.createElement("output");
+      output.id = "emotion-" + emotion.id + "-output";
+      output.textContent = input.value;
+      input.addEventListener("input", () => {
+        state.meaning.emotions[emotion.id] = Number(input.value);
+        updateUI();
+      });
+      label.append(text, input, output);
+      refs.emotionRanges.append(label);
+    });
+
+    refs.breathPattern.innerHTML = "";
+    breathPatterns.forEach((pattern) => {
+      const option = document.createElement("option");
+      option.value = pattern.id;
+      option.textContent = pattern.label;
+      refs.breathPattern.append(option);
+    });
+
+    refs.scenePreset.innerHTML = "";
+    scenePresets.forEach((scene) => {
+      const option = document.createElement("option");
+      option.value = scene.id;
+      option.textContent = scene.label;
+      refs.scenePreset.append(option);
+    });
+    refs.particleMotion.innerHTML = "";
+    particleMotionOptions.forEach((motion) => {
+      const option = document.createElement("option");
+      option.value = motion.id;
+      option.textContent = motion.label;
+      refs.particleMotion.append(option);
+    });
+
+    refs.soundPreset.innerHTML = "";
+    soundPresets.forEach((preset) => {
+      const option = document.createElement("option");
+      option.value = preset.id;
+      option.textContent = preset.label;
+      refs.soundPreset.append(option);
+    });
+
+    refs.primitiveOptions.innerHTML = "";
+    primitiveOptions.forEach((primitive) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "studio-chip primitive-chip";
+      button.textContent = primitive.label;
+      button.dataset.primitive = primitive.id;
+      button.addEventListener("click", () => addCustomPrimitive(primitive.id));
+      refs.primitiveOptions.append(button);
+    });
+
+    refs.symbolContext.innerHTML = "";
+    symbolContextItems.forEach((item) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "context-card";
+      button.dataset.contextSymbol = item.id;
+      const title = document.createElement("strong");
+      title.textContent = item.label;
+      const summary = document.createElement("span");
+      summary.textContent = item.summary;
+      button.append(title, summary);
+      button.addEventListener("click", () => applySymbolContext(item));
+      refs.symbolContext.append(button);
+    });
+  }
+
+  function toggleMeaningTag(tagId) {
+    if (!meaningTagOptions.some((tag) => tag.id === tagId)) return;
+    const exists = state.meaning.tags.includes(tagId);
+    state.meaning.tags = exists ? state.meaning.tags.filter((tag) => tag !== tagId) : state.meaning.tags.concat(tagId).slice(-6);
+    state.sealedAt = null;
+    state.sealSignature = null;
+    updateUI();
+    showToast((exists ? "Removed " : "Tagged ") + meaningTagLabel(tagId));
+  }
+
+  function meaningTagLabel(tagId) {
+    const tag = meaningTagOptions.find((item) => item.id === tagId);
+    return tag ? tag.label : tagId;
+  }
+
+  function addCustomPrimitive(type) {
+    if (!primitiveOptions.some((primitive) => primitive.id === type)) return;
+    const layerIndex = state.customGlyph.layers.length;
+    state.customGlyph.layers.push({
+      id: String(Date.now()) + "-" + layerIndex,
+      type,
+      size: 0.76 + (layerIndex % 4) * 0.16,
+      rotation: (layerIndex % 8) * Math.PI / 8,
+      x: ((layerIndex % 3) - 1) * 0.18,
+      y: (Math.floor(layerIndex / 3) % 3 - 1) * 0.16,
+      opacity: 0.78
+    });
+    state.family = "custom";
+    state.seed = "personal-glyph";
+    state.seedCategory = "all";
+    buildSeedControls();
+    applyFamilyDefaults();
+    rebuildGlyph("Added " + primitiveLabel(type));
+  }
+
+  function primitiveLabel(type) {
+    const primitive = primitiveOptions.find((item) => item.id === type);
+    return primitive ? primitive.label : type;
+  }
+
+  function applySymbolContext(item) {
+    const tag = meaningTagOptions.find((option) => item.label.toLowerCase().includes(option.id) || option.id === item.id);
+    if (tag && !state.meaning.tags.includes(tag.id)) state.meaning.tags = state.meaning.tags.concat(tag.id).slice(-6);
+    state.journal = (state.journal ? state.journal + "\n" : "") + item.label + ": " + item.summary;
+    refs.journal.value = state.journal;
+    updateUI();
+    showToast(item.label);
+  }
+
+  function setSoundPreset(presetId) {
+    const preset = soundPresets.find((item) => item.id === presetId) || soundPresets[0];
+    state.sound.preset = preset.id;
+    state.sound.frequency = preset.frequency || currentTone().freq;
+    updateUI();
+    pulse(state.sound.frequency, 0.04 + state.sound.volume * 0.012);
+    showToast("Sound: " + preset.label);
+  }
+
+  function playSoundGlyph() {
+    if (state.sound.objectUrl) {
+      const audio = new Audio(state.sound.objectUrl);
+      audio.volume = clampFloat(state.sound.volume / 9, 0.05, 1);
+      audio.play().catch(() => pulse(soundFrequency(), 0.05));
+      return;
+    }
+    pulse(soundFrequency(), 0.045 + state.sound.volume * 0.014);
+  }
+
+  function soundFrequency() {
+    return clampNumber(state.sound.frequency || currentTone().freq, 80, 1200, currentTone().freq);
+  }
+
+  function handleSoundUpload(file) {
+    if (!file) return;
+    if (state.sound.objectUrl) URL.revokeObjectURL(state.sound.objectUrl);
+    state.sound.objectUrl = URL.createObjectURL(file);
+    state.sound.uploadedName = file.name.slice(0, 60);
+    state.sound.recordedName = "";
+    state.sound.preset = "custom";
+    updateUI();
+    showToast("Sound uploaded");
+  }
+
+  async function recordSoundGlyph() {
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      showToast("Recording unavailable");
+      return;
+    }
+    if (state.sound.recorder && state.sound.recorder.state === "recording") {
+      state.sound.recorder.stop();
+      refs.soundRecord.textContent = "Record";
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+      recorder.addEventListener("dataavailable", (event) => {
+        if (event.data && event.data.size) chunks.push(event.data);
+      });
+      recorder.addEventListener("stop", () => {
+        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+        if (state.sound.objectUrl) URL.revokeObjectURL(state.sound.objectUrl);
+        state.sound.objectUrl = URL.createObjectURL(blob);
+        state.sound.recordedName = "Recorded tone";
+        state.sound.uploadedName = "";
+        stream.getTracks().forEach((track) => track.stop());
+        updateUI();
+        showToast("Sound recorded");
+      });
+      state.sound.recorder = recorder;
+      recorder.start();
+      refs.soundRecord.textContent = "Stop";
+      showToast("Recording");
+    } catch {
+      showToast("Mic permission needed");
+    }
   }
 
   async function startRenderer() {
@@ -890,11 +1323,12 @@
     const record = {
       id: String(Date.now()),
       createdAt: new Date().toISOString(),
-      schemaVersion: 4,
+      schemaVersion: 5,
       intention: state.intention,
       tone: state.tone,
       colors: state.colors.slice(),
       mode: state.mode,
+      meaningTags: state.meaning.tags.slice(),
       sealedAt: state.sealedAt,
       recipe: createRecipeSnapshot()
     };
@@ -1007,6 +1441,42 @@
     refs.motion.value = state.motionPreset;
     refs.zoom.value = Math.round(state.zoom * 100);
     refs.zoomOutput.textContent = state.zoom.toFixed(2);
+    refs.journal.value = state.journal;
+    refs.reflectionPrompt.textContent = reflectionPrompts[state.reflectionIndex % reflectionPrompts.length];
+    refs.breathPattern.value = state.breathPattern;
+    Array.from(refs.meaningTags.children).forEach((button) => {
+      const active = state.meaning.tags.includes(button.dataset.meaningTag);
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    emotionOptions.forEach((emotion) => {
+      const input = document.getElementById("emotion-" + emotion.id + "-range");
+      const output = document.getElementById("emotion-" + emotion.id + "-output");
+      const value = String(state.meaning.emotions[emotion.id] ?? emotion.defaultValue);
+      if (input && input.value !== value) input.value = value;
+      if (output) output.textContent = value;
+    });
+    refs.scenePreset.value = state.scene.preset;
+    refs.particleMotion.value = state.particles.motion;
+    Object.keys(refs.sceneRanges).forEach((key) => {
+      const value = String(state.scene[key]);
+      if (refs.sceneRanges[key].value !== value) refs.sceneRanges[key].value = value;
+      refs.sceneOutputs[key].textContent = value;
+    });
+    Object.keys(refs.particleRanges).forEach((key) => {
+      const value = String(state.particles[key]);
+      if (refs.particleRanges[key].value !== value) refs.particleRanges[key].value = value;
+      refs.particleOutputs[key].textContent = value;
+    });
+    refs.soundPreset.value = state.sound.preset;
+    refs.soundFrequency.value = Math.round(soundFrequency());
+    refs.soundFrequencyOutput.textContent = Math.round(soundFrequency());
+    refs.soundVolume.value = state.sound.volume;
+    refs.soundVolumeOutput.textContent = state.sound.volume;
+    refs.soundSource.textContent = state.sound.uploadedName || state.sound.recordedName || currentSoundPresetLabel();
+    refs.customSymmetry.value = state.customGlyph.symmetry;
+    refs.customMirror.value = state.customGlyph.mirror;
+    refs.customLayerCount.textContent = state.customGlyph.layers.length + (state.customGlyph.layers.length === 1 ? " layer" : " layers");
     refs.premium.value = state.premiumPack;
     refs.premiumSummary.textContent = currentPremiumPack().summary;
     Array.from(refs.layerOptions.querySelectorAll("input[data-layer]")).forEach((input) => {
@@ -1022,6 +1492,15 @@
     state.colors.forEach((color, index) => {
       root.style.setProperty("--tone-" + String.fromCharCode(97 + index), color);
     });
+    const scene = currentScene();
+    document.body.dataset.scene = scene.id;
+    root.style.setProperty("--scene-ink", scene.ink);
+    root.style.setProperty("--scene-mid", scene.mid);
+    root.style.setProperty("--scene-glow", scene.glow);
+    root.style.setProperty("--scene-accent", scene.accent);
+    root.style.setProperty("--scene-intensity", state.scene.intensity / 9);
+    root.style.setProperty("--scene-motion", state.scene.motion / 9);
+    root.style.setProperty("--scene-grain", state.scene.grain / 9);
     if (state.renderer && state.renderer.updateTheme) state.renderer.updateTheme();
   }
 
@@ -1057,6 +1536,23 @@
     return premiumPacks.find((item) => item.id === state.premiumPack) || premiumPacks[0];
   }
 
+  function currentScene() {
+    return scenePresets.find((item) => item.id === state.scene.preset) || scenePresets[0];
+  }
+
+  function currentParticleMotion() {
+    return particleMotionOptions.find((item) => item.id === state.particles.motion) || particleMotionOptions[1];
+  }
+
+  function currentBreathPattern() {
+    return breathPatterns.find((item) => item.id === state.breathPattern) || breathPatterns[0];
+  }
+
+  function currentSoundPresetLabel() {
+    const preset = soundPresets.find((item) => item.id === state.sound.preset);
+    return preset ? preset.label + " oscillator" : "Custom oscillator";
+  }
+
   function layerEnabled(id) {
     return Boolean(state.layers[id]);
   }
@@ -1075,7 +1571,10 @@
       lineOpacity: material.line,
       glow: material.glow,
       thickness: material.thickness,
-      particle: material.particle
+      particle: material.particle,
+      scene: state.scene,
+      particles: state.particles,
+      breathPattern: currentBreathPattern()
     };
   }
 
@@ -1113,7 +1612,7 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       const v2Saves = raw ? JSON.parse(raw) : [];
       if (Array.isArray(v2Saves) && v2Saves.length) {
-        state.saves = v2Saves;
+        state.saves = v2Saves.map(normalizeSavedRecord);
       } else {
         const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
         const legacy = legacyRaw ? JSON.parse(legacyRaw) : [];
@@ -1133,6 +1632,37 @@
       state.saves = [];
     }
     renderSaves();
+  }
+
+  function normalizeSavedRecord(record) {
+    const recipe = normalizeRecipe(record && record.recipe ? record.recipe : legacyRecipeFromRecord(record || {}));
+    return {
+      id: record && record.id ? String(record.id) : recipe.id || String(Date.now()),
+      createdAt: record && record.createdAt ? record.createdAt : recipe.createdAt || new Date().toISOString(),
+      schemaVersion: 5,
+      intention: recipe.intention || "",
+      tone: recipe.tone || "calm",
+      colors: Array.isArray(recipe.colors) ? recipe.colors.slice(0, 4) : toneProfiles[0].colors.slice(),
+      mode: recipe.mode || "ritual",
+      sealedAt: recipe.sealedAt || null,
+      meaningTags: recipe.meaning.tags.slice(),
+      recipe
+    };
+  }
+
+  function normalizeRecipe(recipe) {
+    const safe = recipe || legacyRecipeFromRecord({});
+    return {
+      ...safe,
+      schemaVersion: Math.max(5, Number(safe.schemaVersion) || 5),
+      meaning: normalizeMeaning(safe.meaning),
+      journal: typeof safe.journal === "string" ? safe.journal.slice(0, 420) : "",
+      scene: normalizeScene(safe.scene),
+      particles: normalizeParticles(safe.particles),
+      sound: normalizeSound(safe.sound),
+      breathPattern: breathPatterns.some((pattern) => pattern.id === safe.breathPattern) ? safe.breathPattern : "free",
+      customGlyph: normalizeCustomGlyph(safe.customGlyph)
+    };
   }
 
   function persistSaves() {
@@ -1156,7 +1686,8 @@
       const dot = document.createElement("span");
       dot.style.setProperty("--chip-color", record.colors && record.colors[0] ? record.colors[0] : "#f6d27a");
       const seed = record.recipe && record.recipe.seed ? seedLabel(record.recipe.seed) : toneLabel(record.tone);
-      const text = document.createTextNode(record.intention ? record.intention.slice(0, 22) : seed);
+      const tag = record.meaningTags && record.meaningTags[0] ? meaningTagLabel(record.meaningTags[0]) : "";
+      const text = document.createTextNode(record.intention ? record.intention.slice(0, 22) : tag || seed);
       button.append(dot, text);
       refs.savedGlyphs.append(button);
     });
@@ -1181,6 +1712,7 @@
       sacred: { symmetry: 6, density: 6, orbits: 2, depth: 1, aura: 5, breath: 4 },
       elemental: { symmetry: 4, density: 5, orbits: 2, depth: 4, aura: 5, breath: 4 },
       crop: { symmetry: 9, density: 7, orbits: 3, depth: 2, aura: 7, breath: 5 },
+      custom: { symmetry: 6, density: 6, orbits: 2, depth: 2, aura: 6, breath: 5 },
       tone: { symmetry: 8, density: 6, orbits: 3, depth: 2, aura: 6, breath: 5 },
       ritual: { symmetry: 6, density: 5, orbits: 2, depth: 1, aura: 7, breath: 4 },
       motion: { symmetry: 9, density: 5, orbits: 3, depth: 3, aura: 6, breath: 6 }
@@ -1221,7 +1753,7 @@
 
   function createRecipeSnapshot() {
     return {
-      schemaVersion: 4,
+      schemaVersion: 5,
       id: String(Date.now()),
       createdAt: new Date().toISOString(),
       family: state.family,
@@ -1241,7 +1773,28 @@
       sealedAt: state.sealedAt,
       sealSignature: state.sealSignature ? { ...state.sealSignature } : null,
       builder: { ...state.builder },
-      gesture: state.gesture.slice(-120)
+      gesture: state.gesture.slice(-120),
+      meaning: {
+        tags: state.meaning.tags.slice(0, 8),
+        emotions: { ...state.meaning.emotions }
+      },
+      journal: state.journal.slice(0, 420),
+      scene: { ...state.scene },
+      particles: { ...state.particles },
+      sound: {
+        preset: state.sound.preset,
+        frequency: soundFrequency(),
+        volume: state.sound.volume,
+        uploadedName: state.sound.uploadedName || "",
+        recordedName: state.sound.recordedName || ""
+      },
+      breathPattern: state.breathPattern,
+      reflectionIndex: state.reflectionIndex,
+      customGlyph: {
+        symmetry: state.customGlyph.symmetry,
+        mirror: state.customGlyph.mirror,
+        layers: state.customGlyph.layers.map((layer) => ({ ...layer })).slice(-40)
+      }
     };
   }
 
@@ -1264,12 +1817,82 @@
       premiumPack: "core",
       sealedAt: record.sealedAt || null,
       builder: { symmetry: 6, density: 6, orbits: 2, depth: 1, aura: 5, breath: 4, variant: 0 },
-      gesture: []
+      gesture: [],
+      meaning: { tags: [], emotions: Object.fromEntries(emotionOptions.map((emotion) => [emotion.id, emotion.defaultValue])) },
+      journal: "",
+      scene: { preset: "void", intensity: 5, motion: 3, grain: 3 },
+      particles: { motion: "drift", density: 5, speed: 4, trails: 2 },
+      sound: { preset: "tone", frequency: toneProfiles[0].freq, volume: 5, uploadedName: "", recordedName: "" },
+      breathPattern: "free",
+      customGlyph: { symmetry: "free", mirror: "none", layers: [] }
+    };
+  }
+
+  function normalizeMeaning(value) {
+    const source = value && typeof value === "object" ? value : {};
+    const allowedTags = new Set(meaningTagOptions.map((tag) => tag.id));
+    const tags = Array.isArray(source.tags) ? source.tags.filter((tag) => allowedTags.has(tag)).slice(0, 8) : [];
+    const emotions = Object.fromEntries(emotionOptions.map((emotion) => [
+      emotion.id,
+      clampNumber(source.emotions && source.emotions[emotion.id], 0, 9, emotion.defaultValue)
+    ]));
+    return { tags, emotions };
+  }
+
+  function normalizeScene(value) {
+    const source = value && typeof value === "object" ? value : {};
+    return {
+      preset: scenePresets.some((scene) => scene.id === source.preset) ? source.preset : "void",
+      intensity: clampNumber(source.intensity, 1, 9, 5),
+      motion: clampNumber(source.motion, 0, 9, 3),
+      grain: clampNumber(source.grain, 0, 9, 3)
+    };
+  }
+
+  function normalizeParticles(value) {
+    const source = value && typeof value === "object" ? value : {};
+    return {
+      motion: particleMotionOptions.some((mode) => mode.id === source.motion) ? source.motion : "drift",
+      density: clampNumber(source.density, 1, 9, 5),
+      speed: clampNumber(source.speed, 1, 9, 4),
+      trails: clampNumber(source.trails, 0, 9, 2)
+    };
+  }
+
+  function normalizeSound(value) {
+    const source = value && typeof value === "object" ? value : {};
+    return {
+      preset: soundPresets.some((preset) => preset.id === source.preset) ? source.preset : "tone",
+      frequency: clampNumber(source.frequency, 80, 1200, currentTone().freq),
+      volume: clampNumber(source.volume, 1, 9, 5),
+      uploadedName: typeof source.uploadedName === "string" ? source.uploadedName.slice(0, 60) : "",
+      recordedName: typeof source.recordedName === "string" ? source.recordedName.slice(0, 60) : ""
+    };
+  }
+
+  function normalizeCustomGlyph(value) {
+    const source = value && typeof value === "object" ? value : {};
+    const validTypes = new Set(primitiveOptions.map((primitive) => primitive.id));
+    const validSymmetry = new Set(["free", "radial-3", "radial-4", "radial-6", "radial-8"]);
+    const validMirror = new Set(["none", "vertical", "horizontal", "both"]);
+    const layers = Array.isArray(source.layers) ? source.layers.filter((layer) => layer && validTypes.has(layer.type)).slice(-40).map((layer, index) => ({
+      id: typeof layer.id === "string" ? layer.id : "layer-" + index,
+      type: layer.type,
+      size: clampFloat(Number(layer.size) || 0.9, 0.24, 2.4),
+      rotation: Number.isFinite(Number(layer.rotation)) ? Number(layer.rotation) : 0,
+      x: clampFloat(Number(layer.x) || 0, -2, 2),
+      y: clampFloat(Number(layer.y) || 0, -2, 2),
+      opacity: clampFloat(Number(layer.opacity) || 0.78, 0.1, 1)
+    })) : [];
+    return {
+      symmetry: validSymmetry.has(source.symmetry) ? source.symmetry : "free",
+      mirror: validMirror.has(source.mirror) ? source.mirror : "none",
+      layers
     };
   }
 
   function applyRecipe(recipe) {
-    const safe = recipe || legacyRecipeFromRecord({});
+    const safe = normalizeRecipe(recipe || legacyRecipeFromRecord({}));
     const family = glyphFamilies.find((item) => item.id === safe.family) ? safe.family : "sacred";
     const familySeeds = glyphFamilies.find((item) => item.id === family).seeds;
     state.family = family;
@@ -1304,6 +1927,14 @@
       variant: clampNumber(safe.builder && safe.builder.variant, 0, 11, 0)
     };
     state.gesture = Array.isArray(safe.gesture) ? safe.gesture.slice(-120) : [];
+    state.meaning = normalizeMeaning(safe.meaning);
+    state.journal = typeof safe.journal === "string" ? safe.journal.slice(0, 420) : "";
+    state.scene = normalizeScene(safe.scene);
+    state.particles = normalizeParticles(safe.particles);
+    state.sound = normalizeSound(safe.sound);
+    state.breathPattern = breathPatterns.some((pattern) => pattern.id === safe.breathPattern) ? safe.breathPattern : "free";
+    state.customGlyph = normalizeCustomGlyph(safe.customGlyph);
+    state.reflectionIndex = clampNumber(safe.reflectionIndex, 0, reflectionPrompts.length - 1, 0);
   }
 
   function rebuildGlyph(message) {
@@ -1349,11 +1980,12 @@
       const now = audioContext.currentTime;
       const oscillator = audioContext.createOscillator();
       const gain = audioContext.createGain();
+      const scaledGain = gainValue * clampFloat((state.sound && state.sound.volume ? state.sound.volume : 5) / 5, 0.2, 1.8);
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(frequency, now);
       oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.015, now + 0.42);
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(scaledGain, now + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
       oscillator.connect(gain);
       gain.connect(audioContext.destination);
@@ -1376,6 +2008,7 @@
     if (seed === "mirror") return createMirrorGeometry(recipeState);
     if (seed === "gesture") return createGestureGeometry(recipeState);
     if (recipeState.family === "crop") return createCropGeometry(recipeState);
+    if (recipeState.family === "custom") return createCustomGlyphGeometry(recipeState);
     if (recipeState.family === "elemental") return createElementalGeometry(recipeState);
     if (["harmonic", "octave", "chord"].includes(seed)) return createToneGeometry(recipeState);
     if (["seal", "release", "protect", "open", "remember"].includes(seed)) return createRitualGeometry(recipeState);
@@ -1595,6 +2228,100 @@
     const circles = nodes.slice(1).map((_, index) => ({ node: index + 1, radius: 0.74, weight: 0.72, role: "vesica" }));
     circles.push({ node: 0, radius: 0.4, weight: 0.4, role: "center" });
     return normalizeModel({ id: "vesica-chain", label: "Vesica Chain", family: "sacred", nodes, lines, circles, circleRadius: 0.72 });
+  }
+
+  function createCustomGlyphGeometry(recipeState) {
+    const custom = recipeState.customGlyph || { symmetry: "free", mirror: "none", layers: [] };
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0, radius: 1.18 }];
+    const lines = [];
+    const circles = [{ node: 0, radius: 0.32, weight: 0.48, role: "custom-center" }];
+    const layers = custom.layers && custom.layers.length ? custom.layers : [{ id: "origin", type: "circle", size: 0.9, rotation: 0, x: 0, y: 0, opacity: 0.7 }];
+    const repeats = custom.symmetry && custom.symmetry.startsWith("radial-") ? Number(custom.symmetry.split("-")[1]) || 1 : 1;
+    const mirrors = custom.mirror === "both" ? [[1, 1], [-1, 1], [1, -1], [-1, -1]] : custom.mirror === "vertical" ? [[1, 1], [-1, 1]] : custom.mirror === "horizontal" ? [[1, 1], [1, -1]] : [[1, 1]];
+
+    layers.forEach((layer, layerIndex) => {
+      for (let repeat = 0; repeat < repeats; repeat += 1) {
+        const repeatAngle = repeat / repeats * Math.PI * 2;
+        mirrors.forEach(([mirrorX, mirrorY], mirrorIndex) => {
+          addCustomPrimitiveGeometry(recipeState, nodes, lines, circles, layer, layerIndex, repeatAngle, mirrorX, mirrorY, mirrorIndex);
+        });
+      }
+    });
+    if (recipeState.builder.density > 5) {
+      for (let index = 1; index < nodes.length; index += Math.max(2, 10 - recipeState.builder.density)) {
+        lines.push({ from: 0, to: index, weight: 0.18, role: "custom-center-link" });
+      }
+    }
+    circles.push({ node: 0, radius: 1.78, weight: 0.22, role: "custom-field" });
+    return normalizeModel({ id: "personal-glyph", label: "Personal Glyph", family: "custom", nodes, lines, circles, circleRadius: 0.42 });
+  }
+
+  function addCustomPrimitiveGeometry(recipeState, nodes, lines, circles, layer, layerIndex, repeatAngle, mirrorX, mirrorY, mirrorIndex) {
+    const size = layer.size || 0.9;
+    const rotation = (layer.rotation || 0) + repeatAngle;
+    const opacity = layer.opacity || 0.78;
+    const idPrefix = "custom-" + layerIndex + "-" + mirrorIndex + "-" + Math.round(repeatAngle * 1000);
+    const transform = (x, y, zUnit) => {
+      const mirroredX = x * mirrorX + (layer.x || 0) * mirrorX;
+      const mirroredY = y * mirrorY + (layer.y || 0) * mirrorY;
+      const cos = Math.cos(rotation);
+      const sin = Math.sin(rotation);
+      return {
+        x: mirroredX * cos - mirroredY * sin,
+        y: mirroredX * sin + mirroredY * cos,
+        z: zFromDepth(recipeState, zUnit + layerIndex * 0.07),
+        radius: 0.82 + opacity * 0.28
+      };
+    };
+    const addNode = (x, y, zUnit, ring) => {
+      const point = transform(x, y, zUnit);
+      const index = nodes.length;
+      nodes.push({ id: idPrefix + "-" + index, ring, ...point });
+      return index;
+    };
+
+    if (layer.type === "circle") {
+      const center = addNode(0, 0, 0.15, "custom-circle");
+      circles.push({ node: center, radius: size, weight: 0.35 + opacity * 0.28, role: "custom-circle" });
+      return;
+    }
+    if (layer.type === "line") {
+      const from = addNode(-size, 0, 0.2, "custom-line");
+      const to = addNode(size, 0, 0.7, "custom-line");
+      lines.push({ from, to, weight: 0.5 + opacity * 0.25, role: "custom-line" });
+      return;
+    }
+    if (layer.type === "triangle") {
+      const group = [
+        addNode(0, -size, 0.1, "custom-triangle"),
+        addNode(size * 0.9, size * 0.58, 0.45, "custom-triangle"),
+        addNode(-size * 0.9, size * 0.58, 0.75, "custom-triangle")
+      ];
+      lines.push(...ringLines(nodes, group, 0.48 + opacity * 0.28));
+      return;
+    }
+    if (layer.type === "spiral") {
+      const group = [];
+      const count = 9 + recipeState.builder.density;
+      for (let index = 0; index < count; index += 1) {
+        const t = index / (count - 1);
+        const angle = t * Math.PI * 2 * 1.35;
+        group.push(addNode(Math.cos(angle) * size * t, Math.sin(angle) * size * t, t, "custom-spiral"));
+      }
+      for (let index = 0; index < group.length - 1; index += 1) lines.push({ from: group[index], to: group[index + 1], weight: 0.42 + opacity * 0.18, role: "custom-spiral" });
+      return;
+    }
+    if (layer.type === "curve") {
+      const group = [];
+      const count = 8 + Math.floor(recipeState.builder.density / 2);
+      for (let index = 0; index < count; index += 1) {
+        const t = index / (count - 1);
+        const x = (t - 0.5) * size * 2;
+        const y = Math.sin(t * Math.PI) * size * 0.7;
+        group.push(addNode(x, y, t, "custom-curve"));
+      }
+      for (let index = 0; index < group.length - 1; index += 1) lines.push({ from: group[index], to: group[index + 1], weight: 0.4 + opacity * 0.18, role: "custom-curve" });
+    }
   }
 
   function createCropGeometry(recipeState) {
@@ -2562,12 +3289,12 @@
       this.group = new THREE.Group();
       this.scene.add(this.group);
       this.scene.add(new THREE.AmbientLight(0xffffff, 1.05));
-      const keyLight = new THREE.PointLight(0xf6d27a, 2.4, 18);
+      const keyLight = new THREE.PointLight(0xe8c46d, 2.4, 18);
       keyLight.position.set(2.4, -3.2, 4);
       this.scene.add(keyLight);
-      const coolLight = new THREE.PointLight(0x66e2cf, 1.6, 14);
-      coolLight.position.set(-3.2, 2.8, 3);
-      this.scene.add(coolLight);
+      const fillLight = new THREE.PointLight(0xbc7566, 1.35, 14);
+      fillLight.position.set(-3.2, 2.8, 3);
+      this.scene.add(fillLight);
 
       this.raycaster = new THREE.Raycaster();
       this.pointer = new THREE.Vector2();
@@ -2672,7 +3399,7 @@
 
       if (settings.showParticles) {
         const particleGeometry = new THREE.SphereGeometry(0.027 * materialProfile.particle, 14, 10);
-        const particleCount = 36 + this.state.builder.aura * 8;
+        const particleCount = 24 + this.state.builder.aura * 6 + this.state.particles.density * 8;
         for (let index = 0; index < particleCount; index += 1) {
           const t = index / particleCount;
           const angle = t * Math.PI * 2 * (2 + this.state.builder.orbits * 0.25);
@@ -2687,13 +3414,13 @@
             emissive: index % 3 === 0 ? colors[2] : colors[1],
             emissiveIntensity: 0.55 * materialProfile.glow,
             transparent: true,
-            opacity: 0.16 + materialProfile.particle * 0.08,
+            opacity: 0.12 + materialProfile.particle * 0.06 + this.state.particles.trails * 0.012,
             roughness: materialProfile.roughness,
             metalness: materialProfile.metalness
           });
           const particle = new THREE.Mesh(particleGeometry, particleMaterial);
           particle.position.copy(point3);
-          particle.userData = { base: point3.clone(), phase: angle, baseOpacity: particleMaterial.opacity };
+          particle.userData = { base: point3.clone(), phase: angle, baseOpacity: particleMaterial.opacity, index, t };
           this.particleMeshes.push(particle);
           this.group.add(particle);
         }
@@ -2852,8 +3579,9 @@
       const solidForm = this.model.family === "elemental";
       const motion = currentMotion();
       const settings = renderSettings();
-      const breathRate = mode === "breath" ? 1.35 : 0.45 + motion.pulse * 0.18;
-      const breathDepth = (mode === "breath" ? 0.08 : 0.018) * currentShapeType().breath * Math.max(0.2, motion.pulse);
+      const breathPattern = currentBreathPattern();
+      const breathRate = mode === "breath" ? breathPattern.rate * 6.4 : 0.45 + motion.pulse * 0.18;
+      const breathDepth = (mode === "breath" ? 0.08 * breathPattern.depth : 0.018) * currentShapeType().breath * Math.max(0.2, motion.pulse);
       const breath = reduced || trueGlyph ? 1 : 1 + Math.sin(seconds * breathRate) * breathDepth;
       const sealPulse = this.state.sealedAt ? Math.max(0, 1 - (Date.now() - this.state.sealedAt) / 5200) : 0;
       const tapPulse = Math.max(0, 1 - (now - this.state.activePulse) / 1300);
@@ -2901,14 +3629,44 @@
       });
 
       this.particleMeshes.forEach((mesh, index) => {
-        const phase = mesh.userData.phase + seconds * (0.18 + motion.spin * 0.08);
+        const particleMode = this.state.particles.motion;
+        const particleSpeed = reduced ? 0 : 0.1 + this.state.particles.speed * 0.055;
+        const phase = mesh.userData.phase + seconds * (particleSpeed + motion.spin * 0.08);
         const base = mesh.userData.base;
-        mesh.position.set(
-          base.x * Math.cos(phase * 0.05) - base.z * Math.sin(phase * 0.05),
-          base.y + Math.sin(seconds * 0.9 + index) * 0.06 * motion.pulse,
-          base.x * Math.sin(phase * 0.05) + base.z * Math.cos(phase * 0.05)
-        );
-        mesh.material.opacity = settings.showParticles ? mesh.userData.baseOpacity + Math.sin(seconds * 1.1 + index) * 0.035 : 0;
+        let x = base.x;
+        let y = base.y;
+        let z = base.z;
+        if (particleMode === "orbit" || particleMode === "comet") {
+          const orbit = phase * (particleMode === "comet" ? 0.24 : 0.11);
+          x = base.x * Math.cos(orbit) - base.z * Math.sin(orbit);
+          z = base.x * Math.sin(orbit) + base.z * Math.cos(orbit);
+          y = base.y + Math.sin(seconds * 0.55 + index) * 0.04;
+        } else if (particleMode === "breath") {
+          const lift = 1 + Math.sin(seconds * currentBreathPattern().rate * 4 + index * 0.08) * 0.08 * currentBreathPattern().depth;
+          x = base.x * lift;
+          y = base.y * lift;
+          z = base.z * lift;
+        } else if (particleMode === "spark") {
+          const spark = Math.max(0, Math.sin(seconds * (1.2 + this.state.particles.speed * 0.2) + index * 2.1));
+          y = base.y + spark * 0.18;
+        } else if (particleMode === "tone-sync") {
+          const sync = Math.sin(seconds * (soundFrequency() / 96) + index * 0.45) * 0.08;
+          x = base.x + sync;
+          z = base.z - sync * 0.6;
+        } else if (particleMode === "node-magnet") {
+          const node = this.model.nodes[(index % Math.max(1, this.model.nodes.length - 1)) + 1] || this.model.nodes[0];
+          const pull = (Math.sin(seconds * 0.42 + index) + 1) / 2 * 0.28;
+          x = base.x + (node.x - base.x) * pull;
+          y = base.y + (node.y - base.y) * pull;
+          z = base.z + ((node.z || 0) - base.z) * pull;
+        } else if (particleMode === "drift") {
+          x = base.x + Math.sin(seconds * particleSpeed + index) * 0.08;
+          y = base.y + Math.sin(seconds * particleSpeed * 0.8 + index * 1.7) * 0.06;
+          z = base.z + Math.cos(seconds * particleSpeed + index) * 0.08;
+        }
+        mesh.position.set(x, y, z);
+        const shimmer = particleMode === "spark" || particleMode === "tone-sync" ? Math.max(0, Math.sin(seconds * 2.2 + index)) * 0.12 : Math.sin(seconds * 1.1 + index) * 0.035;
+        mesh.material.opacity = settings.showParticles && particleMode !== "still" ? mesh.userData.baseOpacity + shimmer : settings.showParticles ? mesh.userData.baseOpacity * 0.72 : 0;
       });
 
       this.camera = this.activeCamera();
@@ -3039,6 +3797,8 @@
       material: currentMaterial(),
       shapeType: currentShapeType(),
       layers: state.layers,
+      scene: state.scene,
+      particles: state.particles,
       zoom: state.zoom,
       mode: state.mode,
       trueGlyph: state.trueGlyph,
@@ -3062,11 +3822,39 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  function drawSceneBackground(ctx, width, height, cx, cy, scale, sceneState, layers) {
+    const preset = scenePresets.find((item) => item.id === sceneState.preset) || scenePresets[0];
+    if (preset.id === "transparent") return;
+    const intensity = clampFloat((sceneState.intensity || 5) / 9, 0.1, 1);
+    const bg = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(width, height) * 0.76);
+    bg.addColorStop(0, mix(preset.accent, preset.ink, layers.toneField ? 0.62 - intensity * 0.12 : 0.82));
+    bg.addColorStop(0.42, mix(preset.glow, preset.mid, 0.72));
+    bg.addColorStop(1, preset.ink);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+    if ((sceneState.grain || 0) > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.018 * sceneState.grain;
+      ctx.fillStyle = preset.accent;
+      const gap = Math.max(28, 70 - sceneState.grain * 4);
+      for (let y = 0; y < height; y += gap) {
+        for (let x = (y / gap) % 2 ? gap / 2 : 0; x < width; x += gap) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1.1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+  }
+
   function drawGlyph2D(ctx, width, height, options) {
     const colors = options.colors;
     const material = options.material || currentMaterial();
     const shapeType = options.shapeType || currentShapeType();
     const layers = options.layers || state.layers;
+    const scene = options.scene || state.scene;
+    const particleSettings = options.particles || state.particles;
     const showFaces = !options.trueGlyph && shapeType.faces && layers.faces;
     const showParticles = !options.trueGlyph && shapeType.particles && layers.particles;
     const showRings = shapeType.rings && layers.aura;
@@ -3080,12 +3868,7 @@
 
     ctx.clearRect(0, 0, width, height);
     if (!options.transparent) {
-      const bg = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(width, height) * 0.72);
-      bg.addColorStop(0, mix(toneFamilyPalette.gold, toneFamilyPalette.ink, layers.toneField ? 0.78 : 0.9));
-      bg.addColorStop(0.38, mix(toneFamilyPalette.teal, toneFamilyPalette.ink, layers.toneField ? 0.86 : 0.94));
-      bg.addColorStop(1, toneFamilyPalette.shadow);
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, width, height);
+      drawSceneBackground(ctx, width, height, cx, cy, scale, scene, layers);
     }
 
     const projected = options.model.nodes.map((node) => {
@@ -3154,14 +3937,25 @@
     });
 
     if (showParticles) {
-      const count = 34 + (state.builder ? state.builder.aura : 5) * 6;
+      const count = 24 + (state.builder ? state.builder.aura : 5) * 5 + particleSettings.density * 7;
       for (let index = 0; index < count; index += 1) {
         const t = index / count;
-        const angle = t * Math.PI * 2 * 2.7 + Date.now() / 2400;
+        const speed = 1200 + (10 - particleSettings.speed) * 220;
+        const angle = t * Math.PI * 2 * 2.7 + Date.now() / speed;
         const radius = scale * (1.35 + (index % 8) * 0.12);
-        const x = cx + pan.x * scale + Math.cos(angle) * radius;
-        const y = cy + pan.y * scale + Math.sin(angle * 1.2) * radius * 0.58;
-        ctx.fillStyle = alpha(index % 3 === 0 ? colors[2] : colors[1], 0.18 + material.particle * 0.04);
+        let x = cx + pan.x * scale + Math.cos(angle) * radius;
+        let y = cy + pan.y * scale + Math.sin(angle * 1.2) * radius * 0.58;
+        if (particleSettings.motion === "breath") {
+          const pulseSize = 1 + Math.sin(Date.now() / 1000 + index) * 0.08;
+          x = cx + (x - cx) * pulseSize;
+          y = cy + (y - cy) * pulseSize;
+        } else if (particleSettings.motion === "node-magnet" && projected.length > 1) {
+          const node = projected[(index % (projected.length - 1)) + 1];
+          x = x * 0.82 + node.x * 0.18;
+          y = y * 0.82 + node.y * 0.18;
+        }
+        const opacity = 0.14 + material.particle * 0.035 + particleSettings.trails * 0.012;
+        ctx.fillStyle = alpha(index % 3 === 0 ? colors[2] : colors[1], particleSettings.motion === "still" ? opacity * 0.6 : opacity);
         ctx.shadowColor = index % 3 === 0 ? colors[2] : colors[1];
         ctx.shadowBlur = 10 * material.glow;
         ctx.beginPath();

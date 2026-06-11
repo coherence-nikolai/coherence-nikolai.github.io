@@ -3,15 +3,15 @@
   --ink: #0b0707;
   --ink-2: #130d0c;
   --ink-3: #211715;
-  --parchment: #f2eadf;
+  --parchment: #f4efe2;
   --bone: var(--parchment);
   --muted: rgba(242, 234, 223, 0.64);
   --faint: rgba(242, 234, 223, 0.36);
   --hairline: rgba(242, 234, 223, 0.13);
-  --gold: #e8d7b2;
-  --amber: #bd8d64;
-  --rose: #b98574;
-  --teal: #86bdb4;
+  --gold: #e8c46d;
+  --amber: #b98245;
+  --rose: #bc7566;
+  --teal: #d09a50;
   --bg: #050303;
   --bg-soft: var(--ink-2);
   --text: var(--bone);
@@ -22,6 +22,13 @@
   --tone-b: var(--teal);
   --tone-c: var(--rose);
   --tone-d: #6f5f50;
+  --scene-ink: #0b0707;
+  --scene-mid: #21120f;
+  --scene-glow: #d09a50;
+  --scene-accent: #e8c46d;
+  --scene-intensity: 0.56;
+  --scene-motion: 0.33;
+  --scene-grain: 0.33;
   --danger: #c98578;
   --shadow: rgba(0, 0, 0, 0.46);
   --display: "Iowan Old Style", "IowanOldStyle-Roman", "Palatino Linotype", "Book Antiqua", Georgia, serif;
@@ -46,8 +53,8 @@ body {
 body {
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 8%, rgba(134, 189, 180, 0.10), transparent 23rem),
-    linear-gradient(180deg, #120908 0%, var(--ink) 58%, #050303 100%);
+    radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--scene-glow) calc(var(--scene-intensity) * 18%), transparent), transparent 23rem),
+    linear-gradient(180deg, var(--scene-mid) 0%, var(--scene-ink) 58%, #050303 100%);
   touch-action: none;
 }
 
@@ -67,10 +74,62 @@ button {
   min-height: 100svh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 8%, rgba(134, 189, 180, 0.10), transparent 23rem),
-    radial-gradient(circle at 52% 18%, rgba(189, 141, 100, 0.20), transparent 31rem),
-    radial-gradient(circle at 50% 52%, rgba(232, 215, 178, 0.10), transparent 34rem),
-    linear-gradient(180deg, #120908 0%, var(--ink) 58%, #050303 100%);
+    radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--scene-glow) calc(var(--scene-intensity) * 18%), transparent), transparent 23rem),
+    radial-gradient(circle at 52% 18%, color-mix(in srgb, var(--scene-accent) calc(var(--scene-intensity) * 22%), transparent), transparent 31rem),
+    radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--tone-a) calc(var(--scene-intensity) * 12%), transparent), transparent 34rem),
+    linear-gradient(180deg, var(--scene-mid) 0%, var(--scene-ink) 58%, #050303 100%);
+}
+
+.app-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: calc(var(--scene-grain) * 0.18);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+    radial-gradient(circle at 74% 42%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px);
+  background-size: 38px 42px, 54px 58px;
+}
+
+body[data-scene="paper-ink"] {
+  color-scheme: light;
+  --text: #17120e;
+  --muted: rgba(23, 18, 14, 0.64);
+  --faint: rgba(23, 18, 14, 0.38);
+  --hairline: rgba(23, 18, 14, 0.18);
+  --glass: rgba(246, 238, 221, 0.64);
+  --glass-strong: rgba(246, 238, 221, 0.88);
+  --shadow: rgba(32, 22, 12, 0.22);
+}
+
+body[data-scene="transparent"] .app-shell {
+  background: transparent;
+}
+
+body[data-scene="starfield"] .app-shell::before,
+body[data-scene="obsidian"] .app-shell::before {
+  opacity: calc(var(--scene-grain) * 0.32);
+}
+
+body[data-scene="crop-field"] .orbital-shade {
+  filter: blur(34px);
+  opacity: 0.74;
+}
+
+body[data-scene="aurora"] .orbital-shade,
+body[data-scene="water-veil"] .orbital-shade {
+  animation: scene-drift calc(18s - var(--scene-motion) * 8s) ease-in-out infinite alternate;
+}
+
+@keyframes scene-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0) scale(0.98) rotate(-2deg);
+  }
+  to {
+    transform: translate3d(1.5%, -1%, 0) scale(1.04) rotate(3deg);
+  }
 }
 
 .stage {
@@ -101,7 +160,7 @@ button {
   border-radius: 999px;
   background:
     radial-gradient(circle, rgba(242, 234, 223, 0.055), transparent 48%),
-    conic-gradient(from 20deg, rgba(232, 215, 178, 0.08), rgba(134, 189, 180, 0.04), rgba(185, 133, 116, 0.08), rgba(232, 215, 178, 0.08));
+    conic-gradient(from 20deg, rgba(232, 196, 109, 0.1), rgba(185, 130, 69, 0.06), rgba(188, 117, 102, 0.08), rgba(232, 196, 109, 0.1));
   filter: blur(42px);
   opacity: 0.88;
 }
@@ -215,7 +274,7 @@ button {
   color: #071016;
   border-color: transparent;
   background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
-  box-shadow: 0 0 28px rgba(102, 226, 207, 0.18);
+  box-shadow: 0 0 28px rgba(208, 154, 80, 0.18);
 }
 
 .mode-rail {
@@ -290,7 +349,7 @@ button {
 .primary-action-button {
   color: #120908;
   border-color: rgba(232, 215, 178, 0.36);
-  background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(134, 189, 180, 0.78));
+  background: linear-gradient(135deg, rgba(232, 196, 109, 0.95), rgba(208, 154, 80, 0.82));
   box-shadow: 0 0 32px rgba(232, 215, 178, 0.18);
 }
 
@@ -425,8 +484,8 @@ textarea {
 }
 
 textarea:focus {
-  border-color: rgba(102, 226, 207, 0.5);
-  box-shadow: 0 0 0 3px rgba(102, 226, 207, 0.12);
+  border-color: rgba(208, 154, 80, 0.5);
+  box-shadow: 0 0 0 3px rgba(208, 154, 80, 0.12);
 }
 
 .action-row {
@@ -458,7 +517,7 @@ textarea:focus {
 
 .primary-action {
   color: #120908;
-  background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(134, 189, 180, 0.78));
+  background: linear-gradient(135deg, rgba(232, 196, 109, 0.95), rgba(208, 154, 80, 0.82));
 }
 
 .quiet-action {
@@ -540,7 +599,7 @@ textarea:focus {
 .seed-category.active {
   color: #120908;
   border-color: rgba(232, 215, 178, 0.34);
-  background: linear-gradient(135deg, rgba(232, 215, 178, 0.95), rgba(134, 189, 180, 0.78));
+  background: linear-gradient(135deg, rgba(232, 196, 109, 0.95), rgba(208, 154, 80, 0.82));
 }
 
 .seed-grid {
@@ -633,6 +692,35 @@ select {
   background: rgba(238, 245, 238, 0.08);
   padding: 0 10px;
   outline: none;
+  color-scheme: dark;
+}
+
+select option,
+select optgroup {
+  color: #f7efe0;
+  background-color: #17100d;
+}
+
+select option:checked {
+  color: #17100d;
+  background-color: #e8c46d;
+}
+
+body[data-scene="paper-ink"] select {
+  color: #17120e;
+  background: rgba(246, 238, 221, 0.9);
+  color-scheme: light;
+}
+
+body[data-scene="paper-ink"] select option,
+body[data-scene="paper-ink"] select optgroup {
+  color: #17120e;
+  background-color: #f4e9d7;
+}
+
+body[data-scene="paper-ink"] select option:checked {
+  color: #17100d;
+  background-color: #d7b05f;
 }
 
 .select-row input[type="range"] {
@@ -661,6 +749,95 @@ select {
 
 .layer-toggle input {
   accent-color: var(--tone-b);
+}
+
+.studio-block {
+  margin-top: 12px;
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.studio-chip,
+.upload-action {
+  min-height: 34px;
+  border: 1px solid rgba(238, 245, 238, 0.12);
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(238, 245, 238, 0.07);
+  padding: 0 11px;
+  font-size: 0.76rem;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.studio-chip.active {
+  color: #071016;
+  background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+}
+
+.compact-ranges {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.reflection-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.studio-count {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.context-list {
+  display: grid;
+  gap: 7px;
+}
+
+.context-card {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(238, 245, 238, 0.1);
+  border-radius: 14px;
+  color: var(--text);
+  background: rgba(238, 245, 238, 0.055);
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.context-card span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.upload-action {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.upload-action input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .premium-summary {
