@@ -89,7 +89,13 @@
     harmonic: "Harmonic",
     ritual: "Ritual",
     motion: "Motion",
-    gates: "Gates"
+    gates: "Gates",
+    fractals: "Fractals",
+    messages: "Messages",
+    helix: "Helix",
+    symbols: "Symbols",
+    mandalas: "Mandalas",
+    math: "Math"
   };
 
   const premiumPacks = [
@@ -194,6 +200,32 @@
         { id: "obelisk", label: "Obelisk", category: "temples", summary: "A tall tapering pillar for vertical ritual presence." },
         { id: "octagonal-gate", label: "Octagonal Gate", category: "temples", summary: "An eight-sided threshold form for portal-like glyphs." },
         { id: "spiral-column", label: "Spiral Column", category: "temples", summary: "A rising helix around a central column." }
+      ]
+    },
+    {
+      id: "crop",
+      label: "Crop",
+      seeds: [
+        { id: "stonehenge-julia", label: "Stonehenge Julia", category: "fractals", summary: "1996 Stonehenge Julia Set: a long fractal spiral of nested circles." },
+        { id: "triple-julia", label: "Triple Julia", category: "fractals", summary: "1996 Windmill Hill triple spiral, built as three curling field currents." },
+        { id: "alton-dna", label: "Alton DNA", category: "helix", summary: "1996 Alton Barnes DNA-inspired double strand with a central current." },
+        { id: "ashbury-vesica", label: "Ashbury Vesica", category: "symbols", summary: "1996 Vesica Pisces field form with intersecting circles and a lens." },
+        { id: "celtic-brooch", label: "Celtic Brooch", category: "symbols", summary: "1996 Barton-le-Clay ring glyph with a brooch-like woven center." },
+        { id: "milk-hill-galaxy", label: "Milk Hill Galaxy", category: "fractals", summary: "2001 Milk Hill six-armed galaxy spiral, inspired by the 409-circle formation." },
+        { id: "chilbolton-face", label: "Chilbolton Face", category: "messages", summary: "2001 dot-matrix face field glyph near the Chilbolton radio telescope." },
+        { id: "chilbolton-arecibo", label: "Chilbolton Arecibo", category: "messages", summary: "2001 Arecibo-response style binary message rendered as a glyph panel." },
+        { id: "great-shelford-angel", label: "Shelford Angel", category: "symbols", summary: "2001 Great Shelford angel-like formation with winged symmetry." },
+        { id: "berwick-pursuit", label: "Berwick Pursuit", category: "math", summary: "2001 Berwick Bassett triangular curves-of-pursuit pattern." },
+        { id: "crooked-soley-dna", label: "Crooked Soley DNA", category: "helix", summary: "2002 Crooked Soley DNA ring with a standing central circle." },
+        { id: "sparsholt-disc", label: "Sparsholt Disc", category: "messages", summary: "2002 face-and-disc message formation, treated as a paired transmission glyph." },
+        { id: "stonehenge-ribbons", label: "Stonehenge Ribbons", category: "symbols", summary: "2002 six-fold ribbon formation near Stonehenge." },
+        { id: "highclere-eye", label: "Highclere Eye", category: "symbols", summary: "2002 pyramid-with-eye field glyph, rendered as a focused triangular seal." },
+        { id: "avebury-pentagram", label: "Avebury Pentagram", category: "mandalas", summary: "2003 Avebury pentagon and pentagram formation with layered star geometry." },
+        { id: "huish-mandala", label: "Huish Mandala", category: "mandalas", summary: "2003 thirteen-fold mandala, tuned for unusual rotational symmetry." },
+        { id: "milk-hill-caduceus", label: "Milk Hill Caduceus", category: "helix", summary: "2004 Milk Hill caduceus-like twin current with a central spine." },
+        { id: "west-kennett-labyrinth", label: "West Kennett Labyrinth", category: "mandalas", summary: "2004 quadruple labyrinth, simplified into four inward walking paths." },
+        { id: "barbury-pi", label: "Barbury Pi", category: "math", summary: "2008 Barbury Castle ratcheted Pi spiral." },
+        { id: "wilton-euler", label: "Wilton Euler", category: "math", summary: "2010 Wilton Windmill Euler Identity, drawn as a maze-like math glyph." }
       ]
     },
     {
@@ -1148,6 +1180,7 @@
     const defaults = {
       sacred: { symmetry: 6, density: 6, orbits: 2, depth: 1, aura: 5, breath: 4 },
       elemental: { symmetry: 4, density: 5, orbits: 2, depth: 4, aura: 5, breath: 4 },
+      crop: { symmetry: 9, density: 7, orbits: 3, depth: 2, aura: 7, breath: 5 },
       tone: { symmetry: 8, density: 6, orbits: 3, depth: 2, aura: 6, breath: 5 },
       ritual: { symmetry: 6, density: 5, orbits: 2, depth: 1, aura: 7, breath: 4 },
       motion: { symmetry: 9, density: 5, orbits: 3, depth: 3, aura: 6, breath: 6 }
@@ -1342,6 +1375,7 @@
     if (seed === "torus") return createTorusGeometry(recipeState);
     if (seed === "mirror") return createMirrorGeometry(recipeState);
     if (seed === "gesture") return createGestureGeometry(recipeState);
+    if (recipeState.family === "crop") return createCropGeometry(recipeState);
     if (recipeState.family === "elemental") return createElementalGeometry(recipeState);
     if (["harmonic", "octave", "chord"].includes(seed)) return createToneGeometry(recipeState);
     if (["seal", "release", "protect", "open", "remember"].includes(seed)) return createRitualGeometry(recipeState);
@@ -1561,6 +1595,346 @@
     const circles = nodes.slice(1).map((_, index) => ({ node: index + 1, radius: 0.74, weight: 0.72, role: "vesica" }));
     circles.push({ node: 0, radius: 0.4, weight: 0.4, role: "center" });
     return normalizeModel({ id: "vesica-chain", label: "Vesica Chain", family: "sacred", nodes, lines, circles, circleRadius: 0.72 });
+  }
+
+  function createCropGeometry(recipeState) {
+    const seed = recipeState.seed;
+    const spiralConfigs = {
+      "stonehenge-julia": { arms: 1, points: 44, turns: 2.75, radius: 2.18, circleEvery: 2, crossEvery: 6 },
+      "triple-julia": { arms: 3, points: 20, turns: 1.55, radius: 1.92, circleEvery: 3, crossEvery: 4 },
+      "milk-hill-galaxy": { arms: 6, points: 14, turns: 1.18, radius: 2.12, circleEvery: 2, crossEvery: 3 },
+      "berwick-pursuit": { arms: 3, points: 18, turns: 0.72, radius: 1.92, circleEvery: 4, crossEvery: 2 },
+      "west-kennett-labyrinth": { arms: 4, points: 18, turns: -1.05, radius: 1.92, circleEvery: 5, crossEvery: 4 },
+      "barbury-pi": { arms: 1, points: 36, turns: 3.14, radius: 2.04, circleEvery: 4, ticks: [3, 1, 4, 1, 5, 9, 2, 6, 5, 4] }
+    };
+    const helixConfigs = {
+      "alton-dna": { count: 18, turns: 3.6, ringed: false },
+      "crooked-soley-dna": { count: 20, turns: 3.9, ringed: true },
+      "milk-hill-caduceus": { count: 22, turns: 4.4, caduceus: true }
+    };
+    const messageConfigs = {
+      "chilbolton-face": {
+        pattern: [
+          "00111100",
+          "01111110",
+          "11011011",
+          "11111111",
+          "10111101",
+          "10011001",
+          "01111110",
+          "00111100"
+        ],
+        spacing: 0.28
+      },
+      "chilbolton-arecibo": {
+        pattern: [
+          "10100101001",
+          "00110110010",
+          "11100100111",
+          "01011101010",
+          "11001001101",
+          "00111110010",
+          "10101010101",
+          "01100110011"
+        ],
+        spacing: 0.22
+      },
+      "sparsholt-disc": {
+        pattern: [
+          "00111000011100",
+          "01000100100010",
+          "10010101001001",
+          "10111101111101",
+          "10010101001001",
+          "01000100100010",
+          "00111000011100"
+        ],
+        spacing: 0.2,
+        disc: true
+      },
+      "wilton-euler": {
+        pattern: [
+          "11111111111",
+          "10001000101",
+          "10101110101",
+          "10101010101",
+          "10111010101",
+          "10000010101",
+          "11111110111"
+        ],
+        spacing: 0.23
+      }
+    };
+    const radialConfigs = {
+      "celtic-brooch": { symmetry: 8, orbits: 3, star: 3, phase: Math.PI / 8 },
+      "great-shelford-angel": { symmetry: 6, orbits: 3, star: 2, phase: -Math.PI / 2, wings: true },
+      "stonehenge-ribbons": { symmetry: 6, orbits: 3, star: 1, phase: -Math.PI / 2, ribbons: true },
+      "avebury-pentagram": { symmetry: 5, orbits: 3, star: 2, phase: -Math.PI / 2 },
+      "huish-mandala": { symmetry: 13, orbits: 3, star: 5, phase: -Math.PI / 2 }
+    };
+    if (seed === "ashbury-vesica") return createCropVesicaGeometry(recipeState);
+    if (seed === "highclere-eye") return createCropEyeGeometry(recipeState);
+    if (spiralConfigs[seed]) return createCropSpiralGeometry(recipeState, { id: seed, label: seedLabel(seed), ...spiralConfigs[seed] });
+    if (helixConfigs[seed]) return createCropHelixGeometry(recipeState, { id: seed, label: seedLabel(seed), ...helixConfigs[seed] });
+    if (messageConfigs[seed]) return createCropMessageGeometry(recipeState, { id: seed, label: seedLabel(seed), ...messageConfigs[seed] });
+    return createCropRadialGeometry(recipeState, { id: seed, label: seedLabel(seed), ...(radialConfigs[seed] || radialConfigs["huish-mandala"]) });
+  }
+
+  function createCropSpiralGeometry(recipeState, config) {
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0, radius: 1.12 }];
+    const groups = [];
+    const phase = -Math.PI / 2 + recipeState.builder.variant * 0.045;
+    for (let arm = 0; arm < config.arms; arm += 1) {
+      const group = [];
+      for (let point = 0; point < config.points; point += 1) {
+        const t = (point + 1) / config.points;
+        const radius = 0.14 + t * config.radius;
+        const angle = phase + arm / config.arms * Math.PI * 2 + config.turns * Math.PI * 2 * t;
+        const nodeIndex = nodes.length;
+        group.push(nodeIndex);
+        nodes.push({
+          id: "crop-spiral-" + arm + "-" + point,
+          ring: "crop-spiral",
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+          z: zFromDepth(recipeState, t + arm / config.arms),
+          radius: point % Math.max(2, config.circleEvery) === 0 ? 1.08 : 0.78
+        });
+      }
+      groups.push(group);
+    }
+
+    const lines = [];
+    groups.forEach((group) => {
+      lines.push({ from: 0, to: group[0], weight: 0.36, role: "spiral-origin" });
+      for (let index = 0; index < group.length - 1; index += 1) lines.push({ from: group[index], to: group[index + 1], weight: 0.72, role: "spiral-path" });
+    });
+    const crossEvery = config.crossEvery || 4;
+    for (let point = crossEvery - 1; point < config.points; point += crossEvery) {
+      for (let arm = 0; arm < groups.length; arm += 1) {
+        const nextArm = (arm + 1) % groups.length;
+        if (groups[nextArm][point]) lines.push({ from: groups[arm][point], to: groups[nextArm][point], weight: 0.24, role: "field-bridge" });
+      }
+    }
+    if (config.ticks) {
+      config.ticks.forEach((digit, index) => {
+        const t = (index + 1) / (config.ticks.length + 1);
+        const baseIndex = groups[0][Math.min(groups[0].length - 1, Math.round(t * (groups[0].length - 1)))];
+        const base = nodes[baseIndex];
+        const angle = Math.atan2(base.y, base.x) + Math.PI / 2;
+        const tickIndex = nodes.length;
+        nodes.push({
+          id: "pi-tick-" + index,
+          ring: "pi-tick",
+          x: base.x + Math.cos(angle) * (0.12 + digit * 0.025),
+          y: base.y + Math.sin(angle) * (0.12 + digit * 0.025),
+          z: base.z,
+          radius: 0.62
+        });
+        lines.push({ from: baseIndex, to: tickIndex, weight: 0.46, role: "pi-ratchet" });
+      });
+    }
+
+    const circles = [{ node: 0, radius: 0.34, weight: 0.56, role: "standing-circle" }];
+    groups.flat().forEach((nodeIndex, index) => {
+      if (index % Math.max(1, config.circleEvery) === 0) {
+        const node = nodes[nodeIndex];
+        const distance = Math.hypot(node.x, node.y);
+        circles.push({ node: nodeIndex, radius: 0.14 + Math.max(0, 1 - distance / 2.4) * 0.22, weight: 0.4, role: "laid-circle" });
+      }
+    });
+    circles.push({ node: 0, radius: 2.08, weight: 0.24, role: "formation-field" });
+    return normalizeModel({ id: config.id, label: config.label, family: "crop", nodes, lines, circles, circleRadius: 0.4 });
+  }
+
+  function createCropMessageGeometry(recipeState, config) {
+    const pattern = config.pattern;
+    const rows = pattern.length;
+    const cols = Math.max(...pattern.map((row) => row.length));
+    const spacing = config.spacing || 0.24;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0, radius: 1.12 }];
+    const grid = [];
+    for (let row = 0; row < rows; row += 1) {
+      grid[row] = [];
+      for (let col = 0; col < pattern[row].length; col += 1) {
+        if (pattern[row][col] !== "1") continue;
+        const x = (col - (cols - 1) / 2) * spacing;
+        const y = ((rows - 1) / 2 - row) * spacing;
+        const nodeIndex = nodes.length;
+        grid[row][col] = nodeIndex;
+        nodes.push({
+          id: "message-" + row + "-" + col,
+          ring: "message",
+          x,
+          y,
+          z: zFromDepth(recipeState, (row + col) / Math.max(1, rows + cols)),
+          radius: 0.84
+        });
+      }
+    }
+    const lines = [];
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        const nodeIndex = grid[row] && grid[row][col];
+        if (!nodeIndex) continue;
+        if (grid[row][col + 1]) lines.push({ from: nodeIndex, to: grid[row][col + 1], weight: 0.38, role: "message-row" });
+        if (grid[row + 1] && grid[row + 1][col]) lines.push({ from: nodeIndex, to: grid[row + 1][col], weight: 0.34, role: "message-col" });
+      }
+    }
+    const circles = nodes.slice(1).map((_, index) => ({ node: index + 1, radius: 0.08 + spacing * 0.34, weight: 0.44, role: "message-dot" }));
+    circles.push({ node: 0, radius: Math.max(cols, rows) * spacing * 0.62, weight: 0.28, role: "message-field" });
+    if (config.disc) {
+      const discCenter = nodes.length;
+      nodes.push({ id: "message-disc", ring: "disc", x: cols * spacing * 0.42, y: 0, z: zFromDepth(recipeState, 0.5), radius: 0.92 });
+      circles.push({ node: discCenter, radius: 0.58, weight: 0.46, role: "disc" });
+      circles.push({ node: discCenter, radius: 0.34, weight: 0.34, role: "disc-inner" });
+      lines.push({ from: 0, to: discCenter, weight: 0.32, role: "message-disc-link" });
+    }
+    return normalizeModel({ id: config.id, label: config.label, family: "crop", nodes, lines, circles, circleRadius: 0.26 });
+  }
+
+  function createCropHelixGeometry(recipeState, config) {
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0, radius: 1.12 }];
+    const strandA = [];
+    const strandB = [];
+    const depth = 0.36 + recipeState.builder.depth * 0.08;
+    for (let index = 0; index < config.count; index += 1) {
+      const t = index / Math.max(1, config.count - 1);
+      const angle = -Math.PI / 2 + t * Math.PI * config.turns + recipeState.builder.variant * 0.04;
+      const y = -1.62 + t * 3.24;
+      const nodeA = nodes.length;
+      strandA.push(nodeA);
+      nodes.push({ id: "helix-a-" + index, ring: "helix", x: Math.cos(angle) * 0.72, y, z: Math.sin(angle) * depth, radius: index % 3 === 0 ? 1.02 : 0.82 });
+      const nodeB = nodes.length;
+      strandB.push(nodeB);
+      nodes.push({ id: "helix-b-" + index, ring: "helix", x: Math.cos(angle + Math.PI) * 0.72, y, z: Math.sin(angle + Math.PI) * depth, radius: index % 3 === 0 ? 1.02 : 0.82 });
+    }
+    const lines = [];
+    for (let index = 0; index < config.count - 1; index += 1) {
+      lines.push({ from: strandA[index], to: strandA[index + 1], weight: 0.62, role: "helix-strand" });
+      lines.push({ from: strandB[index], to: strandB[index + 1], weight: 0.62, role: "helix-strand" });
+      if (index % 2 === 0) lines.push({ from: strandA[index], to: strandB[index], weight: 0.42, role: "helix-rung" });
+    }
+    if (config.caduceus) {
+      const spineTop = nodes.length;
+      nodes.push({ id: "spine-top", ring: "spine", x: 0, y: 1.82, z: 0, radius: 0.9 });
+      const spineBottom = nodes.length;
+      nodes.push({ id: "spine-bottom", ring: "spine", x: 0, y: -1.82, z: 0, radius: 0.9 });
+      lines.push({ from: spineBottom, to: spineTop, weight: 0.7, role: "caduceus-spine" });
+      const wingLeft = nodes.length;
+      nodes.push({ id: "wing-left", ring: "wing", x: -1.18, y: 1.28, z: zFromDepth(recipeState, 0.24), radius: 0.82 });
+      const wingRight = nodes.length;
+      nodes.push({ id: "wing-right", ring: "wing", x: 1.18, y: 1.28, z: zFromDepth(recipeState, 0.76), radius: 0.82 });
+      lines.push({ from: spineTop, to: wingLeft, weight: 0.46, role: "wing" });
+      lines.push({ from: spineTop, to: wingRight, weight: 0.46, role: "wing" });
+    }
+    const circles = [{ node: 0, radius: config.ringed ? 1.18 : 0.42, weight: 0.38, role: config.ringed ? "helix-ring" : "helix-center" }];
+    strandA.concat(strandB).forEach((nodeIndex, index) => {
+      if (index % 4 === 0) circles.push({ node: nodeIndex, radius: 0.18, weight: 0.34, role: "crop-node" });
+    });
+    return normalizeModel({ id: config.id, label: config.label, family: "crop", nodes, lines, circles, circleRadius: 0.32 });
+  }
+
+  function createCropVesicaGeometry(recipeState) {
+    const nodes = [
+      { id: "center", ring: "center", x: 0, y: 0, z: 0, radius: 1.14 },
+      { id: "left", ring: "vesica", x: -0.62, y: 0, z: zFromDepth(recipeState, 0.2), radius: 0.92 },
+      { id: "right", ring: "vesica", x: 0.62, y: 0, z: zFromDepth(recipeState, 0.8), radius: 0.92 },
+      { id: "upper", ring: "lens", x: 0, y: 0.78, z: zFromDepth(recipeState, 0.35), radius: 0.82 },
+      { id: "lower", ring: "lens", x: 0, y: -0.78, z: zFromDepth(recipeState, 0.65), radius: 0.82 }
+    ];
+    const lines = [
+      { from: 1, to: 2, weight: 0.72, role: "vesica-axis" },
+      { from: 3, to: 4, weight: 0.72, role: "vesica-axis" },
+      { from: 1, to: 3, weight: 0.46, role: "lens" },
+      { from: 1, to: 4, weight: 0.46, role: "lens" },
+      { from: 2, to: 3, weight: 0.46, role: "lens" },
+      { from: 2, to: 4, weight: 0.46, role: "lens" },
+      { from: 0, to: 3, weight: 0.3, role: "center-ray" },
+      { from: 0, to: 4, weight: 0.3, role: "center-ray" }
+    ];
+    const circles = [
+      { node: 1, radius: 1, weight: 0.78, role: "vesica-disc" },
+      { node: 2, radius: 1, weight: 0.78, role: "vesica-disc" },
+      { node: 0, radius: 0.22, weight: 0.5, role: "standing-circle" }
+    ];
+    return normalizeModel({ id: "ashbury-vesica", label: "Ashbury Vesica", family: "crop", nodes, lines, circles, circleRadius: 0.62 });
+  }
+
+  function createCropEyeGeometry(recipeState) {
+    const nodes = [
+      { id: "center", ring: "eye", x: 0, y: 0, z: 0, radius: 1.18 },
+      { id: "apex", ring: "pyramid", x: 0, y: 1.55, z: zFromDepth(recipeState, 0.16), radius: 1 },
+      { id: "left-base", ring: "pyramid", x: -1.32, y: -1.08, z: zFromDepth(recipeState, 0.44), radius: 0.9 },
+      { id: "right-base", ring: "pyramid", x: 1.32, y: -1.08, z: zFromDepth(recipeState, 0.72), radius: 0.9 },
+      { id: "eye-left", ring: "eye", x: -0.62, y: 0.08, z: 0, radius: 0.76 },
+      { id: "eye-right", ring: "eye", x: 0.62, y: 0.08, z: 0, radius: 0.76 },
+      { id: "eye-top", ring: "eye", x: 0, y: 0.42, z: 0, radius: 0.68 },
+      { id: "eye-bottom", ring: "eye", x: 0, y: -0.24, z: 0, radius: 0.68 }
+    ];
+    const lines = [
+      { from: 1, to: 2, weight: 0.84, role: "pyramid-edge" },
+      { from: 2, to: 3, weight: 0.84, role: "pyramid-edge" },
+      { from: 3, to: 1, weight: 0.84, role: "pyramid-edge" },
+      { from: 4, to: 6, weight: 0.5, role: "eye-lid" },
+      { from: 6, to: 5, weight: 0.5, role: "eye-lid" },
+      { from: 5, to: 7, weight: 0.5, role: "eye-lid" },
+      { from: 7, to: 4, weight: 0.5, role: "eye-lid" },
+      { from: 0, to: 1, weight: 0.3, role: "pyramid-ray" },
+      { from: 0, to: 2, weight: 0.3, role: "pyramid-ray" },
+      { from: 0, to: 3, weight: 0.3, role: "pyramid-ray" }
+    ];
+    const circles = [{ node: 0, radius: 0.28, weight: 0.58, role: "eye-pupil" }, { node: 0, radius: 0.68, weight: 0.34, role: "eye-field" }];
+    return normalizeModel({ id: "highclere-eye", label: "Highclere Eye", family: "crop", nodes, lines, circles, circleRadius: 0.34 });
+  }
+
+  function createCropRadialGeometry(recipeState, config) {
+    const symmetry = config.symmetry || 8;
+    const orbits = config.orbits || 3;
+    const phase = config.phase || 0;
+    const nodes = [{ id: "center", ring: "center", x: 0, y: 0, z: 0, radius: 1.14 }];
+    const groups = [];
+    for (let ring = 1; ring <= orbits; ring += 1) {
+      const group = [];
+      const radius = 0.56 + ring * 0.52;
+      for (let index = 0; index < symmetry; index += 1) {
+        const angle = phase + index / symmetry * Math.PI * 2 + recipeState.builder.variant * ring * 0.016;
+        const nodeIndex = nodes.length;
+        group.push(nodeIndex);
+        nodes.push({
+          id: "crop-r" + ring + "-" + index,
+          ring: "crop-ring-" + ring,
+          x: Math.cos(angle) * radius,
+          y: Math.sin(angle) * radius,
+          z: zFromDepth(recipeState, ring / orbits + index / symmetry),
+          radius: ring === orbits ? 0.92 : 0.78
+        });
+      }
+      groups.push(group);
+    }
+    let lines = radialLines(nodes, 0).filter((_, index) => index % 2 === 0);
+    groups.forEach((group, ringIndex) => {
+      lines = lines.concat(ringLines(nodes, group, 0.52 + ringIndex * 0.08));
+      lines = lines.concat(chordLines(nodes, group, config.star || 2, 0.38));
+    });
+    for (let ring = 1; ring < groups.length; ring += 1) {
+      groups[ring].forEach((nodeIndex, index) => {
+        lines.push({ from: nodeIndex, to: groups[ring - 1][index % symmetry], weight: 0.3, role: "orbit-link" });
+        if (config.ribbons && index % 2 === 0) lines.push({ from: nodeIndex, to: groups[ring - 1][(index + 1) % symmetry], weight: 0.24, role: "ribbon" });
+      });
+    }
+    if (config.wings && groups[2]) {
+      for (let index = 1; index <= 2; index += 1) {
+        lines.push({ from: 1, to: groups[2][index], weight: 0.28, role: "angel-wing" });
+        lines.push({ from: 1, to: groups[2][symmetry - index], weight: 0.28, role: "angel-wing" });
+      }
+    }
+    const circles = [{ node: 0, radius: 0.32, weight: 0.5, role: "standing-circle" }];
+    groups.flat().forEach((nodeIndex, index) => {
+      if (index % 2 === 0 || config.symmetry === 13) circles.push({ node: nodeIndex, radius: 0.2, weight: 0.32, role: "crop-disc" });
+    });
+    for (let ring = 1; ring <= orbits; ring += 1) circles.push({ node: 0, radius: 0.56 + ring * 0.52, weight: 0.18, role: "field-ring" });
+    return normalizeModel({ id: config.id, label: config.label, family: "crop", nodes, lines, circles, circleRadius: 0.34 });
   }
 
   function createElementalGeometry(recipeState) {
