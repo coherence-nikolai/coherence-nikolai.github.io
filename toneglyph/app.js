@@ -1186,6 +1186,7 @@
     state.controlTab = actionCopy[action].tab;
     document.body.dataset.controlTab = state.controlTab;
     updateUI();
+    scheduleRendererResize();
     if (action !== "none") showToast(actionCopy[action].label);
   }
 
@@ -1196,7 +1197,16 @@
     document.body.dataset.controlTab = tab;
     document.body.dataset.action = state.activeAction;
     updateUI();
+    scheduleRendererResize();
     showToast(controlTabCopy[tab] + " controls");
+  }
+
+  function scheduleRendererResize() {
+    if (!state.renderer || typeof state.renderer.resize !== "function") return;
+    requestAnimationFrame(() => {
+      state.renderer.resize();
+      requestAnimationFrame(() => state.renderer && state.renderer.resize && state.renderer.resize());
+    });
   }
 
   function activate3DForm() {
@@ -3595,9 +3605,10 @@
       }
 
       const mirrorTilt = motion.id === "mirror" && !trueGlyph ? Math.sin(seconds * 0.55) * 0.16 : 0;
+      const mobileLayout = mobileDrawerGlyphLayout(this.canvas);
       this.group.rotation.set(trueGlyph ? 0 : this.rotation.x + mirrorTilt, trueGlyph ? 0 : this.rotation.y, trueGlyph ? 0 : this.rotation.z);
-      this.group.position.set(this.state.pan.x, -this.state.pan.y, 0);
-      this.group.scale.setScalar((trueGlyph ? 1 : breath + sealPulse * 0.035) * this.state.zoom);
+      this.group.position.set(this.state.pan.x, -this.state.pan.y + mobileLayout.lift, 0);
+      this.group.scale.setScalar((trueGlyph ? 1 : breath + sealPulse * 0.035) * this.state.zoom * mobileLayout.scale);
 
       this.lineMeshes.forEach((mesh, index) => {
         const phase = mesh.userData.travelPhase || index * 0.33;
@@ -3735,11 +3746,11 @@
         colors: this.state.colors,
         intention: "",
         rotation: this.state.trueGlyph ? 0 : this.rotation,
-        pan: this.state.pan,
+        pan: canvasDrawerPan(this.canvas, this.state.pan),
         material: currentMaterial(),
         shapeType: currentShapeType(),
         layers: this.state.layers,
-        zoom: this.state.zoom,
+        zoom: this.state.zoom * mobileDrawerGlyphLayout(this.canvas).scale,
         mode: this.state.mode,
         trueGlyph: this.state.trueGlyph,
         sealSignature: this.state.sealSignature,
@@ -3764,6 +3775,25 @@
       this.model = model;
       this.resetOrientation();
     }
+  }
+
+  function mobileDrawerGlyphLayout(canvas) {
+    if (window.innerWidth > 780 || state.activeAction === "none") return { lift: 0, scale: 1 };
+    const rect = canvas.getBoundingClientRect();
+    const tightness = clampFloat((300 - rect.height) / 220, 0, 1);
+    return {
+      lift: 0.34 + tightness * 0.26,
+      scale: 0.94 - tightness * 0.04
+    };
+  }
+
+  function canvasDrawerPan(canvas, pan) {
+    const layout = mobileDrawerGlyphLayout(canvas);
+    if (!layout.lift) return pan;
+    return {
+      x: pan.x,
+      y: pan.y - layout.lift
+    };
   }
 
   function makeCylinderBetween(THREE, start, end, radius, material) {
