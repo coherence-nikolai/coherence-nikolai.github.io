@@ -145,12 +145,89 @@
   ];
 
   const symbolContextItems = [
-    { id: "spiral", label: "Spiral", summary: "A path of return, growth, unwinding, and re-entry." },
-    { id: "eye", label: "Eye", summary: "Witnessing, attention, perception, and protection." },
-    { id: "ankh", label: "Ankh", summary: "Life-force, continuity, and threshold imagery." },
-    { id: "labyrinth", label: "Labyrinth", summary: "A slow inward path for reflection and ritual walking." },
-    { id: "tree", label: "Tree", summary: "Root, branch, lineage, and layered ascent." },
-    { id: "caduceus", label: "Caduceus", summary: "Twin currents, balance, and a central channel." }
+    {
+      id: "spiral",
+      label: "Spiral",
+      summary: "A path of return, growth, unwinding, and re-entry.",
+      family: "sacred",
+      seed: "golden-spiral",
+      tags: ["return", "transformation"],
+      motionPreset: "spiral",
+      particleMotion: "orbit",
+      scenePreset: "crop-field",
+      breathPattern: "release-448"
+    },
+    {
+      id: "eye",
+      label: "Eye",
+      summary: "Witnessing, attention, perception, and protection.",
+      family: "crop",
+      seed: "highclere-eye",
+      tags: ["protection", "clarity"],
+      motionPreset: "still",
+      particleMotion: "node-magnet",
+      scenePreset: "starfield",
+      breathPattern: "kasina"
+    },
+    {
+      id: "ankh",
+      label: "Ankh",
+      summary: "Life-force, continuity, and threshold imagery.",
+      family: "custom",
+      seed: "personal-glyph",
+      tags: ["healing", "integration"],
+      motionPreset: "breathe",
+      particleMotion: "breath",
+      scenePreset: "dawn",
+      breathPattern: "coherent",
+      customGlyph: {
+        symmetry: "free",
+        mirror: "vertical",
+        layers: [
+          { type: "circle", size: 0.74, rotation: 0, x: 0, y: 0.48, opacity: 0.86 },
+          { type: "line", size: 1.12, rotation: Math.PI / 2, x: 0, y: -0.18, opacity: 0.82 },
+          { type: "line", size: 0.66, rotation: 0, x: 0, y: 0.12, opacity: 0.78 },
+          { type: "curve", size: 0.8, rotation: Math.PI, x: 0, y: -0.78, opacity: 0.68 }
+        ]
+      }
+    },
+    {
+      id: "labyrinth",
+      label: "Labyrinth",
+      summary: "A slow inward path for reflection and ritual walking.",
+      family: "sacred",
+      seed: "labyrinth",
+      tags: ["return", "release"],
+      motionPreset: "mirror",
+      particleMotion: "still",
+      scenePreset: "temple-smoke",
+      breathPattern: "kasina"
+    },
+    {
+      id: "tree",
+      label: "Tree",
+      summary: "Root, branch, lineage, and layered ascent.",
+      family: "sacred",
+      seed: "tree-life",
+      tags: ["integration", "devotion"],
+      motionPreset: "breathe",
+      particleMotion: "breath",
+      scenePreset: "temple-smoke",
+      breathPattern: "coherent"
+    },
+    {
+      id: "caduceus",
+      label: "Caduceus",
+      summary: "Twin currents, balance, and a central channel.",
+      family: "crop",
+      seed: "milk-hill-caduceus",
+      tags: ["healing", "integration"],
+      motionPreset: "spiral",
+      particleMotion: "tone-sync",
+      scenePreset: "aurora",
+      breathPattern: "coherent",
+      soundPreset: "solfeggio-528"
+    }
   ];
 
   const primitiveOptions = [
@@ -393,6 +470,7 @@
     sound: { preset: "tone", frequency: toneProfiles[0].freq, volume: 5, uploadedName: "", recordedName: "" },
     breathPattern: "free",
     reflectionIndex: 0,
+    symbolContext: null,
     customGlyph: { symmetry: "free", mirror: "none", layers: [] },
     family: "sacred",
     seed: "metatron",
@@ -604,6 +682,7 @@
     refs.exploreSeed.addEventListener("click", exploreNextSeed);
     refs.actionSelect.addEventListener("change", () => {
       state.ritualAction = refs.actionSelect.value;
+      state.symbolContext = null;
       applyActionDefaults();
       rebuildGlyph("Action: " + currentAction().label);
     });
@@ -665,11 +744,13 @@
     Object.keys(refs.ranges).forEach((key) => {
       refs.ranges[key].addEventListener("input", () => {
         state.builder[key] = Number(refs.ranges[key].value);
+        state.symbolContext = null;
         rebuildGlyph();
       });
     });
     refs.variant.addEventListener("click", () => {
       state.builder.variant = (state.builder.variant + 1) % 12;
+      state.symbolContext = null;
       rebuildGlyph("Variant " + (state.builder.variant + 1));
     });
     refs.clearGesture.addEventListener("click", () => {
@@ -678,16 +759,19 @@
     });
     refs.customSymmetry.addEventListener("change", () => {
       state.customGlyph.symmetry = refs.customSymmetry.value;
+      state.symbolContext = null;
       rebuildGlyph("Custom repeat");
     });
     refs.customMirror.addEventListener("change", () => {
       state.customGlyph.mirror = refs.customMirror.value;
+      state.symbolContext = null;
       rebuildGlyph("Custom mirror");
     });
     refs.clearCustom.addEventListener("click", () => {
       state.customGlyph.layers = [];
       state.family = "custom";
       state.seed = "personal-glyph";
+      state.symbolContext = null;
       buildSeedControls();
       rebuildGlyph("Custom cleared");
     });
@@ -710,6 +794,7 @@
         state.family = family.id;
         state.seed = family.seeds[0].id;
         state.seedCategory = "all";
+        state.symbolContext = null;
         buildSeedControls();
         applyFamilyDefaults();
         rebuildGlyph("Family: " + family.label);
@@ -796,6 +881,7 @@
     const seed = currentFamily().seeds.find((item) => item.id === seedId);
     if (!seed) return;
     state.seed = seedId;
+    if (!options || !options.keepContext) state.symbolContext = null;
     refs.seedSelect.value = state.seed;
     state.sealedAt = null;
     state.sealSignature = null;
@@ -1065,6 +1151,7 @@
     state.family = "custom";
     state.seed = "personal-glyph";
     state.seedCategory = "all";
+    state.symbolContext = null;
     buildSeedControls();
     applyFamilyDefaults();
     rebuildGlyph("Added " + primitiveLabel(type));
@@ -1076,12 +1163,63 @@
   }
 
   function applySymbolContext(item) {
-    const tag = meaningTagOptions.find((option) => item.label.toLowerCase().includes(option.id) || option.id === item.id);
-    if (tag && !state.meaning.tags.includes(tag.id)) state.meaning.tags = state.meaning.tags.concat(tag.id).slice(-6);
-    state.journal = (state.journal ? state.journal + "\n" : "") + item.label + ": " + item.summary;
+    const context = symbolContextItems.find((option) => option.id === item.id);
+    if (!context) return;
+    state.symbolContext = context.id;
+    state.sealedAt = null;
+    state.sealSignature = null;
+
+    const family = glyphFamilies.find((option) => option.id === context.family);
+    if (family && family.seeds.some((seed) => seed.id === context.seed)) {
+      state.family = family.id;
+      state.seed = context.seed;
+      state.seedCategory = "all";
+      applyFamilyDefaults();
+      if (context.customGlyph) state.customGlyph = createContextCustomGlyph(context);
+      buildSeedControls();
+    }
+
+    if (Array.isArray(context.tags)) {
+      context.tags.forEach((tag) => {
+        if (meaningTagOptions.some((option) => option.id === tag) && !state.meaning.tags.includes(tag)) {
+          state.meaning.tags.push(tag);
+        }
+      });
+      state.meaning.tags = state.meaning.tags.slice(-6);
+    }
+    if (motionPresets.some((preset) => preset.id === context.motionPreset)) state.motionPreset = context.motionPreset;
+    if (particleMotionOptions.some((motion) => motion.id === context.particleMotion)) state.particles.motion = context.particleMotion;
+    if (scenePresets.some((scene) => scene.id === context.scenePreset)) state.scene.preset = context.scenePreset;
+    if (breathPatterns.some((pattern) => pattern.id === context.breathPattern)) state.breathPattern = context.breathPattern;
+    if (soundPresets.some((preset) => preset.id === context.soundPreset)) {
+      const preset = soundPresets.find((option) => option.id === context.soundPreset);
+      state.sound.preset = preset.id;
+      state.sound.frequency = preset.frequency || currentTone().freq;
+    }
+
+    const journalEntry = context.label + ": " + context.summary;
+    if (!state.journal.includes(journalEntry)) state.journal = (state.journal ? state.journal + "\n" : "") + journalEntry;
+    state.journal = state.journal.slice(0, 420);
     refs.journal.value = state.journal;
-    updateUI();
-    showToast(item.label);
+    applyTheme();
+    rebuildGlyph("Context: " + context.label);
+  }
+
+  function createContextCustomGlyph(context) {
+    const custom = context.customGlyph || { symmetry: "free", mirror: "none", layers: [] };
+    return {
+      symmetry: custom.symmetry || "free",
+      mirror: custom.mirror || "none",
+      layers: (custom.layers || []).map((layer, index) => ({
+        id: context.id + "-" + index,
+        type: layer.type,
+        size: layer.size,
+        rotation: layer.rotation,
+        x: layer.x,
+        y: layer.y,
+        opacity: layer.opacity
+      }))
+    };
   }
 
   function setSoundPreset(presetId) {
@@ -1487,6 +1625,11 @@
     refs.customSymmetry.value = state.customGlyph.symmetry;
     refs.customMirror.value = state.customGlyph.mirror;
     refs.customLayerCount.textContent = state.customGlyph.layers.length + (state.customGlyph.layers.length === 1 ? " layer" : " layers");
+    Array.from(refs.symbolContext.children).forEach((button) => {
+      const active = button.dataset.contextSymbol === state.symbolContext;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
     refs.premium.value = state.premiumPack;
     refs.premiumSummary.textContent = currentPremiumPack().summary;
     Array.from(refs.layerOptions.querySelectorAll("input[data-layer]")).forEach((input) => {
@@ -1494,7 +1637,8 @@
     });
 
     const label = modeCopy[state.mode] || "Field";
-    refs.status.textContent = state.moveGlyph ? "Move glyph" : state.trueGlyph ? "True glyph" : currentSeed().label + " " + label;
+    const context = currentSymbolContext();
+    refs.status.textContent = state.moveGlyph ? "Move glyph" : state.trueGlyph ? "True glyph" : context ? context.label + " Context" : currentSeed().label + " " + label;
   }
 
   function applyTheme() {
@@ -1548,6 +1692,10 @@
 
   function currentScene() {
     return scenePresets.find((item) => item.id === state.scene.preset) || scenePresets[0];
+  }
+
+  function currentSymbolContext() {
+    return symbolContextItems.find((item) => item.id === state.symbolContext) || null;
   }
 
   function currentParticleMotion() {
@@ -1671,6 +1819,7 @@
       particles: normalizeParticles(safe.particles),
       sound: normalizeSound(safe.sound),
       breathPattern: breathPatterns.some((pattern) => pattern.id === safe.breathPattern) ? safe.breathPattern : "free",
+      symbolContext: normalizeSymbolContext(safe.symbolContext),
       customGlyph: normalizeCustomGlyph(safe.customGlyph)
     };
   }
@@ -1800,6 +1949,7 @@
       },
       breathPattern: state.breathPattern,
       reflectionIndex: state.reflectionIndex,
+      symbolContext: state.symbolContext,
       customGlyph: {
         symmetry: state.customGlyph.symmetry,
         mirror: state.customGlyph.mirror,
@@ -1834,6 +1984,7 @@
       particles: { motion: "drift", density: 5, speed: 4, trails: 2 },
       sound: { preset: "tone", frequency: toneProfiles[0].freq, volume: 5, uploadedName: "", recordedName: "" },
       breathPattern: "free",
+      symbolContext: null,
       customGlyph: { symmetry: "free", mirror: "none", layers: [] }
     };
   }
@@ -1901,6 +2052,10 @@
     };
   }
 
+  function normalizeSymbolContext(value) {
+    return symbolContextItems.some((item) => item.id === value) ? value : null;
+  }
+
   function applyRecipe(recipe) {
     const safe = normalizeRecipe(recipe || legacyRecipeFromRecord({}));
     const family = glyphFamilies.find((item) => item.id === safe.family) ? safe.family : "sacred";
@@ -1943,6 +2098,7 @@
     state.particles = normalizeParticles(safe.particles);
     state.sound = normalizeSound(safe.sound);
     state.breathPattern = breathPatterns.some((pattern) => pattern.id === safe.breathPattern) ? safe.breathPattern : "free";
+    state.symbolContext = normalizeSymbolContext(safe.symbolContext);
     state.customGlyph = normalizeCustomGlyph(safe.customGlyph);
     state.reflectionIndex = clampNumber(safe.reflectionIndex, 0, reflectionPrompts.length - 1, 0);
   }

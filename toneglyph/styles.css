@@ -819,10 +819,21 @@ body[data-scene="paper-ink"] select option:checked {
   text-align: left;
 }
 
+.context-card.active {
+  color: #120908;
+  border-color: rgba(232, 196, 109, 0.42);
+  background: linear-gradient(135deg, rgba(232, 196, 109, 0.94), rgba(208, 154, 80, 0.82));
+  box-shadow: 0 0 26px rgba(232, 196, 109, 0.16);
+}
+
 .context-card span {
   color: var(--muted);
   font-size: 0.72rem;
   line-height: 1.25;
+}
+
+.context-card.active span {
+  color: rgba(18, 9, 8, 0.72);
 }
 
 .upload-action {
