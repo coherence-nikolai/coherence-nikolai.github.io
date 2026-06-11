@@ -23,8 +23,8 @@
     <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="toneparadox-icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
-    <script type="module" crossorigin src="./assets/index-DvBJ5YRS.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BqctJeeW.css">
+    <script type="module" crossorigin src="./assets/index-MS3po6sR.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-B2ubyEQH.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -36,7 +36,7 @@
           </a>
           <div class="landing-nav" aria-label="Tone Paradox actions">
             <button class="landing-link" type="button" id="landingAboutButton">About</button>
-            <button class="landing-link primary-link" type="button" id="landingTopStart">Begin</button>
+            <button class="landing-link primary-link" type="button" id="landingTopStart">Practice</button>
           </div>
         </header>
 
@@ -128,7 +128,7 @@
           </div>
 
           <div class="landing-actions">
-            <button class="landing-button primary" type="button" id="landingStartButton">Enter Practice</button>
+            <button class="landing-button primary" type="button" id="landingStartButton">Enter Paradox</button>
             <button class="landing-button ghost" type="button" id="landingAboutHeroButton">About the practice</button>
           </div>
           <p class="landing-copy">
@@ -213,6 +213,29 @@
           <strong id="phaseCue">Name the two poles.</strong>
         </section>
 
+        <section class="practice-rail" id="practiceRail" aria-label="Practice map">
+          <div class="rail-step" data-rail-phase="present">
+            <span>01</span>
+            <strong>Present</strong>
+            <small>formed state</small>
+          </div>
+          <div class="rail-step" data-rail-phase="opposite">
+            <span>02</span>
+            <strong>Opposite</strong>
+            <small>wider field</small>
+          </div>
+          <div class="rail-step" data-rail-phase="include">
+            <span>03</span>
+            <strong>Include</strong>
+            <small>both visible</small>
+          </div>
+          <div class="rail-step" data-rail-phase="hold">
+            <span>04</span>
+            <strong>Hold</strong>
+            <small>no collapse</small>
+          </div>
+        </section>
+
         <section class="bottom-sheet" id="setupSheet" aria-labelledby="setupTitle">
           <div class="sheet-handle" aria-hidden="true"></div>
           <form id="setupForm">
@@ -276,6 +299,11 @@
               Copper carries the conscious, self-referential loop of what is formed. Blue carries the
               unformed opposite or wider field. Gold marks the contact where both can be observed without choosing.
             </p>
+            <div class="practice-action-card">
+              <strong>Core move</strong>
+              <span>Name the formed state, name its opposite, then watch both without solving.</span>
+            </div>
+            <p class="memory-summary" id="memorySummary" aria-live="polite">No saved insights yet.</p>
 
             <div class="mode-row">
               <span class="field-caption">Practice mode</span>
@@ -348,6 +376,9 @@
                 </label>
               </fieldset>
             </div>
+            <p class="audio-hint">
+              Guide plays the built-in cues. Mine uses your local recordings when you add them below.
+            </p>
 
             <section class="voice-recorder-panel" id="voiceRecorderPanel" aria-label="My voice guide" hidden>
               <div class="voice-panel-head">
@@ -544,26 +575,31 @@
           </p>
           <div class="plus-grid">
             <article>
+              <em>Free core</em>
               <strong>Meaning Layer</strong>
               <span>Plain and math vocabularies for toroid, hyperboloid, and focal ring.</span>
               <button type="button" data-plus-action="meanings">Turn on plain</button>
             </article>
             <article>
+              <em>Free core</em>
               <strong>Insight Memory</strong>
-              <span>Saved sessions, recurring pairs, and searchable reflection history.</span>
+              <span>Saved sessions in this browser, with one-tap repeat for recurring pairs.</span>
               <button type="button" data-about-jump="journal">Open journal</button>
             </article>
             <article>
+              <em>Plus layer</em>
               <strong>Guided Library</strong>
               <span>Long-form audio, Tone family voices, and themed paradox sequences.</span>
               <button type="button" data-plus-action="audio">Preview layer</button>
             </article>
             <article>
+              <em>Plus layer</em>
               <strong>Study Notes</strong>
               <span>Toroid, hyperboloid, focal ring, and r=1 contact language.</span>
               <button type="button" data-plus-action="study">Show study map</button>
             </article>
             <article>
+              <em>iPhone later</em>
               <strong>iPhone Plus</strong>
               <span>Home Screen app mode, iCloud-ready memory, and premium visual themes.</span>
               <button type="button" data-plus-action="iphone">Phone map</button>
