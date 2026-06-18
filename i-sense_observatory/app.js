@@ -105,7 +105,9 @@ const state = {
   perceptions: new Set(),
   note: "",
   observeEndsAt: 0,
+  prepareEndsAt: 0,
   observeTimer: null,
+  isPreparingObservation: false,
   sessions: loadSessions()
 };
 
@@ -143,6 +145,27 @@ const canvasState = {
   startedAt: performance.now()
 };
 
+const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+const motionProfiles = {
+  arrive: { field: 0.18, aperture: 0.92, peripheral: 0.14, rays: 0 },
+  locate: { field: 0.24, aperture: 0.98, peripheral: 0.2, rays: 0 },
+  texture: { field: 0.28, aperture: 1, peripheral: 0.24, rays: 0 },
+  stillness: { field: 0.3, aperture: 1.03, peripheral: 0.28, rays: 0 },
+  observe: { field: 0.68, aperture: 1.18, peripheral: 0.88, rays: 0.46 },
+  report: { field: 0.36, aperture: 1.05, peripheral: 0.42, rays: 0 },
+  threshold: { field: 0.82, aperture: 1.34, peripheral: 1, rays: 0.54 },
+  note: { field: 0.4, aperture: 1.08, peripheral: 0.48, rays: 0 }
+};
+
+const motionState = {
+  current: { ...motionProfiles.arrive },
+  target: { ...motionProfiles.arrive },
+  reducedMotion: reduceMotionQuery.matches,
+  lastFrameAt: performance.now(),
+  renderedReducedFrame: false
+};
+
 function loadSessions() {
   try {
     const saved = localStorage.getItem(storageKey);
@@ -167,17 +190,23 @@ function resetSession() {
   state.perceptions = new Set();
   state.note = "";
   state.observeEndsAt = 0;
+  state.prepareEndsAt = 0;
+  state.isPreparingObservation = false;
   render();
 }
 
 function setView(view) {
+  const previousView = state.view;
   state.view = view;
+  if (previousView === "observatory" && view !== "observatory") stopObserveTimer();
   els.tabs.forEach((tab) => {
     tab.classList.toggle("is-active", tab.dataset.viewTarget === view);
   });
   Object.entries(els.views).forEach(([name, element]) => {
     element.classList.toggle("is-active", name === view);
   });
+  updateStageChrome();
+  setMotionTarget();
   if (view === "notes") renderNotes();
   if (view === "patterns") renderPatterns();
 }
@@ -218,9 +247,10 @@ function renderSteps() {
 }
 
 function updateStageChrome() {
-  const key = stageKeys[state.stage] || "arrive";
+  const key = getChromeStage();
   document.documentElement.dataset.stage = key;
-  document.documentElement.classList.toggle("is-observing", state.stage === 3 && Boolean(state.observeTimer));
+  document.documentElement.classList.toggle("is-observing", state.view === "observatory" && state.stage === 3 && Boolean(state.observeTimer));
+  document.documentElement.classList.toggle("is-preparing", state.view === "observatory" && state.isPreparingObservation);
 }
 
 function renderSummary() {
@@ -256,22 +286,28 @@ function renderArrive() {
   setStageContent(
     "direct observation",
     "I-Sense Observatory",
-    "No belief is required. No conclusion is supplied. Look directly. Record your own result.",
+    "Look directly. Record your own result.",
     `<div class="arrival-instrument">
       ${renderSignalMark("signal-mark")}
-      <div class="choice-row" aria-label="Experiment stance">
-        ${["locate", "observe", "record"].map((label) => `<span class="chip-button quiet-chip">${label}</span>`).join("")}
+      <div class="arrival-constellation" aria-hidden="true"></div>
+      <div class="arrival-control-row" aria-label="Experiment stance">
+        ${[
+          ["locate", "target"],
+          ["observe", "eye"],
+          ["record", "circle"]
+        ].map(([label, icon]) => `<span class="instrument-control ${icon}"><span></span><b>${label}</b></span>`).join("")}
       </div>
     </div>`,
-    `<button class="primary-button" type="button" data-action="begin">Begin experiment</button>
-     <button class="secondary-button" type="button" data-action="view-notes">View notes</button>`
+    `<button class="primary-button ceremonial-button" type="button" data-action="begin"><span class="button-sigil" aria-hidden="true"></span><span>Begin experiment</span><span class="button-arrow" aria-hidden="true"></span></button>
+     <button class="secondary-button archive-button" type="button" data-action="view-notes"><span class="archive-icon" aria-hidden="true"></span><span>Notes</span><span class="button-arrow small" aria-hidden="true"></span></button>`
   );
 }
 
 function renderLocate() {
   const choices = locationOptions.map((option) => {
     const selected = state.location === option ? "is-selected" : "";
-    return `<button class="choice-button ${selected}" type="button" data-location="${option}">${option}</button>`;
+    const pressed = state.location === option ? "true" : "false";
+    return `<button class="choice-button ${selected}" type="button" data-location="${option}" aria-pressed="${pressed}">${option}</button>`;
   }).join("");
 
   setStageContent(
@@ -299,7 +335,7 @@ function renderTexture() {
     "Select any qualities that fit the immediate felt sense.",
     `<div class="choice-row">${renderChipButtons(textureOptions, state.textures, "texture")}</div>
      <div class="choice-row" style="margin-top:18px" aria-label="Observation duration">
-       ${durationOptions.map((seconds) => `<button class="chip-button ${state.duration === seconds ? "is-selected" : ""}" type="button" data-duration="${seconds}">${seconds}s</button>`).join("")}
+       ${durationOptions.map((seconds) => `<button class="chip-button ${state.duration === seconds ? "is-selected" : ""}" type="button" data-duration="${seconds}" aria-pressed="${state.duration === seconds ? "true" : "false"}">${seconds}s</button>`).join("")}
      </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
      <button class="primary-button" type="button" data-action="next">Observe</button>`
@@ -311,7 +347,7 @@ function renderObserveIntro() {
   setStageContent(
     "observe",
     "Rest attention on the felt sense.",
-    "Do not analyze it. Observe whether it stays, shifts, softens, drops away, or re-forms.",
+    "First, five seconds of stillness. Then observe whether it stays, shifts, softens, drops away, or re-forms.",
     `<div class="observe-field">
       <div class="timer-disc is-ready" style="--angle:0deg">
         ${renderSignalMark("timer-mark")}
@@ -326,9 +362,47 @@ function renderObserveIntro() {
 
 function startObservation() {
   stopObserveTimer();
-  state.observeEndsAt = Date.now() + state.duration * 1000;
-  state.observeTimer = window.setInterval(renderObserveActive, 250);
-  renderObserveActive();
+  state.observeEndsAt = 0;
+  state.isPreparingObservation = true;
+  state.prepareEndsAt = performance.now() + 5000;
+  state.observeTimer = window.setInterval(renderObserveStillness, 180);
+  renderObserveStillness();
+}
+
+function renderObserveStillness() {
+  const remainingMs = Math.max(0, state.prepareEndsAt - performance.now());
+  const remainingSeconds = Math.ceil(remainingMs / 1000);
+  updateStageChrome();
+  setMotionTarget();
+
+  const activeDisc = els.body.querySelector(".timer-disc.is-preparing");
+  if (activeDisc) {
+    const number = activeDisc.querySelector("strong");
+    if (number) number.textContent = String(remainingSeconds);
+  } else {
+    setStageContent(
+      "stillness",
+      "Let the field become quiet.",
+      "Nothing needs to happen. Let the felt sense be present before observing it.",
+      `<div class="observe-field">
+        <div class="timer-disc is-preparing" style="--angle:0deg">
+          ${renderSignalMark("timer-mark")}
+          <strong>${remainingSeconds}</strong>
+          <span>stillness</span>
+        </div>
+      </div>`,
+      `<button class="secondary-button" type="button" data-action="end-observe">Stop</button>`
+    );
+  }
+
+  if (remainingMs <= 0) {
+    state.isPreparingObservation = false;
+    state.observeEndsAt = Date.now() + state.duration * 1000;
+    window.clearInterval(state.observeTimer);
+    state.observeTimer = window.setInterval(renderObserveActive, 250);
+    updateStageChrome();
+    renderObserveActive();
+  }
 }
 
 function renderObserveActive() {
@@ -371,6 +445,9 @@ function stopObserveTimer() {
     window.clearInterval(state.observeTimer);
     state.observeTimer = null;
   }
+  state.isPreparingObservation = false;
+  state.prepareEndsAt = 0;
+  setMotionTarget();
 }
 
 function renderReport() {
@@ -425,7 +502,7 @@ function renderSaved() {
       <span class="chip-button">no conclusion supplied</span>
     </div>`,
     `<button class="primary-button" type="button" data-action="new-session">Begin again</button>
-     <button class="secondary-button" type="button" data-action="view-notes">View notes</button>
+     <button class="secondary-button" type="button" data-action="view-notes">Notes</button>
      <button class="secondary-button" type="button" data-action="view-patterns">View patterns</button>`
   );
 }
@@ -448,7 +525,8 @@ function renderSignalMark(className) {
 function renderChipButtons(options, set, key) {
   return options.map((option) => {
     const selected = set.has(option) ? "is-selected" : "";
-    return `<button class="chip-button ${selected}" type="button" data-toggle="${key}" data-value="${option}">${option}</button>`;
+    const pressed = set.has(option) ? "true" : "false";
+    return `<button class="chip-button ${selected}" type="button" data-toggle="${key}" data-value="${option}" aria-pressed="${pressed}">${option}</button>`;
   }).join("");
 }
 
@@ -594,10 +672,25 @@ function escapeHtml(value) {
 
 function updateFieldIntensity() {
   updateStageChrome();
-  const observing = state.stage === 3 && state.observeTimer;
-  const threshold = state.stage === 5;
-  const intensity = observing ? 1 : threshold ? 0.72 : state.stage >= 4 ? 0.42 : 0.18;
-  document.documentElement.style.setProperty("--field-intensity", String(intensity));
+  setMotionTarget();
+}
+
+function getChromeStage() {
+  return state.view === "observatory" ? stageKeys[state.stage] || "arrive" : state.view;
+}
+
+function setMotionTarget() {
+  const stage = getChromeStage();
+  const profileKey = state.isPreparingObservation ? "stillness" : stage;
+  const profile = state.stage === 3 && state.observeTimer && !state.isPreparingObservation
+    ? motionProfiles.observe
+    : motionProfiles[profileKey] || motionProfiles.arrive;
+
+  motionState.target = { ...profile };
+  document.documentElement.style.setProperty("--field-intensity", String(profile.field));
+  document.documentElement.style.setProperty("--field-aperture", String(profile.aperture));
+  document.documentElement.style.setProperty("--field-peripheral", String(profile.peripheral));
+  document.documentElement.style.setProperty("--field-rays", String(profile.rays));
 }
 
 function resizeCanvas() {
@@ -612,22 +705,35 @@ function resizeCanvas() {
 }
 
 function drawField(now) {
+  if (document.hidden) return;
+
   const ctx = canvasState.context;
   const width = canvasState.width;
   const height = canvasState.height;
   const t = (now - canvasState.startedAt) / 1000;
-  const intensity = Number(getComputedStyle(document.documentElement).getPropertyValue("--field-intensity")) || 0.18;
+  const delta = Math.min(0.08, Math.max(0.001, (now - motionState.lastFrameAt) / 1000));
+  motionState.lastFrameAt = now;
+  const ease = motionState.reducedMotion ? 1 : Math.min(1, delta * 4.4);
+
+  Object.keys(motionState.current).forEach((key) => {
+    motionState.current[key] += (motionState.target[key] - motionState.current[key]) * ease;
+  });
+
+  const intensity = motionState.current.field;
+  const aperture = motionState.current.aperture;
+  const peripheral = motionState.current.peripheral;
+  const rayPower = motionState.current.rays;
   const stage = document.documentElement.dataset.stage || "arrive";
   ctx.clearRect(0, 0, width, height);
 
   const cx = width * 0.5;
-  const cy = height * 0.46;
-  const maxRadius = Math.max(width, height) * (0.48 + intensity * 0.34);
+  const cy = height * (stage === "arrive" ? 0.48 : 0.46);
+  const maxRadius = Math.max(width, height) * (0.44 + aperture * 0.23 + peripheral * 0.17);
 
   const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRadius);
-  gradient.addColorStop(0, `rgba(255, 255, 255, ${0.88 + intensity * 0.1})`);
-  gradient.addColorStop(0.18, `rgba(255, 255, 255, ${0.38 + intensity * 0.24})`);
-  gradient.addColorStop(0.52, `rgba(196, 205, 201, ${0.16 + intensity * 0.14})`);
+  gradient.addColorStop(0, `rgba(255, 250, 240, ${0.36 + intensity * 0.24})`);
+  gradient.addColorStop(0.15, `rgba(255, 250, 240, ${0.18 + intensity * 0.16})`);
+  gradient.addColorStop(0.48, `rgba(188, 211, 203, ${0.08 + peripheral * 0.16})`);
   gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
@@ -636,54 +742,58 @@ function drawField(now) {
   ctx.translate(cx, cy);
   const rings = 7;
   for (let i = 0; i < rings; i += 1) {
-    const phase = (t * 0.035 + i / rings) % 1;
+    const phase = (t * (motionState.reducedMotion ? 0 : 0.018 + peripheral * 0.026) + i / rings) % 1;
     const radius = maxRadius * (0.08 + phase * 0.9);
-    const alpha = Math.max(0, (1 - phase) * (0.12 + intensity * 0.18));
+    const alpha = Math.max(0, (1 - phase) * (0.055 + peripheral * 0.16));
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.strokeStyle = `rgba(255, 250, 240, ${alpha})`;
     ctx.lineWidth = 1;
     ctx.stroke();
   }
 
-  const points = 44;
+  const points = 58;
   for (let i = 0; i < points; i += 1) {
-    const angle = (Math.PI * 2 * i) / points + Math.sin(t * 0.12 + i) * 0.04;
-    const distance = maxRadius * (0.12 + ((i * 37) % 100) / 100 * (0.42 + intensity * 0.26));
+    const angle = (Math.PI * 2 * i) / points + Math.sin(t * 0.07 + i) * (motionState.reducedMotion ? 0 : 0.026);
+    const spread = 0.34 + peripheral * 0.42;
+    const distance = maxRadius * (0.16 + ((i * 37) % 100) / 100 * spread);
     const x = Math.cos(angle) * distance;
-    const y = Math.sin(angle) * distance * 0.72;
+    const y = Math.sin(angle) * distance * (0.66 + peripheral * 0.12);
     ctx.beginPath();
-    ctx.arc(x, y, 1.1 + intensity * 1.1, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${0.14 + intensity * 0.22})`;
+    ctx.arc(x, y, 0.62 + peripheral * 1.05, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 250, 240, ${0.08 + peripheral * 0.2})`;
     ctx.fill();
   }
   ctx.restore();
 
-  if (intensity > 0.38) {
+  if (rayPower > 0.08) {
     const rayBaseX = cx + Math.sin(t * 0.11) * 8;
     const rayBaseY = cy - maxRadius * 0.06;
     const rayAngles = [-2.03, -1.72, -1.42, -1.11];
     ctx.save();
     ctx.lineCap = "round";
     rayAngles.forEach((angle, index) => {
-      const length = maxRadius * (stage === "threshold" ? 0.74 : 0.56) * (0.86 + index * 0.045);
-      const wobble = Math.sin(t * 0.38 + index) * 0.018;
+      const length = maxRadius * (stage === "threshold" ? 0.68 : 0.48) * (0.86 + index * 0.045);
+      const wobble = Math.sin(t * 0.25 + index) * (motionState.reducedMotion ? 0 : 0.014);
       const endX = rayBaseX + Math.cos(angle + wobble) * length;
       const endY = rayBaseY + Math.sin(angle + wobble) * length;
       const gradientLine = ctx.createLinearGradient(rayBaseX, rayBaseY, endX, endY);
-      gradientLine.addColorStop(0, `rgba(255, 250, 238, ${0.12 + intensity * 0.28})`);
+      gradientLine.addColorStop(0, `rgba(255, 250, 238, ${0.08 + rayPower * 0.26})`);
       gradientLine.addColorStop(1, "rgba(255, 250, 238, 0)");
       ctx.beginPath();
       ctx.moveTo(rayBaseX, rayBaseY);
       ctx.lineTo(endX, endY);
       ctx.strokeStyle = gradientLine;
-      ctx.lineWidth = 1.2 + intensity * 1.2;
+      ctx.lineWidth = 0.8 + rayPower * 1.2;
       ctx.stroke();
     });
     ctx.restore();
   }
 
-  requestAnimationFrame(drawField);
+  if (!motionState.reducedMotion || !motionState.renderedReducedFrame) {
+    motionState.renderedReducedFrame = motionState.reducedMotion;
+    requestAnimationFrame(drawField);
+  }
 }
 
 function handleBodyClick(event) {
@@ -750,6 +860,17 @@ els.exportNotes.addEventListener("click", exportNotes);
 els.clearNotes.addEventListener("click", clearNotes);
 document.addEventListener("click", handleBodyClick);
 window.addEventListener("resize", resizeCanvas);
+reduceMotionQuery.addEventListener("change", (event) => {
+  motionState.reducedMotion = event.matches;
+  motionState.renderedReducedFrame = false;
+  requestAnimationFrame(drawField);
+});
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !motionState.reducedMotion) {
+    motionState.lastFrameAt = performance.now();
+    requestAnimationFrame(drawField);
+  }
+});
 
 resizeCanvas();
 render();
