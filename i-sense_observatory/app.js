@@ -92,14 +92,31 @@ const perceptionOptions = [
   "unclear"
 ];
 
-const durationOptions = [30, 60, 90];
+const locateQuestions = [
+  "Where do you sense your self?",
+  "Where do you feel located in the body?",
+  "Where is the felt sense of existing as you?",
+  "Where are you mainly located right now?",
+  "If me-ness had a center, where would it seem to be?",
+  "Where does the sense of being the observer appear from?"
+];
+
+const textureQuestions = [
+  "How are you experiencing the sense of self?",
+  "How is me-ness felt in the body?",
+  "What type of experience seems to explain the sense of me?",
+  "Is it pressure, image, center, boundary, watcher, warmth, or something else?",
+  "Does it feel solid, vague, spacious, contracted, moving, or absent?",
+  "What is directly felt before any story about it?"
+];
 
 const state = {
   view: "observatory",
   stage: 0,
+  locateQuestionIndex: 0,
+  textureQuestionIndex: 0,
   location: "",
   textures: new Set(),
-  duration: 60,
   changes: new Set(),
   thresholds: new Set(),
   perceptions: new Set(),
@@ -108,6 +125,8 @@ const state = {
   prepareEndsAt: 0,
   observeTimer: null,
   isPreparingObservation: false,
+  isObservingDirectly: false,
+  observationStartedAt: 0,
   sessions: loadSessions()
 };
 
@@ -182,9 +201,10 @@ function saveSessions() {
 function resetSession() {
   stopObserveTimer();
   state.stage = 0;
+  state.locateQuestionIndex = 0;
+  state.textureQuestionIndex = 0;
   state.location = "";
   state.textures = new Set();
-  state.duration = 60;
   state.changes = new Set();
   state.thresholds = new Set();
   state.perceptions = new Set();
@@ -192,28 +212,36 @@ function resetSession() {
   state.observeEndsAt = 0;
   state.prepareEndsAt = 0;
   state.isPreparingObservation = false;
-  render();
+  state.isObservingDirectly = false;
+  state.observationStartedAt = 0;
+  renderWithTransition();
 }
 
 function setView(view) {
-  const previousView = state.view;
-  state.view = view;
-  if (previousView === "observatory" && view !== "observatory") stopObserveTimer();
-  els.tabs.forEach((tab) => {
-    tab.classList.toggle("is-active", tab.dataset.viewTarget === view);
+  mutateWithTransition(() => {
+    const previousView = state.view;
+    state.view = view;
+    if (previousView === "observatory" && view !== "observatory") stopObserveTimer();
+    els.tabs.forEach((tab) => {
+      tab.classList.toggle("is-active", tab.dataset.viewTarget === view);
+    });
+    Object.entries(els.views).forEach(([name, element]) => {
+      element.classList.toggle("is-active", name === view);
+    });
+    updateStageChrome();
+    setMotionTarget();
+    if (view === "notes") renderNotes();
+    if (view === "patterns") renderPatterns();
   });
-  Object.entries(els.views).forEach(([name, element]) => {
-    element.classList.toggle("is-active", name === view);
-  });
-  updateStageChrome();
-  setMotionTarget();
-  if (view === "notes") renderNotes();
-  if (view === "patterns") renderPatterns();
 }
 
 function setStage(stage) {
-  state.stage = Math.max(0, Math.min(stage, stageOrder.length - 1));
-  render();
+  const nextStage = Math.max(0, Math.min(stage, stageOrder.length - 1));
+  mutateWithTransition(() => {
+    if (state.stage === 3 && nextStage !== 3) stopObserveTimer();
+    state.stage = nextStage;
+    render();
+  });
 }
 
 function selectedArray(set) {
@@ -239,6 +267,24 @@ function render() {
   updateFieldIntensity();
 }
 
+function renderWithTransition() {
+  mutateWithTransition(render);
+}
+
+function mutateWithTransition(mutate) {
+  const canTransition = !motionState.reducedMotion
+    && typeof document.startViewTransition === "function";
+
+  if (!canTransition) {
+    mutate();
+    return;
+  }
+
+  document.startViewTransition(() => {
+    mutate();
+  });
+}
+
 function renderSteps() {
   els.stepList.innerHTML = stageOrder.map((step, index) => {
     const className = index < state.stage ? "is-complete" : index === state.stage ? "is-current" : "";
@@ -249,7 +295,7 @@ function renderSteps() {
 function updateStageChrome() {
   const key = getChromeStage();
   document.documentElement.dataset.stage = key;
-  document.documentElement.classList.toggle("is-observing", state.view === "observatory" && state.stage === 3 && Boolean(state.observeTimer));
+  document.documentElement.classList.toggle("is-observing", state.view === "observatory" && state.stage === 3 && (Boolean(state.observeTimer) || state.isObservingDirectly));
   document.documentElement.classList.toggle("is-preparing", state.view === "observatory" && state.isPreparingObservation);
 }
 
@@ -257,7 +303,7 @@ function renderSummary() {
   const lines = [];
   lines.push(`<div><strong>Location</strong>${state.location || "not observed yet"}</div>`);
   lines.push(`<div><strong>Texture</strong>${joinOrNone(selectedArray(state.textures))}</div>`);
-  lines.push(`<div><strong>Duration</strong>${state.duration} seconds</div>`);
+  lines.push(`<div><strong>Observation</strong>${state.isObservingDirectly ? "open now" : "untimed"}</div>`);
   lines.push(`<div><strong>Change</strong>${joinOrNone(selectedArray(state.changes))}</div>`);
   lines.push(`<div><strong>Threshold</strong>${joinOrNone(selectedArray(state.thresholds))}</div>`);
   els.summary.innerHTML = lines.join("");
@@ -315,8 +361,8 @@ function renderLocate() {
 
   setStageContent(
     "locate",
-    "Where does \"me\" seem to be felt?",
-    "Choose the closest report. No location and no clear location are valid observations.",
+    "Find the felt center of me.",
+    "Let each question angle the attention slightly differently. Choose the closest direct report.",
     `<div class="body-map">
       <div class="body-figure" aria-hidden="true">
         <span class="body-point eyes"></span>
@@ -324,7 +370,10 @@ function renderLocate() {
         <span class="body-point chest"></span>
         <span class="body-point abdomen"></span>
       </div>
-      <div class="choice-grid">${choices}</div>
+      <div class="inquiry-stack">
+        ${renderQuestionLens(locateQuestions, state.locateQuestionIndex, "next-locate-question")}
+        <div class="choice-grid">${choices}</div>
+      </div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
      <button class="primary-button" type="button" data-action="next" ${state.location ? "" : "disabled"}>Continue</button>`
@@ -334,14 +383,14 @@ function renderLocate() {
 function renderTexture() {
   setStageContent(
     "texture",
-    "What is its felt texture?",
-    "Select any qualities that fit the immediate felt sense.",
-    `<div class="choice-row">${renderChipButtons(textureOptions, state.textures, "texture")}</div>
-     <div class="choice-row" style="margin-top:18px" aria-label="Observation duration">
-       ${durationOptions.map((seconds) => `<button class="chip-button ${state.duration === seconds ? "is-selected" : ""}" type="button" data-duration="${seconds}" aria-pressed="${state.duration === seconds ? "true" : "false"}">${seconds}s</button>`).join("")}
+    "Describe how self is appearing.",
+    "Use several angles. Select any qualities that fit the immediate felt experience.",
+    `<div class="texture-inquiry">
+       ${renderQuestionLens(textureQuestions, state.textureQuestionIndex, "next-texture-question")}
+       <div class="choice-row">${renderChipButtons(textureOptions, state.textures, "texture")}</div>
      </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="next">Observe</button>`
+     <button class="primary-button" type="button" data-action="next">Direct observe</button>`
   );
 }
 
@@ -349,98 +398,25 @@ function renderObserveIntro() {
   stopObserveTimer();
   setStageContent(
     "observe",
-    "Rest attention on the felt sense.",
-    "First, five seconds of stillness. Then observe whether it stays, shifts, softens, drops away, or re-forms.",
+    "Observe the felt sense directly.",
+    "No timer. No performance. Let the sense of me be known directly and notice whether it stays, shifts, softens, drops away, or re-forms.",
     `<div class="observe-field">
-      <div class="timer-disc is-ready" style="--angle:0deg">
+      <div class="timer-disc untimed-disc is-ready" style="--angle:0deg">
         ${renderSignalMark("timer-mark")}
-        <strong>${state.duration}</strong>
-        <span>seconds</span>
+        <strong>open</strong>
+        <span>untimed</span>
       </div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="start-observe">Start ${state.duration}s</button>`
+     <button class="primary-button" type="button" data-action="start-observe">Begin observing</button>`
   );
 }
 
 function startObservation() {
   stopObserveTimer();
-  state.observeEndsAt = 0;
-  state.isPreparingObservation = true;
-  state.prepareEndsAt = performance.now() + 5000;
-  state.observeTimer = window.setInterval(renderObserveStillness, 180);
-  renderObserveStillness();
-}
-
-function renderObserveStillness() {
-  const remainingMs = Math.max(0, state.prepareEndsAt - performance.now());
-  const remainingSeconds = Math.ceil(remainingMs / 1000);
-  updateStageChrome();
-  setMotionTarget();
-
-  const activeDisc = els.body.querySelector(".timer-disc.is-preparing");
-  if (activeDisc) {
-    const number = activeDisc.querySelector("strong");
-    if (number) number.textContent = String(remainingSeconds);
-  } else {
-    setStageContent(
-      "stillness",
-      "Let the field become quiet.",
-      "Nothing needs to happen. Let the felt sense be present before observing it.",
-      `<div class="observe-field">
-        <div class="timer-disc is-preparing" style="--angle:0deg">
-          ${renderSignalMark("timer-mark")}
-          <strong>${remainingSeconds}</strong>
-          <span>stillness</span>
-        </div>
-      </div>`,
-      `<button class="secondary-button" type="button" data-action="end-observe">Stop</button>`
-    );
-  }
-
-  if (remainingMs <= 0) {
-    state.isPreparingObservation = false;
-    state.observeEndsAt = Date.now() + state.duration * 1000;
-    window.clearInterval(state.observeTimer);
-    state.observeTimer = window.setInterval(renderObserveActive, 250);
-    updateStageChrome();
-    renderObserveActive();
-  }
-}
-
-function renderObserveActive() {
-  const remainingMs = Math.max(0, state.observeEndsAt - Date.now());
-  const remainingSeconds = Math.ceil(remainingMs / 1000);
-  const elapsed = state.duration - remainingMs / 1000;
-  const progress = Math.max(0, Math.min(1, elapsed / state.duration));
-  const angle = Math.round(progress * 360);
-
-  const activeDisc = els.body.querySelector(".timer-disc.is-active");
-  if (activeDisc) {
-    activeDisc.style.setProperty("--angle", `${angle}deg`);
-    const number = activeDisc.querySelector("strong");
-    if (number) number.textContent = String(remainingSeconds);
-  } else {
-    setStageContent(
-      "observing",
-      "Observe directly.",
-      "Let the felt sense be seen. If nothing changes, record that.",
-      `<div class="observe-field">
-        <div class="timer-disc is-active" style="--angle:${angle}deg">
-          ${renderSignalMark("timer-mark")}
-          <strong>${remainingSeconds}</strong>
-          <span>remaining</span>
-        </div>
-      </div>`,
-      `<button class="secondary-button" type="button" data-action="end-observe">End early</button>`
-    );
-  }
-  updateFieldIntensity();
-
-  if (remainingMs <= 0) {
-    stopObserveTimer();
-    setStage(4);
-  }
+  state.isObservingDirectly = true;
+  state.observationStartedAt = Date.now();
+  renderUntimedObserveActive();
 }
 
 function stopObserveTimer() {
@@ -449,8 +425,28 @@ function stopObserveTimer() {
     state.observeTimer = null;
   }
   state.isPreparingObservation = false;
+  state.isObservingDirectly = false;
   state.prepareEndsAt = 0;
   setMotionTarget();
+}
+
+function renderUntimedObserveActive() {
+  updateStageChrome();
+  setMotionTarget();
+  setStageContent(
+    "observing",
+    "Stay with what is actually here.",
+    "When something is clear enough, record it. If nothing changes, record that too.",
+    `<div class="observe-field">
+      <div class="timer-disc untimed-disc is-active" style="--angle:0deg">
+        ${renderSignalMark("timer-mark")}
+        <strong>now</strong>
+        <span>directly</span>
+      </div>
+    </div>`,
+    `<button class="secondary-button" type="button" data-action="back">Back</button>
+     <button class="primary-button" type="button" data-action="end-observe">Record what happened</button>`
+  );
 }
 
 function renderReport() {
@@ -531,6 +527,21 @@ function renderSignalMark(className) {
   </svg>`;
 }
 
+function renderQuestionLens(questions, activeIndex, action) {
+  const count = questions.length;
+  const normalizedIndex = ((activeIndex % count) + count) % count;
+  const dots = questions.map((_, index) => (
+    `<span class="${index === normalizedIndex ? "is-active" : ""}"></span>`
+  )).join("");
+
+  return `<section class="question-lens" aria-label="Inquiry angle">
+    <span class="lens-label">angle ${normalizedIndex + 1} / ${count}</span>
+    <p>${escapeHtml(questions[normalizedIndex])}</p>
+    <button class="quiet-button lens-next" type="button" data-action="${action}">Another angle</button>
+    <div class="lens-dots" aria-hidden="true">${dots}</div>
+  </section>`;
+}
+
 function renderChipButtons(options, set, key) {
   return options.map((option) => {
     const selected = set.has(option) ? "is-selected" : "";
@@ -551,7 +562,8 @@ function saveCurrentSession() {
   const session = {
     id: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     createdAt: new Date().toISOString(),
-    durationSeconds: state.duration,
+    observationMode: "untimed",
+    durationSeconds: null,
     location: state.location,
     textureMarkers: selectedArray(state.textures),
     observedChangeMarkers: selectedArray(state.changes),
@@ -561,7 +573,11 @@ function saveCurrentSession() {
   };
   state.sessions.unshift(session);
   saveSessions();
-  renderSaved();
+  mutateWithTransition(() => {
+    renderSaved();
+    renderNotes();
+    renderPatterns();
+  });
 }
 
 function renderNotes() {
@@ -588,7 +604,7 @@ function renderNotes() {
         </div>
         <button class="quiet-button danger" type="button" data-delete-session="${session.id}">Delete</button>
       </header>
-      <div class="note-meta">${session.durationSeconds}s observation</div>
+      <div class="note-meta">${session.durationSeconds ? `${session.durationSeconds}s observation` : "untimed observation"}</div>
       <div class="note-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("") || "<span>no markers</span>"}</div>
       <p>${escapeHtml(session.userNote || "No written note.")}</p>
     </article>`;
@@ -691,7 +707,7 @@ function getChromeStage() {
 function setMotionTarget() {
   const stage = getChromeStage();
   const profileKey = state.isPreparingObservation ? "stillness" : stage;
-  const profile = state.stage === 3 && state.observeTimer && !state.isPreparingObservation
+  const profile = state.stage === 3 && (state.observeTimer || state.isObservingDirectly) && !state.isPreparingObservation
     ? motionProfiles.observe
     : motionProfiles[profileKey] || motionProfiles.arrive;
 
@@ -818,6 +834,14 @@ function handleBodyClick(event) {
       stopObserveTimer();
       setStage(4);
     }
+    if (action === "next-locate-question") {
+      state.locateQuestionIndex = (state.locateQuestionIndex + 1) % locateQuestions.length;
+      renderWithTransition();
+    }
+    if (action === "next-texture-question") {
+      state.textureQuestionIndex = (state.textureQuestionIndex + 1) % textureQuestions.length;
+      renderWithTransition();
+    }
     if (action === "save-note") saveCurrentSession();
     if (action === "new-session") resetSession();
     if (action === "view-notes") setView("notes");
@@ -828,14 +852,7 @@ function handleBodyClick(event) {
   const locationTarget = event.target.closest("[data-location]");
   if (locationTarget) {
     state.location = locationTarget.dataset.location;
-    render();
-    return;
-  }
-
-  const durationTarget = event.target.closest("[data-duration]");
-  if (durationTarget) {
-    state.duration = Number(durationTarget.dataset.duration);
-    render();
+    renderWithTransition();
     return;
   }
 
@@ -852,7 +869,7 @@ function handleBodyClick(event) {
     const set = map[key];
     if (set.has(value)) set.delete(value);
     else set.add(value);
-    render();
+    renderWithTransition();
     return;
   }
 
