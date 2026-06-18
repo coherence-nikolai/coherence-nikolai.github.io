@@ -288,18 +288,21 @@ function renderArrive() {
     "I-Sense Observatory",
     "Look directly. Record your own result.",
     `<div class="arrival-instrument">
+      <div class="arrival-starfield" aria-hidden="true"></div>
       ${renderSignalMark("signal-mark")}
       <div class="arrival-constellation" aria-hidden="true"></div>
-      <div class="arrival-control-row" aria-label="Experiment stance">
+      <div class="arrival-ground" aria-hidden="true"></div>
+    </div>`,
+    `<button class="primary-button ceremonial-button" type="button" data-action="begin"><span class="button-sigil" aria-hidden="true"></span><span>Begin experiment</span><span class="button-arrow" aria-hidden="true"></span></button>
+     <div class="arrival-control-row" aria-label="Experiment stance">
         ${[
           ["locate", "target"],
           ["observe", "eye"],
           ["record", "circle"]
         ].map(([label, icon]) => `<span class="instrument-control ${icon}"><span></span><b>${label}</b></span>`).join("")}
       </div>
-    </div>`,
-    `<button class="primary-button ceremonial-button" type="button" data-action="begin"><span class="button-sigil" aria-hidden="true"></span><span>Begin experiment</span><span class="button-arrow" aria-hidden="true"></span></button>
-     <button class="secondary-button archive-button" type="button" data-action="view-notes"><span class="archive-icon" aria-hidden="true"></span><span>Notes</span><span class="button-arrow small" aria-hidden="true"></span></button>`
+     <button class="secondary-button archive-button" type="button" data-action="view-notes"><span class="archive-icon" aria-hidden="true"></span><span>Notes</span><span class="button-arrow small" aria-hidden="true"></span></button>
+     <div class="arrival-footer-ornament" aria-hidden="true"></div>`
   );
 }
 
@@ -503,18 +506,24 @@ function renderSaved() {
     </div>`,
     `<button class="primary-button" type="button" data-action="new-session">Begin again</button>
      <button class="secondary-button" type="button" data-action="view-notes">Notes</button>
-     <button class="secondary-button" type="button" data-action="view-patterns">View patterns</button>`
+     <button class="secondary-button" type="button" data-action="view-patterns">Patterns</button>`
   );
 }
 
 function renderSignalMark(className) {
-  return `<svg class="${className}" viewBox="0 0 640 640" role="img" aria-label="Side profile with four rays">
+  return `<svg class="${className}" viewBox="0 0 640 640" role="img" aria-label="Side profile with five rays">
     <circle class="mark-ripple" cx="320" cy="246" r="36"></circle>
     <g class="mark-rays">
-      <path class="mark-ray" pathLength="1" d="M251 246L141 172"></path>
-      <path class="mark-ray" pathLength="1" d="M283 229L181 68"></path>
-      <path class="mark-ray" pathLength="1" d="M343 232L451 67"></path>
-      <path class="mark-ray" pathLength="1" d="M372 247L495 172"></path>
+      <path class="mark-ray" pathLength="1" d="M248 248L112 184"></path>
+      <path class="mark-ray" pathLength="1" d="M282 230L178 86"></path>
+      <path class="mark-ray" pathLength="1" d="M321 226L321 58"></path>
+      <path class="mark-ray" pathLength="1" d="M352 232L462 86"></path>
+      <path class="mark-ray" pathLength="1" d="M382 248L530 184"></path>
+      <circle class="mark-ray-node" cx="112" cy="184" r="6"></circle>
+      <circle class="mark-ray-node" cx="178" cy="86" r="6"></circle>
+      <circle class="mark-ray-node" cx="321" cy="58" r="6"></circle>
+      <circle class="mark-ray-node" cx="462" cy="86" r="6"></circle>
+      <circle class="mark-ray-node" cx="530" cy="184" r="6"></circle>
     </g>
     <g class="mark-figure">
       <image class="mark-head-image" href="/i-sense_observatory/logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none"></image>

@@ -106,6 +106,7 @@ input:focus-visible {
 }
 
 .brand-mark {
+  position: relative;
   width: 40px;
   height: 40px;
   border: 1px solid rgba(255, 248, 232, 0.24);
@@ -113,6 +114,7 @@ input:focus-visible {
   background: url("/i-sense_observatory/icon.png") center / cover no-repeat;
   box-shadow: 0 0 34px rgba(255, 248, 232, 0.18), 0 12px 30px rgba(0, 0, 0, 0.32);
   flex: 0 0 auto;
+  overflow: hidden;
 }
 
 .brand strong,
@@ -550,6 +552,15 @@ h1 {
 .signal-mark .mark-ray:nth-child(2) { animation-delay: 70ms; }
 .signal-mark .mark-ray:nth-child(3) { animation-delay: 120ms; }
 .signal-mark .mark-ray:nth-child(4) { animation-delay: 170ms; }
+.signal-mark .mark-ray:nth-child(5) { animation-delay: 220ms; }
+
+.mark-ray-node {
+  fill: #fffaf0;
+  opacity: 0.96;
+  filter:
+    drop-shadow(0 0 7px rgba(255, 250, 240, 0.88))
+    drop-shadow(0 0 22px rgba(217, 167, 110, 0.42));
+}
 
 .timer-mark .mark-rays,
 .timer-mark .mark-figure,
@@ -1666,6 +1677,34 @@ html[data-stage="arrive"] .brand-mark {
     0 18px 54px rgba(0, 0, 0, 0.48);
 }
 
+html[data-stage="arrive"] .brand-mark::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  width: 2px;
+  height: 38%;
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.86);
+  transform: translateX(-50%) rotate(0deg);
+  box-shadow:
+    0 0 6px rgba(255, 250, 240, 0.36),
+    0 0 0 2px rgba(255, 250, 240, 0.06);
+}
+
+html[data-stage="arrive"] .brand-mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 250, 240, 0.95);
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(255, 250, 240, 0.5);
+}
+
 html[data-stage="arrive"] .brand strong {
   color: #fffaf0;
   font-size: clamp(2rem, 4vw, 3.1rem);
@@ -2274,5 +2313,998 @@ html[data-stage="arrive"] .archive-button {
     width: min(230px, 46vw);
     min-height: 38px;
     font-size: 0.98rem;
+  }
+}
+
+/* Reference-locked portrait landing. */
+html[data-stage="arrive"] body {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(32, 65, 68, 0.32), rgba(3, 8, 10, 0) 54%),
+    radial-gradient(ellipse at 50% 70%, rgba(16, 52, 57, 0.24), rgba(0, 2, 3, 0) 34%),
+    linear-gradient(180deg, #000 0%, #030808 48%, #000 100%);
+}
+
+html[data-stage="arrive"] .field-canvas {
+  opacity: 0.42;
+}
+
+html[data-stage="arrive"],
+html[data-stage="arrive"] body,
+html[data-stage="arrive"] .app-shell,
+html[data-stage="arrive"] main,
+html[data-stage="arrive"] .observatory-layout {
+  min-height: 100svh;
+  overflow-x: hidden;
+}
+
+html[data-stage="arrive"] main {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+html[data-stage="arrive"] .observatory-layout {
+  display: block;
+}
+
+html[data-stage="arrive"] .experiment-surface {
+  position: relative;
+  display: block;
+  width: min(100%, 852px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+html[data-stage="arrive"] .surface-aperture {
+  display: none;
+}
+
+html[data-stage="arrive"] .experiment-surface::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 9.8svh;
+  z-index: 0;
+  width: 1px;
+  height: 61svh;
+  translate: -50% 0;
+  background:
+    linear-gradient(180deg, transparent, rgba(225, 174, 120, 0.55) 0 11px, transparent 11px 22px, rgba(255, 250, 240, 0.11) 22px 100%);
+  opacity: 0.62;
+}
+
+html[data-stage="arrive"] .topbar {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  z-index: 20;
+  width: min(100% - 44px, 756px);
+  padding-top: max(20px, env(safe-area-inset-top));
+  transform: translateX(-50%);
+}
+
+html[data-stage="arrive"] .brand {
+  gap: 14px;
+}
+
+html[data-stage="arrive"] .brand-mark {
+  width: clamp(48px, 12.2vw, 100px);
+  height: clamp(48px, 12.2vw, 100px);
+  border-radius: clamp(14px, 3.5vw, 24px);
+  background-size: 126%;
+  box-shadow:
+    0 0 0 1px rgba(255, 250, 240, 0.12),
+    0 0 36px rgba(255, 250, 240, 0.08),
+    0 16px 42px rgba(0, 0, 0, 0.62);
+}
+
+html[data-stage="arrive"] .brand strong {
+  font-size: clamp(1.85rem, 7.25vw, 3.65rem);
+  font-weight: 400;
+  line-height: 0.88;
+  text-shadow: 0 0 24px rgba(255, 250, 240, 0.12);
+}
+
+html[data-stage="arrive"] .brand small {
+  margin-top: 10px;
+  color: rgba(255, 250, 240, 0.6);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(0.6rem, 2.15vw, 1.06rem);
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+}
+
+html[data-stage="arrive"] .view-tabs {
+  width: clamp(50px, 12.6vw, 76px);
+  height: clamp(50px, 12.6vw, 76px);
+  padding: 0;
+  border-color: rgba(255, 250, 240, 0.24);
+  background:
+    radial-gradient(circle, rgba(217, 167, 110, 0.17), rgba(255, 250, 240, 0.03) 45%, rgba(0, 0, 0, 0.24));
+}
+
+html[data-stage="arrive"] .view-tabs .tab {
+  display: none;
+}
+
+html[data-stage="arrive"] .view-tabs::before {
+  width: 13px;
+  height: 13px;
+  box-shadow: 0 0 23px rgba(225, 174, 120, 0.78);
+}
+
+html[data-stage="arrive"] .view-tabs::after {
+  width: 5px;
+  height: 5px;
+  box-shadow:
+    0 -13px 0 -2px rgba(225, 174, 120, 0.86),
+    0 13px 0 -2px rgba(225, 174, 120, 0.86),
+    13px 0 0 -2px rgba(225, 174, 120, 0.86),
+    -13px 0 0 -2px rgba(225, 174, 120, 0.86);
+}
+
+html[data-stage="arrive"] .stage-kicker {
+  display: none;
+}
+
+html[data-stage="arrive"] #observatory-title,
+html[data-stage="arrive"] .stage-prompt,
+html[data-stage="arrive"] #stage-body,
+html[data-stage="arrive"] .stage-actions {
+  position: absolute;
+  left: 50%;
+  width: min(100% - 28px, 760px);
+  max-width: none;
+  translate: -50% 0;
+}
+
+html[data-stage="arrive"] #observatory-title {
+  top: clamp(128px, 16.45svh, 300px);
+  z-index: 3;
+  max-width: 9ch;
+  margin: 0;
+  color: #fffaf0;
+  font-size: clamp(4.0rem, 15.4vw, 8.55rem);
+  font-weight: 400;
+  line-height: 0.92;
+  text-align: center;
+  text-shadow:
+    0 0 24px rgba(255, 250, 240, 0.12),
+    0 0 70px rgba(164, 215, 193, 0.08);
+}
+
+html[data-stage="arrive"] #observatory-title::after {
+  width: min(260px, 56vw);
+  height: 1px;
+  margin-top: clamp(16px, 2.6svh, 42px);
+  background:
+    linear-gradient(90deg, transparent 0, rgba(255, 250, 240, 0.34) 7% 43%, transparent 43% 57%, rgba(255, 250, 240, 0.34) 57% 93%, transparent 100%);
+}
+
+html[data-stage="arrive"] .stage-prompt {
+  top: clamp(236px, 29.5svh, 540px);
+  z-index: 4;
+  margin: 0;
+  color: rgba(255, 250, 240, 0.82);
+  font-size: clamp(0.78rem, 3.25vw, 1.48rem);
+  letter-spacing: 0.25em;
+  line-height: 1.45;
+  text-align: center;
+  white-space: nowrap;
+}
+
+html[data-stage="arrive"] .stage-prompt::before {
+  top: clamp(-45px, -5svh, -32px);
+  width: 13px;
+  height: 13px;
+  background: #e1ae78;
+  box-shadow:
+    0 0 20px rgba(225, 174, 120, 0.62),
+    0 0 58px rgba(225, 174, 120, 0.18);
+}
+
+html[data-stage="arrive"] #stage-body {
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  margin: 0;
+  pointer-events: none;
+}
+
+html[data-stage="arrive"] .arrival-instrument {
+  position: absolute;
+  left: 50%;
+  top: clamp(244px, 30.25svh, 590px);
+  width: min(118vw, 980px);
+  height: clamp(350px, 48svh, 850px);
+  transform: translateX(-50%);
+  isolation: isolate;
+}
+
+html[data-stage="arrive"] .arrival-instrument::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  z-index: -1;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(255, 250, 240, 0.92);
+  box-shadow:
+    -170px -64px 0 0 rgba(255, 250, 240, 0.78),
+    -132px -18px 0 0 rgba(255, 250, 240, 0.52),
+    -116px 62px 0 0 rgba(255, 250, 240, 0.42),
+    -92px -92px 0 0 rgba(255, 250, 240, 0.66),
+    -68px 128px 0 0 rgba(255, 250, 240, 0.58),
+    -34px -116px 0 0 rgba(225, 174, 120, 0.78),
+    -18px 86px 0 0 rgba(255, 250, 240, 0.48),
+    36px -104px 0 0 rgba(255, 250, 240, 0.68),
+    56px 116px 0 0 rgba(255, 250, 240, 0.5),
+    84px -54px 0 0 rgba(255, 250, 240, 0.62),
+    116px 74px 0 0 rgba(225, 174, 120, 0.66),
+    132px -112px 0 0 rgba(255, 250, 240, 0.52),
+    162px 10px 0 0 rgba(255, 250, 240, 0.58),
+    188px -34px 0 0 rgba(255, 250, 240, 0.42);
+  opacity: 0.82;
+  filter: drop-shadow(0 0 8px rgba(255, 250, 240, 0.42));
+}
+
+html[data-stage="arrive"] .arrival-starfield {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  z-index: -2;
+  width: min(156vw, 1200px);
+  aspect-ratio: 1.03;
+  transform: translate(-50%, -50%);
+  opacity: 0.9;
+  background:
+    radial-gradient(circle at 14% 42%, rgba(255, 250, 240, 0.84) 0 1px, transparent 2px),
+    radial-gradient(circle at 20% 18%, rgba(255, 250, 240, 0.76) 0 1px, transparent 2px),
+    radial-gradient(circle at 36% 10%, rgba(255, 250, 240, 0.82) 0 1px, transparent 2px),
+    radial-gradient(circle at 66% 16%, rgba(255, 250, 240, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 32%, rgba(255, 250, 240, 0.68) 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 58%, rgba(225, 174, 120, 0.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 26% 68%, rgba(255, 250, 240, 0.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 50% 48%, rgba(255, 250, 240, 0.2), rgba(164, 215, 193, 0.055) 30%, transparent 66%);
+  mask-image: radial-gradient(ellipse, #000 0 64%, transparent 80%);
+}
+
+html[data-stage="arrive"] .arrival-starfield::before,
+html[data-stage="arrive"] .arrival-starfield::after {
+  content: "";
+  position: absolute;
+  inset: 1%;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, rgba(255, 250, 240, 0.11) 0 1px, transparent 1px 74px),
+    linear-gradient(24deg, transparent 49.84%, rgba(255, 250, 240, 0.08) 50%, transparent 50.16%),
+    linear-gradient(156deg, transparent 49.84%, rgba(255, 250, 240, 0.075) 50%, transparent 50.16%);
+  opacity: 0.7;
+}
+
+html[data-stage="arrive"] .arrival-starfield::after {
+  inset: 13%;
+  border: 1px solid rgba(217, 167, 110, 0.22);
+  background:
+    repeating-radial-gradient(circle, transparent 0 76px, rgba(217, 167, 110, 0.18) 77px 78px, transparent 79px 118px);
+  opacity: 0.85;
+}
+
+html[data-stage="arrive"] .arrival-constellation {
+  left: 50%;
+  top: 44%;
+  width: min(155vw, 1180px);
+  opacity: 0.68;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 250, 240, 0.16), rgba(255, 250, 240, 0.02) 18%, transparent 46%),
+    repeating-radial-gradient(circle, rgba(255, 250, 240, 0.16) 0 1px, transparent 1px 70px);
+}
+
+html[data-stage="arrive"] .signal-mark {
+  position: relative;
+  z-index: 3;
+  width: min(102vw, 560px);
+  margin: 0 auto;
+  filter:
+    drop-shadow(0 0 10px rgba(255, 250, 240, 0.48))
+    drop-shadow(0 0 34px rgba(255, 250, 240, 0.18))
+    drop-shadow(0 0 90px rgba(164, 215, 193, 0.18));
+}
+
+html[data-stage="arrive"] .signal-mark .mark-ray {
+  stroke-width: 5.6;
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 5px rgba(255, 250, 240, 0.78))
+    drop-shadow(0 0 20px rgba(255, 250, 240, 0.18));
+}
+
+html[data-stage="arrive"] .signal-mark .mark-ripple {
+  stroke: rgba(217, 167, 110, 0.28);
+}
+
+html[data-stage="arrive"] .mark-head-image {
+  filter:
+    drop-shadow(0 0 6px rgba(255, 250, 240, 0.44))
+    drop-shadow(0 0 28px rgba(164, 215, 193, 0.14));
+}
+
+html[data-stage="arrive"] .arrival-ground {
+  position: absolute;
+  left: 50%;
+  top: min(78%, 660px);
+  z-index: 1;
+  width: min(96vw, 740px);
+  height: 118px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  opacity: 0.72;
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(255, 250, 240, 0.94) 0 2px, rgba(217, 167, 110, 0.5) 3px 4px, transparent 5px),
+    repeating-radial-gradient(ellipse at 50% 26%, transparent 0 8px, rgba(255, 250, 240, 0.35) 9px 10px, transparent 11px 18px),
+    linear-gradient(90deg, transparent, rgba(164, 215, 193, 0.34), transparent),
+    repeating-linear-gradient(0deg, transparent 0 14px, rgba(164, 215, 193, 0.12) 15px 16px, transparent 17px 28px),
+    repeating-linear-gradient(90deg, transparent 0 18px, rgba(164, 215, 193, 0.1) 19px 20px, transparent 21px 38px);
+  mask-image: radial-gradient(ellipse, #000 0 46%, transparent 76%);
+}
+
+html[data-stage="arrive"] .stage-actions {
+  top: auto;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 8;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(12px, 1.9svh, 24px);
+  justify-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html[data-stage="arrive"] .ceremonial-button {
+  width: min(640px, 76vw);
+  min-height: clamp(54px, 6.85svh, 92px);
+  grid-template-columns: clamp(48px, 11vw, 82px) 1fr clamp(48px, 11vw, 82px);
+  padding: 0 clamp(14px, 4vw, 28px);
+  border: 1px solid rgba(225, 174, 120, 0.92);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.08), rgba(0, 0, 0, 0.08) 44%, rgba(0, 0, 0, 0.34)),
+    linear-gradient(180deg, rgba(255, 250, 240, 0.04), rgba(0, 0, 0, 0.36));
+  color: #fffaf0;
+  font-size: clamp(1.32rem, 6.35vw, 3rem);
+  font-weight: 400;
+  box-shadow:
+    0 0 0 1px rgba(225, 174, 120, 0.18),
+    0 0 48px rgba(225, 174, 120, 0.09),
+    0 22px 80px rgba(0, 0, 0, 0.68);
+}
+
+html[data-stage="arrive"] .ceremonial-button > span:nth-child(2),
+html[data-stage="arrive"] .archive-button > span:nth-child(2) {
+  white-space: nowrap;
+}
+
+html[data-stage="arrive"] .arrival-control-row {
+  position: static;
+  z-index: 2;
+  width: min(680px, 78vw);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 7vw, 72px);
+  margin: 0;
+}
+
+html[data-stage="arrive"] .instrument-control {
+  position: relative;
+  gap: 8px;
+  color: rgba(255, 250, 240, 0.78);
+  font-size: clamp(0.72rem, 3.1vw, 1.18rem);
+  letter-spacing: 0.32em;
+}
+
+html[data-stage="arrive"] .instrument-control span {
+  width: clamp(54px, 13.6vw, 92px);
+  height: clamp(54px, 13.6vw, 92px);
+  border-color: rgba(255, 250, 240, 0.5);
+  box-shadow: 0 0 28px rgba(255, 250, 240, 0.06);
+}
+
+html[data-stage="arrive"] .instrument-control:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: clamp(26px, 6.8vw, 45px);
+  left: calc(100% + clamp(8px, 2.3vw, 24px));
+  width: 1px;
+  height: clamp(32px, 8vw, 52px);
+  background: linear-gradient(180deg, transparent, rgba(255, 250, 240, 0.34), transparent);
+}
+
+html[data-stage="arrive"] .archive-button {
+  width: min(370px, 54vw);
+  min-height: clamp(46px, 5.7svh, 66px);
+  grid-template-columns: clamp(40px, 10vw, 58px) 1fr clamp(40px, 10vw, 58px);
+  border: 1px solid rgba(255, 250, 240, 0.32);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.045), rgba(0, 0, 0, 0.26)),
+    linear-gradient(180deg, rgba(255, 250, 240, 0.022), rgba(0, 0, 0, 0.3));
+  color: rgba(255, 250, 240, 0.88);
+  font-size: clamp(1.08rem, 4.7vw, 2rem);
+}
+
+html[data-stage="arrive"] .arrival-footer-ornament {
+  width: min(130px, 34vw);
+  height: 18px;
+  position: relative;
+  opacity: 0.55;
+}
+
+html[data-stage="arrive"] .arrival-footer-ornament::before,
+html[data-stage="arrive"] .arrival-footer-ornament::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.4));
+}
+
+html[data-stage="arrive"] .arrival-footer-ornament::before {
+  left: 0;
+}
+
+html[data-stage="arrive"] .arrival-footer-ornament::after {
+  right: 0;
+  transform: rotate(180deg);
+}
+
+@media (max-width: 430px) {
+  html[data-stage="arrive"] .topbar {
+    width: calc(100% - 36px);
+    padding-top: max(18px, env(safe-area-inset-top));
+  }
+
+  html[data-stage="arrive"] #observatory-title {
+    top: clamp(140px, 16.65svh, 152px);
+    font-size: clamp(3.08rem, 12.15vw, 3.36rem);
+  }
+
+  html[data-stage="arrive"] .stage-prompt {
+    top: clamp(248px, 30.0svh, 258px);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+  }
+
+  html[data-stage="arrive"] .arrival-instrument {
+    top: clamp(244px, 29.8svh, 258px);
+    width: 119vw;
+    height: 390px;
+  }
+
+  html[data-stage="arrive"] .signal-mark {
+    width: 100vw;
+  }
+
+  html[data-stage="arrive"] .arrival-ground {
+    top: 73.8%;
+  }
+
+  html[data-stage="arrive"] .stage-actions {
+    bottom: calc(11px + env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+
+  html[data-stage="arrive"] .ceremonial-button {
+    width: 72vw;
+    min-height: 49px;
+    grid-template-columns: 42px 1fr 42px;
+    padding: 0 11px;
+    font-size: 1.34rem;
+  }
+
+  html[data-stage="arrive"] .arrival-control-row {
+    width: 76vw;
+    gap: 20px;
+  }
+
+  html[data-stage="arrive"] .instrument-control {
+    gap: 6px;
+    font-size: 0.66rem;
+    letter-spacing: 0.28em;
+  }
+
+  html[data-stage="arrive"] .instrument-control span {
+    width: 49px;
+    height: 49px;
+  }
+
+  html[data-stage="arrive"] .archive-button {
+    width: 46vw;
+    min-height: 42px;
+    font-size: 1.06rem;
+  }
+
+  html[data-stage="arrive"] .arrival-footer-ornament {
+    height: 14px;
+  }
+}
+
+/* Reference continuation: every app screen lives in the same observatory. */
+html:not([data-stage="arrive"]) body {
+  background:
+    radial-gradient(ellipse at 50% 34%, rgba(36, 66, 67, 0.3), rgba(1, 4, 6, 0) 56%),
+    radial-gradient(ellipse at 50% 82%, rgba(225, 174, 120, 0.08), rgba(0, 0, 0, 0) 38%),
+    linear-gradient(180deg, #000 0%, #041011 54%, #000 100%);
+}
+
+html:not([data-stage="arrive"]) .field-canvas {
+  opacity: 0.56;
+}
+
+html:not([data-stage="arrive"]) .topbar {
+  width: min(760px, calc(100% - 28px));
+  padding-top: max(14px, env(safe-area-inset-top));
+  padding-bottom: 12px;
+}
+
+html:not([data-stage="arrive"]) .brand {
+  gap: 10px;
+}
+
+html:not([data-stage="arrive"]) .brand-mark {
+  width: 44px;
+  height: 44px;
+  border-color: rgba(255, 250, 240, 0.2);
+  border-radius: 13px;
+  box-shadow:
+    0 0 0 1px rgba(255, 250, 240, 0.08),
+    0 0 28px rgba(255, 250, 240, 0.08),
+    0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+html:not([data-stage="arrive"]) .brand strong {
+  color: #fffaf0;
+  font-size: 1.42rem;
+  font-weight: 500;
+}
+
+html:not([data-stage="arrive"]) .brand small {
+  color: rgba(255, 250, 240, 0.58);
+}
+
+html:not([data-stage="arrive"]) .view-tabs {
+  border-color: rgba(255, 250, 240, 0.14);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.06), rgba(0, 0, 0, 0.16) 55%),
+    rgba(0, 0, 0, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(255, 250, 240, 0.025),
+    0 18px 54px rgba(0, 0, 0, 0.5);
+}
+
+html:not([data-stage="arrive"]) .tab {
+  color: rgba(255, 250, 240, 0.7);
+  font-weight: 400;
+}
+
+html:not([data-stage="arrive"]) .tab.is-active {
+  color: #080b0c;
+  background: #fffaf0;
+  box-shadow:
+    0 0 18px rgba(255, 250, 240, 0.16),
+    inset 0 0 0 1px rgba(255, 250, 240, 0.34);
+}
+
+html:not([data-stage="arrive"]) main {
+  width: min(920px, calc(100% - 28px));
+  padding-bottom: 42px;
+}
+
+html:not([data-stage="arrive"]) .observatory-layout {
+  min-height: calc(100svh - 118px);
+  display: block;
+}
+
+html:not([data-stage="arrive"]) .session-rail,
+html:not([data-stage="arrive"]) .live-summary {
+  display: none;
+}
+
+html:not([data-stage="arrive"]) .experiment-surface,
+html:not([data-stage="arrive"]) .page-panel {
+  position: relative;
+  width: min(760px, 100%);
+  min-height: calc(100svh - 124px);
+  margin: 0 auto;
+  padding: clamp(36px, 6svh, 78px) 0 118px;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+}
+
+html:not([data-stage="arrive"]) .experiment-surface::before,
+html:not([data-stage="arrive"]) .page-panel::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: -1;
+  width: min(820px, 134vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 250, 240, 0.14), rgba(164, 215, 193, 0.045) 24%, transparent 58%),
+    repeating-radial-gradient(circle, rgba(255, 250, 240, 0.12) 0 1px, transparent 1px 70px),
+    linear-gradient(28deg, transparent 49.85%, rgba(255, 250, 240, 0.07) 50%, transparent 50.15%),
+    linear-gradient(152deg, transparent 49.85%, rgba(217, 167, 110, 0.075) 50%, transparent 50.15%);
+  mask-image: radial-gradient(circle, #000 0 66%, transparent 80%);
+  opacity: 0.76;
+}
+
+html:not([data-stage="arrive"]) .experiment-surface::after,
+html:not([data-stage="arrive"]) .page-panel::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 5%;
+  z-index: -1;
+  width: 1px;
+  height: 74%;
+  translate: -50% 0;
+  background: linear-gradient(180deg, rgba(225, 174, 120, 0.32), rgba(255, 250, 240, 0.09), transparent);
+  opacity: 0.7;
+}
+
+html:not([data-stage="arrive"]) .surface-aperture {
+  display: none;
+}
+
+html:not([data-stage="arrive"]) .stage-kicker,
+html:not([data-stage="arrive"]) .rail-label,
+html:not([data-stage="arrive"]) .section-head .stage-kicker {
+  color: rgba(225, 174, 120, 0.94);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+html:not([data-stage="arrive"]) h1,
+html:not([data-stage="arrive"]) .section-head h1 {
+  max-width: 9.8ch;
+  color: #fffaf0;
+  font-size: clamp(3.2rem, 11vw, 5.6rem);
+  font-weight: 400;
+  line-height: 0.9;
+  text-shadow:
+    0 0 28px rgba(255, 250, 240, 0.1),
+    0 0 72px rgba(164, 215, 193, 0.08);
+}
+
+html:not([data-stage="arrive"]) .stage-prompt,
+html:not([data-stage="arrive"]) .section-head p,
+html:not([data-stage="arrive"]) .about-copy p {
+  color: rgba(255, 250, 240, 0.82);
+  font-size: clamp(1rem, 3.4vw, 1.24rem);
+  line-height: 1.38;
+}
+
+html:not([data-stage="arrive"]) .stage-body {
+  position: relative;
+  z-index: 1;
+}
+
+html:not([data-stage="arrive"]) .body-map {
+  grid-template-columns: minmax(110px, 0.44fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(18px, 6vw, 46px);
+}
+
+html:not([data-stage="arrive"]) .body-figure {
+  width: min(190px, 36vw);
+  height: min(360px, 52svh);
+  filter:
+    drop-shadow(0 0 16px rgba(255, 250, 240, 0.14))
+    drop-shadow(0 0 54px rgba(164, 215, 193, 0.12));
+}
+
+html:not([data-stage="arrive"]) .body-figure::before,
+html:not([data-stage="arrive"]) .body-figure::after {
+  border-color: rgba(255, 250, 240, 0.17);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html:not([data-stage="arrive"]) .body-point {
+  background: #fffaf0;
+  box-shadow:
+    0 0 12px rgba(255, 250, 240, 0.86),
+    0 0 44px rgba(225, 174, 120, 0.22);
+}
+
+html:not([data-stage="arrive"]) .choice-grid {
+  gap: 9px;
+}
+
+html:not([data-stage="arrive"]) .choice-row {
+  gap: 10px;
+}
+
+html:not([data-stage="arrive"]) .choice-button,
+html:not([data-stage="arrive"]) .chip-button,
+html:not([data-stage="arrive"]) .quiet-button {
+  border-color: rgba(255, 250, 240, 0.16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.055), transparent 58%),
+    rgba(0, 0, 0, 0.28);
+  color: rgba(255, 250, 240, 0.84);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 250, 240, 0.025),
+    0 18px 48px rgba(0, 0, 0, 0.34);
+}
+
+html:not([data-stage="arrive"]) .choice-button {
+  min-height: 56px;
+  border-radius: 8px;
+}
+
+html:not([data-stage="arrive"]) .chip-button {
+  min-height: 44px;
+  padding: 0 18px;
+}
+
+html:not([data-stage="arrive"]) .choice-button:hover,
+html:not([data-stage="arrive"]) .chip-button:hover,
+html:not([data-stage="arrive"]) .quiet-button:hover {
+  border-color: rgba(225, 174, 120, 0.46);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(225, 174, 120, 0.13), transparent 62%),
+    rgba(0, 0, 0, 0.32);
+}
+
+html:not([data-stage="arrive"]) .choice-button.is-selected,
+html:not([data-stage="arrive"]) .chip-button.is-selected {
+  color: #fffaf0;
+  border-color: rgba(225, 174, 120, 0.88);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(225, 174, 120, 0.2), transparent 60%),
+    linear-gradient(180deg, rgba(255, 250, 240, 0.07), rgba(0, 0, 0, 0.3));
+  box-shadow:
+    0 0 0 1px rgba(225, 174, 120, 0.16),
+    0 0 34px rgba(225, 174, 120, 0.08),
+    0 18px 54px rgba(0, 0, 0, 0.45);
+}
+
+html:not([data-stage="arrive"]) .stage-actions {
+  position: fixed;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 14;
+  width: min(520px, calc(100% - 28px));
+  display: grid;
+  grid-template-columns: 0.7fr 1fr;
+  gap: 10px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid rgba(255, 250, 240, 0.1);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.055), transparent 58%),
+    rgba(0, 0, 0, 0.68);
+  box-shadow:
+    0 0 0 1px rgba(255, 250, 240, 0.025),
+    0 22px 70px rgba(0, 0, 0, 0.62);
+  translate: -50% 0;
+  backdrop-filter: blur(18px);
+}
+
+html:not([data-stage="arrive"]) .stage-actions:has(button:only-child) {
+  grid-template-columns: 1fr;
+}
+
+html:not([data-stage="arrive"]) .stage-actions:has(button:nth-child(3)) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-radius: 32px;
+}
+
+html:not([data-stage="arrive"]) .stage-actions .primary-button,
+html:not([data-stage="arrive"]) .stage-actions .secondary-button {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+html:not([data-stage="arrive"]) .stage-actions:has(button:nth-child(3)) .primary-button,
+html:not([data-stage="arrive"]) .stage-actions:has(button:nth-child(3)) .secondary-button {
+  padding: 0 10px;
+  font-size: 0.96rem;
+}
+
+html:not([data-stage="arrive"]) .primary-button {
+  border-color: rgba(225, 174, 120, 0.92);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(255, 250, 240, 0.05), rgba(0, 0, 0, 0.34));
+  color: #fffaf0;
+  box-shadow:
+    0 0 0 1px rgba(225, 174, 120, 0.16),
+    0 0 40px rgba(225, 174, 120, 0.08),
+    0 18px 58px rgba(0, 0, 0, 0.45);
+}
+
+html:not([data-stage="arrive"]) .secondary-button {
+  border-color: rgba(255, 250, 240, 0.18);
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 250, 240, 0.82);
+}
+
+html:not([data-stage="arrive"]) .primary-button:disabled {
+  border-color: rgba(255, 250, 240, 0.14);
+  color: rgba(255, 250, 240, 0.38);
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+}
+
+html:not([data-stage="arrive"]) .observe-field {
+  min-height: min(54svh, 480px);
+}
+
+html:not([data-stage="arrive"]) .timer-disc {
+  width: min(410px, 84vw);
+  border-color: rgba(255, 250, 240, 0.22);
+  background:
+    radial-gradient(circle, rgba(255, 250, 240, 0.16) 0 13%, rgba(164, 215, 193, 0.055) 14% 33%, rgba(0, 0, 0, 0.02) 34%, transparent 72%),
+    conic-gradient(from var(--angle), rgba(225, 174, 120, 0.24), rgba(255, 250, 240, 0.055), rgba(164, 215, 193, 0.12), rgba(225, 174, 120, 0.24));
+  box-shadow:
+    0 0 74px rgba(255, 250, 240, 0.08),
+    inset 0 0 68px rgba(255, 250, 240, 0.028),
+    0 34px 110px rgba(0, 0, 0, 0.55);
+}
+
+html:not([data-stage="arrive"]) .timer-disc strong {
+  color: #fffaf0;
+  font-weight: 300;
+}
+
+html:not([data-stage="arrive"]) .timer-disc span {
+  color: rgba(255, 250, 240, 0.64);
+}
+
+html:not([data-stage="arrive"]) textarea {
+  min-height: 230px;
+  border-color: rgba(255, 250, 240, 0.18);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.06), transparent 50%),
+    rgba(0, 0, 0, 0.36);
+  color: #fffaf0;
+  box-shadow:
+    inset 0 0 50px rgba(255, 250, 240, 0.024),
+    0 24px 80px rgba(0, 0, 0, 0.36);
+}
+
+html:not([data-stage="arrive"]) textarea::placeholder {
+  color: rgba(255, 250, 240, 0.42);
+}
+
+html:not([data-stage="arrive"]) .toolbar {
+  justify-content: flex-start;
+}
+
+html:not([data-stage="arrive"]) .note-item,
+html:not([data-stage="arrive"]) .pattern-item,
+html:not([data-stage="arrive"]) .principle-grid div,
+html:not([data-stage="arrive"]) .empty-state {
+  border-color: rgba(255, 250, 240, 0.14);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.065), transparent 62%),
+    rgba(0, 0, 0, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 250, 240, 0.025),
+    0 22px 70px rgba(0, 0, 0, 0.36);
+}
+
+html:not([data-stage="arrive"]) .empty-state strong,
+html:not([data-stage="arrive"]) .note-item h3,
+html:not([data-stage="arrive"]) .pattern-item strong,
+html:not([data-stage="arrive"]) .principle-grid strong {
+  color: #fffaf0;
+}
+
+html:not([data-stage="arrive"]) .empty-state span,
+html:not([data-stage="arrive"]) .note-item p,
+html:not([data-stage="arrive"]) .pattern-item span,
+html:not([data-stage="arrive"]) .principle-grid span,
+html:not([data-stage="arrive"]) .grounding-note {
+  color: rgba(255, 250, 240, 0.7);
+}
+
+html:not([data-stage="arrive"]) .pattern-item b {
+  color: #fffaf0;
+  text-shadow: 0 0 28px rgba(255, 250, 240, 0.12);
+}
+
+html:not([data-stage="arrive"]) .grounding-note {
+  border-color: rgba(225, 174, 120, 0.3);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(225, 174, 120, 0.12), transparent 58%),
+    rgba(0, 0, 0, 0.26);
+}
+
+@media (max-width: 720px) {
+  html:not([data-stage="arrive"]) .topbar {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+  }
+
+  html:not([data-stage="arrive"]) .view-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  html:not([data-stage="arrive"]) .tab {
+    padding: 0 11px;
+  }
+
+  html:not([data-stage="arrive"]) .experiment-surface,
+  html:not([data-stage="arrive"]) .page-panel {
+    padding-top: 28px;
+    padding-bottom: 116px;
+  }
+
+  html:not([data-stage="arrive"]) h1,
+  html:not([data-stage="arrive"]) .section-head h1 {
+    font-size: clamp(3rem, 12vw, 3.88rem);
+  }
+
+  html:not([data-stage="arrive"]) .body-map {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  html:not([data-stage="arrive"]) .body-figure {
+    width: 150px;
+    height: 250px;
+    margin: 0 auto -8px;
+  }
+
+  html:not([data-stage="arrive"]) .choice-grid {
+    max-height: none;
+  }
+
+  html:not([data-stage="arrive"]) .stage-actions {
+    grid-template-columns: 0.74fr 1fr;
+  }
+
+  html:not([data-stage="arrive"]) .stage-actions:has(button:only-child) {
+    grid-template-columns: 1fr;
+  }
+
+  html:not([data-stage="arrive"]) .stage-actions:has(button:nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  html:not([data-stage="arrive"]) .observe-field {
+    min-height: 390px;
+  }
+
+  html:not([data-stage="arrive"]) .timer-disc {
+    width: min(300px, 76vw);
+  }
+
+  html:not([data-stage="arrive"]) .timer-disc span {
+    bottom: 58px;
   }
 }

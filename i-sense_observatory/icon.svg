@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title desc">
   <title id="title">I-Sense Observatory</title>
-  <desc id="desc">A side-profile head looking upward with four rays rising from the crown.</desc>
+  <desc id="desc">A side-profile head looking upward with five rays rising from the crown.</desc>
   <defs>
     <radialGradient id="bg" cx="50%" cy="34%" r="78%">
       <stop offset="0%" stop-color="#1f3337"/>
@@ -9,6 +9,13 @@
     </radialGradient>
   </defs>
   <rect width="640" height="640" rx="136" fill="url(#bg)"/>
-  <path d="M251 246L141 172M283 229L181 68M343 232L451 67M372 247L495 172" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round"/>
+  <path d="M248 248L112 184M282 230L178 86M321 226L321 58M352 232L462 86M382 248L530 184" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round"/>
+  <g fill="#fffaf0">
+    <circle cx="112" cy="184" r="6"/>
+    <circle cx="178" cy="86" r="6"/>
+    <circle cx="321" cy="58" r="6"/>
+    <circle cx="462" cy="86" r="6"/>
+    <circle cx="530" cy="184" r="6"/>
+  </g>
   <image href="logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none"/>
 </svg>
