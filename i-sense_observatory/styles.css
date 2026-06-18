@@ -906,9 +906,29 @@ textarea {
     padding: 18px;
   }
 
+  .observatory-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
   .experiment-surface {
-    min-height: auto;
+    order: 1;
+  }
+
+  .session-rail,
+  .live-summary {
+    display: none;
+  }
+
+  .experiment-surface {
+    min-height: calc(100svh - 154px);
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
     justify-content: flex-start;
+    padding: 22px 18px 96px;
   }
 
   .arrival-instrument {
@@ -928,11 +948,12 @@ textarea {
   }
 
   h1 {
-    font-size: 2.45rem;
+    font-size: clamp(2.34rem, 12vw, 3.15rem);
   }
 
   .stage-prompt {
     font-size: 1.12rem;
+    max-width: 25rem;
   }
 
   .timer-disc strong {

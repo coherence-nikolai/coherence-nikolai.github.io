@@ -432,13 +432,13 @@ function renderSaved() {
 
 function renderSignalMark(className) {
   return `<svg class="${className}" viewBox="0 0 220 220" role="img" aria-label="Side profile with four rays">
-    <path class="mark-ray" d="M102 80L78 20"></path>
-    <path class="mark-ray" d="M116 78L120 12"></path>
-    <path class="mark-ray" d="M129 83L161 28"></path>
-    <path class="mark-ray" d="M140 93L194 48"></path>
-    <path class="mark-head" d="M47 199c12-36 38-49 52-69 9-13 5-27-4-39-10-12-13-28-5-42 10-17 29-27 49-23 22 4 39 22 43 44 2 9 7 16 16 20l14 6-16 9c-4 2-5 6-4 10l5 15-21-4c-10-2-19 5-20 15l-2 24"></path>
-    <path class="mark-face" d="M132 75c8-8 18-10 27-5M162 90c7 2 10 6 11 12M135 98c9-4 18-4 26 2M117 125c14 7 28 8 40 5M92 172c20-9 38-10 57 0"></path>
-    <path class="mark-eye" d="M147 82c7 6 14 6 21-1"></path>
+    <path class="mark-ray" d="M83 66L63 18"></path>
+    <path class="mark-ray" d="M97 57L95 8"></path>
+    <path class="mark-ray" d="M111 56L126 9"></path>
+    <path class="mark-ray" d="M124 63L158 21"></path>
+    <path class="mark-head" d="M45 199c9-28 27-39 42-55 9-10 11-23 4-34-10-15-9-33 2-48 12-16 32-24 51-19 20 5 34 21 37 42 1 7 5 12 11 15l16 9-17 6c-4 2-6 6-6 10l2 13-18-3c-8-1-16 4-18 12l-4 20"></path>
+    <path class="mark-face" d="M137 82c8-6 17-6 25-1M160 98c6 2 9 6 9 12M133 105c8-4 17-3 24 2M117 128c12 7 25 8 37 4M86 169c18-9 36-10 55-1"></path>
+    <path class="mark-eye" d="M146 90c6 5 13 4 19-1"></path>
   </svg>`;
 }
 
