@@ -3432,7 +3432,6 @@ html[data-stage="arrive"] .archive-button {
 }
 
 html[data-stage="arrive"] .signal-mark .mark-rays,
-html[data-stage="arrive"] .signal-mark .mark-figure,
 html[data-stage="arrive"] .signal-mark .mark-ripple,
 html[data-stage="arrive"] .signal-mark .mark-ray-node {
   will-change: opacity, transform, stroke-dashoffset;
@@ -3461,9 +3460,8 @@ html[data-stage="arrive"] .signal-mark .mark-ray-node:nth-of-type(4) { animation
 html[data-stage="arrive"] .signal-mark .mark-ray-node:nth-of-type(5) { animation-delay: 390ms; }
 
 html[data-stage="arrive"] .signal-mark .mark-figure {
-  transform-box: view-box;
-  transform-origin: 320px 405px;
-  animation: head-recoil 11.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  transform: none;
+  animation: none;
 }
 
 html[data-stage="arrive"] .signal-mark .mark-ripple {
