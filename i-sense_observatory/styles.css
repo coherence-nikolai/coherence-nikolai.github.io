@@ -4077,6 +4077,351 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   }
 }
 
+/* Lens library expansion. */
+.calibration-chamber,
+.route-shell,
+.lens-chamber,
+.result-chamber,
+.note-chamber {
+  display: grid;
+  gap: clamp(16px, 3vw, 28px);
+}
+
+.calibration-chamber {
+  grid-template-columns: minmax(0, 0.95fr) minmax(280px, 1.05fr);
+  align-items: start;
+}
+
+.calibration-lens {
+  min-height: 260px;
+}
+
+.question-lens small {
+  max-width: 46rem;
+  color: rgba(255, 250, 240, 0.68);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.calibration-grid {
+  grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+  align-content: start;
+}
+
+.calibration-grid.is-multi {
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+}
+
+.first-read-summary,
+.structured-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.first-read-summary {
+  grid-column: 1 / -1;
+}
+
+.first-read-summary span,
+.structured-note span,
+.observe-readout {
+  border: 1px solid rgba(255, 250, 240, 0.12);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: rgba(255, 250, 240, 0.74);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.06), transparent 62%),
+    rgba(0, 0, 0, 0.22);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.first-read-summary b,
+.structured-note b {
+  margin-right: 7px;
+  color: rgba(225, 174, 120, 0.9);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.first-read-summary.is-large {
+  gap: 10px;
+}
+
+.readout-panel,
+.lens-rack,
+.marker-field {
+  position: relative;
+  border: 1px solid rgba(255, 250, 240, 0.12);
+  border-radius: 12px;
+  padding: clamp(16px, 3vw, 24px);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(225, 174, 120, 0.08), transparent 62%),
+    rgba(0, 0, 0, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 250, 240, 0.025),
+    0 22px 70px rgba(0, 0, 0, 0.28);
+}
+
+.readout-panel::before,
+.lens-rack::before,
+.marker-field::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  width: 28%;
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(225, 174, 120, 0.58), transparent);
+}
+
+.rack-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.rack-head p {
+  max-width: 22rem;
+  margin: 0;
+  color: rgba(255, 250, 240, 0.62);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.lens-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 10px;
+}
+
+.lens-card-grid.is-suggested {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lens-card {
+  position: relative;
+  display: grid;
+  gap: 9px;
+  min-height: 156px;
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 250, 240, 0.14);
+  border-radius: 12px;
+  color: rgba(255, 250, 240, 0.82);
+  text-align: left;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 240, 0.06), transparent 58%),
+    rgba(0, 0, 0, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 250, 240, 0.025),
+    0 18px 54px rgba(0, 0, 0, 0.28);
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 260ms ease,
+    background 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.lens-card::before {
+  content: "";
+  position: absolute;
+  right: -38px;
+  top: -38px;
+  width: 96px;
+  height: 96px;
+  border: 1px solid rgba(255, 250, 240, 0.12);
+  border-radius: 50%;
+}
+
+.lens-card:hover,
+.lens-card.is-recommended {
+  transform: translateY(-2px);
+  border-color: rgba(225, 174, 120, 0.64);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(225, 174, 120, 0.13), transparent 62%),
+    rgba(0, 0, 0, 0.32);
+  box-shadow:
+    0 0 0 1px rgba(225, 174, 120, 0.12),
+    0 0 32px rgba(225, 174, 120, 0.06),
+    0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+.lens-card span {
+  color: rgba(225, 174, 120, 0.82);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.lens-card strong {
+  color: #fffaf0;
+  font-size: clamp(1.28rem, 3vw, 1.74rem);
+  font-weight: 400;
+  line-height: 0.98;
+}
+
+.lens-card small {
+  color: rgba(255, 250, 240, 0.62);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.lens-chamber {
+  position: relative;
+}
+
+.lens-compass {
+  position: absolute;
+  right: clamp(4px, 2vw, 22px);
+  top: clamp(-18px, -2vw, -4px);
+  z-index: 0;
+  width: min(220px, 42vw);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 250, 240, 0.11);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 250, 240, 0.12) 0 2px, transparent 3px),
+    repeating-radial-gradient(circle, transparent 0 34px, rgba(255, 250, 240, 0.1) 35px 36px, transparent 37px 58px);
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.lens-compass span,
+.lens-compass::before,
+.lens-compass::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 76%;
+  background: linear-gradient(180deg, transparent, rgba(225, 174, 120, 0.38), transparent);
+  transform-origin: center;
+}
+
+.lens-compass span {
+  transform: translate(-50%, -50%);
+}
+
+.lens-compass::before {
+  transform: translate(-50%, -50%) rotate(58deg);
+}
+
+.lens-compass::after {
+  transform: translate(-50%, -50%) rotate(-58deg);
+}
+
+.lens-chamber > .question-lens,
+.lens-chamber > .marker-field {
+  z-index: 1;
+}
+
+.marker-field {
+  display: grid;
+  gap: 12px;
+}
+
+.result-chamber {
+  grid-template-columns: 1fr;
+}
+
+.note-chamber {
+  gap: 16px;
+}
+
+.structured-note {
+  margin-bottom: 2px;
+}
+
+.observe-field {
+  gap: 16px;
+}
+
+.observe-readout {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 12px;
+  max-width: min(560px, 100%);
+  margin: -8px auto 0;
+  border-radius: 14px;
+  white-space: normal;
+}
+
+.observe-readout span {
+  color: rgba(225, 174, 120, 0.86);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.observe-readout b {
+  color: rgba(255, 250, 240, 0.78);
+  font-weight: 400;
+}
+
+@media (max-width: 720px) {
+  .calibration-chamber,
+  .lens-card-grid.is-suggested {
+    grid-template-columns: 1fr;
+  }
+
+  .calibration-lens {
+    min-height: 0;
+  }
+
+  .rack-head {
+    display: grid;
+  }
+
+  .lens-card {
+    min-height: 128px;
+  }
+
+  .lens-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lens-compass {
+    width: 150px;
+    opacity: 0.36;
+  }
+
+  .first-read-summary span,
+  .structured-note span,
+  .observe-readout {
+    border-radius: 12px;
+  }
+
+  html:not([data-stage="arrive"]) .stage-body {
+    max-height: calc(100svh - 434px);
+    overflow-y: auto;
+    padding-right: 2px;
+    padding-bottom: 12px;
+    overscroll-behavior: contain;
+  }
+
+  html:not([data-stage="arrive"]) .stage-body::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  html:not([data-stage="arrive"]) .stage-body::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(255, 250, 240, 0.18);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-stage="arrive"] .signal-mark .mark-ray,
   html[data-stage="arrive"] .signal-mark .mark-ray-node,

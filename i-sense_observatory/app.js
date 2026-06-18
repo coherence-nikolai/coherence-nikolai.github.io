@@ -1,130 +1,47 @@
+import {
+  createEmptyFirstRead,
+  firstReadQuestions,
+  getLensById,
+  lensLibrary,
+  remainsMarkers as remainsOptions,
+  resultMarkers as resultOptions,
+  suggestLensIds,
+  summarizePatterns
+} from "./lens-model.mjs?v=20260618-lens-library-flow3";
+
 const storageKey = "i-sense-observatory.sessions.v1";
 
 const stageOrder = [
   "Arrive",
-  "Locate",
-  "Texture",
+  "First Read",
+  "Route",
+  "Lens",
   "Observe",
-  "Report",
-  "Threshold",
+  "Result",
   "Note"
 ];
 
 const stageKeys = [
   "arrive",
-  "locate",
-  "texture",
+  "calibrate",
+  "route",
+  "lens",
   "observe",
-  "report",
-  "threshold",
+  "result",
   "note"
-];
-
-const locationOptions = [
-  "behind the eyes",
-  "face",
-  "head",
-  "throat",
-  "chest",
-  "abdomen",
-  "whole body",
-  "around the body",
-  "no clear location",
-  "not present"
-];
-
-const textureOptions = [
-  "pressure",
-  "center",
-  "boundary",
-  "contraction",
-  "watcher",
-  "density",
-  "warmth",
-  "vibration",
-  "image",
-  "spaciousness",
-  "unclear",
-  "absent"
-];
-
-const changeOptions = [
-  "stayed the same",
-  "shifted",
-  "softened",
-  "intensified",
-  "moved",
-  "expanded",
-  "became unclear",
-  "dropped away briefly",
-  "re-formed",
-  "not sure"
-];
-
-const thresholdChangeMarkers = new Set([
-  "expanded",
-  "became unclear",
-  "dropped away briefly",
-  "re-formed"
-]);
-
-const thresholdOptions = [
-  "awareness present",
-  "sensation present",
-  "sound present",
-  "space present",
-  "center absent",
-  "wide perception",
-  "peripheral clarity",
-  "body included in a larger field",
-  "fear",
-  "peace",
-  "nothing clear",
-  "cannot say"
-];
-
-const perceptionOptions = [
-  "centered",
-  "wide",
-  "peripheral",
-  "ordinary",
-  "spacious",
-  "unclear"
-];
-
-const locateQuestions = [
-  "Where do you sense your self?",
-  "Where do you feel located in the body?",
-  "Where is the felt sense of existing as you?",
-  "Where are you mainly located right now?",
-  "If me-ness had a center, where would it seem to be?",
-  "Where does the sense of being the observer appear from?"
-];
-
-const textureQuestions = [
-  "How are you experiencing the sense of self?",
-  "How is me-ness felt in the body?",
-  "What type of experience seems to explain the sense of me?",
-  "Is it pressure, image, center, boundary, watcher, warmth, or something else?",
-  "Does it feel solid, vague, spacious, contracted, moving, or absent?",
-  "What is directly felt before any story about it?"
 ];
 
 const state = {
   view: "observatory",
   stage: 0,
-  locateQuestionIndex: 0,
-  textureQuestionIndex: 0,
-  location: "",
-  textures: new Set(),
-  changes: new Set(),
-  thresholds: new Set(),
-  perceptions: new Set(),
+  calibrationIndex: 0,
+  firstRead: createEmptyFirstRead(),
+  selectedLensId: "",
+  lensPromptIndex: 0,
+  lensMarkers: new Set(),
+  resultMarkers: new Set(),
+  remainsMarkers: new Set(),
   note: "",
-  observeEndsAt: 0,
-  prepareEndsAt: 0,
-  observeTimer: null,
-  isPreparingObservation: false,
   isObservingDirectly: false,
   observationStartedAt: 0,
   sessions: loadSessions()
@@ -133,7 +50,6 @@ const state = {
 let lastStageAnimationKey = "";
 
 const els = {
-  documentBody: document.body,
   tabs: Array.from(document.querySelectorAll("[data-view-target]")),
   views: {
     observatory: document.getElementById("view-observatory"),
@@ -168,13 +84,15 @@ const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 const motionProfiles = {
   arrive: { field: 0.18, aperture: 0.92, peripheral: 0.14, rays: 0 },
-  locate: { field: 0.24, aperture: 0.98, peripheral: 0.2, rays: 0 },
-  texture: { field: 0.28, aperture: 1, peripheral: 0.24, rays: 0 },
-  stillness: { field: 0.3, aperture: 1.03, peripheral: 0.28, rays: 0 },
-  observe: { field: 0.68, aperture: 1.18, peripheral: 0.88, rays: 0.46 },
-  report: { field: 0.36, aperture: 1.05, peripheral: 0.42, rays: 0 },
-  threshold: { field: 0.82, aperture: 1.34, peripheral: 1, rays: 0.54 },
-  note: { field: 0.4, aperture: 1.08, peripheral: 0.48, rays: 0 }
+  calibrate: { field: 0.28, aperture: 1.02, peripheral: 0.24, rays: 0.08 },
+  route: { field: 0.32, aperture: 1.08, peripheral: 0.32, rays: 0.1 },
+  lens: { field: 0.42, aperture: 1.12, peripheral: 0.46, rays: 0.18 },
+  observe: { field: 0.72, aperture: 1.26, peripheral: 0.9, rays: 0.48 },
+  result: { field: 0.44, aperture: 1.12, peripheral: 0.5, rays: 0.12 },
+  note: { field: 0.38, aperture: 1.08, peripheral: 0.42, rays: 0.08 },
+  notes: { field: 0.36, aperture: 1.04, peripheral: 0.36, rays: 0 },
+  patterns: { field: 0.46, aperture: 1.14, peripheral: 0.56, rays: 0.08 },
+  about: { field: 0.34, aperture: 1.06, peripheral: 0.34, rays: 0 }
 };
 
 const motionState = {
@@ -188,32 +106,57 @@ const motionState = {
 function loadSessions() {
   try {
     const saved = localStorage.getItem(storageKey);
-    return saved ? JSON.parse(saved) : [];
+    const parsed = saved ? JSON.parse(saved) : [];
+    return parsed.map(normalizeSession);
   } catch {
     return [];
   }
+}
+
+function normalizeSession(session) {
+  if (session.firstRead) return session;
+  const lens = getLensById(session.lensId || "location");
+  return {
+    ...session,
+    lensId: lens.id,
+    lensTitle: lens.title,
+    firstRead: {
+      location: session.location || "",
+      textures: session.textureMarkers || [],
+      stability: "",
+      observer: "",
+      agency: "",
+      tone: ""
+    },
+    lensMarkers: session.textureMarkers || [],
+    resultMarkers: session.observedChangeMarkers || [],
+    remainsMarkers: [
+      ...(session.thresholdMarkers || []),
+      ...(session.perceptionMarkers || [])
+    ],
+    userNote: session.userNote || ""
+  };
 }
 
 function saveSessions() {
   localStorage.setItem(storageKey, JSON.stringify(state.sessions));
 }
 
-function resetSession() {
-  stopObserveTimer();
-  state.stage = 0;
-  state.locateQuestionIndex = 0;
-  state.textureQuestionIndex = 0;
-  state.location = "";
-  state.textures = new Set();
-  state.changes = new Set();
-  state.thresholds = new Set();
-  state.perceptions = new Set();
+function resetDraft() {
+  stopObservation();
+  state.calibrationIndex = 0;
+  state.firstRead = createEmptyFirstRead();
+  state.selectedLensId = "";
+  state.lensPromptIndex = 0;
+  state.lensMarkers = new Set();
+  state.resultMarkers = new Set();
+  state.remainsMarkers = new Set();
   state.note = "";
-  state.observeEndsAt = 0;
-  state.prepareEndsAt = 0;
-  state.isPreparingObservation = false;
-  state.isObservingDirectly = false;
-  state.observationStartedAt = 0;
+}
+
+function resetSession() {
+  resetDraft();
+  state.stage = 1;
   renderWithTransition();
 }
 
@@ -221,7 +164,7 @@ function setView(view) {
   mutateWithTransition(() => {
     const previousView = state.view;
     state.view = view;
-    if (previousView === "observatory" && view !== "observatory") stopObserveTimer();
+    if (previousView === "observatory" && view !== "observatory") stopObservation();
     els.tabs.forEach((tab) => {
       tab.classList.toggle("is-active", tab.dataset.viewTarget === view);
     });
@@ -238,14 +181,20 @@ function setView(view) {
 function setStage(stage) {
   const nextStage = Math.max(0, Math.min(stage, stageOrder.length - 1));
   mutateWithTransition(() => {
-    if (state.stage === 3 && nextStage !== 3) stopObserveTimer();
+    if (state.stage === 4 && nextStage !== 4) stopObservation();
+    if (nextStage === 3 && !state.selectedLensId) chooseLens(suggestLensIds(state.firstRead)[0], false);
     state.stage = nextStage;
     render();
   });
 }
 
-function selectedArray(set) {
-  return Array.from(set);
+function goBack() {
+  if (state.stage === 1 && state.calibrationIndex > 0) {
+    state.calibrationIndex -= 1;
+    renderWithTransition();
+    return;
+  }
+  setStage(state.stage - 1);
 }
 
 function render() {
@@ -255,11 +204,11 @@ function render() {
 
   const renderer = [
     renderArrive,
-    renderLocate,
-    renderTexture,
-    renderObserveIntro,
-    renderReport,
-    renderThreshold,
+    renderFirstRead,
+    renderRoute,
+    renderLens,
+    renderObserve,
+    renderResult,
     renderNote
   ][state.stage];
 
@@ -272,17 +221,7 @@ function renderWithTransition() {
 }
 
 function mutateWithTransition(mutate) {
-  const canTransition = !motionState.reducedMotion
-    && typeof document.startViewTransition === "function";
-
-  if (!canTransition) {
-    mutate();
-    return;
-  }
-
-  document.startViewTransition(() => {
-    mutate();
-  });
+  mutate();
 }
 
 function renderSteps() {
@@ -295,22 +234,29 @@ function renderSteps() {
 function updateStageChrome() {
   const key = getChromeStage();
   document.documentElement.dataset.stage = key;
-  document.documentElement.classList.toggle("is-observing", state.view === "observatory" && state.stage === 3 && (Boolean(state.observeTimer) || state.isObservingDirectly));
-  document.documentElement.classList.toggle("is-preparing", state.view === "observatory" && state.isPreparingObservation);
+  document.documentElement.classList.toggle("is-observing", state.view === "observatory" && state.stage === 4 && state.isObservingDirectly);
 }
 
 function renderSummary() {
-  const lines = [];
-  lines.push(`<div><strong>Location</strong>${state.location || "not observed yet"}</div>`);
-  lines.push(`<div><strong>Texture</strong>${joinOrNone(selectedArray(state.textures))}</div>`);
-  lines.push(`<div><strong>Observation</strong>${state.isObservingDirectly ? "open now" : "untimed"}</div>`);
-  lines.push(`<div><strong>Change</strong>${joinOrNone(selectedArray(state.changes))}</div>`);
-  lines.push(`<div><strong>Threshold</strong>${joinOrNone(selectedArray(state.thresholds))}</div>`);
-  els.summary.innerHTML = lines.join("");
+  const lens = getSelectedLens();
+  const lines = [
+    ["Location", state.firstRead.location || "not observed yet"],
+    ["Texture", joinOrNone(state.firstRead.textures)],
+    ["Lens", state.selectedLensId ? lens.shortTitle : "not chosen yet"],
+    ["Lens markers", joinOrNone(selectedArray(state.lensMarkers))],
+    ["Result", joinOrNone(selectedArray(state.resultMarkers))],
+    ["Remains", joinOrNone(selectedArray(state.remainsMarkers))]
+  ];
+
+  els.summary.innerHTML = lines.map(([label, value]) => `<div><strong>${label}</strong>${escapeHtml(value)}</div>`).join("");
+}
+
+function selectedArray(set) {
+  return Array.from(set);
 }
 
 function joinOrNone(items) {
-  return items.length ? items.join(", ") : "not observed yet";
+  return items && items.length ? items.join(", ") : "not observed yet";
 }
 
 function setStageContent(kicker, title, prompt, bodyHtml, actionsHtml) {
@@ -352,135 +298,211 @@ function renderArrive() {
   );
 }
 
-function renderLocate() {
-  const choices = locationOptions.map((option) => {
-    const selected = state.location === option ? "is-selected" : "";
-    const pressed = state.location === option ? "true" : "false";
-    return `<button class="choice-button ${selected}" type="button" data-location="${option}" aria-pressed="${pressed}">${option}</button>`;
-  }).join("");
+function renderFirstRead() {
+  const question = firstReadQuestions[state.calibrationIndex];
+  const isLast = state.calibrationIndex === firstReadQuestions.length - 1;
+  const canAdvance = firstReadHasAnswer(question);
+  const progressDots = firstReadQuestions.map((_, index) => (
+    `<span class="${index === state.calibrationIndex ? "is-active" : ""}"></span>`
+  )).join("");
+  const choices = question.options.map((option) => renderFirstReadChoice(question, option)).join("");
 
   setStageContent(
-    "locate",
-    "Find the felt center of me.",
-    "Let each question angle the attention slightly differently. Choose the closest direct report.",
-    `<div class="body-map">
-      <div class="body-figure" aria-hidden="true">
-        <span class="body-point eyes"></span>
-        <span class="body-point throat"></span>
-        <span class="body-point chest"></span>
-        <span class="body-point abdomen"></span>
+    "first read",
+    "Tune the instrument.",
+    "A few direct reports find the door that is alive now. No lens is primary.",
+    `<div class="calibration-chamber">
+      <section class="question-lens calibration-lens" aria-label="First read question">
+        <span class="lens-label">${escapeHtml(question.title)} ${state.calibrationIndex + 1} / ${firstReadQuestions.length}</span>
+        <p>${escapeHtml(question.question)}</p>
+        <small>${escapeHtml(question.help)}</small>
+        <div class="lens-dots" aria-hidden="true">${progressDots}</div>
+      </section>
+      <div class="choice-grid calibration-grid ${question.mode === "multi" ? "is-multi" : ""}">
+        ${choices}
       </div>
-      <div class="inquiry-stack">
-        ${renderQuestionLens(locateQuestions, state.locateQuestionIndex, "next-locate-question")}
-        <div class="choice-grid">${choices}</div>
-      </div>
+      <div class="first-read-summary">${renderFirstReadSummary()}</div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="next" ${state.location ? "" : "disabled"}>Continue</button>`
+     <button class="primary-button" type="button" data-action="next-calibration" ${canAdvance ? "" : "disabled"}>${isLast ? "Suggest lenses" : "Continue"}</button>`
   );
 }
 
-function renderTexture() {
+function renderFirstReadChoice(question, option) {
+  const escaped = escapeHtml(option);
+  if (question.mode === "multi") {
+    const selected = state.firstRead[question.id].includes(option);
+    return `<button class="choice-button ${selected ? "is-selected" : ""}" type="button" data-first-read-toggle="${question.id}" data-value="${escaped}" aria-pressed="${selected ? "true" : "false"}">${escaped}</button>`;
+  }
+  const selected = state.firstRead[question.id] === option;
+  return `<button class="choice-button ${selected ? "is-selected" : ""}" type="button" data-first-read-single="${question.id}" data-value="${escaped}" aria-pressed="${selected ? "true" : "false"}">${escaped}</button>`;
+}
+
+function firstReadHasAnswer(question) {
+  const value = state.firstRead[question.id];
+  return Array.isArray(value) ? value.length > 0 : Boolean(value);
+}
+
+function renderFirstReadSummary() {
+  const items = [
+    ["location", state.firstRead.location],
+    ["texture", joinOrNone(state.firstRead.textures)],
+    ["stability", state.firstRead.stability],
+    ["observer", state.firstRead.observer],
+    ["agency", state.firstRead.agency],
+    ["tone", state.firstRead.tone]
+  ];
+  return items
+    .filter(([, value]) => value && value !== "not observed yet")
+    .map(([label, value]) => `<span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`)
+    .join("") || `<span><b>first read</b>waiting for direct markers</span>`;
+}
+
+function renderRoute() {
+  const suggestedIds = suggestLensIds(state.firstRead);
+  const suggestedCards = suggestedIds.slice(0, 3).map((id, index) => renderLensCard(getLensById(id), index === 0, "suggested")).join("");
+  const libraryCards = lensLibrary.map((lens) => renderLensCard(lens, false, "library")).join("");
+
   setStageContent(
-    "texture",
-    "Describe how self is appearing.",
-    "Use several angles. Select any qualities that fit the immediate felt experience.",
-    `<div class="texture-inquiry">
-       ${renderQuestionLens(textureQuestions, state.textureQuestionIndex, "next-texture-question")}
-       <div class="choice-row">${renderChipButtons(textureOptions, state.textures, "texture")}</div>
-     </div>`,
+    "route",
+    "Choose the next lens.",
+    "The app can suggest from your First Read, or you can choose freely.",
+    `<div class="route-shell">
+      <section class="readout-panel">
+        <span class="lens-label">calibration readout</span>
+        <div class="first-read-summary is-large">${renderFirstReadSummary()}</div>
+      </section>
+      <section class="lens-rack">
+        <div class="rack-head">
+          <span class="lens-label">suggested doors</span>
+          <p>Suggestion is only routing, not a conclusion.</p>
+        </div>
+        <div class="lens-card-grid is-suggested">${suggestedCards}</div>
+      </section>
+      <section class="lens-rack">
+        <div class="rack-head">
+          <span class="lens-label">all lenses</span>
+          <p>Every route remains available.</p>
+        </div>
+        <div class="lens-card-grid">${libraryCards}</div>
+      </section>
+    </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
+     <button class="primary-button" type="button" data-action="choose-suggested">Use first suggestion</button>`
+  );
+}
+
+function renderLensCard(lens, recommended, context) {
+  return `<button class="lens-card ${recommended ? "is-recommended" : ""}" type="button" data-lens-id="${lens.id}" data-context="${context}">
+    <span>${escapeHtml(lens.lineage)}</span>
+    <strong>${escapeHtml(lens.shortTitle)}</strong>
+    <small>${escapeHtml(lens.aim)}</small>
+  </button>`;
+}
+
+function renderLens() {
+  const lens = getSelectedLens();
+  const promptIndex = state.lensPromptIndex % lens.prompts.length;
+  const markers = renderChipButtons(lens.markers, state.lensMarkers, "lens");
+  const dots = lens.prompts.map((_, index) => `<span class="${index === promptIndex ? "is-active" : ""}"></span>`).join("");
+
+  setStageContent(
+    lens.lineage,
+    lens.title,
+    lens.aim,
+    `<div class="lens-chamber">
+      <div class="lens-compass" aria-hidden="true"><span></span></div>
+      <section class="question-lens">
+        <span class="lens-label">inquiry ${promptIndex + 1} / ${lens.prompts.length}</span>
+        <p>${escapeHtml(lens.prompts[promptIndex])}</p>
+        <div class="lens-dots" aria-hidden="true">${dots}</div>
+      </section>
+      <div class="marker-field">
+        <span class="lens-label">direct markers</span>
+        <div class="choice-row">${markers}</div>
+      </div>
+    </div>`,
+    `<button class="secondary-button" type="button" data-action="back">Lenses</button>
+     <button class="secondary-button" type="button" data-action="next-lens-prompt">Another prompt</button>
      <button class="primary-button" type="button" data-action="next">Direct observe</button>`
   );
 }
 
-function renderObserveIntro() {
-  stopObserveTimer();
+function renderObserve() {
+  const lens = getSelectedLens();
+  const observing = state.isObservingDirectly;
+
   setStageContent(
-    "observe",
-    "Observe the felt sense directly.",
-    "No timer. No performance. Let the sense of me be known directly and notice whether it stays, shifts, softens, drops away, or re-forms.",
+    observing ? "observing" : "observe",
+    observing ? "Stay with what is actually here." : "Observe through the lens.",
+    observing ? "When something is clear enough, record it. If nothing changes, record that too." : "No timer. Let the lens point attention, then watch what happens directly.",
     `<div class="observe-field">
-      <div class="timer-disc untimed-disc is-ready" style="--angle:0deg">
+      <div class="timer-disc untimed-disc ${observing ? "is-active" : "is-ready"}" style="--angle:0deg">
         ${renderSignalMark("timer-mark")}
-        <strong>open</strong>
-        <span>untimed</span>
+        <strong>${observing ? "now" : "open"}</strong>
+        <span>${escapeHtml(lens.shortTitle)}</span>
+      </div>
+      <div class="observe-readout">
+        <span>${escapeHtml(lens.title)}</span>
+        <b>${escapeHtml(joinOrNone(selectedArray(state.lensMarkers)))}</b>
       </div>
     </div>`,
-    `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="start-observe">Begin observing</button>`
+    observing
+      ? `<button class="secondary-button" type="button" data-action="back">Back</button>
+         <button class="primary-button" type="button" data-action="end-observe">Record what happened</button>`
+      : `<button class="secondary-button" type="button" data-action="back">Back</button>
+         <button class="primary-button" type="button" data-action="start-observe">Begin observing</button>`
   );
 }
 
 function startObservation() {
-  stopObserveTimer();
   state.isObservingDirectly = true;
   state.observationStartedAt = Date.now();
-  renderUntimedObserveActive();
+  renderWithTransition();
 }
 
-function stopObserveTimer() {
-  if (state.observeTimer) {
-    window.clearInterval(state.observeTimer);
-    state.observeTimer = null;
-  }
-  state.isPreparingObservation = false;
+function stopObservation() {
   state.isObservingDirectly = false;
-  state.prepareEndsAt = 0;
+  state.observationStartedAt = 0;
   setMotionTarget();
 }
 
-function renderUntimedObserveActive() {
-  updateStageChrome();
-  setMotionTarget();
+function renderResult() {
   setStageContent(
-    "observing",
-    "Stay with what is actually here.",
-    "When something is clear enough, record it. If nothing changes, record that too.",
-    `<div class="observe-field">
-      <div class="timer-disc untimed-disc is-active" style="--angle:0deg">
-        ${renderSignalMark("timer-mark")}
-        <strong>now</strong>
-        <span>directly</span>
-      </div>
+    "result",
+    "What changed?",
+    "Record what happened under observation without deciding what it means.",
+    `<div class="result-chamber">
+      <section class="marker-field">
+        <span class="lens-label">self-sense</span>
+        <div class="choice-row">${renderChipButtons(resultOptions, state.resultMarkers, "result")}</div>
+      </section>
+      <section class="marker-field">
+        <span class="lens-label">what remained present</span>
+        <div class="choice-row">${renderChipButtons(remainsOptions, state.remainsMarkers, "remains")}</div>
+      </section>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="end-observe">Record what happened</button>`
-  );
-}
-
-function renderReport() {
-  setStageContent(
-    "report",
-    "What happened when it was observed?",
-    "Select everything that actually fits. This is not a score.",
-    `<div class="choice-row">${renderChipButtons(changeOptions, state.changes, "change")}</div>`,
-    `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="after-report">Continue</button>`
-  );
-}
-
-function renderThreshold() {
-  setStageContent(
-    "threshold",
-    "What was present around the shift?",
-    "Record the perceptual field without deciding what it means.",
-    `<div class="choice-row">${renderChipButtons(thresholdOptions, state.thresholds, "threshold")}</div>
-     <p class="stage-prompt" style="margin:24px 0 14px;font-size:1.08rem">Perception felt:</p>
-     <div class="choice-row">${renderChipButtons(perceptionOptions, state.perceptions, "perception")}</div>`,
-    `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="next">Continue</button>`
+     <button class="primary-button" type="button" data-action="next">Continue to note</button>`
   );
 }
 
 function renderNote() {
+  const lens = getSelectedLens();
   const value = escapeHtml(state.note);
   setStageContent(
     "field note",
     "What did you directly notice?",
     "Write only what was observed. No interpretation is required.",
-    `<div class="textarea-wrap">
-      <textarea id="note-input" placeholder="Example: the center behind the eyes softened, then returned.">${value}</textarea>
+    `<div class="note-chamber">
+      <div class="structured-note">
+        <span><b>Lens</b>${escapeHtml(lens.shortTitle)}</span>
+        <span><b>First read</b>${escapeHtml(state.firstRead.location || "unlocated")} / ${escapeHtml(joinOrNone(state.firstRead.textures))}</span>
+        <span><b>Result</b>${escapeHtml(joinOrNone(selectedArray(state.resultMarkers)))}</span>
+      </div>
+      <div class="textarea-wrap">
+        <textarea id="note-input" placeholder="Example: watcher behind the eyes became pressure and image, then softened.">${value}</textarea>
+      </div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
      <button class="primary-button" type="button" data-action="save-note">Save field note</button>`
@@ -492,13 +514,15 @@ function renderNote() {
 }
 
 function renderSaved() {
+  const lens = getSelectedLens();
   setStageContent(
     "saved",
     "Field note saved.",
-    "The result is your own observation.",
+    `${lens.shortTitle} recorded. The result is your own observation.`,
     `<div class="choice-row">
       <span class="chip-button">local only</span>
       <span class="chip-button">no conclusion supplied</span>
+      <span class="chip-button">${escapeHtml(lens.shortTitle)}</span>
     </div>`,
     `<button class="primary-button" type="button" data-action="new-session">Begin again</button>
      <button class="secondary-button" type="button" data-action="view-notes">Notes</button>
@@ -506,69 +530,41 @@ function renderSaved() {
   );
 }
 
-function renderSignalMark(className) {
-  return `<svg class="${className}" viewBox="0 0 640 640" role="img" aria-label="Side profile with five rays">
-    <circle class="mark-ripple" cx="320" cy="246" r="36"></circle>
-    <g class="mark-rays">
-      <path class="mark-ray" pathLength="1" d="M248 248L112 184"></path>
-      <path class="mark-ray" pathLength="1" d="M282 230L178 86"></path>
-      <path class="mark-ray" pathLength="1" d="M321 226L321 58"></path>
-      <path class="mark-ray" pathLength="1" d="M352 232L462 86"></path>
-      <path class="mark-ray" pathLength="1" d="M382 248L530 184"></path>
-      <circle class="mark-ray-node" cx="112" cy="184" r="6"></circle>
-      <circle class="mark-ray-node" cx="178" cy="86" r="6"></circle>
-      <circle class="mark-ray-node" cx="321" cy="58" r="6"></circle>
-      <circle class="mark-ray-node" cx="462" cy="86" r="6"></circle>
-      <circle class="mark-ray-node" cx="530" cy="184" r="6"></circle>
-    </g>
-    <g class="mark-figure">
-      <image class="mark-head-image" href="/i-sense_observatory/logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none"></image>
-    </g>
-  </svg>`;
-}
-
-function renderQuestionLens(questions, activeIndex, action) {
-  const count = questions.length;
-  const normalizedIndex = ((activeIndex % count) + count) % count;
-  const dots = questions.map((_, index) => (
-    `<span class="${index === normalizedIndex ? "is-active" : ""}"></span>`
-  )).join("");
-
-  return `<section class="question-lens" aria-label="Inquiry angle">
-    <span class="lens-label">angle ${normalizedIndex + 1} / ${count}</span>
-    <p>${escapeHtml(questions[normalizedIndex])}</p>
-    <button class="quiet-button lens-next" type="button" data-action="${action}">Another angle</button>
-    <div class="lens-dots" aria-hidden="true">${dots}</div>
-  </section>`;
-}
-
 function renderChipButtons(options, set, key) {
   return options.map((option) => {
-    const selected = set.has(option) ? "is-selected" : "";
-    const pressed = set.has(option) ? "true" : "false";
-    return `<button class="chip-button ${selected}" type="button" data-toggle="${key}" data-value="${option}" aria-pressed="${pressed}">${option}</button>`;
+    const selected = set.has(option);
+    const escaped = escapeHtml(option);
+    return `<button class="chip-button ${selected ? "is-selected" : ""}" type="button" data-toggle="${key}" data-value="${escaped}" aria-pressed="${selected ? "true" : "false"}">${escaped}</button>`;
   }).join("");
 }
 
-function afterReport() {
-  const needsThreshold = selectedArray(state.changes).some((change) => thresholdChangeMarkers.has(change))
-    || state.location === "no clear location"
-    || state.location === "not present";
+function chooseLens(id, rerender = true) {
+  state.selectedLensId = id;
+  state.lensPromptIndex = 0;
+  state.lensMarkers = new Set();
+  if (rerender) setStage(3);
+}
 
-  setStage(needsThreshold ? 5 : 6);
+function getSelectedLens() {
+  return getLensById(state.selectedLensId || suggestLensIds(state.firstRead)[0]);
 }
 
 function saveCurrentSession() {
+  const lens = getSelectedLens();
   const session = {
     id: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     createdAt: new Date().toISOString(),
+    lensId: lens.id,
+    lensTitle: lens.title,
+    firstRead: {
+      ...state.firstRead,
+      textures: [...state.firstRead.textures]
+    },
+    lensMarkers: selectedArray(state.lensMarkers),
+    resultMarkers: selectedArray(state.resultMarkers),
+    remainsMarkers: selectedArray(state.remainsMarkers),
     observationMode: "untimed",
     durationSeconds: null,
-    location: state.location,
-    textureMarkers: selectedArray(state.textures),
-    observedChangeMarkers: selectedArray(state.changes),
-    thresholdMarkers: selectedArray(state.thresholds),
-    perceptionMarkers: selectedArray(state.perceptions),
     userNote: state.note.trim()
   };
   state.sessions.unshift(session);
@@ -589,22 +585,23 @@ function renderNotes() {
 
   els.notesList.innerHTML = state.sessions.map((session) => {
     const date = new Date(session.createdAt);
-    const title = session.location || "unlocated";
+    const lens = getLensById(session.lensId);
+    const firstRead = session.firstRead || createEmptyFirstRead();
     const tags = [
-      ...session.textureMarkers,
-      ...session.observedChangeMarkers,
-      ...session.thresholdMarkers,
-      ...session.perceptionMarkers
+      ...(firstRead.textures || []),
+      ...(session.lensMarkers || []),
+      ...(session.resultMarkers || []),
+      ...(session.remainsMarkers || [])
     ];
     return `<article class="note-item">
       <header>
         <div>
-          <h3>${escapeHtml(title)}</h3>
+          <h3>${escapeHtml(lens.shortTitle)} / ${escapeHtml(firstRead.location || "unlocated")}</h3>
           <time datetime="${session.createdAt}">${date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</time>
         </div>
         <button class="quiet-button danger" type="button" data-delete-session="${session.id}">Delete</button>
       </header>
-      <div class="note-meta">${session.durationSeconds ? `${session.durationSeconds}s observation` : "untimed observation"}</div>
+      <div class="note-meta">${escapeHtml(lens.title)} / untimed observation</div>
       <div class="note-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("") || "<span>no markers</span>"}</div>
       <p>${escapeHtml(session.userNote || "No written note.")}</p>
     </article>`;
@@ -612,29 +609,23 @@ function renderNotes() {
 }
 
 function renderPatterns() {
-  const total = state.sessions.length;
-  if (!total) {
+  const summary = summarizePatterns(state.sessions);
+  if (!summary.total) {
     const template = document.getElementById("empty-note-template");
     els.patternGrid.innerHTML = template.innerHTML;
     return;
   }
 
-  const locationCounts = countBy(state.sessions.map((session) => session.location).filter(Boolean));
-  const changeCounts = countBy(state.sessions.flatMap((session) => session.observedChangeMarkers));
-  const thresholdCounts = countBy(state.sessions.flatMap((session) => session.thresholdMarkers));
-  const perceptionCounts = countBy(state.sessions.flatMap((session) => session.perceptionMarkers));
-
-  const droppedAway = changeCounts["dropped away briefly"] || 0;
-  const reformed = changeCounts["re-formed"] || 0;
-  const wide = (thresholdCounts["wide perception"] || 0) + (perceptionCounts.wide || 0);
-
   const patterns = [
-    ["Sessions recorded", "Total local field notes.", total],
-    ["Most common location", "Where me most often seemed to appear.", topCount(locationCounts)],
-    ["Most common change", "What most often happened under observation.", topCount(changeCounts)],
-    ["Dropped away", "Reported as a possible observation.", droppedAway],
-    ["Re-forming", "Reported after observation or threshold.", reformed],
-    ["Wide perception", "Wide or peripheral field reports.", wide]
+    ["Sessions", "Total local field notes.", summary.total],
+    ["Most used lens", "The lens most often explored.", labelLens(summary.topLens)],
+    ["Common location", "Where me most often seemed to gather.", summary.topLocation],
+    ["Common texture", "What the self-sense most often seemed made of.", summary.topTexture],
+    ["Common result", "Most repeated observation result.", summary.topResult],
+    ["Dropped away", "Reported as a possible observation.", summary.droppedAway],
+    ["Became unclear", "Reported when self-sense lost definition.", summary.becameUnclear],
+    ["Re-formed", "Reported after softening or absence.", summary.reformed],
+    ["Widened / space", "Wide field or space reports.", summary.widened]
   ];
 
   els.patternGrid.innerHTML = patterns.map(([title, description, value]) => `
@@ -646,16 +637,9 @@ function renderPatterns() {
   `).join("");
 }
 
-function countBy(items) {
-  return items.reduce((counts, item) => {
-    counts[item] = (counts[item] || 0) + 1;
-    return counts;
-  }, {});
-}
-
-function topCount(counts) {
-  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  return entries[0] ? entries[0][0] : "none yet";
+function labelLens(id) {
+  if (id === "none yet") return id;
+  return getLensById(id).shortTitle;
 }
 
 function exportNotes() {
@@ -686,13 +670,25 @@ function deleteSession(id) {
   renderPatterns();
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function renderSignalMark(className) {
+  return `<svg class="${className}" viewBox="0 0 640 640" role="img" aria-label="Side profile with five rays">
+    <circle class="mark-ripple" cx="320" cy="246" r="36"></circle>
+    <g class="mark-rays">
+      <path class="mark-ray" pathLength="1" d="M248 248L112 184"></path>
+      <path class="mark-ray" pathLength="1" d="M282 230L178 86"></path>
+      <path class="mark-ray" pathLength="1" d="M321 226L321 58"></path>
+      <path class="mark-ray" pathLength="1" d="M352 232L462 86"></path>
+      <path class="mark-ray" pathLength="1" d="M382 248L530 184"></path>
+      <circle class="mark-ray-node" cx="112" cy="184" r="6"></circle>
+      <circle class="mark-ray-node" cx="178" cy="86" r="6"></circle>
+      <circle class="mark-ray-node" cx="321" cy="58" r="6"></circle>
+      <circle class="mark-ray-node" cx="462" cy="86" r="6"></circle>
+      <circle class="mark-ray-node" cx="530" cy="184" r="6"></circle>
+    </g>
+    <g class="mark-figure">
+      <image class="mark-head-image" href="/i-sense_observatory/logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none"></image>
+    </g>
+  </svg>`;
 }
 
 function updateFieldIntensity() {
@@ -706,10 +702,9 @@ function getChromeStage() {
 
 function setMotionTarget() {
   const stage = getChromeStage();
-  const profileKey = state.isPreparingObservation ? "stillness" : stage;
-  const profile = state.stage === 3 && (state.observeTimer || state.isObservingDirectly) && !state.isPreparingObservation
+  const profile = state.stage === 4 && state.isObservingDirectly
     ? motionProfiles.observe
-    : motionProfiles[profileKey] || motionProfiles.arrive;
+    : motionProfiles[stage] || motionProfiles.arrive;
 
   motionState.target = { ...profile };
   document.documentElement.style.setProperty("--field-intensity", String(profile.field));
@@ -777,7 +772,7 @@ function drawField(now) {
     ctx.stroke();
   }
 
-  const points = 58;
+  const points = 62;
   for (let i = 0; i < points; i += 1) {
     const angle = (Math.PI * 2 * i) / points + Math.sin(t * 0.07 + i) * (motionState.reducedMotion ? 0 : 0.026);
     const spread = 0.34 + peripheral * 0.42;
@@ -794,12 +789,12 @@ function drawField(now) {
   if (rayPower > 0.08) {
     const rayBaseX = cx + Math.sin(t * 0.11) * 8;
     const rayBaseY = cy - maxRadius * 0.06;
-    const rayAngles = [-2.03, -1.72, -1.42, -1.11];
+    const rayAngles = [-2.15, -1.86, -1.57, -1.28, -0.99];
     ctx.save();
     ctx.lineCap = "round";
     rayAngles.forEach((angle, index) => {
-      const length = maxRadius * (stage === "threshold" ? 0.68 : 0.48) * (0.86 + index * 0.045);
-      const wobble = Math.sin(t * 0.25 + index) * (motionState.reducedMotion ? 0 : 0.014);
+      const length = maxRadius * (stage === "result" ? 0.5 : 0.58) * (0.86 + index * 0.035);
+      const wobble = Math.sin(t * 0.25 + index) * (motionState.reducedMotion ? 0 : 0.012);
       const endX = rayBaseX + Math.cos(angle + wobble) * length;
       const endY = rayBaseY + Math.sin(angle + wobble) * length;
       const gradientLine = ctx.createLinearGradient(rayBaseX, rayBaseY, endX, endY);
@@ -822,25 +817,32 @@ function drawField(now) {
 }
 
 function handleBodyClick(event) {
+  const lensTarget = event.target.closest("[data-lens-id]");
+  if (lensTarget) {
+    chooseLens(lensTarget.dataset.lensId);
+    return;
+  }
+
   const actionTarget = event.target.closest("[data-action]");
   if (actionTarget) {
     const action = actionTarget.dataset.action;
-    if (action === "begin") setStage(1);
-    if (action === "back") setStage(state.stage - 1);
+    if (action === "begin") {
+      resetDraft();
+      setStage(1);
+    }
+    if (action === "back") goBack();
     if (action === "next") setStage(state.stage + 1);
-    if (action === "after-report") afterReport();
+    if (action === "next-calibration") advanceCalibration();
+    if (action === "choose-suggested") chooseLens(suggestLensIds(state.firstRead)[0]);
+    if (action === "next-lens-prompt") {
+      const lens = getSelectedLens();
+      state.lensPromptIndex = (state.lensPromptIndex + 1) % lens.prompts.length;
+      renderWithTransition();
+    }
     if (action === "start-observe") startObservation();
     if (action === "end-observe") {
-      stopObserveTimer();
-      setStage(4);
-    }
-    if (action === "next-locate-question") {
-      state.locateQuestionIndex = (state.locateQuestionIndex + 1) % locateQuestions.length;
-      renderWithTransition();
-    }
-    if (action === "next-texture-question") {
-      state.textureQuestionIndex = (state.textureQuestionIndex + 1) % textureQuestions.length;
-      renderWithTransition();
+      stopObservation();
+      setStage(5);
     }
     if (action === "save-note") saveCurrentSession();
     if (action === "new-session") resetSession();
@@ -849,9 +851,20 @@ function handleBodyClick(event) {
     return;
   }
 
-  const locationTarget = event.target.closest("[data-location]");
-  if (locationTarget) {
-    state.location = locationTarget.dataset.location;
+  const singleTarget = event.target.closest("[data-first-read-single]");
+  if (singleTarget) {
+    state.firstRead[singleTarget.dataset.firstReadSingle] = singleTarget.dataset.value;
+    renderWithTransition();
+    return;
+  }
+
+  const firstReadToggle = event.target.closest("[data-first-read-toggle]");
+  if (firstReadToggle) {
+    const key = firstReadToggle.dataset.firstReadToggle;
+    const value = firstReadToggle.dataset.value;
+    const values = state.firstRead[key];
+    if (values.includes(value)) state.firstRead[key] = values.filter((item) => item !== value);
+    else state.firstRead[key] = [...values, value];
     renderWithTransition();
     return;
   }
@@ -861,10 +874,9 @@ function handleBodyClick(event) {
     const key = toggleTarget.dataset.toggle;
     const value = toggleTarget.dataset.value;
     const map = {
-      texture: state.textures,
-      change: state.changes,
-      threshold: state.thresholds,
-      perception: state.perceptions
+      lens: state.lensMarkers,
+      result: state.resultMarkers,
+      remains: state.remainsMarkers
     };
     const set = map[key];
     if (set.has(value)) set.delete(value);
@@ -877,6 +889,24 @@ function handleBodyClick(event) {
   if (deleteTarget) {
     deleteSession(deleteTarget.dataset.deleteSession);
   }
+}
+
+function advanceCalibration() {
+  if (state.calibrationIndex < firstReadQuestions.length - 1) {
+    state.calibrationIndex += 1;
+    renderWithTransition();
+    return;
+  }
+  setStage(2);
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 els.tabs.forEach((tab) => {
