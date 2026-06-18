@@ -23,8 +23,8 @@
     <link rel="icon" href="./assets/favicon-DorxldkA.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="toneparadox-icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
-    <script type="module" crossorigin src="./assets/index-MS3po6sR.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-B2ubyEQH.css">
+    <script type="module" crossorigin src="./assets/index-B9Pf3Krh.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-C-APeEi-.css">
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -197,6 +197,7 @@
           <button class="meaning-toggle-button" type="button" id="meaningToggleButton" aria-pressed="false">
             Terms
           </button>
+          <button class="context-button" type="button" id="contextButton">What?</button>
           <button class="view-reset-button" type="button" id="viewResetButton" aria-label="Reset view" title="Reset view">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M7.2 8.2A6.8 6.8 0 1 1 5.4 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -302,6 +303,7 @@
             <div class="practice-action-card">
               <strong>Core move</strong>
               <span>Name the formed state, name its opposite, then watch both without solving.</span>
+              <button class="inline-context-button" type="button" data-context-topic="setup">What does this mean?</button>
             </div>
             <p class="memory-summary" id="memorySummary" aria-live="polite">No saved insights yet.</p>
 
@@ -454,6 +456,9 @@
           <button type="button" class="about-tab" data-about-tab="journal">Journal</button>
           <button type="button" class="about-tab" data-about-tab="plus">Plus</button>
         </div>
+        <button class="about-context-button" type="button" data-context-topic="about-current">
+          What does this tab mean for me?
+        </button>
         <section class="about-panel is-active" data-about-panel="practice">
           <p>
             A symbolic paradox practice inspired by mathematical, geometric, and consciousness-related themes
@@ -516,6 +521,7 @@
                 recognizes itself by coming back around.
               </p>
               <code>× · recursive · closed</code>
+              <button class="inline-context-button" type="button" data-context-topic="copper">Meaning</button>
             </article>
             <article class="study-card study-card-blue">
               <strong>Blue hyperboloid</strong>
@@ -525,6 +531,7 @@
                 a clear thought or category.
               </p>
               <code>+ · additive · open</code>
+              <button class="inline-context-button" type="button" data-context-topic="blue">Meaning</button>
             </article>
             <article class="study-card study-card-gold">
               <strong>Gold focal ring</strong>
@@ -534,6 +541,7 @@
                 ring are deliberately aligned so the practice has one visual meeting place.
               </p>
               <code>r = 1 · no collapse</code>
+              <button class="inline-context-button" type="button" data-context-topic="gold">Meaning</button>
             </article>
           </div>
           <p class="study-note">
@@ -613,6 +621,14 @@
           </p>
           <div class="journal-list" id="journalList"></div>
         </section>
+      </dialog>
+
+      <dialog id="contextDialog" class="context-dialog">
+        <button class="dialog-close" type="button" id="closeContext" aria-label="Close explanation">Close</button>
+        <span class="context-kicker" id="contextKicker">What am I seeing?</span>
+        <h2 id="contextTitle">What am I seeing?</h2>
+        <p class="context-summary" id="contextSummary"></p>
+        <div class="context-grid" id="contextGrid"></div>
       </dialog>
     </div>
 
