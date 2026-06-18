@@ -222,32 +222,32 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
   };
 
   const tones = [
-    { id: "144hz", value: 144, label: "144 Hz", why: "Foundation, stillness, and a low stabilizing carrier." },
-    { id: "432hz", value: 432, label: "432 Hz", why: "Harmonic alignment, steady exploration, and balanced field tone." },
-    { id: "528hz", value: 528, label: "528 Hz", why: "Heart coherence, compassion, and connective resonance." },
-    { id: "888.25hz", value: 888.25, label: "888.25 Hz", why: "Threshold work, future-self alignment, and higher integration." }
+    { id: "144hz", value: 144, label: "144 Hz", why: "Choose for grounding, Echo work, and still integration when the field needs a low stabilizing carrier." },
+    { id: "432hz", value: 432, label: "432 Hz", why: "Choose for Gate contact, dimensional ally work, and steady exploration through a balanced field tone." },
+    { id: "528hz", value: 528, label: "528 Hz", why: "Choose for Mirror, Oversoul, Monad, compassion, and connective resonance." },
+    { id: "888.25hz", value: 888.25, label: "888.25 Hz", why: "Choose for Vector transmission, future-self alignment, threshold work, and higher integration." }
   ];
 
   const breathRhythms = {
-    steady: { title: "Steady", cycle: "4-4-4-4", why: "Neutral entry point. Balanced enough for most sessions and easy to follow." },
-    slow: { title: "Slow", cycle: "5-5-5-5", why: "Use when the field needs patience, steadiness, and longer attention." },
-    box: { title: "Box", cycle: "4-4-4-4", why: "Use for symmetry, stability, and a clear body seal." },
-    extendedExhale: { title: "Extended Exhale", cycle: "4-6-4-6", why: "Use when you want a slower, more receptive gate with longer holding phases." },
-    prime2357: { title: "2-3-5-7", cycle: "2-3-5-7", why: "Prime-phase entrainment: quick entry, widening hold, long release." },
-    prime3711: { title: "3-7-11", cycle: "3-7-11", why: "A deeper prime breath: inhale, hold, and long exhale without a pause phase." },
-    balancedFive: { title: "5-5-5-5", cycle: "5-5-5-5", why: "Balanced anticipation for Future Self alignment." },
-    receptiveFourSix: { title: "4-6-4-6", cycle: "4-6-4-6", why: "Inward receptivity and extended holding for Oversoul Guide alignment." },
-    neutralThree: { title: "3-3-3-3", cycle: "3-3-3-3", why: "Neutral harmonic pulse for Monad Echo alignment." },
-    symmetricalFour: { title: "4-4-4-4", cycle: "4-4-4-4", why: "Symmetry and stability for Dimensional Ally alignment." }
+    steady: { title: "4-4-4-4 breath", cycle: "4-4-4-4", why: "Recommended starting breath. Use it when you want balanced pacing and do not need to customize." },
+    slow: { title: "5-5-5-5 breath", cycle: "5-5-5-5", why: "Use when the field needs patience, steadiness, and longer attention." },
+    box: { title: "4-4-4-4 breath", cycle: "4-4-4-4", why: "Use for symmetry, stability, and a clear body seal." },
+    extendedExhale: { title: "4-6-4-6 breath", cycle: "4-6-4-6", why: "Use when you want slower, more receptive attention with longer holding phases." },
+    prime2357: { title: "2-3-5-7 breath", cycle: "2-3-5-7", why: "Use for quick opening, widening hold, and long release. This is a breath rhythm, not a prime path choice." },
+    prime3711: { title: "3-7-11 breath", cycle: "3-7-11", why: "Use for deeper settling: inhale, hold, and long exhale without a pause phase. This is a breath rhythm." },
+    balancedFive: { title: "5-5-5-5 breath", cycle: "5-5-5-5", why: "Balanced anticipation for Future Self alignment." },
+    receptiveFourSix: { title: "4-6-4-6 breath", cycle: "4-6-4-6", why: "Inward receptivity and extended holding for Oversoul Guide alignment." },
+    neutralThree: { title: "3-3-3-3 breath", cycle: "3-3-3-3", why: "Neutral harmonic pulse for Monad Echo alignment." },
+    symmetricalFour: { title: "4-4-4-4 breath", cycle: "4-4-4-4", why: "Symmetry and stability for Dimensional Ally alignment." }
   };
 
   const calibrationBreathChoices = ["prime2357", "prime3711", "symmetricalFour", "receptiveFourSix"];
   const gateBreathSeals = ["2-3-5-7", "3-7-11", "4-4-4-4", "4-6-4-6"];
   const gateBreathSealChoices = [
-    { id: "2-3-5-7", title: "2-3-5-7", why: "Quick opening, widening hold, and long release." },
-    { id: "3-7-11", title: "3-7-11", why: "Deeper seal with fewer transitions and a long settling exhale." },
-    { id: "4-4-4-4", title: "4-4-4-4", why: "Stable, balanced pacing when you want grounding." },
-    { id: "4-6-4-6", title: "4-6-4-6", why: "Slower, more receptive attention with longer holds." }
+    { id: "2-3-5-7", title: "2-3-5-7 breath seal", why: "Quick opening, widening hold, and long release. Choose it when you want the gate to feel more exploratory." },
+    { id: "3-7-11", title: "3-7-11 breath seal", why: "Deeper seal with fewer transitions and a long settling exhale. Choose it for longer contact windows." },
+    { id: "4-4-4-4", title: "4-4-4-4 breath seal", why: "Recommended Gate default. Choose it when you want stable, balanced pacing." },
+    { id: "4-6-4-6", title: "4-6-4-6 breath seal", why: "Slower, more receptive attention with longer holds. Choose it when you need more softness." }
   ];
 
   const triplets = {
@@ -454,6 +454,75 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     { id: "save", title: "Save", stage: "ground" }
   ];
 
+  const flowStepCues = {
+    mode: {
+      duration: "30 seconds",
+      minimum: "Choose Silent or Audio Mirror.",
+      readiness: "Continue when the session mode feels simple enough to use without thinking about it.",
+      next: "Breath calibration"
+    },
+    breath: {
+      duration: "1-2 minutes",
+      minimum: "Complete 3 comfortable breath cycles.",
+      readiness: "Continue when the rhythm feels followable and the tone choice feels settled enough.",
+      next: "Micro-ritual"
+    },
+    ritual: {
+      duration: "30-60 seconds",
+      minimum: "Read the recovery phrase once and take 3 breaths.",
+      readiness: "Continue when the body feels present enough to choose the contact frame.",
+      next: "Archetype"
+    },
+    archetype: {
+      duration: "Take as long as needed",
+      minimum: "Choose one contact frame.",
+      readiness: "Continue when one archetype feels like the clear lens for this session.",
+      next: "Frequency Alignment"
+    },
+    alignment: {
+      duration: "3 minutes",
+      minimum: "Stay for at least 3 breath cycles if you skip the full timer.",
+      readiness: "Continue when breath, tone, and geometry feel coherent enough to carry forward.",
+      next: "Intention"
+    },
+    intention: {
+      duration: "1-2 minutes",
+      minimum: "Write or speak one clear phrase.",
+      readiness: "Continue when the intention can be held without needing to edit it again.",
+      next: "Mirror Phase"
+    },
+    mirror: {
+      duration: "5-10 minutes",
+      minimum: "Stay for 3 breaths after reading the intention.",
+      readiness: "Continue when the reflection feels complete, or when you have honestly noted stillness.",
+      next: "Echo Playback"
+    },
+    echo: {
+      duration: "2-3 listens",
+      minimum: "Listen once without analysis.",
+      readiness: "Continue when one word, feeling, body response, or quiet impression has been noticed.",
+      next: "Glyph"
+    },
+    glyph: {
+      duration: "1-2 minutes",
+      minimum: "Capture or accept one glyph.",
+      readiness: "Continue when the glyph feels true enough to represent the session.",
+      next: "Grounding"
+    },
+    grounding: {
+      duration: "1-3 minutes",
+      minimum: "Take 3 slow breaths.",
+      readiness: "Continue when attention has returned to the body and room.",
+      next: "Save"
+    },
+    save: {
+      duration: "No timer",
+      minimum: "Save only what feels worth keeping.",
+      readiness: "Finish when the Codex entry represents the session clearly enough.",
+      next: "Return to Anchor or Wheel"
+    }
+  };
+
   const echoPresets = {
     near: { title: "Near", pitch: -120, space: "18%", delay: 0.18, rate: 0.97, why: "Choose Near when the reflection should stay close to your original voice." },
     deep: { title: "Deep", pitch: -300, space: "27%", delay: 0.34, rate: 0.84, why: "Choose Deep when the contact should feel lower, slower, and more interior." },
@@ -627,6 +696,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       notice: "Pay attention to words, images, pressure, emotion, warmth, resistance, or a sudden change in what you actually want to ask.",
       force: "Do not try to answer the intention here. Just aim it.",
       defaultTone: 888.25,
+      guidedDefaults: {
+        tone: 888.25,
+        triplet: "3-7-11",
+        reason: "Vector starts with 888.25 Hz and Prime path 3-7-11 because this is the clearest default for transmitting a request."
+      },
       guidanceAsset: "HarmonicVectorModuleGuidance.wav"
     },
     breath: {
@@ -652,6 +726,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       notice: "Breath depth, body tension, warmth, pressure, emotion, restlessness, calm, images behind the eyes, or silence.",
       force: "This stage prepares the field before deeper contact.",
       defaultTone: 144,
+      guidedDefaults: {
+        tone: 144,
+        breathRhythm: "steady",
+        reason: "Echo starts with 144 Hz and a 4-4-4-4 breath because integration works best when the body feels steady first."
+      },
       guidanceAsset: "ToroidalPhaseModuleGuidance.wav"
     },
     gate: {
@@ -677,6 +756,12 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       notice: "Geometric impressions, body shifts, inner words, a felt presence, curiosity, wonder, or nothing obvious. Nothing obvious still counts.",
       force: "Do not chase certainty. Let the gate disclose or remain quiet.",
       defaultTone: 432,
+      guidedDefaults: {
+        tone: 432,
+        triplet: "3-7-11",
+        breathSeal: "4-4-4-4",
+        reason: "Gate starts with 432 Hz, Prime path 3-7-11, and a 4-4-4-4 Breath Seal because this is the most balanced contact default."
+      },
       guidanceAsset: "PrimeGateModuleGuidance.wav"
     },
     mirror: {
@@ -702,6 +787,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       notice: "Imagery, pressure, emotion, inner words, a felt presence, changes in posture, or nothing obvious. Nothing obvious is still a valid session.",
       force: "Do not chase certainty during Mirror Phase. Let the reflection complete in its own time.",
       defaultTone: 528,
+      guidedDefaults: {
+        tone: 528,
+        reason: "Mirror starts with 528 Hz because it supports Oversoul, Monad, compassion, and reflective coherence."
+      },
       guidanceAsset: "SymbolicMirrorModuleGuidance.wav"
     },
     guided: {
@@ -1590,7 +1679,9 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   function renderChoiceGroup(items, selected, className, dataName) {
     return items.map((item) => {
       const value = typeof item === "string" ? item : String(item.value ?? item.id);
-      const label = typeof item === "string" ? item : item.label ?? item.title;
+      let label = typeof item === "string" ? item : item.label ?? item.title;
+      if (typeof item === "string" && dataName === "breath" && breathRhythms[item]) label = breathRhythms[item].title;
+      if (typeof item === "string" && dataName === "triplet") label = `Prime path ${item}`;
       const why = typeof item === "string" ? (triplets[item] || breathRhythms[item]?.why || "") : item.why || item.symbolic || "";
       const isSelected = String(selected) === value || Number(selected) === Number(value);
       return `<button class="${className}${isSelected ? " selected" : ""}" data-${dataName}="${escapeHtml(value)}">${escapeHtml(label)}<span>${escapeHtml(why)}</span></button>`;
@@ -1984,6 +2075,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     state.currentFlowStep = stepID;
     const step = flowSteps.find((item) => item.id === stepID) || flowSteps[0];
     state.module = "guided";
+    const moduleScreen = $("#screen-module");
+    if (moduleScreen) {
+      moduleScreen.dataset.module = "guided";
+      moduleScreen.style.setProperty("--module-accent", modules.guided.accent);
+    }
     const root = $("#module-root");
     root.innerHTML = `
       <header class="module-header">
@@ -1992,6 +2088,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <p>${flowSubtitle(step.id)}</p>
         ${renderStepProgress(step.id)}
       </header>
+      ${renderFlowStepCue(step.id)}
       ${renderStepBody(step)}
     `;
     bindFlow(root);
@@ -2027,6 +2124,42 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     `;
   }
 
+  function renderStepCuePanel(cue = {}, options = {}) {
+    const title = options.title || "Step Guide";
+    const description = options.description || "The timer is a guide, not a rule.";
+    return `
+      <section class="step-cue-card ${options.className || ""}">
+        <div>
+          <p class="path-label">${escapeHtml(title)}</p>
+          <p>${escapeHtml(description)}</p>
+        </div>
+        <div class="cue-grid">
+          <span><small>Suggested time</small><strong>${escapeHtml(cue.duration || "No timer")}</strong></span>
+          <span><small>Minimum</small><strong>${escapeHtml(cue.minimum || "Complete the visible action.")}</strong></span>
+          <span><small>Continue when</small><strong>${escapeHtml(cue.readiness || "The step feels complete enough to carry forward.")}</strong></span>
+          <span><small>Next</small><strong>${escapeHtml(cue.next || "Follow the next button.")}</strong></span>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderFlowStepCue(stepID) {
+    return renderStepCuePanel(flowStepCues[stepID], {
+      title: "How Long Here",
+      description: "Stay long enough for the step to settle. You can continue once the readiness cue is met."
+    });
+  }
+
+  function renderRecommendationCard(title, copy, items = []) {
+    return `
+      <div class="recommendation-card">
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(copy)}</p>
+        ${items.length ? `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+      </div>
+    `;
+  }
+
   function renderStepBody(step) {
     if (step.id === "mode") {
       return `
@@ -2034,7 +2167,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <section class="panel">
           <h3>Session Mode</h3>
           <div class="choice-grid">
-            <button class="choice ${state.draft.mode === "silent" ? "selected" : ""}" data-mode="silent">Silent<span>Text-only intention and symbolic echo.</span></button>
+            <button class="choice ${state.draft.mode === "silent" ? "selected" : ""}" data-mode="silent">Silent<span>Written intention and reflection. Audio Echo requires Audio Mirror.</span></button>
             <button class="choice ${state.draft.mode === "audioMirror" ? "selected" : ""}" data-mode="audioMirror">Audio Mirror<span>Record your own voice locally for Echo Playback.</span></button>
           </div>
           <label class="toggle-row"><span>Camera Mirror</span><input type="checkbox" id="camera-toggle" ${state.draft.usesCameraMirror ? "checked" : ""}></label>
@@ -2048,12 +2181,17 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         ${stageCard("settle")}
         <section class="panel">
           <h3>Breath Rhythm</h3>
+          ${renderRecommendationCard("Recommended starting setup", "Use 4-4-4-4 breath and 144 Hz unless another option clearly fits your intention.", [
+            "4-4-4-4 is the easiest rhythm to follow.",
+            "144 Hz supports grounding and steady integration."
+          ])}
           <div class="choice-grid">${renderChoiceGroup(calibrationBreathChoices, state.draft.breathRhythm, "choice", "breath")}</div>
           <p class="small-copy">${escapeHtml(breathRhythms[state.draft.breathRhythm]?.why || "")}</p>
           <label for="resonance">Self-rated resonance: <strong id="resonance-value">${state.draft.resonance}</strong></label>
           <input id="resonance" type="range" min="1" max="10" value="${state.draft.resonance}">
           <p>Choose the number that matches your current charge. A higher number can mean more intensity, openness, emotion, energy, or readiness. It is not a score to perform.</p>
           <h3>Carrier Tone</h3>
+          ${renderRecommendationCard("Tone choice", "If you are unsure, stay with the recommended tone. Change it only when the reason on another tone matches the session better. Tone is supportive; it is not mandatory.")}
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
           <div class="module-canvas-card"><canvas id="module-canvas" width="620" height="620"></canvas></div>
           <div class="control-row">
@@ -2130,6 +2268,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <label for="intention">Prompt</label>
           <textarea id="intention" class="textarea" placeholder="I am entering this session to...">${escapeHtml(state.draft.intention)}</textarea>
           <h3>Carrier Tone</h3>
+          ${renderRecommendationCard("Recommended carrier", "Use the tone already selected from calibration unless the intention clearly asks for a different carrier. The tone supports the prompt; the words carry the signal.")}
           <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
           ${recordingControls()}
           <p class="small-copy">Record only if you want your spoken intention as the source Echo Playback. Skip it to continue with the written anchor.</p>
@@ -2170,7 +2309,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         ${stageCard("echo")}
         <section class="panel">
           <h3>Audio Reflection</h3>
-          <p>Original and modulated echo playback are local-only. Draft audio is saved only if you choose that on Save Session.</p>
+          <p>Original and modulated echo playback are local-only. If you chose Silent mode, use this step as written reflection unless you recorded an original voice note.</p>
           <div class="phase-panel">
             <div class="metric-grid">
               <span class="metric"><small>Original</small><strong>${state.draft.originalAudioDataUrl ? "Ready" : "Missing"}</strong></span>
@@ -2387,37 +2526,37 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const module = modules[name] || modules.mirror;
     if (name === "vector") {
       return [
-        { title: "Orient the Vector", instruction: "Use this module when you want to transmit a request, encode a signal, or form a glyph from intention.", notice: "Notice the exact words that feel alive before you type anything." },
-        { title: "Enter Intention", instruction: "Write one clear phrase. Keep it short enough that the glyph can feel like one signal.", notice: "Watch for resistance, clarity, heat, pressure, or a phrase that suddenly feels more accurate." },
-        { title: "Choose Prime Path", instruction: "Choose the prime triplet as the geometry key. It shapes the vector and glyph; it is not a breath pattern.", notice: "A smaller triplet feels foundational. Wider triplets feel more exploratory." },
-        { title: "Transmit", instruction: "Tap Transmit Vector. Let the tone and glyph carry the request without trying to answer it yet.", notice: "Notice what the glyph seems to carry: direction, weight, mood, or symbolic charge." },
-        { title: "Reflect or Save", instruction: "If the signal feels complete, save it to the Personal Codex or move to another portal.", notice: "The vector is the sent signal. Integration can happen later through Mirror or Echo." }
+        { title: "Orient the Vector", instruction: "Use this module when you want to transmit a request, encode a signal, or form a glyph from intention.", duration: "30-60 seconds", minimum: "Read the purpose and take 3 breaths.", readiness: "Continue when the request feels outward-facing and simple.", next: "Enter intention", notice: "Notice the exact words that feel alive before you type anything." },
+        { title: "Enter Intention", instruction: "Write one clear phrase. Keep it short enough that the glyph can feel like one signal.", duration: "1-2 minutes", minimum: "Write one sentence or short phrase.", readiness: "Continue when the wording feels clear enough to transmit without editing again.", next: "Choose Prime Path", notice: "Watch for resistance, clarity, heat, pressure, or a phrase that suddenly feels more accurate." },
+        { title: "Choose Prime Path", instruction: "Choose the prime triplet as the geometry key. It shapes the vector and glyph; it is not a breath pattern.", duration: "30-60 seconds", minimum: "Use the recommended Prime path 3-7-11 unless another pathway clearly fits.", readiness: "Continue when the path choice feels settled enough.", next: "Transmit", notice: "A smaller triplet feels foundational. Wider triplets feel more exploratory." },
+        { title: "Transmit", instruction: "Tap Transmit Vector. Let the tone and glyph carry the request without trying to answer it yet.", duration: "2-3 minutes", minimum: "Play the carrier tone once and watch the glyph form.", readiness: "Continue when the signal feels sent, even if nothing obvious happens.", next: "Reflect or Save", notice: "Notice what the glyph seems to carry: direction, weight, mood, or symbolic charge." },
+        { title: "Reflect or Save", instruction: "If the signal feels complete, save it to the Personal Codex or move to another portal.", duration: "1 minute", minimum: "Name one thing the vector seemed to carry.", readiness: "Finish when the sent signal is recorded clearly enough.", next: "Wheel or Gate", notice: "The vector is the sent signal. Integration can happen later through Mirror or Echo." }
       ];
     }
     if (name === "breath") {
       return [
-        { title: "Orient the Echo", instruction: "Use Echo when the work is integration: future echoes, dreamtime, collective resonance, or subconscious retrieval.", notice: "Begin with breath. Keep the question light rather than gripping it." },
-        { title: "Choose Breath and Tone", instruction: "Choose a rhythm and carrier tone. Breath paces the body while the toroidal field gives the echo a shape.", notice: "A higher resonance number means more current charge, not better performance." },
-        { title: "Begin Echo Field", instruction: "Start the tone and watch the toroidal motion. Let the active glyph breathe with the pattern if one is sealed.", notice: "Look for image, memory, body sensation, emotion, inner words, or silence." },
-        { title: "Integrate", instruction: "Name one thing that returned. If nothing obvious returned, record the stillness honestly.", notice: "Echo work can be subtle. Quiet is still valid." }
+        { title: "Orient the Echo", instruction: "Use Echo when the work is integration: future echoes, dreamtime, collective resonance, or subconscious retrieval.", duration: "30-60 seconds", minimum: "Read the purpose and choose the question lightly.", readiness: "Continue when the question feels light enough to hold without gripping.", next: "Choose breath and tone", notice: "Begin with breath. Keep the question light rather than gripping it." },
+        { title: "Choose Breath and Tone", instruction: "Choose a rhythm and carrier tone. Breath paces the body while the toroidal field gives the echo a shape.", duration: "1 minute", minimum: "Use the recommended 4-4-4-4 breath and 144 Hz unless another option clearly fits.", readiness: "Continue when the breath and tone feel comfortable enough to follow.", next: "Begin Echo Field", notice: "A higher resonance number means more current charge, not better performance." },
+        { title: "Begin Echo Field", instruction: "Start the tone and watch the toroidal motion. Let the active glyph breathe with the pattern if one is sealed.", duration: "3-5 minutes", minimum: "Complete 3 full breath cycles.", readiness: "Continue when one image, feeling, memory, phrase, body response, or honest stillness has surfaced.", next: "Integrate", notice: "Look for image, memory, body sensation, emotion, inner words, or silence." },
+        { title: "Integrate", instruction: "Name one thing that returned. If nothing obvious returned, record the stillness honestly.", duration: "1-3 minutes", minimum: "Write one line or save the quiet accurately.", readiness: "Finish when the echo has been named simply.", next: "Wheel or Vector", notice: "Echo work can be subtle. Quiet is still valid." }
       ];
     }
     if (name === "gate") {
       return [
-        { title: "Orient the Gate", instruction: "Use Gate when the intention is dimensional or stellar ally contact. This is the contact portal.", notice: "Start only when the intention is clear enough to hold without forcing." },
-        { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate geometry; the Breath Seal sets the body rhythm.", notice: "Choose the Breath Seal by the pace your body needs for this contact." },
-        { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone, breath seal, and geometry establish the threshold.", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
-        { title: "Seal the Breath", instruction: "Complete one full Breath Seal and mark it sealed when the body feels steady enough.", notice: "The breath seal is a body anchor, not a race." },
-        { title: "Hold Intention", instruction: "Name the contact intention silently, then mark it held. Keep it simple.", notice: "The intention should feel like a clear beacon, not a demand." },
-        { title: "Open Contact Window", instruction: "Tap the glyph nodes in order. When the third node opens, remain here before moving to integration.", notice: "Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence." },
-        { title: "Integrate Through Mirror", instruction: "After the gate, open Mirror to reflect and integrate what came through.", notice: "Do not chase certainty. Return through Mirror even if the gate was quiet." }
+        { title: "Orient the Gate", instruction: "Use Gate when the intention is dimensional or stellar ally contact. This is the contact portal.", duration: "30-60 seconds", minimum: "Read the purpose and name the contact intention once.", readiness: "Continue when the intention is clear enough to hold without forcing.", next: "Choose Gate Settings", notice: "Start only when the intention is clear enough to hold without forcing." },
+        { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate geometry; the Breath Seal sets the body rhythm.", duration: "1 minute", minimum: "Use the recommended 3-7-11 Prime path, 4-4-4-4 Breath Seal, and 432 Hz unless another setting clearly fits.", readiness: "Continue when the settings feel stable enough to stop adjusting.", next: "Begin Gate Field", notice: "Choose the Breath Seal by the pace your body needs for this contact." },
+        { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone, breath seal, and geometry establish the threshold.", duration: "1-2 minutes", minimum: "Complete one full Breath Seal while the tone runs.", readiness: "Continue when the field feels established enough to mark the breath.", next: "Seal the Breath", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
+        { title: "Seal the Breath", instruction: "Complete one full Breath Seal and mark it sealed when the body feels steady enough.", duration: "1 breath seal", minimum: "Complete one full selected breath cycle.", readiness: "Continue when the body feels steady enough.", next: "Hold Intention", notice: "The breath seal is a body anchor, not a race." },
+        { title: "Hold Intention", instruction: "Name the contact intention silently, then mark it held. Keep it simple.", duration: "30-60 seconds", minimum: "Hold the intention through one breath.", readiness: "Continue when the intention feels like a clear beacon, not a demand.", next: "Open Contact Window", notice: "The intention should feel like a clear beacon, not a demand." },
+        { title: "Open Contact Window", instruction: "Tap the glyph nodes in order. When the third node opens, remain here before moving to integration.", duration: "5 minutes", minimum: "Stay for at least 3 Breath Seals after the gate opens.", readiness: "Continue when the contact window feels complete, or when you have honestly noted stillness.", next: "Mirror Integration", notice: "Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence." },
+        { title: "Integrate Through Mirror", instruction: "After the gate, open Mirror to reflect and integrate what came through.", duration: "1-3 minutes", minimum: "Write one note before leaving the Gate.", readiness: "Continue when the experience has a simple anchor: image, feeling, phrase, body note, or stillness.", next: "Mirror", notice: "Do not chase certainty. Return through Mirror even if the gate was quiet." }
       ];
     }
     return [
-      { title: "Orient the Mirror", instruction: "Use Mirror for Oversoul, Monad, self-harmonic alignment, or integration after contact work.", notice: "The camera is optional. Attention, breath, and inner imagery are the deeper mirror." },
-      { title: "Set the Intention", instruction: "Read or type one intention. Speak it once if using voice, then stop trying to force an answer.", notice: "Notice breath, body pressure, emotion, inner words, memory, symbols, image, or stillness." },
-      { title: "Enter Mirror", instruction: "Activate the camera or simply gaze at the symbolic surface. Hold the intention lightly.", notice: "Nothing obvious is still a valid Mirror session." },
-      { title: "Reflect or Save", instruction: "Record what remains after the mirror phase. Save only what feels worth keeping.", notice: "The Mirror reflects and integrates; it does not need to prove anything." }
+      { title: "Orient the Mirror", instruction: "Use Mirror for Oversoul, Monad, self-harmonic alignment, or integration after contact work.", duration: "30-60 seconds", minimum: "Read the purpose and take 3 breaths.", readiness: "Continue when the intention feels ready to be reflected rather than solved.", next: "Set the Intention", notice: "The camera is optional. Attention, breath, and inner imagery are the deeper mirror." },
+      { title: "Set the Intention", instruction: "Read or type one intention. Speak it once if using voice, then stop trying to force an answer.", duration: "1-2 minutes", minimum: "Write or read one clear phrase.", readiness: "Continue when the phrase can be held gently without editing it again.", next: "Enter Mirror", notice: "Notice breath, body pressure, emotion, inner words, memory, symbols, image, or stillness." },
+      { title: "Enter Mirror", instruction: "Activate the camera or simply gaze at the symbolic surface. Hold the intention lightly.", duration: "5-10 minutes", minimum: "Stay for 3 breaths after reading the intention.", readiness: "Continue when the reflection feels complete, or when you have honestly noted stillness.", next: "Reflect or Save", notice: "Nothing obvious is still a valid Mirror session." },
+      { title: "Reflect or Save", instruction: "Record what remains after the mirror phase. Save only what feels worth keeping.", duration: "1-3 minutes", minimum: "Write one line or save the quiet accurately.", readiness: "Finish when the reflection has been named simply.", next: "Wheel or Echo", notice: "The Mirror reflects and integrates; it does not need to prove anything." }
     ];
   }
 
@@ -2477,6 +2616,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <p>${escapeHtml(step.instruction)}</p>
         ${renderModuleStepProgress(name, steps, stepIndex)}
       </header>
+      ${renderStepCuePanel(step, {
+        title: "How Long Here",
+        description: "Use the time as a guide. Continue when the readiness cue is met.",
+        className: "module-cue-card"
+      })}
 
       <section class="panel guided-module-card">
         <p class="path-label">${escapeHtml(module.title)}</p>
@@ -2497,7 +2641,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       : `<button class="button button-quiet" data-action="open-wheel">Return to Wheel</button>`;
     const isGateContactWindow = name === "gate" && stepIndex === 5;
     const gateCanIntegrate = !isGateContactWindow || state.gateTouchedNodes.length >= 3;
-    const nextLabel = isGateContactWindow ? "Continue to Mirror Integration" : "Next Step";
+    const nextStep = stepIndex < count - 1 ? moduleStepDefinitions(name)[stepIndex + 1] : null;
+    const nextLabel = isGateContactWindow ? "Continue to Mirror Integration" : `Continue to ${nextStep?.title || "Next Step"}`;
     const nextDisabled = gateCanIntegrate ? "" : " disabled aria-disabled=\"true\"";
     const next = stepIndex < count - 1
       ? `<button class="button button-primary" data-action="module-next-step" data-module-name="${escapeHtml(name)}"${nextDisabled}>${nextLabel}</button>`
@@ -2546,12 +2691,14 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <label for="intention">Intention</label>
         <textarea id="intention" class="textarea" placeholder="I am entering this session to...">${escapeHtml(state.draft.intention)}</textarea>
         <h3>Carrier Tone</h3>
+        ${renderRecommendationCard("Recommended carrier", modules.vector.guidedDefaults.reason)}
         <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
       `;
     }
     if (stepIndex === 2) {
       return `
         <h3>Prime Triplet Pathway</h3>
+        ${renderRecommendationCard("Recommended prime path", "Start with Prime path 3-7-11. It is the balanced, recursive default for Vector work. Choose 2-3-5 for grounding, 5-11-17 for deeper exploration, or 7-11-13 for sharper refinement.")}
         <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
         <p class="small-copy">The three numbers are geometry keys written as p1-p2-p3. They shape the vector axes and glyph behavior.</p>
       `;
@@ -2596,11 +2743,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (stepIndex === 1) {
       return `
         <h3>Breath Rhythm</h3>
+        ${renderRecommendationCard("Recommended Echo setup", modules.breath.guidedDefaults.reason)}
         <div class="choice-grid">${renderChoiceGroup(calibrationBreathChoices, state.draft.breathRhythm, "choice", "breath")}</div>
         <label for="resonance">Self-rated resonance: <strong id="resonance-value">${state.draft.resonance}</strong></label>
         <input id="resonance" type="range" min="1" max="10" value="${state.draft.resonance}">
         <p>A higher number can mean more intensity, openness, emotion, energy, or readiness. It is not a score to perform.</p>
         <h3>Carrier Tone</h3>
+        ${renderRecommendationCard("Tone choice", "Keep 144 Hz for grounding and integration unless another tone clearly matches your intention. Echo work is usually easier when the carrier feels steady rather than intense.")}
         <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
       `;
     }
@@ -2639,6 +2788,11 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (stepIndex === 1) {
       return `
         <h3>Prime Triplet Pathway</h3>
+        ${renderRecommendationCard("Recommended Gate setup", modules.gate.guidedDefaults.reason, [
+          "Prime path shapes the gate geometry.",
+          "Breath Seal paces the body.",
+          "Carrier tone supports the field."
+        ])}
         <div class="choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
         <h3>Breath Seal</h3>
         <div class="choice-grid">${renderChoiceGroup(gateBreathSealChoices, state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
@@ -2697,6 +2851,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <p>${isOpen
             ? "This is the contact window. Keep the Gate Field tone running, continue the chosen Breath Seal, and hold the intention without forcing an answer. You may visualise yourself moving through the gate."
             : "Complete the glyph nodes first. When the third node opens, stay on this screen before moving to Mirror integration."}</p>
+          ${isOpen ? `
+            <div class="contact-window-timing">
+              <span><small>Suggested time</small><strong>5 minutes</strong></span>
+              <span><small>Minimum</small><strong>3 Breath Seals</strong></span>
+              <span><small>Move on when</small><strong>The contact window feels complete, or stillness has been noted.</strong></span>
+            </div>
+          ` : ""}
           <ul>
             <li>Look for presence, inner words, geometry, emotion, body sensation, image, pressure, temperature, or stillness.</li>
             <li>Do not chase certainty. Silence or nothing obvious is still a valid gate session.</li>
@@ -2739,6 +2900,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <label for="mirror-intention">Current intention</label>
         <textarea id="mirror-intention" class="textarea" placeholder="Read the intention back to yourself.">${escapeHtml(state.draft.intention)}</textarea>
         <h3>Carrier Tone</h3>
+        ${renderRecommendationCard("Recommended carrier", modules.mirror.guidedDefaults.reason)}
         <div class="choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
       `;
     }
@@ -2765,6 +2927,14 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     `;
   }
 
+  function applyModuleGuidedDefaults(module) {
+    const defaults = module.guidedDefaults || {};
+    if (defaults.tone) state.draft.tone = defaults.tone;
+    if (defaults.triplet) state.draft.triplet = defaults.triplet;
+    if (defaults.breathRhythm) state.draft.breathRhythm = defaults.breathRhythm;
+    if (defaults.breathSeal) state.draft.breathSeal = defaults.breathSeal;
+  }
+
   function renderModule(name, options = {}) {
     const { resetScroll = true } = options;
     const module = modules[name];
@@ -2785,7 +2955,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       moduleScreen.dataset.module = name;
       moduleScreen.style.setProperty("--module-accent", module.accent);
     }
-    if (isNewModule) state.draft.tone = module.defaultTone;
+    if (isNewModule) applyModuleGuidedDefaults(module);
     if (isNewModule) {
       state.moduleSteps[name] = 0;
       state.advancedModules[name] = false;
