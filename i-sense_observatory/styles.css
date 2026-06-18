@@ -4427,9 +4427,9 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   html[data-stage="arrive"] .experiment-surface {
     --arrival-title-top: clamp(116px, 15svh, 148px);
     --arrival-title-size: clamp(2.72rem, 10.8cqw, 3.22rem);
-    --arrival-prompt-top: clamp(238px, 28.8svh, 292px);
+    --arrival-prompt-top: clamp(252px, 30.4svh, 304px);
     --arrival-prompt-size: clamp(0.64rem, 1.72cqw, 0.76rem);
-    --arrival-art-top: clamp(252px, 30.8svh, 304px);
+    --arrival-art-top: clamp(272px, 32.6svh, 320px);
     --arrival-art-width: 88cqw;
     --arrival-art-height: clamp(250px, 34svh, 320px);
     --arrival-cta-width: 68cqw;
@@ -4439,6 +4439,12 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
 
   html[data-stage="arrive"] .stage-prompt {
     letter-spacing: clamp(0.16em, 0.52cqw, 0.22em);
+  }
+
+  html[data-stage="arrive"] .stage-prompt::before {
+    top: -16px;
+    width: 10px;
+    height: 10px;
   }
 
   html[data-stage="arrive"] .signal-mark {
@@ -4496,9 +4502,9 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   html[data-stage="arrive"] .experiment-surface {
     --arrival-title-top: clamp(96px, 14.4svh, 116px);
     --arrival-title-size: clamp(2.44rem, 9.9cqw, 2.9rem);
-    --arrival-prompt-top: clamp(204px, 27.6svh, 226px);
+    --arrival-prompt-top: clamp(228px, 30.8svh, 238px);
     --arrival-prompt-size: clamp(0.58rem, 1.52cqw, 0.66rem);
-    --arrival-art-top: clamp(220px, 30.2svh, 242px);
+    --arrival-art-top: clamp(246px, 33.3svh, 260px);
     --arrival-art-width: 78cqw;
     --arrival-art-height: clamp(210px, 31svh, 250px);
     --arrival-cta-width: 66cqw;
@@ -4532,6 +4538,12 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
 
   html[data-stage="arrive"] .signal-mark {
     width: min(68cqw, 292px);
+  }
+
+  html[data-stage="arrive"] .stage-prompt::before {
+    top: -16px;
+    width: 9px;
+    height: 9px;
   }
 
   html[data-stage="arrive"] .arrival-ground {
