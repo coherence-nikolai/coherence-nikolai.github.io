@@ -1,11 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">I-Sense Observatory</title>
-  <desc id="desc">A white center opening into a quiet circular field.</desc>
-  <rect width="512" height="512" rx="96" fill="#f7f4ec"/>
-  <circle cx="256" cy="256" r="206" fill="none" stroke="#171514" stroke-opacity=".16" stroke-width="4"/>
-  <circle cx="256" cy="256" r="152" fill="none" stroke="#4f7762" stroke-opacity=".34" stroke-width="3"/>
-  <circle cx="256" cy="256" r="98" fill="none" stroke="#536f91" stroke-opacity=".28" stroke-width="3"/>
-  <circle cx="256" cy="256" r="42" fill="#fffdf8" stroke="#b56a2d" stroke-opacity=".46" stroke-width="4"/>
-  <path d="M256 40v118M256 354v118M40 256h118M354 256h118" stroke="#171514" stroke-opacity=".22" stroke-width="6" stroke-linecap="round"/>
-  <path d="M117 117l83 83M312 312l83 83M395 117l-83 83M200 312l-83 83" stroke="#995f68" stroke-opacity=".22" stroke-width="5" stroke-linecap="round"/>
+  <desc id="desc">A side-profile head looking upward with four rays rising from the crown.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#1f3337"/>
+      <stop offset="48%" stop-color="#0b171d"/>
+      <stop offset="100%" stop-color="#05090d"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <path d="M248 173L206 62M275 169L278 42M302 178L357 69M323 196L430 112" fill="none" stroke="#fffaf0" stroke-width="9" stroke-linecap="round"/>
+  <path d="M132 456c24-74 76-101 104-141 18-26 10-54-8-76-20-24-26-56-10-84 19-33 57-52 96-45 43 8 77 43 85 87 3 18 14 32 32 39l29 12-33 18c-7 4-10 12-8 20l9 30-41-7c-20-4-38 10-40 30l-4 48" fill="none" stroke="#fffaf0" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M301 205c14-14 35-18 53-10M361 235c13 4 20 12 22 24M306 249c16-8 36-7 52 4M272 300c28 13 54 17 78 9M224 394c38-18 75-19 113 0" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M331 221c13 12 27 11 42-2" fill="none" stroke="#fffaf0" stroke-width="7" stroke-linecap="round"/>
 </svg>

@@ -5,8 +5,8 @@
   "start_url": "/i-sense_observatory/",
   "scope": "/i-sense_observatory/",
   "display": "standalone",
-  "background_color": "#f7f4ec",
-  "theme_color": "#f7f4ec",
+  "background_color": "#071015",
+  "theme_color": "#071015",
   "icons": [
     {
       "src": "/i-sense_observatory/icon.svg",

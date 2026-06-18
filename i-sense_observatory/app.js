@@ -10,6 +10,16 @@ const stageOrder = [
   "Note"
 ];
 
+const stageKeys = [
+  "arrive",
+  "locate",
+  "texture",
+  "observe",
+  "report",
+  "threshold",
+  "note"
+];
+
 const locationOptions = [
   "behind the eyes",
   "face",
@@ -99,6 +109,8 @@ const state = {
   sessions: loadSessions()
 };
 
+let lastStageAnimationKey = "";
+
 const els = {
   documentBody: document.body,
   tabs: Array.from(document.querySelectorAll("[data-view-target]")),
@@ -109,6 +121,7 @@ const els = {
     about: document.getElementById("view-about")
   },
   stepList: document.getElementById("step-list"),
+  surface: document.querySelector(".experiment-surface"),
   kicker: document.getElementById("stage-kicker"),
   title: document.getElementById("observatory-title"),
   prompt: document.getElementById("stage-prompt"),
@@ -179,6 +192,7 @@ function selectedArray(set) {
 }
 
 function render() {
+  updateStageChrome();
   renderSteps();
   renderSummary();
 
@@ -203,6 +217,12 @@ function renderSteps() {
   }).join("");
 }
 
+function updateStageChrome() {
+  const key = stageKeys[state.stage] || "arrive";
+  document.documentElement.dataset.stage = key;
+  document.documentElement.classList.toggle("is-observing", state.stage === 3 && Boolean(state.observeTimer));
+}
+
 function renderSummary() {
   const lines = [];
   lines.push(`<div><strong>Location</strong>${state.location || "not observed yet"}</div>`);
@@ -218,11 +238,18 @@ function joinOrNone(items) {
 }
 
 function setStageContent(kicker, title, prompt, bodyHtml, actionsHtml) {
+  const animationKey = `${state.stage}:${kicker}:${title}`;
   els.kicker.textContent = kicker;
   els.title.textContent = title;
   els.prompt.textContent = prompt;
   els.body.innerHTML = bodyHtml;
   els.actions.innerHTML = actionsHtml;
+  if (animationKey !== lastStageAnimationKey) {
+    lastStageAnimationKey = animationKey;
+    els.surface.classList.remove("is-entering");
+    void els.surface.offsetWidth;
+    els.surface.classList.add("is-entering");
+  }
 }
 
 function renderArrive() {
@@ -230,8 +257,11 @@ function renderArrive() {
     "direct observation",
     "I-Sense Observatory",
     "No belief is required. No conclusion is supplied. Look directly. Record your own result.",
-    `<div class="choice-row" aria-label="Experiment stance">
-      ${["locate", "observe", "record"].map((label) => `<span class="chip-button">${label}</span>`).join("")}
+    `<div class="arrival-instrument">
+      ${renderSignalMark("signal-mark")}
+      <div class="choice-row" aria-label="Experiment stance">
+        ${["locate", "observe", "record"].map((label) => `<span class="chip-button quiet-chip">${label}</span>`).join("")}
+      </div>
     </div>`,
     `<button class="primary-button" type="button" data-action="begin">Begin experiment</button>
      <button class="secondary-button" type="button" data-action="view-notes">View notes</button>`
@@ -283,8 +313,10 @@ function renderObserveIntro() {
     "Rest attention on the felt sense.",
     "Do not analyze it. Observe whether it stays, shifts, softens, drops away, or re-forms.",
     `<div class="observe-field">
-      <div class="timer-disc" style="--angle:0deg">
+      <div class="timer-disc is-ready" style="--angle:0deg">
+        ${renderSignalMark("timer-mark")}
         <strong>${state.duration}</strong>
+        <span>seconds</span>
       </div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
@@ -293,9 +325,10 @@ function renderObserveIntro() {
 }
 
 function startObservation() {
+  stopObserveTimer();
   state.observeEndsAt = Date.now() + state.duration * 1000;
-  renderObserveActive();
   state.observeTimer = window.setInterval(renderObserveActive, 250);
+  renderObserveActive();
 }
 
 function renderObserveActive() {
@@ -305,17 +338,26 @@ function renderObserveActive() {
   const progress = Math.max(0, Math.min(1, elapsed / state.duration));
   const angle = Math.round(progress * 360);
 
-  setStageContent(
-    "observing",
-    "Observe directly.",
-    "Let the felt sense be seen. If nothing changes, record that.",
-    `<div class="observe-field">
-      <div class="timer-disc" style="--angle:${angle}deg">
-        <strong>${remainingSeconds}</strong>
-      </div>
-    </div>`,
-    `<button class="secondary-button" type="button" data-action="end-observe">End early</button>`
-  );
+  const activeDisc = els.body.querySelector(".timer-disc.is-active");
+  if (activeDisc) {
+    activeDisc.style.setProperty("--angle", `${angle}deg`);
+    const number = activeDisc.querySelector("strong");
+    if (number) number.textContent = String(remainingSeconds);
+  } else {
+    setStageContent(
+      "observing",
+      "Observe directly.",
+      "Let the felt sense be seen. If nothing changes, record that.",
+      `<div class="observe-field">
+        <div class="timer-disc is-active" style="--angle:${angle}deg">
+          ${renderSignalMark("timer-mark")}
+          <strong>${remainingSeconds}</strong>
+          <span>remaining</span>
+        </div>
+      </div>`,
+      `<button class="secondary-button" type="button" data-action="end-observe">End early</button>`
+    );
+  }
   updateFieldIntensity();
 
   if (remainingMs <= 0) {
@@ -386,6 +428,18 @@ function renderSaved() {
      <button class="secondary-button" type="button" data-action="view-notes">View notes</button>
      <button class="secondary-button" type="button" data-action="view-patterns">View patterns</button>`
   );
+}
+
+function renderSignalMark(className) {
+  return `<svg class="${className}" viewBox="0 0 220 220" role="img" aria-label="Side profile with four rays">
+    <path class="mark-ray" d="M102 80L78 20"></path>
+    <path class="mark-ray" d="M116 78L120 12"></path>
+    <path class="mark-ray" d="M129 83L161 28"></path>
+    <path class="mark-ray" d="M140 93L194 48"></path>
+    <path class="mark-head" d="M47 199c12-36 38-49 52-69 9-13 5-27-4-39-10-12-13-28-5-42 10-17 29-27 49-23 22 4 39 22 43 44 2 9 7 16 16 20l14 6-16 9c-4 2-5 6-4 10l5 15-21-4c-10-2-19 5-20 15l-2 24"></path>
+    <path class="mark-face" d="M132 75c8-8 18-10 27-5M162 90c7 2 10 6 11 12M135 98c9-4 18-4 26 2M117 125c14 7 28 8 40 5M92 172c20-9 38-10 57 0"></path>
+    <path class="mark-eye" d="M147 82c7 6 14 6 21-1"></path>
+  </svg>`;
 }
 
 function renderChipButtons(options, set, key) {
@@ -536,6 +590,7 @@ function escapeHtml(value) {
 }
 
 function updateFieldIntensity() {
+  updateStageChrome();
   const observing = state.stage === 3 && state.observeTimer;
   const threshold = state.stage === 5;
   const intensity = observing ? 1 : threshold ? 0.72 : state.stage >= 4 ? 0.42 : 0.18;
@@ -559,6 +614,7 @@ function drawField(now) {
   const height = canvasState.height;
   const t = (now - canvasState.startedAt) / 1000;
   const intensity = Number(getComputedStyle(document.documentElement).getPropertyValue("--field-intensity")) || 0.18;
+  const stage = document.documentElement.dataset.stage || "arrive";
   ctx.clearRect(0, 0, width, height);
 
   const cx = width * 0.5;
@@ -599,6 +655,30 @@ function drawField(now) {
     ctx.fill();
   }
   ctx.restore();
+
+  if (intensity > 0.38) {
+    const rayBaseX = cx + Math.sin(t * 0.11) * 8;
+    const rayBaseY = cy - maxRadius * 0.06;
+    const rayAngles = [-2.03, -1.72, -1.42, -1.11];
+    ctx.save();
+    ctx.lineCap = "round";
+    rayAngles.forEach((angle, index) => {
+      const length = maxRadius * (stage === "threshold" ? 0.74 : 0.56) * (0.86 + index * 0.045);
+      const wobble = Math.sin(t * 0.38 + index) * 0.018;
+      const endX = rayBaseX + Math.cos(angle + wobble) * length;
+      const endY = rayBaseY + Math.sin(angle + wobble) * length;
+      const gradientLine = ctx.createLinearGradient(rayBaseX, rayBaseY, endX, endY);
+      gradientLine.addColorStop(0, `rgba(255, 250, 238, ${0.12 + intensity * 0.28})`);
+      gradientLine.addColorStop(1, "rgba(255, 250, 238, 0)");
+      ctx.beginPath();
+      ctx.moveTo(rayBaseX, rayBaseY);
+      ctx.lineTo(endX, endY);
+      ctx.strokeStyle = gradientLine;
+      ctx.lineWidth = 1.2 + intensity * 1.2;
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
 
   requestAnimationFrame(drawField);
 }
