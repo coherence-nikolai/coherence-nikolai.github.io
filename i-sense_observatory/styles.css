@@ -109,7 +109,7 @@ input:focus-visible {
   height: 40px;
   border: 1px solid rgba(255, 248, 232, 0.24);
   border-radius: 10px;
-  background: url("/i-sense_observatory/icon.svg") center / cover no-repeat;
+  background: url("/i-sense_observatory/icon.png") center / cover no-repeat;
   box-shadow: 0 0 34px rgba(255, 248, 232, 0.18), 0 12px 30px rgba(0, 0, 0, 0.32);
   flex: 0 0 auto;
 }
@@ -473,14 +473,16 @@ h1 {
 }
 
 .signal-mark {
-  width: min(210px, 54vw);
+  width: min(300px, 66vw);
   height: auto;
   filter: drop-shadow(0 0 28px rgba(255, 248, 232, 0.18));
+  overflow: visible;
 }
 
 .mark-head,
 .mark-face,
-.mark-eye,
+.mark-ear,
+.mark-throat,
 .mark-ray {
   fill: none;
   stroke: #fff8e8;
@@ -489,30 +491,70 @@ h1 {
 }
 
 .mark-head {
-  stroke-width: 9;
+  stroke-width: 15;
 }
 
 .mark-face {
-  stroke-width: 4.6;
+  stroke-width: 8;
 }
 
-.mark-eye {
-  stroke-width: 4;
+.mark-ear {
+  stroke-width: 8;
+}
+
+.mark-throat {
+  stroke-width: 8;
 }
 
 .mark-ray {
-  stroke-width: 3;
-  opacity: 0.9;
-  transform-origin: 120px 84px;
+  stroke-width: 8;
+  opacity: 0.92;
+}
+
+.mark-head-image {
+  width: 100%;
+  height: 100%;
+}
+
+.mark-ripple {
+  fill: none;
+  stroke: rgba(255, 248, 232, 0.42);
+  stroke-width: 2;
+  opacity: 0;
+  transform-origin: 320px 246px;
+}
+
+.signal-mark .mark-rays {
+  transform-box: view-box;
+  transform-origin: 320px 246px;
 }
 
 .signal-mark .mark-ray {
-  animation: four-ray-breathe 4.8s ease-in-out infinite;
+  opacity: 0;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ray-extend 8.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 
-.signal-mark .mark-ray:nth-child(2) { animation-delay: 120ms; }
-.signal-mark .mark-ray:nth-child(3) { animation-delay: 240ms; }
-.signal-mark .mark-ray:nth-child(4) { animation-delay: 360ms; }
+.signal-mark .mark-figure {
+  transform-box: fill-box;
+  transform-origin: 315px 405px;
+  animation: head-recoil 8.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.signal-mark .mark-ripple {
+  animation: crown-ripple 8.4s ease-out infinite;
+}
+
+.signal-mark .mark-ray:nth-child(2) { animation-delay: 70ms; }
+.signal-mark .mark-ray:nth-child(3) { animation-delay: 120ms; }
+.signal-mark .mark-ray:nth-child(4) { animation-delay: 170ms; }
+
+.timer-mark .mark-rays,
+.timer-mark .mark-figure,
+.timer-mark .mark-ripple {
+  animation: none;
+}
 
 .body-map {
   display: grid;
@@ -623,10 +665,6 @@ h1 {
   opacity: 0.22;
   transform: translateY(-12px);
   filter: drop-shadow(0 0 22px rgba(255, 248, 232, 0.24));
-}
-
-.timer-disc.is-active .timer-mark .mark-ray {
-  animation: four-ray-open 2.8s ease-in-out infinite;
 }
 
 .timer-disc.is-active {
@@ -778,25 +816,49 @@ textarea {
   }
 }
 
-@keyframes four-ray-breathe {
-  0%, 100% {
-    opacity: 0.66;
-    transform: scaleY(0.94);
+@keyframes ray-extend {
+  0%, 58%, 100% {
+    opacity: 0;
+    stroke-dashoffset: 1;
   }
-  50% {
+  64% {
+    opacity: 0.72;
+    stroke-dashoffset: 0.36;
+  }
+  72%, 84% {
     opacity: 1;
-    transform: scaleY(1.04);
+    stroke-dashoffset: 0;
+  }
+  91% {
+    opacity: 0.18;
+    stroke-dashoffset: 0;
   }
 }
 
-@keyframes four-ray-open {
-  0%, 100% {
-    opacity: 0.38;
-    transform: scaleY(0.9);
+@keyframes head-recoil {
+  0%, 58%, 100% {
+    transform: translate(0, 0) rotate(0deg);
   }
-  50% {
-    opacity: 0.92;
-    transform: scaleY(1.12);
+  66%, 78% {
+    transform: translate(-10px, -5px) rotate(-1.4deg);
+  }
+  90% {
+    transform: translate(-2px, -1px) rotate(-0.25deg);
+  }
+}
+
+@keyframes crown-ripple {
+  0%, 58%, 100% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+  66% {
+    opacity: 0.42;
+    transform: scale(0.45);
+  }
+  86% {
+    opacity: 0;
+    transform: scale(4.2);
   }
 }
 
@@ -936,7 +998,7 @@ textarea {
   }
 
   .signal-mark {
-    width: min(178px, 58vw);
+    width: min(306px, 78vw);
   }
 
   .choice-grid {

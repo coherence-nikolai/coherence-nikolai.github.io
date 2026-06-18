@@ -9,9 +9,9 @@
   "theme_color": "#071015",
   "icons": [
     {
-      "src": "/i-sense_observatory/icon.svg",
+      "src": "/i-sense_observatory/icon.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

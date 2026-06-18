@@ -431,14 +431,17 @@ function renderSaved() {
 }
 
 function renderSignalMark(className) {
-  return `<svg class="${className}" viewBox="0 0 220 220" role="img" aria-label="Side profile with four rays">
-    <path class="mark-ray" d="M83 66L63 18"></path>
-    <path class="mark-ray" d="M97 57L95 8"></path>
-    <path class="mark-ray" d="M111 56L126 9"></path>
-    <path class="mark-ray" d="M124 63L158 21"></path>
-    <path class="mark-head" d="M45 199c9-28 27-39 42-55 9-10 11-23 4-34-10-15-9-33 2-48 12-16 32-24 51-19 20 5 34 21 37 42 1 7 5 12 11 15l16 9-17 6c-4 2-6 6-6 10l2 13-18-3c-8-1-16 4-18 12l-4 20"></path>
-    <path class="mark-face" d="M137 82c8-6 17-6 25-1M160 98c6 2 9 6 9 12M133 105c8-4 17-3 24 2M117 128c12 7 25 8 37 4M86 169c18-9 36-10 55-1"></path>
-    <path class="mark-eye" d="M146 90c6 5 13 4 19-1"></path>
+  return `<svg class="${className}" viewBox="0 0 640 640" role="img" aria-label="Side profile with four rays">
+    <circle class="mark-ripple" cx="320" cy="246" r="36"></circle>
+    <g class="mark-rays">
+      <path class="mark-ray" pathLength="1" d="M251 246L141 172"></path>
+      <path class="mark-ray" pathLength="1" d="M283 229L181 68"></path>
+      <path class="mark-ray" pathLength="1" d="M343 232L451 67"></path>
+      <path class="mark-ray" pathLength="1" d="M372 247L495 172"></path>
+    </g>
+    <g class="mark-figure">
+      <image class="mark-head-image" href="/i-sense_observatory/logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none"></image>
+    </g>
   </svg>`;
 }
 
