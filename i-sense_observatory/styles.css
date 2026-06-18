@@ -4422,6 +4422,124 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   }
 }
 
+/* Phone landing collision guard: keep the figure, CTA, controls, and Notes in separate vertical slots. */
+@media (max-width: 520px) {
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-top: clamp(116px, 15svh, 148px);
+    --arrival-title-size: clamp(2.72rem, 10.8cqw, 3.22rem);
+    --arrival-prompt-top: clamp(238px, 28.8svh, 292px);
+    --arrival-prompt-size: clamp(0.64rem, 1.72cqw, 0.76rem);
+    --arrival-art-top: clamp(252px, 30.8svh, 304px);
+    --arrival-art-width: 88cqw;
+    --arrival-art-height: clamp(250px, 34svh, 320px);
+    --arrival-cta-width: 68cqw;
+    --arrival-control-width: 70cqw;
+    --arrival-notes-width: 42cqw;
+  }
+
+  html[data-stage="arrive"] .stage-prompt {
+    letter-spacing: clamp(0.16em, 0.52cqw, 0.22em);
+  }
+
+  html[data-stage="arrive"] .signal-mark {
+    width: min(78cqw, 320px);
+  }
+
+  html[data-stage="arrive"] .arrival-ground {
+    top: min(74%, 438px);
+    height: clamp(72px, 11svh, 96px);
+  }
+
+  html[data-stage="arrive"] .stage-actions {
+    gap: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  html[data-stage="arrive"] .ceremonial-button {
+    min-height: clamp(44px, 5.8svh, 52px);
+    grid-template-columns: 38px 1fr 38px;
+    padding: 0 11px;
+    font-size: clamp(1.12rem, 4.7cqw, 1.34rem);
+  }
+
+  html[data-stage="arrive"] .arrival-control-row {
+    gap: clamp(14px, 5.6cqw, 26px);
+  }
+
+  html[data-stage="arrive"] .instrument-control {
+    gap: 5px;
+    font-size: clamp(0.52rem, 1.55cqw, 0.66rem);
+  }
+
+  html[data-stage="arrive"] .instrument-control span {
+    width: clamp(40px, 10.2cqw, 48px);
+    height: clamp(40px, 10.2cqw, 48px);
+  }
+
+  html[data-stage="arrive"] .instrument-control:not(:last-child)::after {
+    top: clamp(20px, 5.1cqw, 24px);
+    height: 26px;
+  }
+
+  html[data-stage="arrive"] .archive-button {
+    min-height: clamp(36px, 4.8svh, 42px);
+    grid-template-columns: 34px 1fr 34px;
+    font-size: clamp(0.92rem, 3.4cqw, 1.08rem);
+  }
+
+  html[data-stage="arrive"] .arrival-footer-ornament {
+    height: 10px;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 820px) {
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-top: clamp(96px, 14.4svh, 116px);
+    --arrival-title-size: clamp(2.44rem, 9.9cqw, 2.9rem);
+    --arrival-prompt-top: clamp(204px, 27.6svh, 226px);
+    --arrival-prompt-size: clamp(0.58rem, 1.52cqw, 0.66rem);
+    --arrival-art-top: clamp(220px, 30.2svh, 242px);
+    --arrival-art-width: 78cqw;
+    --arrival-art-height: clamp(210px, 31svh, 250px);
+    --arrival-cta-width: 66cqw;
+    --arrival-control-width: 68cqw;
+    --arrival-notes-width: 40cqw;
+  }
+
+  html[data-stage="arrive"] .topbar {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+
+  html[data-stage="arrive"] .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+
+  html[data-stage="arrive"] .brand strong {
+    font-size: 1.58rem;
+  }
+
+  html[data-stage="arrive"] .brand small {
+    margin-top: 4px;
+    font-size: 0.5rem;
+  }
+
+  html[data-stage="arrive"] .view-tabs {
+    width: 42px;
+    height: 42px;
+  }
+
+  html[data-stage="arrive"] .signal-mark {
+    width: min(68cqw, 292px);
+  }
+
+  html[data-stage="arrive"] .arrival-ground {
+    top: min(72%, 350px);
+    height: 72px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-stage="arrive"] .signal-mark .mark-ray,
   html[data-stage="arrive"] .signal-mark .mark-ray-node,

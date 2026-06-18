@@ -7,7 +7,7 @@ import {
   resultMarkers as resultOptions,
   suggestLensIds,
   summarizePatterns
-} from "./lens-model.mjs?v=20260618-lens-library-flow3";
+} from "./lens-model.mjs?v=20260618-phone-layout";
 
 const storageKey = "i-sense-observatory.sessions.v1";
 
