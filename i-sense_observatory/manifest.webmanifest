@@ -1,0 +1,18 @@
+{
+  "name": "I-Sense Observatory",
+  "short_name": "I-Sense",
+  "description": "A direct observation experiment for the felt sense of being me.",
+  "start_url": "/i-sense_observatory/",
+  "scope": "/i-sense_observatory/",
+  "display": "standalone",
+  "background_color": "#f7f4ec",
+  "theme_color": "#f7f4ec",
+  "icons": [
+    {
+      "src": "/i-sense_observatory/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

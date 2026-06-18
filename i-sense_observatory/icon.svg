@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">I-Sense Observatory</title>
+  <desc id="desc">A white center opening into a quiet circular field.</desc>
+  <rect width="512" height="512" rx="96" fill="#f7f4ec"/>
+  <circle cx="256" cy="256" r="206" fill="none" stroke="#171514" stroke-opacity=".16" stroke-width="4"/>
+  <circle cx="256" cy="256" r="152" fill="none" stroke="#4f7762" stroke-opacity=".34" stroke-width="3"/>
+  <circle cx="256" cy="256" r="98" fill="none" stroke="#536f91" stroke-opacity=".28" stroke-width="3"/>
+  <circle cx="256" cy="256" r="42" fill="#fffdf8" stroke="#b56a2d" stroke-opacity=".46" stroke-width="4"/>
+  <path d="M256 40v118M256 354v118M40 256h118M354 256h118" stroke="#171514" stroke-opacity=".22" stroke-width="6" stroke-linecap="round"/>
+  <path d="M117 117l83 83M312 312l83 83M395 117l-83 83M200 312l-83 83" stroke="#995f68" stroke-opacity=".22" stroke-width="5" stroke-linecap="round"/>
+</svg>
