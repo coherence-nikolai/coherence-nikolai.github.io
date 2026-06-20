@@ -1,0 +1,23 @@
+{
+  "name": "Sota Haiku",
+  "short_name": "Sota Haiku",
+  "description": "Three lines for mind and body.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b0707",
+  "theme_color": "#0b0707",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

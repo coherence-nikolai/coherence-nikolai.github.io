@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sota Haiku three line mark">
+  <rect width="512" height="512" rx="112" fill="#F6F1E7"/>
+  <path d="M166 166 C205 154 305 154 346 166" fill="none" stroke="#17140F" stroke-width="28" stroke-linecap="round"/>
+  <path d="M96 256 C173 230 338 232 416 256" fill="none" stroke="#17140F" stroke-width="34" stroke-linecap="round"/>
+  <path d="M156 350 C218 366 295 366 356 350" fill="none" stroke="#17140F" stroke-width="30" stroke-linecap="round"/>
+  <rect x="356" y="328" width="52" height="52" rx="5" fill="#9B2D20"/>
+  <circle cx="382" cy="349" r="4.5" fill="#FFF7E8" opacity=".9"/>
+  <path d="M365 365 C373 354 392 354 400 365" fill="none" stroke="#FFF7E8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M363 372 C374 363 393 378 403 369" fill="none" stroke="#FFF7E8" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,223 @@
+[
+  {
+    "id": "gate-01",
+    "order": 1,
+    "title": "Two things are seen",
+    "stanza": ["Look, two things are seen,", "Seemingly separated.", "Mind, body, entwined."],
+    "theme": "Mind-body distinction",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "distinction and relationship"},
+    "purpose": "Notice sensation, thought, and the feeling tone that gets assigned to them. Keep it simple: body, thought, pleasant/unpleasant/neutral, body again.",
+    "reflectionPrompt": "Are body and thought linked?",
+    "dailyCarry": "Today, notice body, thought, and the tone assigned to them.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Feel one body sensation.", "Notice one thought about it.", "Notice the automatic tone: pleasant, unpleasant, neutral, I like it, I don't like it, or I don't care.", "Alternate body, thought, body. Are they linked?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Feel one body sensation.", "Notice one thought about it.", "Notice the automatic tone: pleasant, unpleasant, neutral, I like it, I don't like it, or I don't care.", "Alternate body, thought, body. Are they linked?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Feel one body sensation.", "Notice one thought about it.", "Notice the automatic tone: pleasant, unpleasant, neutral, I like it, I don't like it, or I don't care.", "Alternate body, thought, body. Are they linked?"]}
+    ]
+  },
+  {
+    "id": "gate-02",
+    "order": 2,
+    "title": "Cause and effect",
+    "stanza": ["Thought triggers tingles,", "Cause, effect, and on and on.", "Mind, body, bouncing."],
+    "theme": "Conditionality",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "influence passes line to line"},
+    "purpose": "Look for influence rather than a single cause. Emotion, thought, sensation, and attention may all be shaping each other.",
+    "reflectionPrompt": "What is influencing what?",
+    "dailyCarry": "Today, look for influence rather than one cause.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Notice the current emotion present in mind and body.", "Agitation? Relaxed? Something else?", "Notice any thoughts related to that emotion, then a body sensation seemingly related to it.", "What is influencing what?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Notice the current emotion present in mind and body.", "Agitation? Relaxed? Something else?", "Notice any thoughts related to that emotion, then a body sensation seemingly related to it.", "What is influencing what?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Notice the current emotion present in mind and body.", "Agitation? Relaxed? Something else?", "Notice any thoughts related to that emotion, then a body sensation seemingly related to it.", "What is influencing what?"]}
+    ]
+  },
+  {
+    "id": "gate-03",
+    "order": 3,
+    "title": "Thoughts loop without help",
+    "stanza": ["Thoughts loop without help,", "Flickerings spark and vanish.", "Mind, body, frustrates."],
+    "theme": "Automaticity",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "repeat faintly, then settle"},
+    "purpose": "Thoughts may appear before you decide to think them. Notice beginnings, endings, and replacement without trying to stop the stream.",
+    "reflectionPrompt": "How fast do thoughts arise and pass?",
+    "dailyCarry": "Today, notice one thought arrive before you choose it.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Pay attention to thoughts arising.", "See if you can catch when one thought ends.", "Notice when another thought takes its place.", "How fast do thoughts arise and pass?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Pay attention to thoughts arising.", "See if you can catch when one thought ends.", "Notice when another thought takes its place.", "How fast do thoughts arise and pass?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Pay attention to thoughts arising.", "See if you can catch when one thought ends.", "Notice when another thought takes its place.", "How fast do thoughts arise and pass?"]}
+    ]
+  },
+  {
+    "id": "gate-04",
+    "order": 4,
+    "title": "Gaps and spaces",
+    "stanza": ["Closer, more subtle,", "The gaps and spaces between.", "Mind, body, bursting."],
+    "theme": "Micro-gaps and endings",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "breaks become visible"},
+    "purpose": "The gap may be obvious, tiny, peaceful, neutral, or barely findable. The practice is noticing endings, not manufacturing silence.",
+    "reflectionPrompt": "How are the gaps experienced?",
+    "dailyCarry": "Today, notice one ending and the space after it.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Listen for one sound, or notice one thought.", "Notice when it ends.", "Notice the gap before the next sound or thought.", "How are the gaps experienced?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Listen for one sound, or notice one thought.", "Notice when it ends.", "Notice the gap before the next sound or thought.", "How are the gaps experienced?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Listen for one sound, or notice one thought.", "Notice when it ends.", "Notice the gap before the next sound or thought.", "How are the gaps experienced?"]}
+    ]
+  },
+  {
+    "id": "gate-05",
+    "order": 5,
+    "title": "Arise-collapse",
+    "stanza": ["Thoughts arisecollapse.", "No ground nor place to plant feet.", "Mind, body, dissolves."],
+    "theme": "Impermanence and groundlessness",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "paint in and fade from the other end"},
+    "purpose": "Let change be the object. Sensation and thought may seem to pulse together, separate, or disappear before they can be held.",
+    "reflectionPrompt": "Can thoughts and sensations be watched arising and collapsing together?",
+    "dailyCarry": "Today, let change itself be the object.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Find one sensation.", "Watch how it shifts, pulses, fades, or refuses to stay still.", "Notice thoughts seemingly arising and passing in tune with sensations.", "Can you notice thoughts arising and collapsing at the same time?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Find one sensation.", "Watch how it shifts, pulses, fades, or refuses to stay still.", "Notice thoughts seemingly arising and passing in tune with sensations.", "Can you notice thoughts arising and collapsing at the same time?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Find one sensation.", "Watch how it shifts, pulses, fades, or refuses to stay still.", "Notice thoughts seemingly arising and passing in tune with sensations.", "Can you notice thoughts arising and collapsing at the same time?"]}
+    ]
+  },
+  {
+    "id": "gate-06",
+    "order": 6,
+    "title": "Danger signs",
+    "stanza": ["Danger signs, not good.", "I do not like this one bit.", "Mind, body, wary."],
+    "theme": "Fear as an object",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "tremble once, then settle"},
+    "purpose": "Wariness can be known as sensation, image, thought, or impulse. The task is not to defeat fear, but to see how it is made.",
+    "reflectionPrompt": "What happens when wariness or fear is simply noticed?",
+    "dailyCarry": "Today, let wariness be known as part of experience.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Open eyes.", "Feel feet.", "Locate any sense of wariness as body sensation, image, thought, or impulse.", "What happens when this wariness or fear is simply noticed?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Open eyes.", "Feel feet.", "Locate any sense of wariness as body sensation, image, thought, or impulse.", "What happens when this wariness or fear is simply noticed?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Open eyes.", "Feel feet.", "Locate any sense of wariness as body sensation, image, thought, or impulse.", "What happens when this wariness or fear is simply noticed?"]}
+    ]
+  },
+  {
+    "id": "gate-07",
+    "order": 7,
+    "title": "Agitation and clenching",
+    "stanza": ["Heavy breathing, sigh,", "Chest feels so agitated.", "Mind, body, clenches."],
+    "theme": "Somatic contraction",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "compress, vibrate, breathe apart"},
+    "purpose": "Tension may be physical, mental, emotional, or all three. Notice the clench and the wish to unclench.",
+    "reflectionPrompt": "What is tense in mind and body at the moment?",
+    "dailyCarry": "Today, notice the clench and the wish to unclench.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Let breathing be natural.", "Feel chest, hands, and feet.", "Notice clench without fixing.", "What is tense in mind and body at the moment?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Let breathing be natural.", "Feel chest, hands, and feet.", "Notice clench without fixing.", "What is tense in mind and body at the moment?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Let breathing be natural.", "Feel chest, hands, and feet.", "Notice clench without fixing.", "What is tense in mind and body at the moment?"]}
+    ]
+  },
+  {
+    "id": "gate-08",
+    "order": 8,
+    "title": "Disgust and turning away",
+    "stanza": ["Repulsed, brow furrowed.", "Like rancid food, turn away.", "Mind, body, disgusts."],
+    "theme": "Aversion",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "recoil and include"},
+    "purpose": "Aversion has texture: face, throat, stomach, thought, impulse. Let the turning-away itself become part of experience.",
+    "reflectionPrompt": "Why is this experience unpleasant?",
+    "dailyCarry": "Today, let turning away itself be known.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["What is the mind turning away from right now?", "Notice sensation, thought, or impulse of aversion.", "Let turning away be known and be curious about its unpleasant quality.", "Why is this experience unpleasant?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["What is the mind turning away from right now?", "Notice sensation, thought, or impulse of aversion.", "Let turning away be known and be curious about its unpleasant quality.", "Why is this experience unpleasant?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["What is the mind turning away from right now?", "Notice sensation, thought, or impulse of aversion.", "Let turning away be known and be curious about its unpleasant quality.", "Why is this experience unpleasant?"]}
+    ]
+  },
+  {
+    "id": "gate-09",
+    "order": 9,
+    "title": "The escape plan",
+    "stanza": ["A get-away plan,", "Devising an escape route.", "Mind, body, wants out."],
+    "theme": "The impulse to escape",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "one line leaves, then returns"},
+    "purpose": "Wanting out is also experience. Notice where escape lives now: body, image, thought, future, or movement.",
+    "reflectionPrompt": "Where does the mind wish to escape to?",
+    "dailyCarry": "Today, notice where wanting out lives now.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Notice any sense of discomfort and wanting to escape it.", "Where is it in the body?", "Let the wanting be part of experience.", "Where does the mind wish to escape to?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Notice any sense of discomfort and wanting to escape it.", "Where is it in the body?", "Let the wanting be part of experience.", "Where does the mind wish to escape to?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Notice any sense of discomfort and wanting to escape it.", "Where is it in the body?", "Let the wanting be part of experience.", "Where does the mind wish to escape to?"]}
+    ]
+  },
+  {
+    "id": "gate-10",
+    "order": 10,
+    "title": "Again",
+    "stanza": ["Again, revisit,", "Mind-body loops keep looping.", "Mind, body, again."],
+    "theme": "Recurring patterns",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "repeat with imperfect variation"},
+    "purpose": "Repeating loops are not failure. Look for trigger, body, thought, reaction, and any gap inside the repetition.",
+    "reflectionPrompt": "Are there any gaps in the looping?",
+    "dailyCarry": "Today, see repetition as pattern, not failure.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Name one repeating loop.", "Trigger, body, thought, reaction.", "No blame, just pattern.", "Are there any gaps in the looping?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Name one repeating loop.", "Trigger, body, thought, reaction.", "No blame, just pattern.", "Are there any gaps in the looping?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Name one repeating loop.", "Trigger, body, thought, reaction.", "No blame, just pattern.", "Are there any gaps in the looping?"]}
+    ]
+  },
+  {
+    "id": "gate-11",
+    "order": 11,
+    "title": "Panoramic witnessing",
+    "stanza": ["Panoramic views,", "Merging traffic, ID free.", "\"Mind\", \"body\", witnessed."],
+    "theme": "Wide-field awareness",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "widen past the frame"},
+    "purpose": "Let centre and periphery be known together. Sounds, sights, sensations, and thoughts can all belong to one field.",
+    "reflectionPrompt": "What happens when you rest in the periphery of experience?",
+    "dailyCarry": "Today, include centre and periphery together.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Open to sound, body, sight, and space all at the same time.", "Notice a centre to experience and a periphery.", "Notice the periphery with curiosity.", "What happens when you rest in the periphery of sounds, sensations, and thoughts?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Open to sound, body, sight, and space all at the same time.", "Notice a centre to experience and a periphery.", "Notice the periphery with curiosity.", "What happens when you rest in the periphery of sounds, sensations, and thoughts?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Open to sound, body, sight, and space all at the same time.", "Notice a centre to experience and a periphery.", "Notice the periphery with curiosity.", "What happens when you rest in the periphery of sounds, sensations, and thoughts?"]}
+    ]
+  },
+  {
+    "id": "gate-12",
+    "order": 12,
+    "title": "Self and itch",
+    "stanza": ["Phenomena synch,", "Self, mosquito itch, the same.", "\"Mind\", \"body\", collapse."],
+    "theme": "Self as phenomenon",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "a point drifts among the lines"},
+    "purpose": "Compare self-sense with an ordinary sensation. Is \"me\" a location, pressure, image, thought, or something else?",
+    "reflectionPrompt": "How are self-sense and body sensation different or the same?",
+    "dailyCarry": "Today, compare self-sense with one ordinary sensation.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Notice an obvious sensation of the body.", "Now notice the sense of self, perhaps in the head behind the eyes.", "Notice both back and forth, then together from a wide viewpoint.", "How are they different or the same?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Notice an obvious sensation of the body.", "Now notice the sense of self, perhaps in the head behind the eyes.", "Notice both back and forth, then together from a wide viewpoint.", "How are they different or the same?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Notice an obvious sensation of the body.", "Now notice the sense of self, perhaps in the head behind the eyes.", "Notice both back and forth, then together from a wide viewpoint.", "How are they different or the same?"]}
+    ]
+  },
+  {
+    "id": "gate-13",
+    "order": 13,
+    "title": "The path",
+    "stanza": ["Difficult ascent,", "Hitches, bumps, snags and hurdles.", "Half-summit worth it."],
+    "theme": "Integration and humility",
+    "art": {"motif": "three brush lines", "accentHex": "#9B2D20", "motion": "gather into a path, then return"},
+    "purpose": "This moment is enough material. Notice aliveness as sensation, mood, thought, space, and ordinary presence.",
+    "reflectionPrompt": "How is this very moment of aliveness being experienced?",
+    "dailyCarry": "Today, this moment is enough material.",
+    "safetyNote": "Keep this ordinary. The state of mind itself is material.",
+    "exercises": [
+      {"depth": "gentle", "defaultDurationMinutes": 1, "prompts": ["Review this very moment of being alive.", "Notice sensation, mood, thought, space, and ordinary presence.", "Let this moment be enough material.", "How is this very moment of aliveness being experienced?"]},
+      {"depth": "standard", "defaultDurationMinutes": 5, "prompts": ["Review this very moment of being alive.", "Notice sensation, mood, thought, space, and ordinary presence.", "Let this moment be enough material.", "How is this very moment of aliveness being experienced?"]},
+      {"depth": "deepen", "defaultDurationMinutes": 10, "prompts": ["Review this very moment of being alive.", "Notice sensation, mood, thought, space, and ordinary presence.", "Let this moment be enough material.", "How is this very moment of aliveness being experienced?"]}
+    ]
+  }
+]

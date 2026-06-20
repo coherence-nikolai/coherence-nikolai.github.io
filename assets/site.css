@@ -1078,7 +1078,7 @@ dd {
 
 .practice-guide-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
   gap: clamp(18px, 3vw, 28px);
 }
 
@@ -1111,6 +1111,13 @@ dd {
   background:
     radial-gradient(circle at 20% 34%, rgba(232, 215, 178, 0.17), transparent 18rem),
     radial-gradient(circle at 76% 48%, rgba(134, 189, 180, 0.08), transparent 17rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016));
+}
+
+.sota-haiku-stream-panel {
+  background:
+    radial-gradient(circle at 20% 36%, rgba(212, 162, 48, 0.17), transparent 18rem),
+    radial-gradient(circle at 76% 50%, rgba(232, 215, 178, 0.07), transparent 18rem),
     linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016));
 }
 
@@ -1214,6 +1221,20 @@ dd {
     drop-shadow(0 0 8px rgba(232, 196, 110, 0.34));
 }
 
+.sota-haiku-stream-mark {
+  border-radius: 28%;
+  background:
+    radial-gradient(circle, rgba(212, 162, 48, 0.20), transparent 68%),
+    rgba(18, 14, 8, 0.20);
+}
+
+.sota-haiku-stream-mark img {
+  width: min(180px, 88%);
+  filter:
+    invert(78%) sepia(34%) saturate(637%) hue-rotate(357deg) brightness(97%) contrast(92%)
+    drop-shadow(0 0 34px rgba(212, 162, 48, 0.34));
+}
+
 .sota-stream-copy {
   position: relative;
   z-index: 1;
@@ -1229,6 +1250,29 @@ dd {
 .sota-stream-copy p:not(.label) {
   max-width: 590px;
   color: rgba(242, 234, 223, 0.68);
+}
+
+.practice-guide-panel {
+  min-height: 580px;
+}
+
+.practice-guide-panel .sota-stream-mark {
+  width: min(148px, 68%);
+}
+
+.practice-guide-panel .sota-stream-copy h2 {
+  font-size: clamp(2.25rem, 3.1vw, 3.15rem);
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.practice-guide-panel .sota-stream-copy p:not(.label) {
+  font-size: 0.94rem;
+  line-height: 1.65;
+}
+
+.practice-guide-panel .button {
+  min-width: 0;
 }
 
 .sota-actions {
