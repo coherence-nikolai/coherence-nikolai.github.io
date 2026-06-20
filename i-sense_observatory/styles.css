@@ -111,10 +111,42 @@ input:focus-visible {
   height: 40px;
   border: 1px solid rgba(255, 248, 232, 0.24);
   border-radius: 10px;
-  background: url("/i-sense_observatory/icon.png") center / cover no-repeat;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(232, 196, 110, 0.16), transparent 62%),
+    #0b0707;
   box-shadow: 0 0 34px rgba(255, 248, 232, 0.18), 0 12px 30px rgba(0, 0, 0, 0.32);
   flex: 0 0 auto;
   overflow: hidden;
+}
+
+.brand-signal-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scale(1.07);
+}
+
+.brand-signal-ray {
+  fill: none;
+  stroke: var(--family-gold, #e8c46e);
+  stroke-width: 11;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px rgba(232, 196, 110, 0.55));
+}
+
+.brand-signal-nodes {
+  fill: var(--family-gold-bright, #f3d98a);
+  filter: drop-shadow(0 0 8px rgba(232, 196, 110, 0.46));
+}
+
+.brand-signal-head {
+  filter:
+    sepia(1)
+    saturate(2.25)
+    hue-rotate(356deg)
+    brightness(0.88)
+    contrast(1.08)
+    drop-shadow(0 0 8px rgba(232, 196, 110, 0.36));
 }
 
 .brand strong,
@@ -1036,6 +1068,321 @@ textarea {
 
   .timer-disc strong {
     font-size: 2.8rem;
+  }
+}
+
+/* Sota / Unfabricate family authority layer. */
+:root {
+  --ink: #f2eadf;
+  --ink-dark: #120908;
+  --muted: rgba(242, 234, 223, 0.66);
+  --soft: rgba(242, 234, 223, 0.46);
+  --paper: #120908;
+  --paper-strong: #e8d7b2;
+  --panel: rgba(18, 9, 8, 0.72);
+  --panel-strong: rgba(232, 215, 178, 0.09);
+  --line: rgba(232, 215, 178, 0.16);
+  --line-strong: rgba(232, 215, 178, 0.34);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+  --amber: #bd8d64;
+  --green: #d7ad58;
+  --blue: #86bdb4;
+  --rose: #b98574;
+  --focus: #e8d7b2;
+  --radius: 8px;
+  --family-display: "Iowan Old Style", "IowanOldStyle-Roman", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --family-body: Avenir, "Avenir Next", "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
+  --family-mono: "SFMono-Regular", "Menlo", "Consolas", monospace;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--family-body);
+  background:
+    radial-gradient(circle at 16% 8%, rgba(134, 189, 180, 0.11), transparent 24rem),
+    radial-gradient(circle at 50% 18%, rgba(189, 141, 100, 0.2), transparent 32rem),
+    radial-gradient(circle at 50% 54%, rgba(232, 215, 178, 0.08), transparent 36rem),
+    linear-gradient(180deg, #120908 0%, #0b0707 58%, #050303 100%);
+}
+
+.field-canvas {
+  opacity: 0.28;
+  filter: sepia(0.45) saturate(0.72) hue-rotate(346deg);
+}
+
+h1,
+.section-head h1,
+.question-lens p,
+.lens-card strong,
+.timer-disc strong,
+.empty-state strong,
+.note-item h3,
+.pattern-item strong,
+.principle-grid strong {
+  font-family: var(--family-display);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+.stage-prompt,
+.section-head p,
+.about-copy p,
+.summary-lines,
+.choice-button,
+.chip-button,
+.primary-button,
+.secondary-button,
+.quiet-button,
+textarea {
+  font-family: var(--family-body);
+}
+
+.rail-label,
+.stage-kicker,
+.lens-label,
+.rack-head span,
+.note-meta,
+.brand small {
+  color: rgba(232, 215, 178, 0.74);
+  font-family: var(--family-mono);
+  letter-spacing: 0.22em;
+}
+
+.brand strong {
+  color: #f2eadf;
+  font-family: var(--family-display);
+  font-weight: 400;
+}
+
+.brand small {
+  color: rgba(232, 215, 178, 0.64);
+  text-transform: uppercase;
+}
+
+.brand-mark {
+  border-color: rgba(232, 215, 178, 0.22);
+  background-color: rgba(18, 9, 8, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(232, 215, 178, 0.06),
+    0 0 34px rgba(232, 215, 178, 0.12),
+    0 16px 42px rgba(0, 0, 0, 0.42);
+}
+
+.view-tabs,
+.session-rail,
+.live-summary,
+.experiment-surface,
+.page-panel {
+  border-color: rgba(232, 215, 178, 0.16);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(232, 215, 178, 0.08), transparent 18rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.048), rgba(18, 9, 8, 0.58));
+  box-shadow: var(--shadow);
+}
+
+.tab {
+  color: rgba(242, 234, 223, 0.64);
+  font-family: var(--family-body);
+}
+
+.tab.is-active,
+.primary-button,
+.choice-button.is-selected,
+.chip-button.is-selected {
+  color: #120908;
+  border-color: rgba(232, 215, 178, 0.88);
+  background: linear-gradient(180deg, #e8c46e, #bd8d64);
+  box-shadow: 0 14px 34px rgba(189, 141, 100, 0.18), 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+
+.secondary-button,
+.quiet-button,
+.choice-button,
+.chip-button,
+.lens-card,
+.question-lens,
+.readout-panel,
+.lens-rack,
+.note-item,
+.pattern-item,
+.principle-grid div,
+.grounding-note,
+.empty-state,
+.first-read-summary,
+.observe-readout,
+.note-readout,
+.textarea-wrap,
+textarea {
+  border-color: rgba(232, 215, 178, 0.16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 215, 178, 0.055), transparent 12rem),
+    rgba(18, 9, 8, 0.48);
+  color: var(--ink);
+}
+
+.secondary-button,
+.quiet-button {
+  color: rgba(242, 234, 223, 0.78);
+}
+
+.choice-button:hover,
+.chip-button:hover,
+.secondary-button:hover,
+.quiet-button:hover,
+.lens-card:hover {
+  border-color: rgba(232, 215, 178, 0.34);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 215, 178, 0.09), transparent 12rem),
+    rgba(232, 215, 178, 0.055);
+}
+
+.lens-card.is-recommended {
+  border-color: rgba(232, 215, 178, 0.45);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 215, 178, 0.16), transparent 13rem),
+    rgba(189, 141, 100, 0.12);
+}
+
+.question-lens small,
+.lens-card small,
+.lens-card em,
+.rack-head p,
+.summary-lines,
+.empty-state span,
+.note-item p,
+.pattern-item span,
+.principle-grid span,
+.grounding-note,
+textarea::placeholder {
+  color: rgba(242, 234, 223, 0.64);
+}
+
+.mark-ray,
+.mark-head,
+.mark-face,
+.mark-ear,
+.mark-throat {
+  stroke: #f2eadf;
+}
+
+.mark-ray-node {
+  fill: #e8c46e;
+  filter:
+    drop-shadow(0 0 7px rgba(232, 196, 110, 0.78))
+    drop-shadow(0 0 22px rgba(189, 141, 100, 0.34));
+}
+
+.mark-ripple {
+  stroke: rgba(232, 215, 178, 0.34);
+}
+
+html[data-stage="arrive"] body {
+  background:
+    radial-gradient(circle at 50% 25%, rgba(189, 141, 100, 0.18), transparent 28rem),
+    radial-gradient(circle at 50% 58%, rgba(232, 215, 178, 0.08), transparent 30rem),
+    linear-gradient(180deg, #120908 0%, #0b0707 66%, #050303 100%);
+}
+
+html[data-stage="arrive"] .field-canvas {
+  opacity: 0.16;
+}
+
+html[data-stage="arrive"] .experiment-surface {
+  --arrival-title-size: clamp(3.8rem, 4.15vw, 4.45rem);
+  --arrival-prompt-size: clamp(0.88rem, 0.9vw, 1rem);
+}
+
+html[data-stage="arrive"] #observatory-title {
+  color: #f2eadf;
+  font-family: var(--family-display);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  text-shadow:
+    0 1px 0 rgba(255, 253, 248, 0.12),
+    0 0 24px rgba(232, 215, 178, 0.14),
+    0 0 58px rgba(189, 141, 100, 0.18);
+}
+
+html[data-stage="arrive"] .stage-prompt {
+  color: rgba(242, 234, 223, 0.72);
+  font-family: var(--family-body);
+  letter-spacing: 0.14em;
+}
+
+html[data-stage="arrive"] .arrival-control-row,
+html[data-stage="arrive"] .arrival-footer-ornament {
+  display: none;
+}
+
+html[data-stage="arrive"] .arrival-starfield,
+html[data-stage="arrive"] .arrival-constellation {
+  opacity: 0.24;
+}
+
+html[data-stage="arrive"] .arrival-ground {
+  opacity: 0.24;
+}
+
+html[data-stage="arrive"] .signal-mark {
+  filter:
+    drop-shadow(0 0 12px rgba(242, 234, 223, 0.38))
+    drop-shadow(0 0 42px rgba(232, 215, 178, 0.18));
+}
+
+html[data-stage="arrive"] .mark-head-image {
+  filter:
+    sepia(0.18)
+    drop-shadow(0 0 8px rgba(242, 234, 223, 0.32))
+    drop-shadow(0 0 28px rgba(232, 215, 178, 0.12));
+}
+
+html[data-stage="arrive"] .ceremonial-button,
+html[data-stage="arrive"] .archive-button {
+  border-radius: 18px;
+  font-family: var(--family-body);
+}
+
+html[data-stage="arrive"] .ceremonial-button {
+  color: #120908;
+  border-color: rgba(232, 215, 178, 0.92);
+  background: linear-gradient(180deg, #e8c46e, #bd8d64);
+}
+
+html[data-stage="arrive"] .archive-button {
+  color: rgba(242, 234, 223, 0.78);
+  background: rgba(242, 234, 223, 0.045);
+}
+
+html:not([data-stage="arrive"]) body {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(189, 141, 100, 0.17), transparent 26rem),
+    linear-gradient(180deg, #120908 0%, #171007 58%, #24170b 100%);
+}
+
+html:not([data-stage="arrive"]) h1,
+html:not([data-stage="arrive"]) .section-head h1 {
+  color: #f2eadf;
+}
+
+html:not([data-stage="arrive"]) .stage-prompt,
+html:not([data-stage="arrive"]) .section-head p {
+  color: rgba(242, 234, 223, 0.68);
+}
+
+html:not([data-stage="arrive"]) .stage-actions {
+  background: rgba(18, 9, 8, 0.74);
+  border-color: rgba(232, 215, 178, 0.16);
+}
+
+@media (max-width: 520px) {
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-size: clamp(2.58rem, 9.7cqw, 2.92rem);
+    --arrival-prompt-size: clamp(0.62rem, 1.52cqw, 0.72rem);
+  }
+
+  html[data-stage="arrive"] .ceremonial-button,
+  html[data-stage="arrive"] .archive-button {
+    border-radius: 14px;
   }
 }
 
@@ -4844,5 +5191,249 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   ::view-transition-old(stage-actions),
   ::view-transition-new(stage-actions) {
     animation: none !important;
+  }
+}
+
+/* Final practice-family lock: keep the approved mark gold and the landing quiet. */
+:root {
+  --family-gold: #e8c46e;
+  --family-gold-bright: #f3d98a;
+  --family-gold-deep: #bd8d64;
+  --family-black: #120908;
+}
+
+.brand-mark {
+  background-image:
+    radial-gradient(circle at 50% 34%, rgba(232, 196, 110, 0.16), transparent 62%),
+    linear-gradient(180deg, #171007, #0b0707) !important;
+  background-color: rgba(18, 9, 8, 0.72);
+  background-size: cover;
+}
+
+.mark-head,
+.mark-face,
+.mark-ear,
+.mark-throat,
+.mark-ray {
+  stroke: var(--family-gold);
+}
+
+.mark-ray-node {
+  fill: var(--family-gold-bright);
+}
+
+html[data-stage="arrive"] body {
+  background:
+    radial-gradient(circle at 50% 34%, rgba(232, 196, 110, 0.14), transparent 24rem),
+    radial-gradient(circle at 50% 54%, rgba(232, 215, 178, 0.08), transparent 34rem),
+    radial-gradient(circle at 50% 74%, rgba(189, 141, 100, 0.12), transparent 26rem),
+    linear-gradient(180deg, #100807 0%, #070403 58%, #020101 100%);
+}
+
+html[data-stage="arrive"] .field-canvas {
+  opacity: 0.18;
+  filter: sepia(0.8) saturate(0.72) hue-rotate(348deg);
+}
+
+html[data-stage="arrive"] .experiment-surface {
+  --arrival-title-top: clamp(126px, 16svh, 188px);
+  --arrival-title-size: clamp(3.4rem, 13.2cqw, 6.9rem);
+  --arrival-prompt-top: clamp(258px, 30svh, 342px);
+  --arrival-prompt-size: clamp(0.7rem, 2.24cqw, 1.04rem);
+  --arrival-art-top: clamp(286px, 34svh, 390px);
+  --arrival-art-width: min(86cqw, 540px);
+  --arrival-art-height: clamp(292px, 39svh, 440px);
+  --arrival-cta-width: min(70cqw, 520px);
+  --arrival-notes-width: min(44cqw, 280px);
+  background: transparent;
+}
+
+html[data-stage="arrive"] #observatory-title {
+  top: var(--arrival-title-top);
+  color: #f2eadf;
+  font-size: var(--arrival-title-size);
+  letter-spacing: 0;
+  text-shadow:
+    0 0 26px rgba(232, 196, 110, 0.13),
+    0 22px 74px rgba(0, 0, 0, 0.62);
+}
+
+html[data-stage="arrive"] #observatory-title::after,
+html[data-stage="arrive"] .stage-prompt::before {
+  display: none !important;
+}
+
+html[data-stage="arrive"] .stage-prompt {
+  top: var(--arrival-prompt-top);
+  color: rgba(242, 234, 223, 0.72);
+  font-family: var(--family-body);
+  font-size: var(--arrival-prompt-size);
+  letter-spacing: 0.22em;
+  white-space: normal;
+}
+
+html[data-stage="arrive"] .arrival-instrument {
+  top: var(--arrival-art-top);
+  height: var(--arrival-art-height);
+}
+
+html[data-stage="arrive"] .signal-mark {
+  width: var(--arrival-art-width);
+  filter:
+    drop-shadow(0 0 12px rgba(232, 196, 110, 0.34))
+    drop-shadow(0 0 48px rgba(232, 196, 110, 0.16));
+}
+
+html[data-stage="arrive"] .signal-mark .mark-ray {
+  stroke: var(--family-gold);
+  stroke-width: clamp(4.8px, 0.92cqw, 6.8px);
+  filter:
+    drop-shadow(0 0 7px rgba(232, 196, 110, 0.7))
+    drop-shadow(0 0 28px rgba(232, 196, 110, 0.2));
+}
+
+html[data-stage="arrive"] .signal-mark .mark-ray-node {
+  fill: var(--family-gold-bright);
+  filter:
+    drop-shadow(0 0 7px rgba(243, 217, 138, 0.72))
+    drop-shadow(0 0 24px rgba(232, 196, 110, 0.22));
+}
+
+html[data-stage="arrive"] .signal-mark .mark-ripple {
+  stroke: rgba(232, 196, 110, 0.26);
+}
+
+html[data-stage="arrive"] .mark-head-image {
+  filter:
+    sepia(1)
+    saturate(2.25)
+    hue-rotate(356deg)
+    brightness(0.88)
+    contrast(1.08)
+    drop-shadow(0 0 8px rgba(232, 196, 110, 0.45))
+    drop-shadow(0 0 34px rgba(232, 196, 110, 0.15));
+}
+
+html[data-stage="arrive"] .arrival-starfield {
+  opacity: 0.44;
+}
+
+html[data-stage="arrive"] .arrival-starfield::before,
+html[data-stage="arrive"] .arrival-starfield::after,
+html[data-stage="arrive"] .arrival-constellation {
+  opacity: 0.34;
+}
+
+html[data-stage="arrive"] .arrival-ground {
+  opacity: 0.34;
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(232, 196, 110, 0.7) 0 2px, rgba(189, 141, 100, 0.38) 3px 4px, transparent 5px),
+    repeating-radial-gradient(ellipse at 50% 26%, transparent 0 8px, rgba(232, 196, 110, 0.21) 9px 10px, transparent 11px 18px),
+    linear-gradient(90deg, transparent, rgba(232, 196, 110, 0.16), transparent);
+}
+
+html[data-stage="arrive"] .arrival-control-row,
+html[data-stage="arrive"] .arrival-footer-ornament {
+  display: none !important;
+}
+
+html[data-stage="arrive"] .stage-actions {
+  bottom: calc(clamp(30px, 5svh, 64px) + env(safe-area-inset-bottom));
+  gap: 12px;
+}
+
+html[data-stage="arrive"] .ceremonial-button {
+  width: var(--arrival-cta-width);
+  border-color: rgba(232, 196, 110, 0.92);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(243, 217, 138, 0.3), transparent 52%),
+    linear-gradient(180deg, var(--family-gold-bright), var(--family-gold-deep));
+  color: var(--family-black);
+  box-shadow:
+    0 0 0 1px rgba(232, 196, 110, 0.22),
+    0 0 42px rgba(232, 196, 110, 0.18),
+    0 20px 70px rgba(0, 0, 0, 0.6);
+}
+
+html[data-stage="arrive"] .button-sigil,
+html[data-stage="arrive"] .button-arrow {
+  color: var(--family-black);
+  border-color: rgba(18, 9, 8, 0.42);
+}
+
+html[data-stage="arrive"] .button-sigil::before,
+html[data-stage="arrive"] .button-sigil::after,
+html[data-stage="arrive"] .button-arrow::before,
+html[data-stage="arrive"] .button-arrow::after {
+  background: rgba(18, 9, 8, 0.68);
+}
+
+html[data-stage="arrive"] .archive-button {
+  width: var(--arrival-notes-width);
+  border-color: rgba(232, 196, 110, 0.3);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 196, 110, 0.08), transparent 58%),
+    rgba(18, 9, 8, 0.68);
+  color: rgba(242, 234, 223, 0.84);
+}
+
+@media (max-width: 520px) {
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-top: clamp(112px, 14svh, 134px);
+    --arrival-title-size: clamp(2.78rem, 10.8cqw, 3.28rem);
+    --arrival-prompt-top: clamp(224px, 27svh, 256px);
+    --arrival-prompt-size: clamp(0.62rem, 1.7cqw, 0.72rem);
+    --arrival-art-top: clamp(266px, 31.5svh, 302px);
+    --arrival-art-width: min(76cqw, 318px);
+    --arrival-art-height: clamp(270px, 37svh, 330px);
+    --arrival-cta-width: min(70cqw, 340px);
+    --arrival-notes-width: min(45cqw, 220px);
+  }
+
+  html[data-stage="arrive"] .stage-actions {
+    bottom: calc(clamp(28px, 4.2svh, 42px) + env(safe-area-inset-bottom));
+  }
+
+  html[data-stage="arrive"] .ceremonial-button {
+    min-height: clamp(48px, 5.8svh, 58px);
+    font-size: clamp(1.08rem, 4.5cqw, 1.34rem);
+  }
+}
+
+@media (max-width: 520px) and (max-height: 820px) {
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-top: clamp(92px, 13.5svh, 108px);
+    --arrival-title-size: clamp(2.4rem, 9.9cqw, 2.86rem);
+    --arrival-prompt-top: clamp(196px, 28svh, 222px);
+    --arrival-art-top: clamp(236px, 33svh, 258px);
+    --arrival-art-width: min(68cqw, 286px);
+    --arrival-art-height: clamp(218px, 31svh, 258px);
+    --arrival-cta-width: min(68cqw, 330px);
+    --arrival-notes-width: min(42cqw, 200px);
+  }
+}
+
+@media (min-width: 1100px) and (orientation: landscape) {
+  html[data-stage="arrive"] body {
+    background:
+      radial-gradient(ellipse at 50% 38%, rgba(232, 196, 110, 0.12), transparent 28%),
+      radial-gradient(ellipse at 50% 62%, rgba(232, 215, 178, 0.06), transparent 30%),
+      linear-gradient(180deg, #100807 0%, #070403 55%, #020101 100%);
+  }
+
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-top: clamp(124px, 15svh, 148px);
+    --arrival-title-size: clamp(4rem, 4.8vw, 5.7rem);
+    --arrival-prompt-top: clamp(282px, 33svh, 312px);
+    --arrival-prompt-size: clamp(0.76rem, 0.92vw, 1rem);
+    --arrival-art-top: clamp(298px, 35svh, 330px);
+    --arrival-art-width: min(30vw, 430px);
+    --arrival-art-height: clamp(298px, 38svh, 390px);
+    --arrival-cta-width: min(28vw, 460px);
+    --arrival-notes-width: min(17vw, 250px);
+  }
+
+  html[data-stage="arrive"] .stage-actions {
+    bottom: calc(clamp(34px, 5svh, 58px) + env(safe-area-inset-bottom));
   }
 }

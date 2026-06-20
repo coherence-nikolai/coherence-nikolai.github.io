@@ -1078,18 +1078,18 @@ dd {
 
 .practice-guide-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(18px, 3vw, 28px);
 }
 
 .sota-stream-panel {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(150px, 0.52fr) minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: clamp(22px, 4vw, 42px);
-  align-items: center;
-  min-height: 440px;
-  padding: clamp(28px, 4vw, 46px);
+  align-content: start;
+  min-height: 560px;
+  padding: clamp(24px, 3vw, 36px);
   border: 1px solid rgba(232, 215, 178, 0.18);
   border-radius: 32px;
   overflow: hidden;
@@ -1104,6 +1104,13 @@ dd {
   background:
     radial-gradient(circle at 20% 36%, rgba(215, 173, 88, 0.18), transparent 18rem),
     radial-gradient(circle at 76% 50%, rgba(243, 217, 138, 0.08), transparent 18rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016));
+}
+
+.i-sense-stream-panel {
+  background:
+    radial-gradient(circle at 20% 34%, rgba(232, 215, 178, 0.17), transparent 18rem),
+    radial-gradient(circle at 76% 48%, rgba(134, 189, 180, 0.08), transparent 17rem),
     linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.016));
 }
 
@@ -1134,7 +1141,7 @@ dd {
   z-index: 1;
   display: grid;
   place-items: center;
-  width: min(210px, 100%);
+  width: min(160px, 72%);
   margin-inline: auto;
   aspect-ratio: 1;
   border-radius: 32%;
@@ -1142,7 +1149,7 @@ dd {
 }
 
 .sota-stream-mark img {
-  width: min(190px, 92%);
+  width: min(144px, 92%);
   height: auto;
   filter: drop-shadow(0 0 34px rgba(212, 162, 48, 0.34));
 }
@@ -1155,8 +1162,56 @@ dd {
 }
 
 .unfabricate-stream-mark img {
-  width: min(170px, 82%);
+  width: min(138px, 82%);
   filter: drop-shadow(0 0 34px rgba(215, 173, 88, 0.36));
+}
+
+.i-sense-stream-mark {
+  border-radius: 28%;
+  background:
+    radial-gradient(circle, rgba(232, 215, 178, 0.18), transparent 67%),
+    rgba(18, 14, 8, 0.34);
+}
+
+.i-sense-stream-mark img {
+  width: min(138px, 82%);
+  border-radius: 28%;
+  filter:
+    drop-shadow(0 0 28px rgba(232, 215, 178, 0.28))
+    drop-shadow(0 0 36px rgba(134, 189, 180, 0.12));
+}
+
+.i-sense-card-signal {
+  display: block;
+  width: min(142px, 86%);
+  height: auto;
+  overflow: visible;
+  filter:
+    drop-shadow(0 0 26px rgba(232, 196, 110, 0.22))
+    drop-shadow(0 0 42px rgba(0, 0, 0, 0.34));
+}
+
+.i-sense-card-ray {
+  fill: none;
+  stroke: #e8c46e;
+  stroke-width: 11;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px rgba(232, 196, 110, 0.46));
+}
+
+.i-sense-card-nodes {
+  fill: #f3d98a;
+  filter: drop-shadow(0 0 8px rgba(232, 196, 110, 0.4));
+}
+
+.i-sense-card-head {
+  filter:
+    sepia(1)
+    saturate(2.25)
+    hue-rotate(356deg)
+    brightness(0.88)
+    contrast(1.08)
+    drop-shadow(0 0 8px rgba(232, 196, 110, 0.34));
 }
 
 .sota-stream-copy {
@@ -1168,6 +1223,7 @@ dd {
 .sota-stream-copy h2 {
   max-width: 650px;
   margin-bottom: 16px;
+  font-size: clamp(2.45rem, 3.35vw, 3.35rem);
 }
 
 .sota-stream-copy p:not(.label) {
@@ -1404,6 +1460,16 @@ dd {
 
 .northstar-feature .app-card {
   min-height: 0;
+}
+
+@media (max-width: 1080px) {
+  .practice-guide-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sota-stream-panel {
+    min-height: 540px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

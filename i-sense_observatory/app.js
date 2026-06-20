@@ -9,7 +9,7 @@ import {
   resultMarkers as resultOptions,
   suggestLensIds,
   summarizePatterns
-} from "./lens-model.mjs?v=20260620-copy-pass";
+} from "./lens-model.mjs?v=20260620-family-gold-pass";
 
 const storageKey = "i-sense-observatory.sessions.v1";
 
@@ -325,7 +325,7 @@ function renderArrive() {
   setStageContent(
     "direct observation",
     "I-Sense Observatory",
-    "Look directly. Record your own result.",
+    "Look directly at the felt sense of me.",
     `<div class="arrival-instrument">
       <div class="arrival-starfield" aria-hidden="true"></div>
       ${renderSignalMark("signal-mark")}

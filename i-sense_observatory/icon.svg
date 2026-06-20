@@ -1,21 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title desc">
   <title id="title">I-Sense Observatory</title>
-  <desc id="desc">A side-profile head looking upward with five rays rising from the crown.</desc>
+  <desc id="desc">A gold side-profile head looking upward with five rays rising from the crown.</desc>
   <defs>
     <radialGradient id="bg" cx="50%" cy="34%" r="78%">
-      <stop offset="0%" stop-color="#1f3337"/>
-      <stop offset="48%" stop-color="#0b171d"/>
-      <stop offset="100%" stop-color="#05090d"/>
+      <stop offset="0%" stop-color="#372616"/>
+      <stop offset="48%" stop-color="#171007"/>
+      <stop offset="100%" stop-color="#0b0707"/>
     </radialGradient>
+    <filter id="goldLine" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="
+        0.91 0 0 0 0
+        0 0.77 0 0 0
+        0 0 0.43 0 0
+        0 0 0 1 0"/>
+    </filter>
+    <filter id="softGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   <rect width="640" height="640" rx="136" fill="url(#bg)"/>
-  <path d="M248 248L112 184M282 230L178 86M321 226L321 58M352 232L462 86M382 248L530 184" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round"/>
-  <g fill="#fffaf0">
-    <circle cx="112" cy="184" r="6"/>
-    <circle cx="178" cy="86" r="6"/>
-    <circle cx="321" cy="58" r="6"/>
-    <circle cx="462" cy="86" r="6"/>
-    <circle cx="530" cy="184" r="6"/>
+  <path d="M248 248L112 184M282 230L178 86M321 226L321 46M352 232L462 86M382 248L530 184" fill="none" stroke="#e8c46e" stroke-width="10" stroke-linecap="round" filter="url(#softGlow)"/>
+  <path d="M321 226L321 42" fill="none" stroke="#f3d98a" stroke-width="12" stroke-linecap="round"/>
+  <g fill="#e8c46e" filter="url(#softGlow)">
+    <circle cx="112" cy="184" r="7"/>
+    <circle cx="178" cy="86" r="7"/>
+    <circle cx="321" cy="42" r="8"/>
+    <circle cx="462" cy="86" r="7"/>
+    <circle cx="530" cy="184" r="7"/>
   </g>
-  <image href="logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none"/>
+  <image href="logo-head-reference.png" x="0" y="0" width="640" height="640" preserveAspectRatio="none" filter="url(#goldLine)"/>
 </svg>
