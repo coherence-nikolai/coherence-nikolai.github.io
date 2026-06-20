@@ -9,7 +9,7 @@ import {
   resultMarkers as resultOptions,
   suggestLensIds,
   summarizePatterns
-} from "./lens-model.mjs?v=20260620-family-gold-pass";
+} from "./lens-model.mjs?v=20260620-family-gold-interior-pass";
 
 const storageKey = "i-sense-observatory.sessions.v1";
 
@@ -391,14 +391,15 @@ function firstReadHasAnswer(question) {
 }
 
 function renderFirstReadSummary() {
-  return firstReadQuestions
+  const answered = firstReadQuestions
     .map((question) => [
       question.title.toLowerCase(),
       summarizeFirstReadValue(question, state.firstRead[question.id])
     ])
     .filter(([, value]) => value && value !== "not observed yet")
-    .map(([label, value]) => `<span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`)
-    .join("") || `<span><b>first read</b>waiting for answers</span>`;
+    .map(([label, value]) => `<span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`);
+
+  return answered.join("");
 }
 
 function renderRoute() {
@@ -841,9 +842,9 @@ function drawField(now) {
   const maxRadius = Math.max(width, height) * (0.44 + aperture * 0.23 + peripheral * 0.17);
 
   const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRadius);
-  gradient.addColorStop(0, `rgba(255, 250, 240, ${0.36 + intensity * 0.24})`);
-  gradient.addColorStop(0.15, `rgba(255, 250, 240, ${0.18 + intensity * 0.16})`);
-  gradient.addColorStop(0.48, `rgba(188, 211, 203, ${0.08 + peripheral * 0.16})`);
+  gradient.addColorStop(0, `rgba(243, 217, 138, ${0.24 + intensity * 0.2})`);
+  gradient.addColorStop(0.15, `rgba(242, 234, 223, ${0.14 + intensity * 0.14})`);
+  gradient.addColorStop(0.48, `rgba(189, 141, 100, ${0.07 + peripheral * 0.13})`);
   gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
@@ -857,7 +858,7 @@ function drawField(now) {
     const alpha = Math.max(0, (1 - phase) * (0.055 + peripheral * 0.16));
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(255, 250, 240, ${alpha})`;
+    ctx.strokeStyle = `rgba(232, 196, 110, ${alpha})`;
     ctx.lineWidth = 1;
     ctx.stroke();
   }
@@ -871,7 +872,7 @@ function drawField(now) {
     const y = Math.sin(angle) * distance * (0.66 + peripheral * 0.12);
     ctx.beginPath();
     ctx.arc(x, y, 0.62 + peripheral * 1.05, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 250, 240, ${0.08 + peripheral * 0.2})`;
+    ctx.fillStyle = `rgba(242, 234, 223, ${0.06 + peripheral * 0.16})`;
     ctx.fill();
   }
   ctx.restore();
@@ -888,8 +889,8 @@ function drawField(now) {
       const endX = rayBaseX + Math.cos(angle + wobble) * length;
       const endY = rayBaseY + Math.sin(angle + wobble) * length;
       const gradientLine = ctx.createLinearGradient(rayBaseX, rayBaseY, endX, endY);
-      gradientLine.addColorStop(0, `rgba(255, 250, 238, ${0.08 + rayPower * 0.26})`);
-      gradientLine.addColorStop(1, "rgba(255, 250, 238, 0)");
+      gradientLine.addColorStop(0, `rgba(243, 217, 138, ${0.08 + rayPower * 0.26})`);
+      gradientLine.addColorStop(1, "rgba(243, 217, 138, 0)");
       ctx.beginPath();
       ctx.moveTo(rayBaseX, rayBaseY);
       ctx.lineTo(endX, endY);
