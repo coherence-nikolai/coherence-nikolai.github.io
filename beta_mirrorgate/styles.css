@@ -1259,6 +1259,26 @@ h3 {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
 }
 
+.phase-transitioning .step-cue-card,
+.phase-transitioning .guided-module-card,
+.phase-transitioning .module-stage-card {
+  animation: phase-cue-pulse 0.72s ease both;
+}
+
+@keyframes phase-cue-pulse {
+  0% {
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  }
+  38% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--module-accent, var(--gold)) 32%, transparent),
+      0 0 44px color-mix(in srgb, var(--module-accent, var(--gold)) 18%, transparent);
+  }
+  100% {
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  }
+}
+
 .step-cue-card p {
   margin: 0;
   color: var(--muted);
@@ -1372,9 +1392,15 @@ h3 {
 }
 
 .timer-status,
-.quiet-counts {
+.quiet-counts,
+.reanchor-line {
   color: var(--muted);
   line-height: 1.4;
+}
+
+.reanchor-line {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
 }
 
 .guidance-timer-track {
@@ -1401,6 +1427,13 @@ h3 {
   min-height: 38px;
   padding: 9px 13px;
   font-size: 0.86rem;
+}
+
+.auto-flow-toggle.is-active {
+  border-color: color-mix(in srgb, var(--module-accent, var(--gold)) 42%, transparent);
+  color: #0a0b10;
+  background: var(--module-accent, var(--gold));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--module-accent, var(--gold)) 20%, transparent);
 }
 
 .outcome-guide {

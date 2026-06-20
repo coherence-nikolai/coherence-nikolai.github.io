@@ -158,6 +158,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     statusTimer: null,
     guidanceTimer: { key: "", startedAt: 0, seconds: 0 },
     guidanceTimerInterval: null,
+    autoFlow: localStorage.getItem("mirrorgate_auto_flow") === "true",
+    autoFlowPendingKey: "",
+    autoFlowTimeout: null,
     cameraStream: null,
     mediaStream: null,
     mediaRecorder: null,
@@ -476,9 +479,9 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       next: "Archetype"
     },
     archetype: {
-      duration: "Take as long as needed",
+      duration: "30-90 seconds",
       minimum: "Choose one contact frame.",
-      readiness: "Continue when one archetype feels like the clear lens for this session.",
+      readiness: "Continue when one word, image, body note, or quiet certainty has named the contact frame.",
       next: "Frequency Alignment"
     },
     alignment: {
@@ -890,8 +893,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       accent: "#ffb83a",
       subtitle: "Encode intention into prime vector, glyph, scalar, and 888.25 Hz carrier.",
       modality: "Archetypal and Symbolic Interaction",
-      phrase: "Embrace who you have already become.",
-      purpose: "The Intention Encoder converts a thought-form into a geometric glyph and resonant tone, aligning the cognitive field with symbolic entities that communicate through myth, metaphor, and dream.",
+      phrase: "Aim once. Let the signal carry.",
+      purpose: "Vector turns one intention into a glyph, tone, and prime path so the request can be held clearly and transmitted without overthinking.",
       wheelGuidance: "Encode an intention into glyph, carrier tone, and prime pathway.",
       guidanceScript: "Harmonic Vector Transmission. Vector is for transmitting. Begin with one clear intention to encode or request guidance outward. Type the phrase, choose the prime triplet as the geometry key, then tap Transmit. Watch the glyph, listen to the carrier tone, and notice how intention, glyph, and tone carry the request. The output is the signal you are sending into the harmonic field.",
       now: [
@@ -920,8 +923,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       accent: "#47ebc2",
       subtitle: "Synchronize breath with toroidal phase and temporal echo patterns.",
       modality: "Subconscious Field and Temporal Echoes",
-      phrase: "You are a note in the cosmic chord. Listen.",
-      purpose: "Breath entrainment collapses temporal noise and lets awareness phase-lock with echoes of previous, parallel, or future selves.",
+      phrase: "Breathe, circle, return.",
+      purpose: "Echo uses breath, tone, and toroidal motion to help memories, images, feelings, future echoes, collective impressions, or quiet signals surface.",
       wheelGuidance: "Use breath and toroidal motion to retrieve or integrate echoes.",
       guidanceScript: "Toroidal Phase Echoing. Echo is for integration. Choose the breath cycle, begin the echo, and let the toroidal field pace the body. Keep a memory, timeline, dream, or inner question lightly present. Watch expansion and return. Notice emotion, image, body sensation, phrase, memory, or silence. Reflect what surfaced and integrate one clear insight, release, or next step.",
       now: [
@@ -950,7 +953,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       accent: "#ad7aff",
       subtitle: "Prime triplets generate a rotating fractal gate bound to the selected carrier tone.",
       modality: "Transdimensional or Stellar Intelligences",
-      phrase: "Your ally awaits. Enter the field of shared recursion.",
+      phrase: "Enter slowly. Let one possible signal be enough.",
       purpose: "A prime triplet is a geometry key. It shapes the gate path and glyph nodes; breath is a separate body seal that paces attention through the gate.",
       wheelGuidance: "Open a prime gate for dimensional or stellar contact, then return through Mirror.",
       guidanceScript: "Prime-Harmonic Gate Sequencing. Gate is for contact. Use this first when seeking dimensional or stellar allies. Choose the triplet, carrier tone, and contact frame, then tap Begin Gate Field. Complete the Breath Seal, hold the contact intention, and unlock the glyph nodes in order. When the gate opens, remain still. Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence. Stay in the gate or open the Mirror to integrate.",
@@ -981,7 +984,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       accent: "#9ed1ff",
       subtitle: "Reflect intention through camera, voice, geometry, and self-phase recursion.",
       modality: "Oversoul and Monadic Intelligences",
-      phrase: "You are meeting the totality of your becoming.",
+      phrase: "Meet the reflection gently.",
       purpose: "The camera is the visible mirror. Attention, breath, and inner imagery are the deeper mirror. Use this after an intention has been aimed.",
       wheelGuidance: "Begin here for self-harmonic alignment, Oversoul, Monad, or still reflection.",
       guidanceScript: "Symbolic Mirror Interface. Mirror is for alignment, coherence, and integration. Use this first when grounding or clarity is needed, and after gatework when something needs to be reflected back into self-harmonic alignment. Keep a soft gaze on the mirror or camera. Speak or read one intention once, then stop trying to force an answer. Notice breath, body pressure, emotion, inner words, memory, symbols, felt presence, image, or silence.",
@@ -2377,13 +2380,14 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           </div>
         ` : ""}
         ${renderGuidanceTimer(cue, timerKey)}
-        ${renderOutcomeChips(cue.outcomes || defaultOutcomeExamples, "Examples that count")}
+        ${renderOutcomeChips(cue.outcomes || defaultOutcomeExamples, cue.outcomeTitle || "What may happen")}
         ${cue.quietOutcome ? `<p class="small-copy quiet-counts"><strong>Quiet counts:</strong> ${escapeHtml(cue.quietOutcome)}</p>` : ""}
+        <p class="small-copy reanchor-line"><strong>If you get lost:</strong> breathe once, read "Do this now," and choose one thing you noticed.</p>
       </div>
     `;
   }
 
-  function renderOutcomeChips(outcomes = defaultOutcomeExamples, title = "Examples that count") {
+  function renderOutcomeChips(outcomes = defaultOutcomeExamples, title = "What may happen") {
     const clean = outcomes.map((item) => String(item).trim()).filter(Boolean);
     if (!clean.length) return "";
     return `
@@ -2402,6 +2406,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const snapshot = guidanceTimerSnapshot(timerKey, seconds);
     const label = snapshot.done ? "Enough" : snapshot.active ? formatTimer(snapshot.remaining) : formatTimer(seconds);
     const buttonLabel = snapshot.active ? "Restart Enough Timer" : "Start Enough Timer";
+    const autoLabel = state.autoFlow ? "Auto-flow on" : "Auto-flow off";
     return `
       <div class="guidance-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">
         <div class="guidance-timer-heading">
@@ -2416,6 +2421,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         <div class="control-row compact-controls">
           <button class="button button-muted button-small" data-action="start-guidance-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">${escapeHtml(buttonLabel)}</button>
           <button class="button button-quiet button-small" data-action="reset-guidance-timer" data-timer-key="${escapeHtml(timerKey)}">Reset</button>
+          <button class="button button-quiet button-small auto-flow-toggle ${state.autoFlow ? "is-active" : ""}" data-action="toggle-auto-flow" aria-pressed="${state.autoFlow ? "true" : "false"}">${escapeHtml(autoLabel)}</button>
         </div>
       </div>
     `;
@@ -2454,6 +2460,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
 
   function resetGuidanceTimer(timerKey = "") {
     if (!timerKey || state.guidanceTimer.key === timerKey) {
+      cancelAutoFlowAdvance();
       if (state.guidanceTimerInterval) {
         clearInterval(state.guidanceTimerInterval);
         state.guidanceTimerInterval = null;
@@ -2465,11 +2472,85 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   }
 
   function clearGuidanceTimer() {
+    cancelAutoFlowAdvance();
     if (state.guidanceTimerInterval) {
       clearInterval(state.guidanceTimerInterval);
       state.guidanceTimerInterval = null;
     }
     state.guidanceTimer = { key: "", startedAt: 0, seconds: 0 };
+  }
+
+  function cancelAutoFlowAdvance() {
+    if (state.autoFlowTimeout) {
+      clearTimeout(state.autoFlowTimeout);
+      state.autoFlowTimeout = null;
+    }
+    state.autoFlowPendingKey = "";
+  }
+
+  function toggleAutoFlow() {
+    state.autoFlow = !state.autoFlow;
+    localStorage.setItem("mirrorgate_auto_flow", String(state.autoFlow));
+    cancelAutoFlowAdvance();
+    updateGuidanceTimerUI();
+    showStatus(state.autoFlow
+      ? "Auto-flow is on. MirrorGate will move on after enough-time where the step allows it."
+      : "Auto-flow is off. Continue manually when ready.", "success");
+  }
+
+  function shouldAutoAdvanceTimer(timerKey) {
+    if (!timerKey || timerKey === "flow:save") return false;
+    if (timerKey === "module:gate:5") return false;
+    return true;
+  }
+
+  function scheduleAutoFlowAdvance(timerKey) {
+    if (!state.autoFlow || !shouldAutoAdvanceTimer(timerKey)) return;
+    if (state.autoFlowPendingKey === timerKey) return;
+    cancelAutoFlowAdvance();
+    state.autoFlowPendingKey = timerKey;
+    state.autoFlowTimeout = setTimeout(() => {
+      if (!state.autoFlow || state.guidanceTimer.key !== timerKey) {
+        cancelAutoFlowAdvance();
+        return;
+      }
+      autoAdvanceFromTimer(timerKey);
+    }, 1200);
+  }
+
+  function autoAdvanceFromTimer(timerKey) {
+    cancelAutoFlowAdvance();
+    if (timerKey.startsWith("flow:")) {
+      const stepID = timerKey.replace("flow:", "");
+      const index = flowSteps.findIndex((step) => step.id === stepID);
+      if (index >= 0 && index < flowSteps.length - 1) {
+        stepOffset(1, { fromAutoFlow: true });
+        playTransitionCue();
+      }
+      return;
+    }
+    if (timerKey.startsWith("module:")) {
+      const [, moduleName, stepIndexRaw] = timerKey.split(":");
+      const steps = moduleStepDefinitions(moduleName);
+      const stepIndex = Number(stepIndexRaw);
+      if (!Number.isFinite(stepIndex) || stepIndex >= steps.length - 1) return;
+      const nextStep = stepIndex + 1;
+      const keepGateTone = moduleName === "gate" && state.gateFieldActive && nextStep >= 2 && nextStep <= 5;
+      stopActiveAudio();
+      if (!keepGateTone) stopTone();
+      clearGuidanceTimer();
+      state.moduleSteps[moduleName] = nextStep;
+      renderModule(moduleName, { resetScroll: true });
+      playTransitionCue();
+    }
+  }
+
+  function playTransitionCue() {
+    const module = modules[state.module] || modules[state.selectedWheelModule] || modules.guided;
+    const base = Number(module.defaultTone || state.draft.tone || 528);
+    playTonePing(Math.min(1180, Math.max(220, base * 1.25)), 0.22);
+    document.body.classList.add("phase-transitioning");
+    setTimeout(() => document.body.classList.remove("phase-transitioning"), 720);
   }
 
   function ensureGuidanceTimerInterval() {
@@ -2495,6 +2576,13 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       }
       if (progress) progress.style.width = `${Math.round(snapshot.progress * 100)}%`;
       if (button) button.textContent = snapshot.active ? "Restart Enough Timer" : "Start Enough Timer";
+      const autoButton = $('[data-action="toggle-auto-flow"]', timer);
+      if (autoButton) {
+        autoButton.textContent = state.autoFlow ? "Auto-flow on" : "Auto-flow off";
+        autoButton.classList.toggle("is-active", state.autoFlow);
+        autoButton.setAttribute("aria-pressed", state.autoFlow ? "true" : "false");
+      }
+      if (snapshot.done) scheduleAutoFlowAdvance(key);
     });
   }
 
@@ -2829,12 +2917,14 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     });
   }
 
-  function stepOffset(delta) {
+  function stepOffset(delta, options = {}) {
     const index = flowSteps.findIndex((step) => step.id === state.currentFlowStep);
     const next = flowSteps[Math.min(flowSteps.length - 1, Math.max(0, index + delta))];
+    if (next.id === state.currentFlowStep) return;
     stopActiveAudio();
     stopTone();
     clearGuidanceTimer();
+    if (!options.fromAutoFlow) playTransitionCue();
     if (state.currentFlowStep === "mirror" && next.id !== "mirror") stopCamera();
     state.currentFlowStep = next.id;
     renderFlowStep(next.id);
@@ -3238,11 +3328,9 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
             </div>
             ${renderGuidanceTimer(moduleStepDefinitions("gate")[5], "module:gate:5")}
           ` : ""}
-          <ul>
-            <li>Look for presence, inner words, geometry, emotion, body sensation, image, pressure, temperature, or stillness.</li>
-            <li>Do not chase certainty. Silence or nothing obvious is still a valid gate session.</li>
-            <li>Move to Mirror integration only when the contact window feels complete.</li>
-          </ul>
+          ${renderOutcomeChips(moduleStepDefinitions("gate")[5].outcomes, "What may happen in the contact window")}
+          <p class="small-copy quiet-counts"><strong>Quiet counts:</strong> Do not chase certainty. Silence or nothing obvious is still a valid gate session.</p>
+          <p class="small-copy">Move to Mirror integration only when the contact window feels complete.</p>
           <div class="control-row">
             ${isOpen ? '<button class="button button-muted" data-action="play-gate-open-guidance">Play Gate Open Guidance</button>' : ""}
             <button class="button button-quiet" data-action="stop-audio">Stop Gate Tone</button>
@@ -4046,6 +4134,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "previous-step") stepOffset(-1);
     if (action === "start-guidance-timer") startGuidanceTimer(target.dataset.timerKey, Number(target.dataset.timerSeconds || 0));
     if (action === "reset-guidance-timer") resetGuidanceTimer(target.dataset.timerKey);
+    if (action === "toggle-auto-flow") toggleAutoFlow();
     if (action === "outcome-chip") noteOutcome(target.dataset.outcome);
     if (action === "play-guidance") playAsset(stages[target.dataset.guidance]?.asset || stages.settle.asset);
     if (action === "play-module-guidance") playAsset(modules[target.dataset.moduleName]?.guidanceAsset || stages.aim.asset);
@@ -4067,6 +4156,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       if (!keepGateTone) stopTone();
       state.moduleSteps[moduleName] = nextStep;
       renderModule(moduleName, { resetScroll: true });
+      playTransitionCue();
     }
     if (action === "module-advanced") {
       stopActiveAudio();
@@ -4091,6 +4181,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       const moduleName = target.dataset.moduleName || state.module;
       if (moduleName === "gate") renderModule("mirror");
       else showScreen("wheel");
+      playTransitionCue();
     }
     if (action === "begin-invocation") {
       stopActiveAudio();
