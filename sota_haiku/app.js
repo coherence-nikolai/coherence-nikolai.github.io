@@ -87,7 +87,7 @@ app.addEventListener("click", (event) => {
   if (action === "select-duration") {
     state.selectedDurationSeconds = Number(target.dataset.seconds || 0);
     state.selectedDurationLabel = target.dataset.label || "Free";
-    render();
+    updateDurationControls();
   }
   if (action === "start-practice") startPractice(gate, depth);
   if (action === "start-quick-practice") startPractice(gate, "gentle", Number(target.dataset.seconds || 60), target.dataset.label || "One minute", true);
@@ -314,8 +314,27 @@ function scheduleGateControls(delayMs) {
   state.gateRevealTimer = window.setTimeout(() => {
     if (state.view !== "gate") return;
     state.gateControlsVisible = true;
-    render();
+    revealGateControls();
   }, delayMs);
+}
+
+function revealGateControls() {
+  const controls = app.querySelector(".gate-controls");
+  if (!controls) return;
+  controls.classList.add("is-revealed");
+}
+
+function updateDurationControls() {
+  const controls = app.querySelector(".gate-controls");
+  if (!controls) return;
+  controls.querySelectorAll("[data-action='select-duration']").forEach((button) => {
+    button.classList.toggle("selected", Number(button.dataset.seconds || 0) === state.selectedDurationSeconds);
+  });
+  const begin = controls.querySelector("[data-action='start-quick-practice']");
+  if (begin) {
+    begin.dataset.seconds = String(state.selectedDurationSeconds);
+    begin.dataset.label = state.selectedDurationLabel;
+  }
 }
 
 function playHaikuAudio(gate) {
@@ -446,7 +465,7 @@ function renderArrival() {
   return `
     <main class="haiku-flow-shell arrival-shell">
       <section class="haiku-anchor arrival-art" data-anchor-mark aria-hidden="true">
-        <img class="brush-gate-image" src="./shared/brush-lines-only.png?v=20-sota-haiku" alt="" aria-hidden="true" />
+        <img class="brush-gate-image" src="./shared/brush-lines-only.png?v=21-sequence" alt="" aria-hidden="true" />
         ${renderSotaSeal("arrival-seal")}
       </section>
 
@@ -467,7 +486,7 @@ function renderGateList() {
   return `
     <main class="haiku-flow-shell line-menu-shell">
       <section class="haiku-anchor line-menu-anchor" aria-hidden="true">
-        <img class="anchor-mark painted-static" src="./shared/brush-lines-only.png?v=20-sota-haiku" alt="" />
+        <img class="anchor-mark painted-static" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
         ${renderSotaSeal("arrival-seal line-menu-seal")}
       </section>
       <nav class="line-menu-actions" aria-label="Local app areas">
@@ -538,9 +557,9 @@ function renderGateArt(gate) {
   return `
     <section class="haiku-anchor gate-art three-line-art gate-order-${order}" aria-label="Haiku poem for ${escapeHTML(gate.title)}">
       <div class="three-line-stage" aria-hidden="true">
-        <img class="gate-logo-line gate-line-one" src="./shared/brush-lines-only.png?v=20-sota-haiku" alt="" />
-        <img class="gate-logo-line gate-line-two" src="./shared/brush-lines-only.png?v=20-sota-haiku" alt="" />
-        <img class="gate-logo-line gate-line-three" src="./shared/brush-lines-only.png?v=20-sota-haiku" alt="" />
+        <img class="gate-logo-line gate-line-one" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
+        <img class="gate-logo-line gate-line-two" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
+        <img class="gate-logo-line gate-line-three" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
         <span class="gate-seal-ghost-cover"></span>
       </div>
       <div class="three-line-poem" data-fit-poem>
@@ -585,7 +604,7 @@ function renderSotaSeal(className = "") {
 }
 
 function renderMiniLineMark(className = "mini-line-mark") {
-  return `<span class="${className}" aria-hidden="true"><img src="./shared/brush-lines-only.png?v=20-sota-haiku" alt="" /></span>`;
+  return `<span class="${className}" aria-hidden="true"><img src="./shared/brush-lines-only.png?v=21-sequence" alt="" /></span>`;
 }
 
 function renderPracticeShell() {
