@@ -4649,6 +4649,137 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   }
 }
 
+/* Desktop arrival should feel like an open observatory field, not a phone poster trapped in a column. */
+@media (min-width: 1100px) and (orientation: landscape) {
+  html[data-stage="arrive"] body {
+    background:
+      radial-gradient(ellipse at 50% 46%, rgba(34, 69, 70, 0.3), rgba(3, 8, 10, 0) 44%),
+      radial-gradient(ellipse at 50% 72%, rgba(217, 167, 110, 0.09), rgba(0, 2, 3, 0) 31%),
+      linear-gradient(180deg, #000 0%, #030808 50%, #000 100%);
+  }
+
+  html[data-stage="arrive"] .topbar {
+    width: min(1180px, calc(100vw - 96px));
+    padding-top: 28px;
+  }
+
+  html[data-stage="arrive"] .brand {
+    gap: 14px;
+  }
+
+  html[data-stage="arrive"] .brand-mark {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+  }
+
+  html[data-stage="arrive"] .brand strong {
+    font-size: 2.08rem;
+  }
+
+  html[data-stage="arrive"] .brand small {
+    margin-top: 7px;
+    font-size: 0.64rem;
+  }
+
+  html[data-stage="arrive"] .view-tabs {
+    width: 58px;
+    height: 58px;
+  }
+
+  html[data-stage="arrive"] .experiment-surface {
+    --arrival-title-top: clamp(104px, 12.5svh, 118px);
+    --arrival-title-size: clamp(4.05rem, 4.4vw, 4.7rem);
+    --arrival-prompt-top: clamp(274px, 31svh, 286px);
+    --arrival-prompt-size: clamp(0.86rem, 0.92vw, 1.08rem);
+    --arrival-art-top: clamp(268px, 31svh, 286px);
+    --arrival-art-width: min(54vw, 680px);
+    --arrival-art-height: clamp(300px, 36svh, 360px);
+    --arrival-cta-width: min(40vw, 590px);
+    --arrival-control-width: min(44vw, 640px);
+    --arrival-notes-width: min(24vw, 330px);
+    width: 100vw;
+    max-width: none;
+  }
+
+  html[data-stage="arrive"] #observatory-title,
+  html[data-stage="arrive"] .stage-prompt,
+  html[data-stage="arrive"] #stage-body,
+  html[data-stage="arrive"] .stage-actions {
+    width: min(100vw - 72px, 1120px);
+  }
+
+  html[data-stage="arrive"] #observatory-title {
+    max-width: 10ch;
+  }
+
+  html[data-stage="arrive"] #observatory-title::after {
+    display: none;
+  }
+
+  html[data-stage="arrive"] .arrival-starfield {
+    width: min(118vw, 1720px);
+    opacity: 0.56;
+  }
+
+  html[data-stage="arrive"] .arrival-constellation {
+    width: min(112vw, 1480px);
+    opacity: 0.34;
+  }
+
+  html[data-stage="arrive"] .signal-mark {
+    width: min(24vw, 320px);
+  }
+
+  html[data-stage="arrive"] .arrival-instrument::before {
+    opacity: 0.46;
+  }
+
+  html[data-stage="arrive"] .arrival-ground {
+    top: min(72%, 570px);
+    width: min(48vw, 720px);
+    opacity: 0.44;
+  }
+
+  html[data-stage="arrive"] .stage-prompt::before {
+    display: none;
+  }
+
+  html[data-stage="arrive"] .stage-actions {
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    gap: 14px;
+  }
+
+  html[data-stage="arrive"] .ceremonial-button {
+    min-height: 62px;
+    grid-template-columns: 56px 1fr 56px;
+    font-size: clamp(1.56rem, 2vw, 2rem);
+  }
+
+  html[data-stage="arrive"] .arrival-control-row {
+    gap: clamp(28px, 3.6vw, 58px);
+  }
+
+  html[data-stage="arrive"] .instrument-control {
+    font-size: clamp(0.72rem, 0.82vw, 0.94rem);
+  }
+
+  html[data-stage="arrive"] .instrument-control span {
+    width: clamp(58px, 4.6vw, 78px);
+    height: clamp(58px, 4.6vw, 78px);
+  }
+
+  html[data-stage="arrive"] .instrument-control:not(:last-child)::after {
+    top: clamp(29px, 2.3vw, 39px);
+  }
+
+  html[data-stage="arrive"] .archive-button {
+    min-height: 48px;
+    grid-template-columns: 42px 1fr 42px;
+    font-size: clamp(1.05rem, 1.28vw, 1.38rem);
+  }
+}
+
 @media (max-width: 720px) {
   html:not([data-stage="arrive"]) .stage-kicker,
   html:not([data-stage="arrive"]) #observatory-title,

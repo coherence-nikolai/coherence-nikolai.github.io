@@ -93,7 +93,7 @@ export const firstReadQuestions = [
     mode: "single",
     title: "Locate",
     question: "Where does the sense of me seem to gather?",
-    help: "Choose the closest direct report. It can be vague, absent, or changing.",
+    help: "Choose what best matches your experience right now. Vague, absent, or changing is okay.",
     options: locationOptions
   },
   {

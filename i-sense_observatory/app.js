@@ -9,7 +9,7 @@ import {
   resultMarkers as resultOptions,
   suggestLensIds,
   summarizePatterns
-} from "./lens-model.mjs?v=20260620-quality-pass";
+} from "./lens-model.mjs?v=20260620-copy-pass";
 
 const storageKey = "i-sense-observatory.sessions.v1";
 
@@ -356,8 +356,8 @@ function renderFirstRead() {
 
   setStageContent(
     "first read",
-    "Tune the instrument.",
-    "A few direct reports find the door that is alive now. No lens is primary.",
+    "Answer from what you notice.",
+    "Choose the closest answer for each question. Your answers help suggest a starting lens; you can still choose freely.",
     `<div class="calibration-chamber">
       <section class="question-lens calibration-lens" aria-label="First read question">
         <span class="lens-label">${escapeHtml(question.title)} ${state.calibrationIndex + 1} / ${firstReadQuestions.length}</span>
@@ -398,7 +398,7 @@ function renderFirstReadSummary() {
     ])
     .filter(([, value]) => value && value !== "not observed yet")
     .map(([label, value]) => `<span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`)
-    .join("") || `<span><b>first read</b>waiting for direct markers</span>`;
+    .join("") || `<span><b>first read</b>waiting for answers</span>`;
 }
 
 function renderRoute() {
@@ -417,7 +417,7 @@ function renderRoute() {
       </section>
       <section class="lens-rack">
         <div class="rack-head">
-          <span class="lens-label">suggested doors</span>
+          <span class="lens-label">suggested starting lenses</span>
           <p>Suggestion is only routing, not a conclusion.</p>
         </div>
         <div class="lens-card-grid is-suggested">${suggestedCards}</div>
