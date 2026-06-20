@@ -2,12 +2,14 @@ import {
   createEmptyFirstRead,
   firstReadQuestions,
   getLensById,
+  integrationMarkers as integrationOptions,
   lensLibrary,
+  noteFacetGroups,
   remainsMarkers as remainsOptions,
   resultMarkers as resultOptions,
   suggestLensIds,
   summarizePatterns
-} from "./lens-model.mjs?v=20260618-phone-layout";
+} from "./lens-model.mjs?v=20260620-quality-pass";
 
 const storageKey = "i-sense-observatory.sessions.v1";
 
@@ -41,6 +43,7 @@ const state = {
   lensMarkers: new Set(),
   resultMarkers: new Set(),
   remainsMarkers: new Set(),
+  integrationMarkers: new Set(),
   note: "",
   isObservingDirectly: false,
   observationStartedAt: 0,
@@ -48,6 +51,7 @@ const state = {
 };
 
 let lastStageAnimationKey = "";
+let transitionFrame = 0;
 
 const els = {
   tabs: Array.from(document.querySelectorAll("[data-view-target]")),
@@ -114,19 +118,40 @@ function loadSessions() {
 }
 
 function normalizeSession(session) {
-  if (session.firstRead) return session;
   const lens = getLensById(session.lensId || "location");
+  if (session.firstRead) {
+    return {
+      schemaVersion: 2,
+      ...session,
+      lensId: lens.id,
+      lensTitle: session.lensTitle || lens.title,
+      firstRead: {
+        ...createEmptyFirstRead(),
+        ...session.firstRead,
+        textures: session.firstRead.textures || []
+      },
+      lensMarkers: session.lensMarkers || [],
+      resultMarkers: session.resultMarkers || [],
+      remainsMarkers: session.remainsMarkers || [],
+      integrationMarkers: session.integrationMarkers || []
+    };
+  }
   return {
+    schemaVersion: 2,
     ...session,
     lensId: lens.id,
     lensTitle: lens.title,
     firstRead: {
+      ...createEmptyFirstRead(),
       location: session.location || "",
       textures: session.textureMarkers || [],
       stability: "",
+      boundary: "",
+      ownership: "",
       observer: "",
       agency: "",
-      tone: ""
+      tone: "",
+      narrative: ""
     },
     lensMarkers: session.textureMarkers || [],
     resultMarkers: session.observedChangeMarkers || [],
@@ -134,6 +159,7 @@ function normalizeSession(session) {
       ...(session.thresholdMarkers || []),
       ...(session.perceptionMarkers || [])
     ],
+    integrationMarkers: [],
     userNote: session.userNote || ""
   };
 }
@@ -151,6 +177,7 @@ function resetDraft() {
   state.lensMarkers = new Set();
   state.resultMarkers = new Set();
   state.remainsMarkers = new Set();
+  state.integrationMarkers = new Set();
   state.note = "";
 }
 
@@ -221,7 +248,16 @@ function renderWithTransition() {
 }
 
 function mutateWithTransition(mutate) {
+  if (els.surface) {
+    window.cancelAnimationFrame(transitionFrame);
+    els.surface.classList.add("is-transitioning");
+  }
   mutate();
+  if (els.surface) {
+    transitionFrame = window.requestAnimationFrame(() => {
+      els.surface.classList.remove("is-transitioning");
+    });
+  }
 }
 
 function renderSteps() {
@@ -240,12 +276,15 @@ function updateStageChrome() {
 function renderSummary() {
   const lens = getSelectedLens();
   const lines = [
-    ["Location", state.firstRead.location || "not observed yet"],
-    ["Texture", joinOrNone(state.firstRead.textures)],
+    ...firstReadQuestions.slice(0, 5).map((question) => [
+      question.title,
+      summarizeFirstReadValue(question, state.firstRead[question.id])
+    ]),
     ["Lens", state.selectedLensId ? lens.shortTitle : "not chosen yet"],
     ["Lens markers", joinOrNone(selectedArray(state.lensMarkers))],
     ["Result", joinOrNone(selectedArray(state.resultMarkers))],
-    ["Remains", joinOrNone(selectedArray(state.remainsMarkers))]
+    ["Remains", joinOrNone(selectedArray(state.remainsMarkers))],
+    ["After-effect", joinOrNone(selectedArray(state.integrationMarkers))]
   ];
 
   els.summary.innerHTML = lines.map(([label, value]) => `<div><strong>${label}</strong>${escapeHtml(value)}</div>`).join("");
@@ -259,14 +298,22 @@ function joinOrNone(items) {
   return items && items.length ? items.join(", ") : "not observed yet";
 }
 
+function summarizeFirstReadValue(question, value) {
+  if (Array.isArray(value)) return joinOrNone(value);
+  return value || "not observed yet";
+}
+
 function setStageContent(kicker, title, prompt, bodyHtml, actionsHtml) {
   const animationKey = `${state.stage}:${kicker}:${title}`;
+  const stageContentChanged = animationKey !== lastStageAnimationKey;
   els.kicker.textContent = kicker;
   els.title.textContent = title;
   els.prompt.textContent = prompt;
   els.body.innerHTML = bodyHtml;
   els.actions.innerHTML = actionsHtml;
-  if (animationKey !== lastStageAnimationKey) {
+  if (stageContentChanged) {
+    els.body.scrollTop = 0;
+    els.body.scrollLeft = 0;
     lastStageAnimationKey = animationKey;
     els.surface.classList.remove("is-entering");
     void els.surface.offsetWidth;
@@ -344,15 +391,11 @@ function firstReadHasAnswer(question) {
 }
 
 function renderFirstReadSummary() {
-  const items = [
-    ["location", state.firstRead.location],
-    ["texture", joinOrNone(state.firstRead.textures)],
-    ["stability", state.firstRead.stability],
-    ["observer", state.firstRead.observer],
-    ["agency", state.firstRead.agency],
-    ["tone", state.firstRead.tone]
-  ];
-  return items
+  return firstReadQuestions
+    .map((question) => [
+      question.title.toLowerCase(),
+      summarizeFirstReadValue(question, state.firstRead[question.id])
+    ])
     .filter(([, value]) => value && value !== "not observed yet")
     .map(([label, value]) => `<span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`)
     .join("") || `<span><b>first read</b>waiting for direct markers</span>`;
@@ -366,7 +409,7 @@ function renderRoute() {
   setStageContent(
     "route",
     "Choose the next lens.",
-    "The app can suggest from your First Read, or you can choose freely.",
+    "The app can suggest from your First Read, or you can choose freely. No suggestion is a conclusion.",
     `<div class="route-shell">
       <section class="readout-panel">
         <span class="lens-label">calibration readout</span>
@@ -394,9 +437,10 @@ function renderRoute() {
 
 function renderLensCard(lens, recommended, context) {
   return `<button class="lens-card ${recommended ? "is-recommended" : ""}" type="button" data-lens-id="${lens.id}" data-context="${context}">
-    <span>${escapeHtml(lens.lineage)}</span>
+    <span>${escapeHtml(lens.lineage)} / ${escapeHtml(lens.stance)}</span>
     <strong>${escapeHtml(lens.shortTitle)}</strong>
     <small>${escapeHtml(lens.aim)}</small>
+    <em>${escapeHtml(lens.directAction)}</em>
   </button>`;
 }
 
@@ -412,6 +456,10 @@ function renderLens() {
     lens.aim,
     `<div class="lens-chamber">
       <div class="lens-compass" aria-hidden="true"><span></span></div>
+      <div class="lens-instruction">
+        <span class="lens-label">direct action</span>
+        <p>${escapeHtml(lens.directAction)}</p>
+      </div>
       <section class="question-lens">
         <span class="lens-label">inquiry ${promptIndex + 1} / ${lens.prompts.length}</span>
         <p>${escapeHtml(lens.prompts[promptIndex])}</p>
@@ -420,6 +468,10 @@ function renderLens() {
       <div class="marker-field">
         <span class="lens-label">direct markers</span>
         <div class="choice-row">${markers}</div>
+      </div>
+      <div class="lens-reflection">
+        <span class="lens-label">recording angle</span>
+        <p>${escapeHtml(lens.reflection)}</p>
       </div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Lenses</button>
@@ -468,11 +520,21 @@ function stopObservation() {
 }
 
 function renderResult() {
+  const selectedLens = getSelectedLens();
+  const componentOptions = Array.from(new Set([
+    ...selectedLens.markers,
+    ...noteFacetGroups.find((group) => group.id === "components").options
+  ])).slice(0, 18);
+
   setStageContent(
     "result",
     "What changed?",
     "Record what happened under observation without deciding what it means.",
     `<div class="result-chamber">
+      <section class="marker-field">
+        <span class="lens-label">what it seemed made of</span>
+        <div class="choice-row">${renderChipButtons(componentOptions, state.lensMarkers, "lens")}</div>
+      </section>
       <section class="marker-field">
         <span class="lens-label">self-sense</span>
         <div class="choice-row">${renderChipButtons(resultOptions, state.resultMarkers, "result")}</div>
@@ -480,6 +542,10 @@ function renderResult() {
       <section class="marker-field">
         <span class="lens-label">what remained present</span>
         <div class="choice-row">${renderChipButtons(remainsOptions, state.remainsMarkers, "remains")}</div>
+      </section>
+      <section class="marker-field">
+        <span class="lens-label">after-effect</span>
+        <div class="choice-row">${renderChipButtons(integrationOptions, state.integrationMarkers, "integration")}</div>
       </section>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
@@ -499,9 +565,10 @@ function renderNote() {
         <span><b>Lens</b>${escapeHtml(lens.shortTitle)}</span>
         <span><b>First read</b>${escapeHtml(state.firstRead.location || "unlocated")} / ${escapeHtml(joinOrNone(state.firstRead.textures))}</span>
         <span><b>Result</b>${escapeHtml(joinOrNone(selectedArray(state.resultMarkers)))}</span>
+        <span><b>After-effect</b>${escapeHtml(joinOrNone(selectedArray(state.integrationMarkers)))}</span>
       </div>
       <div class="textarea-wrap">
-        <textarea id="note-input" placeholder="Example: watcher behind the eyes became pressure and image, then softened.">${value}</textarea>
+        <textarea id="note-input" placeholder="Example: watcher behind the eyes became pressure and image, then softened. Ordinary experience remained.">${value}</textarea>
       </div>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
@@ -552,6 +619,7 @@ function getSelectedLens() {
 function saveCurrentSession() {
   const lens = getSelectedLens();
   const session = {
+    schemaVersion: 2,
     id: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     createdAt: new Date().toISOString(),
     lensId: lens.id,
@@ -563,6 +631,7 @@ function saveCurrentSession() {
     lensMarkers: selectedArray(state.lensMarkers),
     resultMarkers: selectedArray(state.resultMarkers),
     remainsMarkers: selectedArray(state.remainsMarkers),
+    integrationMarkers: selectedArray(state.integrationMarkers),
     observationMode: "untimed",
     durationSeconds: null,
     userNote: state.note.trim()
@@ -591,7 +660,14 @@ function renderNotes() {
       ...(firstRead.textures || []),
       ...(session.lensMarkers || []),
       ...(session.resultMarkers || []),
-      ...(session.remainsMarkers || [])
+      ...(session.remainsMarkers || []),
+      ...(session.integrationMarkers || [])
+    ];
+    const readout = [
+      ["location", firstRead.location || "unlocated"],
+      ["boundary", firstRead.boundary || "unread"],
+      ["ownership", firstRead.ownership || "unread"],
+      ["tone", firstRead.tone || "unread"]
     ];
     return `<article class="note-item">
       <header>
@@ -602,6 +678,7 @@ function renderNotes() {
         <button class="quiet-button danger" type="button" data-delete-session="${session.id}">Delete</button>
       </header>
       <div class="note-meta">${escapeHtml(lens.title)} / untimed observation</div>
+      <div class="note-readout">${readout.map(([label, value]) => `<span><b>${escapeHtml(label)}</b>${escapeHtml(value)}</span>`).join("")}</div>
       <div class="note-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("") || "<span>no markers</span>"}</div>
       <p>${escapeHtml(session.userNote || "No written note.")}</p>
     </article>`;
@@ -621,20 +698,33 @@ function renderPatterns() {
     ["Most used lens", "The lens most often explored.", labelLens(summary.topLens)],
     ["Common location", "Where me most often seemed to gather.", summary.topLocation],
     ["Common texture", "What the self-sense most often seemed made of.", summary.topTexture],
+    ["Common boundary", "Where me most often seemed to end.", summary.topBoundary],
+    ["Ownership tone", "How experience most often felt owned.", summary.topOwnership],
+    ["Observer signal", "Most repeated watcher report.", summary.topObserver],
+    ["Agency signal", "Most repeated doer/controller report.", summary.topAgency],
+    ["Narrative hook", "Most repeated personal-making factor.", summary.topNarrative],
     ["Common result", "Most repeated observation result.", summary.topResult],
     ["Dropped away", "Reported as a possible observation.", summary.droppedAway],
     ["Became unclear", "Reported when self-sense lost definition.", summary.becameUnclear],
     ["Re-formed", "Reported after softening or absence.", summary.reformed],
-    ["Widened / space", "Wide field or space reports.", summary.widened]
+    ["Widened / space", "Wide field or space reports.", summary.widened],
+    ["After-effect", "Most repeated post-observation marker.", summary.topIntegration]
   ];
 
-  els.patternGrid.innerHTML = patterns.map(([title, description, value]) => `
-    <div class="pattern-item">
-      <strong>${escapeHtml(title)}</strong>
-      <span>${escapeHtml(description)}</span>
-      <b>${escapeHtml(String(value || "none yet"))}</b>
-    </div>
-  `).join("");
+  const insightHtml = summary.insights.length
+    ? `<section class="pattern-insights">
+        <span class="lens-label">neutral reading</span>
+        ${summary.insights.map((insight) => `<p>${escapeHtml(insight)}</p>`).join("")}
+      </section>`
+    : "";
+
+  els.patternGrid.innerHTML = `${insightHtml}${patterns.map(([title, description, value]) => `
+      <div class="pattern-item">
+        <strong>${escapeHtml(title)}</strong>
+        <span>${escapeHtml(description)}</span>
+        <b>${escapeHtml(String(value || "none yet"))}</b>
+      </div>
+    `).join("")}`;
 }
 
 function labelLens(id) {
@@ -876,7 +966,8 @@ function handleBodyClick(event) {
     const map = {
       lens: state.lensMarkers,
       result: state.resultMarkers,
-      remains: state.remainsMarkers
+      remains: state.remainsMarkers,
+      integration: state.integrationMarkers
     };
     const set = map[key];
     if (set.has(value)) set.delete(value);

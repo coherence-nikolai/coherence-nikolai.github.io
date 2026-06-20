@@ -54,6 +54,39 @@ export const toneOptions = [
   "unclear"
 ];
 
+export const boundaryOptions = [
+  "inside the body",
+  "at the skin",
+  "around the body",
+  "in the visual field",
+  "in thought only",
+  "no clear boundary",
+  "not present",
+  "unclear"
+];
+
+export const ownershipOptions = [
+  "clearly mine",
+  "partly mine",
+  "owned as thought",
+  "owned as sensation",
+  "just happening",
+  "not owned",
+  "unclear"
+];
+
+export const narrativeOptions = [
+  "memory",
+  "future",
+  "role",
+  "problem",
+  "image of me",
+  "social pressure",
+  "wordless being",
+  "nothing narrative",
+  "unclear"
+];
+
 export const firstReadQuestions = [
   {
     id: "location",
@@ -80,6 +113,22 @@ export const firstReadQuestions = [
     options: stabilityOptions
   },
   {
+    id: "boundary",
+    mode: "single",
+    title: "Boundary",
+    question: "Where does me seem to end?",
+    help: "Look for the edge, border, or lack of border before explaining it.",
+    options: boundaryOptions
+  },
+  {
+    id: "ownership",
+    mode: "single",
+    title: "Ownership",
+    question: "How owned does this experience feel?",
+    help: "Check whether the sensations, thoughts, or viewpoint feel mine, automatic, or simply present.",
+    options: ownershipOptions
+  },
+  {
     id: "observer",
     mode: "single",
     title: "Observer",
@@ -102,6 +151,14 @@ export const firstReadQuestions = [
     question: "What tone seems to strengthen me-ness?",
     help: "Some users find self-sense intensifies around emotion, urgency, or social pressure.",
     options: toneOptions
+  },
+  {
+    id: "narrative",
+    mode: "single",
+    title: "Story",
+    question: "What most makes this feel personal?",
+    help: "Notice whether me-ness is held by a role, memory, image, problem, or no story at all.",
+    options: narrativeOptions
   }
 ];
 
@@ -131,13 +188,50 @@ export const remainsMarkers = [
   "cannot say"
 ];
 
-export const lensLibrary = [
+export const integrationMarkers = [
+  "easy to return",
+  "needed grounding",
+  "ordinary afterwards",
+  "wide perception stayed",
+  "self-sense re-formed",
+  "emotion softened",
+  "more questions opened",
+  "no after-effect",
+  "cannot say"
+];
+
+export const noteFacetGroups = [
+  {
+    id: "components",
+    label: "what it seemed made of",
+    options: textureOptions
+  },
+  {
+    id: "change",
+    label: "what changed",
+    options: resultMarkers
+  },
+  {
+    id: "remains",
+    label: "what remained",
+    options: remainsMarkers
+  },
+  {
+    id: "integration",
+    label: "after-effect",
+    options: integrationMarkers
+  }
+];
+
+const rawLensLibrary = [
   {
     id: "location",
     title: "Location Lens",
     shortTitle: "Location",
     lineage: "felt center",
     aim: "Find where me-ness seems to gather without assuming it should be anywhere.",
+    directAction: "Let attention touch the apparent center, then check whether it is sensation, image, viewpoint, or thought.",
+    reflection: "Did the center stay, move, become unclear, or show itself as parts?",
     prompts: [
       "Where is the strongest felt center of me?",
       "If the self-sense had a center point, where would it be?",
@@ -153,6 +247,8 @@ export const lensLibrary = [
     shortTitle: "Noting",
     lineage: "bare phenomena",
     aim: "Break the self-sense into direct phenomena: sensation, tone, image, thought, intention.",
+    directAction: "Name the most obvious component simply, then look again before adding a story.",
+    reflection: "Which components remained when the word self was not used?",
     prompts: [
       "What is most obvious: sensation, thought, image, emotion, or intention?",
       "Can me-ness be noted as pressure, pressure, or thinking, thinking?",
@@ -168,6 +264,8 @@ export const lensLibrary = [
     shortTitle: "Seer-Seen",
     lineage: "observer inquiry",
     aim: "Look at whether the self-sense can itself be observed.",
+    directAction: "Turn attention toward the watcher feeling and check whether it has shape, location, texture, or distance.",
+    reflection: "Was the watcher an observer, an observed object, both, neither, or unclear?",
     prompts: [
       "Can the watcher feeling itself be seen or felt?",
       "When the watcher is observed, what is it made of?",
@@ -183,6 +281,8 @@ export const lensLibrary = [
     shortTitle: "I-Thought",
     lineage: "I-am inquiry",
     aim: "Track the arising of I before it becomes a story.",
+    directAction: "Wait for the subtle I to form, then note whether it appears as word, pressure, image, knowing, or movement.",
+    reflection: "What was present just before I became a thought or phrase?",
     prompts: [
       "Where does the wordless sense I first appear?",
       "What is here just before the thought I forms?",
@@ -198,6 +298,8 @@ export const lensLibrary = [
     shortTitle: "Agency",
     lineage: "doer inquiry",
     aim: "Observe the felt doer, controller, chooser, or author of action.",
+    directAction: "Before a simple action, look for the author of intention without slowing the action down.",
+    reflection: "Did intention require an owner, or did ownership arrive afterward?",
     prompts: [
       "Before movement, is there a doer or only intention?",
       "Does choosing feel authored, automatic, or mixed?",
@@ -213,6 +315,8 @@ export const lensLibrary = [
     shortTitle: "Boundary",
     lineage: "inside / outside",
     aim: "Examine where inside-me appears to end and world begins.",
+    directAction: "Include skin, sound, sight, and space, then look for the border that makes experience feel inside or outside.",
+    reflection: "Was the boundary sensory, visual, conceptual, emotional, absent, or unclear?",
     prompts: [
       "Where is the border between me and world?",
       "Is the boundary skin, vision, pressure, attention, or thought?",
@@ -228,6 +332,8 @@ export const lensLibrary = [
     shortTitle: "Narrative",
     lineage: "story self",
     aim: "See whether me-ness is being held together by memory, role, problem, or future.",
+    directAction: "Let the personal story show itself as a sentence, image, role, problem, memory, or expectation.",
+    reflection: "What remained of me-ness when the story paused?",
     prompts: [
       "What story is maintaining me right now?",
       "Is there a role, problem, plan, or memory holding the self-sense?",
@@ -243,6 +349,8 @@ export const lensLibrary = [
     shortTitle: "Emotion",
     lineage: "affective self",
     aim: "Notice how emotion strengthens, softens, or colors the felt sense of self.",
+    directAction: "Feel the emotional tone as body sensation before deciding what it means.",
+    reflection: "Did emotion make the self-sense more solid, softer, defended, tender, or absent?",
     prompts: [
       "Which emotion makes me-ness more solid?",
       "Where is the emotion located relative to the self-sense?",
@@ -258,6 +366,8 @@ export const lensLibrary = [
     shortTitle: "Field",
     lineage: "wide perception",
     aim: "Observe what happens to self-center when perception opens wider.",
+    directAction: "Include peripheral seeing, hearing, and body sensation as one field, then check the apparent center.",
+    reflection: "Did the center disperse, relocate, widen, remain unchanged, or become irrelevant?",
     prompts: [
       "Let peripheral seeing be included. What happens to the center of me?",
       "Does hearing widen the field or reinforce a center?",
@@ -273,6 +383,8 @@ export const lensLibrary = [
     shortTitle: "Absence",
     lineage: "not found",
     aim: "If no clear self is found, record what is still present without forcing a conclusion.",
+    directAction: "Look for the self-sense, and if it is not clear, record what is plainly still present.",
+    reflection: "Was absence blank, ordinary, peaceful, uneasy, spacious, or simply not clear?",
     prompts: [
       "If the self-sense is not found, what is still here?",
       "Is absence blank, spacious, ordinary, peaceful, uneasy, or unclear?",
@@ -284,6 +396,13 @@ export const lensLibrary = [
   }
 ];
 
+export const lensLibrary = rawLensLibrary.map((lens) => ({
+  stance: "direct experiment",
+  directAction: "Let the prompt point attention, then record only what is directly noticed.",
+  reflection: "What changed, if anything, when this lens was applied?",
+  ...lens
+}));
+
 export function getLensById(id) {
   return lensLibrary.find((lens) => lens.id === id) || lensLibrary[0];
 }
@@ -293,9 +412,12 @@ export function createEmptyFirstRead() {
     location: "",
     textures: [],
     stability: "",
+    boundary: "",
+    ownership: "",
     observer: "",
     agency: "",
-    tone: ""
+    tone: "",
+    narrative: ""
   };
 }
 
@@ -304,9 +426,12 @@ export function suggestLensIds(firstRead) {
   const textures = new Set(firstRead.textures || []);
   const location = firstRead.location || "";
   const stability = firstRead.stability || "";
+  const boundary = firstRead.boundary || "";
+  const ownership = firstRead.ownership || "";
   const observer = firstRead.observer || "";
   const agency = firstRead.agency || "";
   const tone = firstRead.tone || "";
+  const narrative = firstRead.narrative || "";
 
   const add = (id, score) => {
     scores[id] += score;
@@ -324,7 +449,7 @@ export function suggestLensIds(firstRead) {
   }
 
   if (textures.has("watcher")) {
-    add("seer-seen", 11);
+    add("seer-seen", 14);
     add("location", 3);
   }
   if (textures.has("pressure") || textures.has("sensation") || textures.has("contraction") || textures.has("warmth")) add("noting", 6);
@@ -352,6 +477,26 @@ export function suggestLensIds(firstRead) {
   if (stability === "re-forming") add("absence", 3);
   if (stability === "hard to look at") add("emotion-tone", 2);
 
+  if (["at the skin", "around the body", "inside the body", "in the visual field"].includes(boundary)) add("boundary", 5);
+  if (["no clear boundary", "not present"].includes(boundary)) {
+    add("field", 4);
+    add("absence", 2);
+  }
+  if (boundary === "in thought only") {
+    add("i-thought", 3);
+    add("narrative", 2);
+  }
+
+  if (["clearly mine", "partly mine", "owned as sensation"].includes(ownership)) add("location", 2);
+  if (ownership === "owned as thought") {
+    add("i-thought", 4);
+    add("narrative", 2);
+  }
+  if (["just happening", "not owned"].includes(ownership)) {
+    add("agency", 3);
+    add("absence", 2);
+  }
+
   if (observer.includes("yes")) add("seer-seen", 5);
   if (observer === "only as a thought") add("i-thought", 3);
   if (observer === "not present") add("absence", 2);
@@ -362,6 +507,16 @@ export function suggestLensIds(firstRead) {
 
   if (["charged", "urgent", "fear", "sadness", "pride", "shame", "desire"].includes(tone)) add("emotion-tone", 4);
   if (tone === "quiet" || tone === "peace") add("field", 2);
+
+  if (["memory", "future", "role", "problem", "image of me", "social pressure"].includes(narrative)) add("narrative", 6);
+  if (narrative === "wordless being") {
+    add("i-thought", 3);
+    add("field", 2);
+  }
+  if (narrative === "nothing narrative") {
+    add("absence", 2);
+    add("field", 2);
+  }
 
   return lensLibrary
     .map((lens, index) => ({ id: lens.id, score: scores[lens.id], index }))
@@ -374,20 +529,42 @@ export function summarizePatterns(sessions) {
   const lensCounts = countBy(normalized.map((session) => session.lensId || "unlensed"));
   const locationCounts = countBy(normalized.map((session) => session.firstRead?.location || session.location).filter(Boolean));
   const textureCounts = countBy(normalized.flatMap((session) => session.firstRead?.textures || session.textureMarkers || []));
+  const boundaryCounts = countBy(normalized.map((session) => session.firstRead?.boundary).filter(Boolean));
+  const ownershipCounts = countBy(normalized.map((session) => session.firstRead?.ownership).filter(Boolean));
+  const observerCounts = countBy(normalized.map((session) => session.firstRead?.observer).filter(Boolean));
+  const agencyCounts = countBy(normalized.map((session) => session.firstRead?.agency).filter(Boolean));
+  const toneCounts = countBy(normalized.map((session) => session.firstRead?.tone).filter(Boolean));
+  const narrativeCounts = countBy(normalized.map((session) => session.firstRead?.narrative).filter(Boolean));
   const resultCounts = countBy(normalized.flatMap((session) => session.resultMarkers || session.observedChangeMarkers || []));
   const remainsCounts = countBy(normalized.flatMap((session) => session.remainsMarkers || session.thresholdMarkers || []));
+  const integrationCounts = countBy(normalized.flatMap((session) => session.integrationMarkers || []));
+  const coOccurrences = summarizeCoOccurrences(normalized);
 
-  return {
+  const summary = {
     total: normalized.length,
     topLens: topCount(lensCounts),
     topLocation: topCount(locationCounts),
     topTexture: topCount(textureCounts),
+    topBoundary: topCount(boundaryCounts),
+    topOwnership: topCount(ownershipCounts),
+    topObserver: topCount(observerCounts),
+    topAgency: topCount(agencyCounts),
+    topTone: topCount(toneCounts),
+    topNarrative: topCount(narrativeCounts),
     topResult: topCount(resultCounts),
     topRemainder: topCount(remainsCounts),
+    topIntegration: topCount(integrationCounts),
+    topCoOccurrence: coOccurrences[0] || null,
     droppedAway: resultCounts["dropped away briefly"] || 0,
     becameUnclear: resultCounts["became unclear"] || 0,
     reformed: resultCounts["re-formed"] || 0,
-    widened: resultCounts.widened || remainsCounts.space || 0
+    widened: resultCounts.widened || remainsCounts.space || 0,
+    grounded: integrationCounts["needed grounding"] || 0
+  };
+
+  return {
+    ...summary,
+    insights: buildNeutralInsights(summary)
   };
 }
 
@@ -402,4 +579,33 @@ function countBy(items) {
 function topCount(counts) {
   const entries = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   return entries[0] ? entries[0][0] : "none yet";
+}
+
+function summarizeCoOccurrences(sessions) {
+  const pairs = sessions.flatMap((session) => {
+    const lens = session.lensId || "unlensed";
+    const location = session.firstRead?.location || session.location || "unlocated";
+    const results = session.resultMarkers || session.observedChangeMarkers || [];
+    return results.map((result) => `${lens} / ${location} -> ${result}`);
+  });
+  return Object.entries(countBy(pairs))
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([label, count]) => ({ label, count }));
+}
+
+function buildNeutralInsights(summary) {
+  if (!summary.total) return [];
+  const insights = [
+    `Most recorded lens: ${summary.topLens}.`,
+    `Most reported location: ${summary.topLocation}.`,
+    `Most reported texture: ${summary.topTexture}.`
+  ];
+
+  if (summary.topBoundary !== "none yet") insights.push(`Most reported boundary: ${summary.topBoundary}.`);
+  if (summary.topOwnership !== "none yet") insights.push(`Most reported ownership: ${summary.topOwnership}.`);
+  if (summary.topResult !== "none yet") insights.push(`Most repeated result: ${summary.topResult}.`);
+  if (summary.topIntegration !== "none yet") insights.push(`Most common after-effect: ${summary.topIntegration}.`);
+  if (summary.topCoOccurrence) insights.push(`Repeated pairing: ${summary.topCoOccurrence.label} (${summary.topCoOccurrence.count}).`);
+
+  return insights.slice(0, 6);
 }

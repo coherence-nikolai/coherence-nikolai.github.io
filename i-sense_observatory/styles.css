@@ -533,9 +533,9 @@ h1 {
 }
 
 .signal-mark .mark-ray {
-  opacity: 0;
+  opacity: 0.58;
   stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+  stroke-dashoffset: 0.04;
   animation: ray-extend 8.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 
@@ -2923,7 +2923,7 @@ html:not([data-stage="arrive"]) .page-panel {
   width: min(760px, 100%);
   min-height: calc(100svh - 124px);
   margin: 0 auto;
-  padding: clamp(36px, 6svh, 78px) 0 118px;
+  padding: clamp(36px, 6svh, 78px) clamp(14px, 4vw, 28px) 118px;
   overflow: hidden;
   border: 0;
   background: transparent;
@@ -3235,11 +3235,29 @@ html:not([data-stage="arrive"]) .pattern-item b {
   text-shadow: 0 0 28px rgba(255, 250, 240, 0.12);
 }
 
+.pattern-insights {
+  grid-column: 1 / -1;
+}
+
+.pattern-insights p {
+  padding-left: 14px;
+  border-left: 1px solid rgba(225, 174, 120, 0.34);
+}
+
 html:not([data-stage="arrive"]) .grounding-note {
   border-color: rgba(225, 174, 120, 0.3);
   background:
     radial-gradient(circle at 50% 0%, rgba(225, 174, 120, 0.12), transparent 58%),
     rgba(0, 0, 0, 0.26);
+}
+
+.experiment-surface.is-transitioning .stage-body,
+.experiment-surface.is-transitioning .stage-actions {
+  opacity: 0.58;
+  transform: translateY(4px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
 }
 
 @media (max-width: 720px) {
@@ -3448,7 +3466,7 @@ html[data-stage="arrive"] .signal-mark .mark-ray:nth-child(4) { animation-delay:
 html[data-stage="arrive"] .signal-mark .mark-ray:nth-child(5) { animation-delay: 350ms; }
 
 html[data-stage="arrive"] .signal-mark .mark-ray-node {
-  opacity: 0;
+  opacity: 0.34;
   transform-box: fill-box;
   transform-origin: center;
   animation: ray-node-bloom 11.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
@@ -3940,12 +3958,12 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
 
 @keyframes ray-extend {
   0%, 42%, 100% {
-    opacity: 0;
-    stroke-dashoffset: 1;
+    opacity: 0.5;
+    stroke-dashoffset: 0.08;
   }
   49% {
-    opacity: 0.34;
-    stroke-dashoffset: 0.74;
+    opacity: 0.68;
+    stroke-dashoffset: 0.04;
   }
   59% {
     opacity: 0.96;
@@ -3956,15 +3974,15 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
     stroke-dashoffset: 0;
   }
   88% {
-    opacity: 0.16;
+    opacity: 0.58;
     stroke-dashoffset: 0;
   }
 }
 
 @keyframes ray-node-bloom {
   0%, 51%, 100% {
-    opacity: 0;
-    transform: scale(0.62);
+    opacity: 0.34;
+    transform: scale(0.78);
   }
   61% {
     opacity: 0.98;
@@ -3975,8 +3993,8 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
     transform: scale(1.12);
   }
   88% {
-    opacity: 0;
-    transform: scale(0.72);
+    opacity: 0.46;
+    transform: scale(0.82);
   }
 }
 
@@ -4278,8 +4296,21 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   line-height: 1.4;
 }
 
+.lens-card em {
+  align-self: end;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 250, 240, 0.08);
+  color: rgba(255, 250, 240, 0.54);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.72rem;
+  font-style: normal;
+  line-height: 1.35;
+}
+
 .lens-chamber {
   position: relative;
+  display: grid;
+  gap: 14px;
 }
 
 .lens-compass {
@@ -4324,8 +4355,40 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
 }
 
 .lens-chamber > .question-lens,
-.lens-chamber > .marker-field {
+.lens-chamber > .marker-field,
+.lens-instruction,
+.lens-reflection {
   z-index: 1;
+}
+
+.lens-instruction,
+.lens-reflection,
+.pattern-insights,
+.note-readout {
+  position: relative;
+  border: 1px solid rgba(255, 250, 240, 0.105);
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgba(225, 174, 120, 0.06), transparent 28%, rgba(255, 250, 240, 0.035)),
+    rgba(0, 0, 0, 0.18);
+}
+
+.lens-instruction,
+.lens-reflection,
+.pattern-insights {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+}
+
+.lens-instruction p,
+.lens-reflection p,
+.pattern-insights p {
+  margin: 0;
+  color: rgba(255, 250, 240, 0.68);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.86rem;
+  line-height: 1.45;
 }
 
 .marker-field {
@@ -4343,6 +4406,33 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
 
 .structured-note {
   margin-bottom: 2px;
+}
+
+.note-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 12px;
+  padding: 10px;
+}
+
+.note-readout span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  border: 1px solid rgba(255, 250, 240, 0.1);
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: rgba(255, 250, 240, 0.62);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.72rem;
+}
+
+.note-readout b {
+  color: rgba(225, 174, 120, 0.88);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .observe-field {
@@ -4549,6 +4639,42 @@ html:not([data-stage="arrive"]) .stage-actions .secondary-button {
   html[data-stage="arrive"] .arrival-ground {
     top: min(72%, 350px);
     height: 72px;
+  }
+}
+
+/* Final collision guards for expanded app surfaces. */
+@media (min-width: 521px) {
+  html[data-stage="arrive"] .signal-mark {
+    width: min(72cqw, 340px);
+  }
+}
+
+@media (max-width: 720px) {
+  html:not([data-stage="arrive"]) .stage-kicker,
+  html:not([data-stage="arrive"]) #observatory-title,
+  html:not([data-stage="arrive"]) .stage-prompt {
+    margin-left: clamp(12px, 4vw, 18px);
+    margin-right: clamp(12px, 4vw, 18px);
+  }
+
+  html:not([data-stage="arrive"]) .stage-body {
+    max-height: calc(100svh - 500px);
+    overflow-x: hidden;
+    padding-bottom: 26px;
+  }
+
+  html[data-stage="note"] .note-chamber {
+    padding-inline: clamp(14px, 4vw, 18px);
+  }
+
+  html:not([data-stage="arrive"]) .stage-actions {
+    bottom: calc(28px + env(safe-area-inset-bottom));
+    padding: 8px;
+  }
+
+  html:not([data-stage="arrive"]) .stage-actions .primary-button,
+  html:not([data-stage="arrive"]) .stage-actions .secondary-button {
+    min-height: 44px;
   }
 }
 
