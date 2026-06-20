@@ -156,6 +156,8 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     toneRequestId: 0,
     activeAudio: null,
     statusTimer: null,
+    guidanceTimer: { key: "", startedAt: 0, seconds: 0 },
+    guidanceTimerInterval: null,
     cameraStream: null,
     mediaStream: null,
     mediaRecorder: null,
@@ -520,6 +522,211 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       minimum: "Save only what feels worth keeping.",
       readiness: "Finish when the Codex entry represents the session clearly enough.",
       next: "Return to Anchor or Wheel"
+    }
+  };
+
+  const defaultOutcomeExamples = [
+    "Warmth",
+    "Pressure",
+    "Image",
+    "Inner word",
+    "Emotion",
+    "Stillness",
+    "Nothing obvious",
+    "Quiet"
+  ];
+
+  const flowLiteralGuidance = {
+    mode: {
+      literalNow: "Choose Silent if you are writing only. Choose Audio Mirror if you want your voice to be part of the session.",
+      cadence: "Choose once. Keep it simple.",
+      outcomes: ["Clear choice", "Still unsure", "Quiet"],
+      quietOutcome: "Still unsure is useful information. Choose Silent and continue.",
+      timerSeconds: 30
+    },
+    breath: {
+      literalNow: "Choose the easiest breath rhythm. Press Play Tone only if the sound helps. Let the app track one minute.",
+      cadence: "Breathe. Arrive. Let the body lead.",
+      outcomes: ["Slower breath", "Body tension", "Warmth", "More energy", "Restless", "Quiet"],
+      quietOutcome: "If nothing changes, the breath rhythm is still doing its job.",
+      timerSeconds: 60
+    },
+    ritual: {
+      literalNow: "Read the recovery phrase once. Take three natural breaths. Do not look for contact yet.",
+      cadence: "Return. Center. Begin.",
+      outcomes: ["Body present", "Room awareness", "Calm", "Restless", "Quiet"],
+      quietOutcome: "The ritual only needs to return attention to the body.",
+      timerSeconds: 45
+    },
+    archetype: {
+      literalNow: "Pick the contact frame that matches why you opened MirrorGate today.",
+      cadence: "One frame. One path.",
+      outcomes: ["Oversoul or Monad", "Dimensional ally", "Future echo", "Collective field", "Not sure"],
+      quietOutcome: "If you are unsure, choose Mirror first.",
+      timerSeconds: 45
+    },
+    alignment: {
+      literalNow: "Let the soundscape run. Follow the breath cue. Keep a soft gaze on the geometry.",
+      cadence: "Tone. Breath. Geometry.",
+      outcomes: ["Settling", "Tingling", "Image", "Emotion", "Body pressure", "Stillness"],
+      quietOutcome: "A quiet alignment still counts as alignment.",
+      timerSeconds: 180
+    },
+    intention: {
+      literalNow: "Write one sentence. Stop editing when it is clear enough to hold.",
+      cadence: "Ask once. Aim clearly.",
+      outcomes: ["Clear phrase", "Question", "Name", "Request", "Gratitude", "Quiet"],
+      quietOutcome: "If words do not come, write a simple request for clarity.",
+      timerSeconds: 60
+    },
+    mirror: {
+      literalNow: "Look softly at the mirror or symbolic surface. Read the intention once. Let one possible signal appear.",
+      cadence: "Look softly. Ask once. Let it be enough.",
+      outcomes: ["Image", "Inner word", "Emotion", "Body pressure", "Felt presence", "Nothing obvious", "Quiet"],
+      quietOutcome: "Nothing obvious is still a valid Mirror session.",
+      timerSeconds: 90
+    },
+    echo: {
+      literalNow: "Play the original or echo once. Do not analyze during the first listen.",
+      cadence: "Listen once. Name one thing.",
+      outcomes: ["Word", "Memory", "Feeling", "Body response", "Future image", "Nothing obvious", "Quiet"],
+      quietOutcome: "Quiet counts. Record it plainly.",
+      timerSeconds: 90
+    },
+    glyph: {
+      literalNow: "Accept the glyph or open Glyph Studio. The glyph only needs to represent this session.",
+      cadence: "See it. Name it. Anchor it.",
+      outcomes: ["Shape", "Color", "Mood", "Charge", "Protection", "Clarity", "Quiet"],
+      quietOutcome: "A simple glyph is enough.",
+      timerSeconds: 60
+    },
+    grounding: {
+      literalNow: "Read the recovery phrase. Feel your feet or the chair. Write one sentence, or write Quiet.",
+      cadence: "Breathe. Return. Close.",
+      outcomes: ["Feet", "Chair", "Room sound", "Breath", "Calm", "Fatigue", "Quiet"],
+      quietOutcome: "Closure is useful even when the session was quiet.",
+      timerSeconds: 90
+    },
+    save: {
+      literalNow: "Save only what you want to keep. Nothing has to be perfect.",
+      cadence: "Keep what matters.",
+      outcomes: ["Saved", "Skip audio", "Notes only", "Return to Wheel"],
+      quietOutcome: "You can save a quiet session as a valid session."
+    }
+  };
+
+  const moduleLiteralGuidance = {
+    vector: {
+      literalNow: "Use one clear request. Let the glyph and tone carry it; do not try to answer it here.",
+      cadence: "Send once. Watch the glyph. Name its mood.",
+      outcomes: ["Direction", "Weight", "Heat", "Clear phrase", "Resistance", "Nothing obvious", "Quiet"],
+      quietOutcome: "A quiet Vector means the signal was sent without obvious feedback.",
+      timerSeconds: 60
+    },
+    breath: {
+      literalNow: "Follow the pulse without counting. Let one memory, image, feeling, or quiet impression return.",
+      cadence: "Follow the pulse. Let one thing return.",
+      outcomes: ["Memory", "Future image", "Body sensation", "Emotion", "Inner word", "Nothing obvious", "Quiet"],
+      quietOutcome: "Quiet can be the echo.",
+      timerSeconds: 90
+    },
+    gate: {
+      literalNow: "Keep the Gate Field tone running. Use the visible breath seal and complete only the action on this step.",
+      cadence: "Tone on. Body steady. One signal counts.",
+      outcomes: ["Presence", "Inner word", "Geometry", "Emotion", "Body sensation", "Pressure", "Stillness", "Nothing obvious"],
+      quietOutcome: "Silence is still a valid gate session.",
+      timerSeconds: 90
+    },
+    mirror: {
+      literalNow: "Read the intention once. Look softly at the mirror or symbolic surface. Notice without chasing.",
+      cadence: "Look softly. Ask once. Let it be enough.",
+      outcomes: ["Image", "Inner word", "Knowing", "Emotion", "Body pressure", "Felt presence", "Nothing obvious", "Quiet"],
+      quietOutcome: "Nothing obvious is still a valid Mirror session.",
+      timerSeconds: 90
+    }
+  };
+
+  const moduleStepLiteralGuidance = {
+    vector: {
+      "Enter Intention": {
+        literalNow: "Write one short sentence. If you are stuck, start with: I request clarity about...",
+        outcomes: ["Request", "Question", "Name", "Gratitude", "Resistance", "Quiet"],
+        timerSeconds: 60
+      },
+      "Choose Prime Path": {
+        literalNow: "Choose 3-7-11 unless your body clearly wants grounding, depth, or sharper focus.",
+        outcomes: ["3-7-11", "2-3-5", "5-11-17", "7-11-13", "Still unsure"],
+        timerSeconds: 45
+      },
+      "Transmit": {
+        literalNow: "Press Transmit Vector once. Keep the tone on and watch the glyph until the timer says Enough.",
+        timerSeconds: 120
+      },
+      "Reflect or Save": {
+        literalNow: "Name one thing the vector carried. If nothing came, write Quiet and save that honestly.",
+        timerSeconds: 60
+      }
+    },
+    breath: {
+      "Choose Breath and Tone": {
+        literalNow: "Choose the breath that is easiest to follow. The goal is not difficulty; the goal is steadiness.",
+        outcomes: ["Steady", "Slow", "Box", "Extended exhale", "Not sure"],
+        timerSeconds: 45
+      },
+      "Begin Echo Field": {
+        literalNow: "Press Begin Echo Field. Let the tone and toroid run. The app tracks time; you notice one thing.",
+        timerSeconds: 180
+      },
+      "Integrate": {
+        literalNow: "Write one line. A memory, emotion, body feeling, or Quiet all count.",
+        timerSeconds: 90
+      }
+    },
+    gate: {
+      "Choose Gate Settings": {
+        literalNow: "Choose a prime path, Breath Seal, and carrier tone. Prime path shapes the gate. Breath Seal paces your body.",
+        outcomes: ["3-7-11", "4-4-4-4", "432 Hz", "More grounding", "More space", "Not sure"],
+        timerSeconds: 60
+      },
+      "Begin Gate Field": {
+        literalNow: "Press Begin Gate Field. The tone should keep running as you continue through breath, intention, and glyph nodes.",
+        timerSeconds: 90
+      },
+      "Seal the Breath": {
+        literalNow: "Follow the visible Breath Seal once. Tap Seal Completed Breath only after one full cycle.",
+        outcomes: ["One full cycle", "Body steady", "Still restless", "Quiet"],
+        timerSeconds: 60
+      },
+      "Hold Intention": {
+        literalNow: "Name the contact intention silently. Turn on Intention held when the phrase feels like a clear beacon.",
+        outcomes: ["Clear beacon", "Name", "Question", "Request", "Still unsure"],
+        timerSeconds: 45
+      },
+      "Open Contact Window": {
+        literalNow: "Gate is open after the third node. Stay here until the timer reaches Enough. Keep the tone running and look for one possible signal.",
+        outcomes: ["Presence", "Inner word", "Geometry", "Emotion", "Body sensation", "Image", "Pressure", "Temperature", "Nothing obvious", "Quiet"],
+        quietOutcome: "Do not chase certainty. Silence or nothing obvious is still a valid gate session.",
+        timerSeconds: 300
+      },
+      "Integrate Through Mirror": {
+        literalNow: "Write one note before leaving Gate. Then open Mirror to reflect and integrate.",
+        timerSeconds: 90
+      }
+    },
+    mirror: {
+      "Set the Intention": {
+        literalNow: "Write or read one intention. Do not rewrite it more than twice.",
+        outcomes: ["Clear phrase", "Question", "Request", "Still unsure"],
+        timerSeconds: 60
+      },
+      "Enter Mirror": {
+        literalNow: "Activate camera if useful, or use the symbolic surface. Read the intention once and keep a soft gaze.",
+        timerSeconds: 180
+      },
+      "Reflect or Save": {
+        literalNow: "Write one line. It can be an image, feeling, word, body sensation, or Quiet.",
+        timerSeconds: 90
+      }
     }
   };
 
@@ -2127,6 +2334,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
   function renderStepCuePanel(cue = {}, options = {}) {
     const title = options.title || "Step Guide";
     const description = options.description || "The timer is a guide, not a rule.";
+    const timerKey = options.timerKey || "";
     return `
       <section class="step-cue-card ${options.className || ""}">
         <div>
@@ -2139,15 +2347,172 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <span><small>Continue when</small><strong>${escapeHtml(cue.readiness || "The step feels complete enough to carry forward.")}</strong></span>
           <span><small>Next</small><strong>${escapeHtml(cue.next || "Follow the next button.")}</strong></span>
         </div>
+        ${renderLiteralGuide(cue, timerKey)}
       </section>
     `;
   }
 
   function renderFlowStepCue(stepID) {
-    return renderStepCuePanel(flowStepCues[stepID], {
+    const cue = { ...(flowStepCues[stepID] || {}), ...(flowLiteralGuidance[stepID] || {}) };
+    return renderStepCuePanel(cue, {
       title: "How Long Here",
-      description: "Stay long enough for the step to settle. You can continue once the readiness cue is met."
+      description: "Stay long enough for the step to settle. You can continue once the readiness cue is met.",
+      timerKey: `flow:${stepID}`
     });
+  }
+
+  function renderLiteralGuide(cue = {}, timerKey = "") {
+    if (!cue.literalNow && !cue.cadence && !cue.outcomes && !cue.quietOutcome && !cue.timerSeconds) return "";
+    return `
+      <div class="literal-guide-card">
+        ${cue.literalNow ? `
+          <div class="literal-now">
+            <small>Do this now</small>
+            <strong>${escapeHtml(cue.literalNow)}</strong>
+          </div>
+        ` : ""}
+        ${cue.cadence ? `
+          <div class="cadence-lines" aria-label="Cadence">
+            ${String(cue.cadence).split(".").map((line) => line.trim()).filter(Boolean).map((line) => `<span>${escapeHtml(line)}.</span>`).join("")}
+          </div>
+        ` : ""}
+        ${renderGuidanceTimer(cue, timerKey)}
+        ${renderOutcomeChips(cue.outcomes || defaultOutcomeExamples, "Examples that count")}
+        ${cue.quietOutcome ? `<p class="small-copy quiet-counts"><strong>Quiet counts:</strong> ${escapeHtml(cue.quietOutcome)}</p>` : ""}
+      </div>
+    `;
+  }
+
+  function renderOutcomeChips(outcomes = defaultOutcomeExamples, title = "Examples that count") {
+    const clean = outcomes.map((item) => String(item).trim()).filter(Boolean);
+    if (!clean.length) return "";
+    return `
+      <div class="outcome-guide">
+        <p class="path-label">${escapeHtml(title)}</p>
+        <div class="outcome-chip-row">
+          ${clean.map((item) => `<button type="button" class="outcome-chip" data-action="outcome-chip" data-outcome="${escapeHtml(item)}">${escapeHtml(item)}</button>`).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderGuidanceTimer(cue = {}, timerKey = "") {
+    const seconds = Number(cue.timerSeconds || 0);
+    if (!seconds || !timerKey) return "";
+    const snapshot = guidanceTimerSnapshot(timerKey, seconds);
+    const label = snapshot.done ? "Enough" : snapshot.active ? formatTimer(snapshot.remaining) : formatTimer(seconds);
+    const buttonLabel = snapshot.active ? "Restart Enough Timer" : "Start Enough Timer";
+    return `
+      <div class="guidance-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">
+        <div class="guidance-timer-heading">
+          <span class="timer-pill ${snapshot.done ? "timer-done" : snapshot.active ? "timer-active" : ""}">
+            <span class="timer-count">${escapeHtml(label)}</span>
+          </span>
+          <span class="timer-status">${snapshot.done ? "Minimum met. Continue when ready." : "The app tracks time so you do not have to count."}</span>
+        </div>
+        <div class="guidance-timer-track" aria-hidden="true">
+          <span style="width: ${Math.round(snapshot.progress * 100)}%"></span>
+        </div>
+        <div class="control-row compact-controls">
+          <button class="button button-muted button-small" data-action="start-guidance-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">${escapeHtml(buttonLabel)}</button>
+          <button class="button button-quiet button-small" data-action="reset-guidance-timer" data-timer-key="${escapeHtml(timerKey)}">Reset</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function guidanceTimerSnapshot(timerKey, seconds) {
+    const active = !!(state.guidanceTimer?.key === timerKey && state.guidanceTimer.startedAt);
+    const elapsed = active ? Math.max(0, Math.floor((performance.now() - state.guidanceTimer.startedAt) / 1000)) : 0;
+    const remaining = Math.max(0, seconds - elapsed);
+    return {
+      active,
+      done: active && remaining <= 0,
+      remaining,
+      progress: seconds ? Math.min(1, elapsed / seconds) : 0
+    };
+  }
+
+  function formatTimer(seconds) {
+    const safe = Math.max(0, Math.ceil(Number(seconds) || 0));
+    const minutes = Math.floor(safe / 60);
+    const remainder = safe % 60;
+    return `${minutes}:${String(remainder).padStart(2, "0")}`;
+  }
+
+  function startGuidanceTimer(timerKey, seconds) {
+    if (!timerKey || !seconds) return;
+    state.guidanceTimer = {
+      key: timerKey,
+      startedAt: performance.now(),
+      seconds: Number(seconds)
+    };
+    ensureGuidanceTimerInterval();
+    updateGuidanceTimerUI();
+    showStatus("Enough timer started. You only need to notice.", "success");
+  }
+
+  function resetGuidanceTimer(timerKey = "") {
+    if (!timerKey || state.guidanceTimer.key === timerKey) {
+      if (state.guidanceTimerInterval) {
+        clearInterval(state.guidanceTimerInterval);
+        state.guidanceTimerInterval = null;
+      }
+      state.guidanceTimer = { key: "", startedAt: 0, seconds: 0 };
+      updateGuidanceTimerUI();
+      showStatus("Timer reset.", "success");
+    }
+  }
+
+  function clearGuidanceTimer() {
+    if (state.guidanceTimerInterval) {
+      clearInterval(state.guidanceTimerInterval);
+      state.guidanceTimerInterval = null;
+    }
+    state.guidanceTimer = { key: "", startedAt: 0, seconds: 0 };
+  }
+
+  function ensureGuidanceTimerInterval() {
+    if (state.guidanceTimerInterval) return;
+    state.guidanceTimerInterval = setInterval(updateGuidanceTimerUI, 350);
+  }
+
+  function updateGuidanceTimerUI() {
+    $$(".guidance-timer").forEach((timer) => {
+      const key = timer.dataset.timerKey || "";
+      const seconds = Number(timer.dataset.timerSeconds || 0);
+      const snapshot = guidanceTimerSnapshot(key, seconds);
+      const count = $(".timer-count", timer);
+      const status = $(".timer-status", timer);
+      const pill = $(".timer-pill", timer);
+      const progress = $(".guidance-timer-track span", timer);
+      const button = $('[data-action="start-guidance-timer"]', timer);
+      if (count) count.textContent = snapshot.done ? "Enough" : snapshot.active ? formatTimer(snapshot.remaining) : formatTimer(seconds);
+      if (status) status.textContent = snapshot.done ? "Minimum met. Continue when ready." : "The app tracks time so you do not have to count.";
+      if (pill) {
+        pill.classList.toggle("timer-active", snapshot.active && !snapshot.done);
+        pill.classList.toggle("timer-done", snapshot.done);
+      }
+      if (progress) progress.style.width = `${Math.round(snapshot.progress * 100)}%`;
+      if (button) button.textContent = snapshot.active ? "Restart Enough Timer" : "Start Enough Timer";
+    });
+  }
+
+  function noteOutcome(outcome) {
+    const clean = String(outcome || "").trim();
+    if (!clean) return;
+    const target = $("#reflection") || $("#notes");
+    if (target) {
+      const prefix = target.value.trim() ? "\n" : "";
+      target.value = `${target.value}${prefix}${clean}`;
+      target.dispatchEvent(new Event("input", { bubbles: true }));
+      showStatus(`${clean} noted.`, "success");
+      return;
+    }
+    const prefix = state.draft.notes ? "\n" : "";
+    state.draft.notes = `${state.draft.notes || ""}${prefix}${clean}`;
+    persistDraft();
+    showStatus(`${clean} noted for this session.`, "success");
   }
 
   function renderRecommendationCard(title, copy, items = []) {
@@ -2469,6 +2834,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const next = flowSteps[Math.min(flowSteps.length - 1, Math.max(0, index + delta))];
     stopActiveAudio();
     stopTone();
+    clearGuidanceTimer();
     if (state.currentFlowStep === "mirror" && next.id !== "mirror") stopCamera();
     state.currentFlowStep = next.id;
     renderFlowStep(next.id);
@@ -2522,42 +2888,52 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     };
   }
 
+  function enrichModuleSteps(name, steps) {
+    const defaults = moduleLiteralGuidance[name] || {};
+    const overrides = moduleStepLiteralGuidance[name] || {};
+    return steps.map((step) => ({
+      ...defaults,
+      ...step,
+      ...(overrides[step.title] || {})
+    }));
+  }
+
   function moduleStepDefinitions(name) {
     const module = modules[name] || modules.mirror;
     if (name === "vector") {
-      return [
+      return enrichModuleSteps("vector", [
         { title: "Orient the Vector", instruction: "Use this module when you want to transmit a request, encode a signal, or form a glyph from intention.", duration: "30-60 seconds", minimum: "Read the purpose and take 3 breaths.", readiness: "Continue when the request feels outward-facing and simple.", next: "Enter intention", notice: "Notice the exact words that feel alive before you type anything." },
         { title: "Enter Intention", instruction: "Write one clear phrase. Keep it short enough that the glyph can feel like one signal.", duration: "1-2 minutes", minimum: "Write one sentence or short phrase.", readiness: "Continue when the wording feels clear enough to transmit without editing again.", next: "Choose Prime Path", notice: "Watch for resistance, clarity, heat, pressure, or a phrase that suddenly feels more accurate." },
         { title: "Choose Prime Path", instruction: "Choose the prime triplet as the geometry key. It shapes the vector and glyph; it is not a breath pattern.", duration: "30-60 seconds", minimum: "Use the recommended Prime path 3-7-11 unless another pathway clearly fits.", readiness: "Continue when the path choice feels settled enough.", next: "Transmit", notice: "A smaller triplet feels foundational. Wider triplets feel more exploratory." },
         { title: "Transmit", instruction: "Tap Transmit Vector. Let the tone and glyph carry the request without trying to answer it yet.", duration: "2-3 minutes", minimum: "Play the carrier tone once and watch the glyph form.", readiness: "Continue when the signal feels sent, even if nothing obvious happens.", next: "Reflect or Save", notice: "Notice what the glyph seems to carry: direction, weight, mood, or symbolic charge." },
         { title: "Reflect or Save", instruction: "If the signal feels complete, save it to the Personal Codex or move to another portal.", duration: "1 minute", minimum: "Name one thing the vector seemed to carry.", readiness: "Finish when the sent signal is recorded clearly enough.", next: "Wheel or Gate", notice: "The vector is the sent signal. Integration can happen later through Mirror or Echo." }
-      ];
+      ]);
     }
     if (name === "breath") {
-      return [
+      return enrichModuleSteps("breath", [
         { title: "Orient the Echo", instruction: "Use Echo when the work is integration: future echoes, dreamtime, collective resonance, or subconscious retrieval.", duration: "30-60 seconds", minimum: "Read the purpose and choose the question lightly.", readiness: "Continue when the question feels light enough to hold without gripping.", next: "Choose breath and tone", notice: "Begin with breath. Keep the question light rather than gripping it." },
         { title: "Choose Breath and Tone", instruction: "Choose a rhythm and carrier tone. Breath paces the body while the toroidal field gives the echo a shape.", duration: "1 minute", minimum: "Use the recommended 4-4-4-4 breath and 144 Hz unless another option clearly fits.", readiness: "Continue when the breath and tone feel comfortable enough to follow.", next: "Begin Echo Field", notice: "A higher resonance number means more current charge, not better performance." },
         { title: "Begin Echo Field", instruction: "Start the tone and watch the toroidal motion. Let the active glyph breathe with the pattern if one is sealed.", duration: "3-5 minutes", minimum: "Complete 3 full breath cycles.", readiness: "Continue when one image, feeling, memory, phrase, body response, or honest stillness has surfaced.", next: "Integrate", notice: "Look for image, memory, body sensation, emotion, inner words, or silence." },
         { title: "Integrate", instruction: "Name one thing that returned. If nothing obvious returned, record the stillness honestly.", duration: "1-3 minutes", minimum: "Write one line or save the quiet accurately.", readiness: "Finish when the echo has been named simply.", next: "Wheel or Vector", notice: "Echo work can be subtle. Quiet is still valid." }
-      ];
+      ]);
     }
     if (name === "gate") {
-      return [
+      return enrichModuleSteps("gate", [
         { title: "Orient the Gate", instruction: "Use Gate when the intention is dimensional or stellar ally contact. This is the contact portal.", duration: "30-60 seconds", minimum: "Read the purpose and name the contact intention once.", readiness: "Continue when the intention is clear enough to hold without forcing.", next: "Choose Gate Settings", notice: "Start only when the intention is clear enough to hold without forcing." },
         { title: "Choose Gate Settings", instruction: "Choose triplet, Breath Seal, and carrier tone. The triplet shapes the gate geometry; the Breath Seal sets the body rhythm.", duration: "1 minute", minimum: "Use the recommended 3-7-11 Prime path, 4-4-4-4 Breath Seal, and 432 Hz unless another setting clearly fits.", readiness: "Continue when the settings feel stable enough to stop adjusting.", next: "Begin Gate Field", notice: "Choose the Breath Seal by the pace your body needs for this contact." },
         { title: "Begin Gate Field", instruction: "Tap Begin Gate Field, then let the tone, breath seal, and geometry establish the threshold.", duration: "1-2 minutes", minimum: "Complete one full Breath Seal while the tone runs.", readiness: "Continue when the field feels established enough to mark the breath.", next: "Seal the Breath", notice: "Notice lightness, tingling, disorientation, presence, geometry, emotion, or silence." },
         { title: "Seal the Breath", instruction: "Complete one full Breath Seal and mark it sealed when the body feels steady enough.", duration: "1 breath seal", minimum: "Complete one full selected breath cycle.", readiness: "Continue when the body feels steady enough.", next: "Hold Intention", notice: "The breath seal is a body anchor, not a race." },
         { title: "Hold Intention", instruction: "Name the contact intention silently, then mark it held. Keep it simple.", duration: "30-60 seconds", minimum: "Hold the intention through one breath.", readiness: "Continue when the intention feels like a clear beacon, not a demand.", next: "Open Contact Window", notice: "The intention should feel like a clear beacon, not a demand." },
-        { title: "Open Contact Window", instruction: "Tap the glyph nodes in order. When the third node opens, remain here before moving to integration.", duration: "5 minutes", minimum: "Stay for at least 3 Breath Seals after the gate opens.", readiness: "Continue when the contact window feels complete, or when you have honestly noted stillness.", next: "Mirror Integration", notice: "Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence." },
+        { title: "Open Contact Window", instruction: "Tap the glyph nodes in order. When the third node opens, remain here before moving to integration.", duration: "5 minutes", minimum: "Stay until the Enough timer completes, or until one clear signal or honest stillness has been noted.", readiness: "Continue when the contact window feels complete, or when you have honestly noted stillness.", next: "Mirror Integration", notice: "Contact may appear as presence, inner words, geometry, emotion, body sensation, vision, or silence." },
         { title: "Integrate Through Mirror", instruction: "After the gate, open Mirror to reflect and integrate what came through.", duration: "1-3 minutes", minimum: "Write one note before leaving the Gate.", readiness: "Continue when the experience has a simple anchor: image, feeling, phrase, body note, or stillness.", next: "Mirror", notice: "Do not chase certainty. Return through Mirror even if the gate was quiet." }
-      ];
+      ]);
     }
-    return [
+    return enrichModuleSteps("mirror", [
       { title: "Orient the Mirror", instruction: "Use Mirror for Oversoul, Monad, self-harmonic alignment, or integration after contact work.", duration: "30-60 seconds", minimum: "Read the purpose and take 3 breaths.", readiness: "Continue when the intention feels ready to be reflected rather than solved.", next: "Set the Intention", notice: "The camera is optional. Attention, breath, and inner imagery are the deeper mirror." },
       { title: "Set the Intention", instruction: "Read or type one intention. Speak it once if using voice, then stop trying to force an answer.", duration: "1-2 minutes", minimum: "Write or read one clear phrase.", readiness: "Continue when the phrase can be held gently without editing it again.", next: "Enter Mirror", notice: "Notice breath, body pressure, emotion, inner words, memory, symbols, image, or stillness." },
       { title: "Enter Mirror", instruction: "Activate the camera or simply gaze at the symbolic surface. Hold the intention lightly.", duration: "5-10 minutes", minimum: "Stay for 3 breaths after reading the intention.", readiness: "Continue when the reflection feels complete, or when you have honestly noted stillness.", next: "Reflect or Save", notice: "Nothing obvious is still a valid Mirror session." },
       { title: "Reflect or Save", instruction: "Record what remains after the mirror phase. Save only what feels worth keeping.", duration: "1-3 minutes", minimum: "Write one line or save the quiet accurately.", readiness: "Finish when the reflection has been named simply.", next: "Wheel or Echo", notice: "The Mirror reflects and integrates; it does not need to prove anything." }
-    ];
+    ]);
   }
 
   function currentModuleStep(name) {
@@ -2619,7 +2995,8 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       ${renderStepCuePanel(step, {
         title: "How Long Here",
         description: "Use the time as a guide. Continue when the readiness cue is met.",
-        className: "module-cue-card"
+        className: "module-cue-card",
+        timerKey: `module:${name}:${stepIndex}`
       })}
 
       <section class="panel guided-module-card">
@@ -2720,6 +3097,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     return `
       <label for="reflection">Reflection</label>
+      ${renderOutcomeChips(moduleStepDefinitions("vector")[4].outcomes, "If you need a word, choose one")}
       <textarea id="reflection" class="textarea" placeholder="What did the vector seem to carry?">${escapeHtml(state.draft.reflection)}</textarea>
       <div class="control-row">
         <button class="button button-primary" data-action="save-session">Save Vector to Codex</button>
@@ -2765,6 +3143,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     return `
       <label for="reflection">Echo Reflection</label>
+      ${renderOutcomeChips(moduleStepDefinitions("breath")[3].outcomes, "If you need a word, choose one")}
       <textarea id="reflection" class="textarea" placeholder="What surfaced through the echo field?">${escapeHtml(state.draft.reflection)}</textarea>
       <div class="control-row">
         <button class="button button-primary" data-action="save-session">Save Echo to Codex</button>
@@ -2854,9 +3233,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           ${isOpen ? `
             <div class="contact-window-timing">
               <span><small>Suggested time</small><strong>5 minutes</strong></span>
-              <span><small>Minimum</small><strong>3 Breath Seals</strong></span>
+              <span><small>Minimum</small><strong>Use the Enough timer, or note one clear signal or honest stillness.</strong></span>
               <span><small>Move on when</small><strong>The contact window feels complete, or stillness has been noted.</strong></span>
             </div>
+            ${renderGuidanceTimer(moduleStepDefinitions("gate")[5], "module:gate:5")}
           ` : ""}
           <ul>
             <li>Look for presence, inner words, geometry, emotion, body sensation, image, pressure, temperature, or stillness.</li>
@@ -2875,6 +3255,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       <h3>Integrate Through Mirror</h3>
       <p>After contact, return through Mirror so the experience can be reflected back through your own center.</p>
       <label for="notes">Gate Notes</label>
+      ${renderOutcomeChips(moduleStepDefinitions("gate")[6].outcomes, "If you need a word, choose one")}
       <textarea id="notes" class="textarea" placeholder="Presence, symbols, body sensations, inner words, or stillness...">${escapeHtml(state.draft.notes)}</textarea>
       <div class="control-row">
         <button class="button button-primary" data-module="mirror">Open Mirror</button>
@@ -2919,6 +3300,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     return `
       <label for="reflection">Mirror Reflection</label>
+      ${renderOutcomeChips(moduleStepDefinitions("mirror")[3].outcomes, "If you need a word, choose one")}
       <textarea id="reflection" class="textarea" placeholder="What remained after the mirror phase?">${escapeHtml(state.draft.reflection)}</textarea>
       <div class="control-row">
         <button class="button button-primary" data-action="save-session">Save Reflection</button>
@@ -3645,22 +4027,26 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       closeRecovery();
       stopActiveAudio();
       stopTone();
+      clearGuidanceTimer();
       showScreen("anchor");
     }
-    if (action === "open-about") { stopActiveAudio(); stopTone(); showScreen("about"); }
+    if (action === "open-about") { stopActiveAudio(); stopTone(); clearGuidanceTimer(); showScreen("about"); }
     if (action === "open-about-audio") {
       showScreen("about");
       playAsset("AboutMirrorGateVoice.mp3");
     }
-    if (action === "open-wheel") { stopActiveAudio(); stopTone(); showScreen("wheel"); }
+    if (action === "open-wheel") { stopActiveAudio(); stopTone(); clearGuidanceTimer(); showScreen("wheel"); }
     if (action === "open-invocation") renderPathInvocation(target.dataset.invocation);
-    if (action === "open-codex") { stopActiveAudio(); stopTone(); openCodex(); }
-    if (action === "open-recovery") openRecovery();
+    if (action === "open-codex") { stopActiveAudio(); stopTone(); clearGuidanceTimer(); openCodex(); }
+    if (action === "open-recovery") { clearGuidanceTimer(); openRecovery(); }
     if (action === "close-recovery") closeRecovery();
     if (action === "repeat-recovery") openRecovery(true);
     if (action === "start-sequence") startFullSequence();
     if (action === "next-step") stepOffset(1);
     if (action === "previous-step") stepOffset(-1);
+    if (action === "start-guidance-timer") startGuidanceTimer(target.dataset.timerKey, Number(target.dataset.timerSeconds || 0));
+    if (action === "reset-guidance-timer") resetGuidanceTimer(target.dataset.timerKey);
+    if (action === "outcome-chip") noteOutcome(target.dataset.outcome);
     if (action === "play-guidance") playAsset(stages[target.dataset.guidance]?.asset || stages.settle.asset);
     if (action === "play-module-guidance") playAsset(modules[target.dataset.moduleName]?.guidanceAsset || stages.aim.asset);
     if (action === "play-wheel-guidance") playAsset("HarmonicWheelOrientationVoice.mp3");
@@ -3672,6 +4058,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     }
     if (action === "module-next-step" || action === "module-prev-step") {
       stopActiveAudio();
+      clearGuidanceTimer();
       const moduleName = target.dataset.moduleName || state.module;
       const steps = moduleStepDefinitions(moduleName);
       const offset = action === "module-next-step" ? 1 : -1;
@@ -3684,6 +4071,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "module-advanced") {
       stopActiveAudio();
       stopTone();
+      clearGuidanceTimer();
       const moduleName = target.dataset.moduleName || state.module;
       state.advancedModules[moduleName] = true;
       renderModule(moduleName, { resetScroll: true });
@@ -3691,6 +4079,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "module-guided") {
       stopActiveAudio();
       stopTone();
+      clearGuidanceTimer();
       const moduleName = target.dataset.moduleName || state.module;
       state.advancedModules[moduleName] = false;
       renderModule(moduleName, { resetScroll: true });
@@ -3698,6 +4087,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "module-complete") {
       stopActiveAudio();
       stopTone();
+      clearGuidanceTimer();
       const moduleName = target.dataset.moduleName || state.module;
       if (moduleName === "gate") renderModule("mirror");
       else showScreen("wheel");
@@ -3705,6 +4095,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "begin-invocation") {
       stopActiveAudio();
       stopTone();
+      clearGuidanceTimer();
       const invocation = pathInvocations[target.dataset.invocation];
       if (invocation?.startsFullSequence) {
         startFullSequence();
@@ -3853,6 +4244,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
         event.preventDefault();
         stopActiveAudio();
         stopTone();
+        clearGuidanceTimer();
         renderModule(moduleTarget.dataset.module);
       }
     });
