@@ -159,6 +159,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
     guidanceTimer: { key: "", startedAt: 0, seconds: 0 },
     guidanceTimerInterval: null,
     autoFlow: localStorage.getItem("mirrorgate_auto_flow") === "true",
+    focusMode: localStorage.getItem("mirrorgate_focus_mode") !== "false",
     autoFlowPendingKey: "",
     autoFlowTimeout: null,
     cameraStream: null,
@@ -654,12 +655,12 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       "Enter Intention": {
         literalNow: "Write one short sentence. If you are stuck, start with: I request clarity about...",
         outcomes: ["Request", "Question", "Name", "Gratitude", "Resistance", "Quiet"],
-        timerSeconds: 60
+        timerSeconds: 0
       },
       "Choose Prime Path": {
         literalNow: "Choose 3-7-11 unless your body clearly wants grounding, depth, or sharper focus.",
         outcomes: ["3-7-11", "2-3-5", "5-11-17", "7-11-13", "Still unsure"],
-        timerSeconds: 45
+        timerSeconds: 0
       },
       "Transmit": {
         literalNow: "Press Transmit Vector once. Keep the tone on and watch the glyph until the timer says Enough.",
@@ -674,7 +675,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       "Choose Breath and Tone": {
         literalNow: "Choose the breath that is easiest to follow. The goal is not difficulty; the goal is steadiness.",
         outcomes: ["Steady", "Slow", "Box", "Extended exhale", "Not sure"],
-        timerSeconds: 45
+        timerSeconds: 0
       },
       "Begin Echo Field": {
         literalNow: "Press Begin Echo Field. Let the tone and toroid run. The app tracks time; you notice one thing.",
@@ -689,11 +690,11 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       "Choose Gate Settings": {
         literalNow: "Choose a prime path, Breath Seal, and carrier tone. Prime path shapes the gate. Breath Seal paces your body.",
         outcomes: ["3-7-11", "4-4-4-4", "432 Hz", "More grounding", "More space", "Not sure"],
-        timerSeconds: 60
+        timerSeconds: 0
       },
       "Begin Gate Field": {
         literalNow: "Press Begin Gate Field. The tone should keep running as you continue through breath, intention, and glyph nodes.",
-        timerSeconds: 90
+        timerSeconds: 0
       },
       "Seal the Breath": {
         literalNow: "Follow the visible Breath Seal once. Tap Seal Completed Breath only after one full cycle.",
@@ -703,7 +704,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       "Hold Intention": {
         literalNow: "Name the contact intention silently. Turn on Intention held when the phrase feels like a clear beacon.",
         outcomes: ["Clear beacon", "Name", "Question", "Request", "Still unsure"],
-        timerSeconds: 45
+        timerSeconds: 0
       },
       "Open Contact Window": {
         literalNow: "Gate is open after the third node. Stay here until the timer reaches Enough. Keep the tone running and look for one possible signal.",
@@ -720,7 +721,7 @@ Welcome to the Web of Collective Consciousness. You are not alone. You are a not
       "Set the Intention": {
         literalNow: "Write or read one intention. Do not rewrite it more than twice.",
         outcomes: ["Clear phrase", "Question", "Request", "Still unsure"],
-        timerSeconds: 60
+        timerSeconds: 0
       },
       "Enter Mirror": {
         literalNow: "Activate camera if useful, or use the symbolic surface. Read the intention once and keep a soft gaze.",
@@ -2289,16 +2290,21 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (moduleScreen) {
       moduleScreen.dataset.module = "guided";
       moduleScreen.style.setProperty("--module-accent", modules.guided.accent);
+      moduleScreen.classList.toggle("focus-mode", state.focusMode);
     }
     const root = $("#module-root");
+    root.className = `module-root guided-module-root module-root-guided ${state.focusMode ? "focus-module-root" : ""}`;
     root.innerHTML = `
-      <header class="module-header">
+      <header class="module-header ${state.focusMode ? "focus-step-header" : ""}">
         <p class="path-label">Full Harmonic Contact Interface Sequence</p>
         <h2>${escapeHtml(step.title)}</h2>
         <p>${flowSubtitle(step.id)}</p>
-        ${renderStepProgress(step.id)}
+        <div class="focus-header-tools">
+          ${renderFocusModeToggle()}
+        </div>
+        ${state.focusMode ? renderFocusStepProgress(flowSteps, flowSteps.findIndex((item) => item.id === step.id)) : renderStepProgress(step.id)}
       </header>
-      ${renderFlowStepCue(step.id)}
+      ${state.focusMode ? renderFocusStepCue({ ...(flowStepCues[step.id] || {}), ...(flowLiteralGuidance[step.id] || {}) }, `flow:${step.id}`) : renderFlowStepCue(step.id)}
       ${renderStepBody(step)}
     `;
     bindFlow(root);
@@ -2334,6 +2340,25 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     `;
   }
 
+  function renderFocusModeToggle() {
+    return `
+      <button class="button button-quiet button-small focus-mode-toggle ${state.focusMode ? "is-active" : ""}" data-action="toggle-focus-mode" aria-pressed="${state.focusMode ? "true" : "false"}">
+        ${state.focusMode ? "Focus Mode On" : "Detailed Mode"}
+      </button>
+    `;
+  }
+
+  function renderFocusStepProgress(steps = [], currentIndex = 0) {
+    const safeIndex = Math.max(0, currentIndex);
+    const current = steps[safeIndex] || steps[0] || { title: "Step" };
+    return `
+      <div class="focus-step-progress" aria-label="Current step">
+        <span>Step ${safeIndex + 1} of ${steps.length || 1}</span>
+        <strong>${escapeHtml(current.title)}</strong>
+      </div>
+    `;
+  }
+
   function renderStepCuePanel(cue = {}, options = {}) {
     const title = options.title || "Step Guide";
     const description = options.description || "The timer is a guide, not a rule.";
@@ -2351,6 +2376,41 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
           <span><small>Next</small><strong>${escapeHtml(cue.next || "Follow the next button.")}</strong></span>
         </div>
         ${renderLiteralGuide(cue, timerKey)}
+      </section>
+    `;
+  }
+
+  function renderFocusStepCue(cue = {}, timerKey = "") {
+    const doNow = cue.literalNow || cue.minimum || "Complete the visible action on this screen.";
+    const stay = cue.duration || "No timer";
+    const continueWhen = cue.readiness || "The step feels complete enough to carry forward.";
+    const hasMore = !!(cue.cadence || cue.outcomes || cue.quietOutcome || cue.next);
+    return `
+      <section class="focus-cue-card" aria-label="One screen guidance">
+        <div class="focus-command">
+          <small>Do this now</small>
+          <strong>${escapeHtml(doNow)}</strong>
+        </div>
+        <div class="focus-cue-grid">
+          <span><small>Stay</small><strong>${escapeHtml(stay)}</strong></span>
+          <span><small>Continue when</small><strong>${escapeHtml(continueWhen)}</strong></span>
+        </div>
+        <p class="focus-duration-line"><strong>Stay:</strong> ${escapeHtml(stay)} <span>·</span> <strong>Continue:</strong> ${escapeHtml(continueWhen)}</p>
+        ${renderGuidanceTimer(cue, timerKey)}
+        ${hasMore ? `
+          <details class="focus-detail-drawer">
+            <summary>Need examples or more guidance?</summary>
+            ${cue.cadence ? `
+              <div class="cadence-lines" aria-label="Cadence">
+                ${String(cue.cadence).split(".").map((line) => line.trim()).filter(Boolean).map((line) => `<span>${escapeHtml(line)}.</span>`).join("")}
+              </div>
+            ` : ""}
+            ${renderOutcomeChips(cue.outcomes || defaultOutcomeExamples, cue.outcomeTitle || "What may happen")}
+            ${cue.quietOutcome ? `<p class="small-copy quiet-counts"><strong>Quiet counts:</strong> ${escapeHtml(cue.quietOutcome)}</p>` : ""}
+            ${cue.next ? `<p class="small-copy"><strong>Next:</strong> ${escapeHtml(cue.next)}</p>` : ""}
+            <p class="small-copy reanchor-line"><strong>If you get lost:</strong> breathe once, read "Do this now," and choose one thing you noticed.</p>
+          </details>
+        ` : ""}
       </section>
     `;
   }
@@ -2407,6 +2467,22 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const label = snapshot.done ? "Enough" : snapshot.active ? formatTimer(snapshot.remaining) : formatTimer(seconds);
     const buttonLabel = snapshot.active ? "Restart Enough Timer" : "Start Enough Timer";
     const autoLabel = state.autoFlow ? "Auto-flow on" : "Auto-flow off";
+    if (state.focusMode) {
+      return `
+        <div class="guidance-timer focus-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">
+          <div class="guidance-timer-heading">
+            <span class="timer-pill ${snapshot.done ? "timer-done" : snapshot.active ? "timer-active" : ""}">
+              <span class="timer-count">${escapeHtml(label)}</span>
+            </span>
+            <span class="timer-status">${snapshot.done ? "Minimum met. Continue when ready." : "The app tracks time so you do not have to count."}</span>
+          </div>
+          <div class="guidance-timer-track" aria-hidden="true">
+            <span style="width: ${Math.round(snapshot.progress * 100)}%"></span>
+          </div>
+          <button class="button button-muted button-small" data-action="start-guidance-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">${escapeHtml(buttonLabel)}</button>
+        </div>
+      `;
+    }
     return `
       <div class="guidance-timer" data-timer-key="${escapeHtml(timerKey)}" data-timer-seconds="${seconds}">
         <div class="guidance-timer-heading">
@@ -2496,6 +2572,20 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     showStatus(state.autoFlow
       ? "Auto-flow is on. MirrorGate will move on after enough-time where the step allows it."
       : "Auto-flow is off. Continue manually when ready.", "success");
+  }
+
+  function toggleFocusMode() {
+    state.focusMode = !state.focusMode;
+    localStorage.setItem("mirrorgate_focus_mode", String(state.focusMode));
+    const message = state.focusMode
+      ? "Focus Mode is on. Each step shows one main action first."
+      : "Detailed Mode is on. Full guidance is visible.";
+    if (state.module === "guided") {
+      renderFlowStep(state.currentFlowStep, { resetScroll: false });
+    } else if (state.module && modules[state.module]) {
+      renderModule(state.module, { resetScroll: false });
+    }
+    showStatus(message, "success");
   }
 
   function shouldAutoAdvanceTimer(timerKey) {
@@ -2980,9 +3070,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
 
   function enrichModuleSteps(name, steps) {
     const defaults = moduleLiteralGuidance[name] || {};
+    const { literalNow, timerSeconds, ...sharedDefaults } = defaults;
     const overrides = moduleStepLiteralGuidance[name] || {};
     return steps.map((step) => ({
-      ...defaults,
+      ...sharedDefaults,
       ...step,
       ...(overrides[step.title] || {})
     }));
@@ -3076,23 +3167,26 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const stepIndex = currentModuleStep(name);
     const step = steps[stepIndex];
     return `
-      <header class="module-header guided-module-header">
+      <header class="module-header guided-module-header ${state.focusMode ? "focus-step-header" : ""}">
         <p class="path-label" style="color: var(--module-accent)">${escapeHtml(module.actionLabel)}</p>
         <h2>${escapeHtml(step.title)}</h2>
         <p>${escapeHtml(step.instruction)}</p>
-        ${renderModuleStepProgress(name, steps, stepIndex)}
+        <div class="focus-header-tools">
+          ${renderFocusModeToggle()}
+        </div>
+        ${state.focusMode ? renderFocusStepProgress(steps, stepIndex) : renderModuleStepProgress(name, steps, stepIndex)}
       </header>
-      ${renderStepCuePanel(step, {
+      ${state.focusMode ? renderFocusStepCue(step, `module:${name}:${stepIndex}`) : renderStepCuePanel(step, {
         title: "How Long Here",
         description: "Use the time as a guide. Continue when the readiness cue is met.",
         className: "module-cue-card",
         timerKey: `module:${name}:${stepIndex}`
       })}
 
-      <section class="panel guided-module-card">
+      <section class="panel guided-module-card ${state.focusMode ? "focus-module-card" : ""}">
         <p class="path-label">${escapeHtml(module.title)}</p>
-        ${renderGuidedModuleStepBody(name, stepIndex)}
-        <div class="notice-strip">
+        ${state.focusMode ? renderFocusedGuidedModuleStepBody(name, stepIndex) : renderGuidedModuleStepBody(name, stepIndex)}
+        <div class="notice-strip ${state.focusMode ? "focus-mode-detail" : ""}">
           <strong>What to notice</strong>
           <span>${escapeHtml(step.notice)}</span>
         </div>
@@ -3114,9 +3208,10 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     const next = stepIndex < count - 1
       ? `<button class="button button-primary" data-action="module-next-step" data-module-name="${escapeHtml(name)}"${nextDisabled}>${nextLabel}</button>`
       : `<button class="button button-primary" data-action="module-complete" data-module-name="${escapeHtml(name)}">${escapeHtml(moduleCompletionLabel(name))}</button>`;
+    const detailLabel = state.focusMode ? "Detailed View" : "Advanced View";
     const advanced = stepIndex < count - 1
-      ? `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Advanced View</button>`
-      : `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">Advanced View</button>`;
+      ? `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">${detailLabel}</button>`
+      : `<button class="button button-muted" data-action="module-advanced" data-module-name="${escapeHtml(name)}">${detailLabel}</button>`;
     return `
       <div class="control-row flow-actions module-step-actions">
         ${back}
@@ -3139,6 +3234,148 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (name === "breath") return renderEchoGuidedStep(stepIndex);
     if (name === "gate") return renderGateGuidedStep(stepIndex);
     return renderMirrorGuidedStep(stepIndex);
+  }
+
+  function renderFocusedGuidedModuleStepBody(name, stepIndex) {
+    const module = modules[name] || modules.mirror;
+    if (stepIndex === 0) {
+      return `
+        <div class="focus-module-summary">
+          <h3>${escapeHtml(module.title)}</h3>
+          <p>${escapeHtml(module.wheelGuidance || module.purpose)}</p>
+          <button class="button button-muted button-wide" data-action="play-module-guidance" data-module-name="${escapeHtml(name)}">Play ${escapeHtml(module.sequenceLabel)} Guidance</button>
+          <details class="focus-detail-drawer">
+            <summary>Read the full module guidance</summary>
+            <p>${escapeHtml(module.purpose)}</p>
+            ${activeGlyphInline(name)}
+            ${renderTranscript(module.guidanceScript, `Read ${module.sequenceLabel} transcript`)}
+          </details>
+        </div>
+      `;
+    }
+    if (name === "gate" && stepIndex === 1) {
+      return `
+        <div class="focus-setting-stack">
+          <label>Prime Path</label>
+          <div class="choice-grid compact-choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
+          <label>Breath Seal</label>
+          <div class="choice-grid compact-choice-grid">${renderChoiceGroup(gateBreathSealChoices, state.draft.breathSeal || "4-4-4-4", "choice", "breath-seal")}</div>
+          <label>Carrier Tone</label>
+          <div class="choice-grid compact-choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+          <details class="focus-detail-drawer">
+            <summary>Why these choices?</summary>
+            ${renderRecommendationCard("Recommended Gate setup", modules.gate.guidedDefaults.reason, [
+              "Prime path shapes the gate geometry.",
+              "Breath Seal paces the body.",
+              "Carrier tone supports the field."
+            ])}
+          </details>
+        </div>
+      `;
+    }
+    if (name === "gate" && stepIndex === 2) {
+      return `
+        <div class="focus-live-field">
+          <div class="module-canvas-card focus-field-canvas"><canvas id="module-canvas" width="620" height="620"></canvas></div>
+          ${renderBreathSealVisual(state.draft.breathSeal || "4-4-4-4")}
+          <div class="control-row compact-controls">
+            <button class="button button-primary" data-action="enter-gate">Begin Gate Field</button>
+            <button class="button button-muted" data-action="stop-audio">Stop Gate Tone</button>
+          </div>
+        </div>
+      `;
+    }
+    if (name === "gate" && stepIndex === 3) {
+      return `
+        <div class="focus-live-field">
+          <div class="carry-tone-strip ${state.gateFieldActive ? "is-active" : ""}">
+            <strong>${state.gateFieldActive ? "Gate tone running" : "Gate tone ready"}</strong>
+            <button class="button button-quiet button-small" data-action="stop-audio">Stop Tone</button>
+          </div>
+          ${renderBreathSealVisual(state.draft.breathSeal || "4-4-4-4")}
+          <button class="button button-primary button-wide" data-action="seal-breath">Seal Completed Breath</button>
+          <div class="metric-grid compact-metrics">
+            <span class="metric"><small>Breath Cycle</small><strong id="breath-lock">${state.gateBreathSealed ? "Sealed" : "Pending"}</strong></span>
+            <span class="metric"><small>Carrier</small><strong>${escapeHtml(getTone(state.draft.tone).label)}</strong></span>
+          </div>
+        </div>
+      `;
+    }
+    if (name === "gate" && stepIndex === 4) {
+      return `
+        <div class="focus-live-field">
+          <div class="carry-tone-strip ${state.gateFieldActive ? "is-active" : ""}">
+            <strong>${state.gateFieldActive ? "Gate tone running" : "Gate tone ready"}</strong>
+            <button class="button button-quiet button-small" data-action="stop-audio">Stop Tone</button>
+          </div>
+          <label class="toggle-row">
+            <input id="held-intention-toggle" type="checkbox" ${state.gateHeldIntention ? "checked" : ""}>
+            <span>Intention held</span>
+          </label>
+          <p class="small-copy">Name the contact intention silently or aloud. Mark it held when it feels like a clear beacon rather than a demand.</p>
+        </div>
+      `;
+    }
+    if (name === "breath" && stepIndex === 1) {
+      return `
+        <div class="focus-setting-stack">
+          <label>Breath Rhythm</label>
+          <div class="choice-grid compact-choice-grid">${renderChoiceGroup(calibrationBreathChoices, state.draft.breathRhythm, "choice", "breath")}</div>
+          <label for="resonance">Resonance: <strong id="resonance-value">${state.draft.resonance}</strong></label>
+          <input id="resonance" type="range" min="1" max="10" value="${state.draft.resonance}">
+          <label>Carrier Tone</label>
+          <div class="choice-grid compact-choice-grid">${renderChoiceGroup(tones, state.draft.tone, "tone-choice", "tone")}</div>
+          <details class="focus-detail-drawer">
+            <summary>Why this breath and tone?</summary>
+            <p>A higher resonance number can mean more intensity, openness, emotion, energy, or readiness. It is not a score to perform.</p>
+            ${renderRecommendationCard("Tone choice", "Keep 144 Hz for grounding and integration unless another tone clearly matches your intention. Echo work is usually easier when the carrier feels steady rather than intense.")}
+          </details>
+        </div>
+      `;
+    }
+    if (name === "vector" && stepIndex === 2) {
+      return `
+        <div class="focus-setting-stack">
+          <label>Prime Triplet Pathway</label>
+          <div class="choice-grid compact-choice-grid">${renderChoiceGroup(Object.keys(triplets), state.draft.triplet, "choice", "triplet")}</div>
+          <details class="focus-detail-drawer">
+            <summary>What do the numbers mean?</summary>
+            <p>The three numbers are geometry keys written as p1-p2-p3. They shape the vector axes and glyph behavior.</p>
+            ${renderRecommendationCard("Recommended prime path", "Start with Prime path 3-7-11. It is the balanced, recursive default for Vector work. Choose 2-3-5 for grounding, 5-11-17 for deeper exploration, or 7-11-13 for sharper refinement.")}
+          </details>
+        </div>
+      `;
+    }
+    if (name === "gate" && stepIndex === 5) {
+      const nodes = state.draft.triplet.split("-");
+      const isOpen = state.gateTouchedNodes.length >= nodes.length;
+      return `
+        <div class="focus-contact-surface ${isOpen ? "is-open" : ""}">
+          <h3>${isOpen ? "Gate Open: Remain Here" : "Glyph Nodes"}</h3>
+          <p>${isOpen
+            ? "Stay here. Keep the Gate Field tone running, continue the Breath Seal, and notice one possible signal or honest stillness."
+            : `Tap in order: ${escapeHtml(nodes.join(" -> "))}. The next node glows in the Gate color.`}</p>
+          <div class="control-row compact-node-row" id="node-buttons"></div>
+          <div class="metric-grid compact-metrics">
+            <span class="metric"><small>Glyph Sequence</small><strong id="node-lock">${state.gateTouchedNodes.length} / 3</strong></span>
+            <span class="metric"><small>Gate</small><strong id="gate-lock">${isOpen ? "Open" : "Locked"}</strong></span>
+          </div>
+          ${isOpen ? `
+            <div class="control-row">
+              <button class="button button-muted" data-action="play-gate-open-guidance">Play Gate Open Guidance</button>
+              <button class="button button-quiet" data-action="stop-audio">Stop Gate Tone</button>
+            </div>
+            <details class="focus-detail-drawer">
+              <summary>What may happen here?</summary>
+              ${renderOutcomeChips(moduleStepDefinitions("gate")[5].outcomes, "What may happen in the contact window")}
+              <p class="small-copy quiet-counts"><strong>Quiet counts:</strong> Do not chase certainty. Silence or nothing obvious is still a valid gate session.</p>
+              ${renderTranscript(voiceScripts.gateOpenContactWindow, "Read Gate Open transcript")}
+            </details>
+          ` : ""}
+        </div>
+      `;
+    }
+    return renderGuidedModuleStepBody(name, stepIndex);
   }
 
   function renderVectorGuidedStep(stepIndex) {
@@ -3424,6 +3661,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (moduleScreen) {
       moduleScreen.dataset.module = name;
       moduleScreen.style.setProperty("--module-accent", module.accent);
+      moduleScreen.classList.toggle("focus-mode", state.focusMode);
     }
     if (isNewModule) applyModuleGuidedDefaults(module);
     if (isNewModule) {
@@ -3434,7 +3672,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
       state.gateTouchedNodes = [];
     }
     const root = $("#module-root");
-    root.className = `module-root guided-module-root module-root-${name}`;
+    root.className = `module-root guided-module-root module-root-${name} ${state.focusMode ? "focus-module-root" : ""}`;
     if (!state.advancedModules[name]) {
       root.innerHTML = renderGuidedModule(name);
       bindModule(root, name);
@@ -4135,6 +4373,7 @@ Let it become a clear symbol of what you are carrying, what you are opening, and
     if (action === "start-guidance-timer") startGuidanceTimer(target.dataset.timerKey, Number(target.dataset.timerSeconds || 0));
     if (action === "reset-guidance-timer") resetGuidanceTimer(target.dataset.timerKey);
     if (action === "toggle-auto-flow") toggleAutoFlow();
+    if (action === "toggle-focus-mode") toggleFocusMode();
     if (action === "outcome-chip") noteOutcome(target.dataset.outcome);
     if (action === "play-guidance") playAsset(stages[target.dataset.guidance]?.asset || stages.settle.asset);
     if (action === "play-module-guidance") playAsset(modules[target.dataset.moduleName]?.guidanceAsset || stages.aim.asset);
