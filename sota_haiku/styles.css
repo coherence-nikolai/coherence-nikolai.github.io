@@ -1,18 +1,18 @@
 :root {
-  color-scheme: light;
-  --seed-green: #9b2d20;
-  --soil: #5a4632;
-  --sand: #f3ede1;
-  --ink: #17140f;
-  --deep-ink: #f8f2e7;
-  --graphite: #e8decf;
-  --rice: #fffaf0;
+  color-scheme: dark;
+  --seed-green: #d8aa4f;
+  --soil: #1d120c;
+  --sand: #d8aa4f;
+  --ink: #f8f2e7;
+  --deep-ink: #0b0705;
+  --graphite: #776b5c;
+  --rice: #fff6e8;
   --mist: #dee8ec;
-  --amber: #17140f;
-  --red: #9b2d20;
-  --surface: rgba(255, 250, 240, 0.78);
-  --line: rgba(23, 20, 15, 0.16);
-  --muted: rgba(23, 20, 15, 0.64);
+  --amber: #d8aa4f;
+  --red: #d8aa4f;
+  --surface: rgba(18, 12, 9, 0.72);
+  --line: rgba(232, 215, 178, 0.18);
+  --muted: rgba(246, 239, 226, 0.68);
   --radius: 8px;
   --haiku-anchor-size: min(88vw, 39dvh, 27.5rem);
   --haiku-anchor-top: clamp(0rem, 0.8dvh, 0.7rem);
@@ -35,9 +35,9 @@ body {
   min-height: 100%;
   margin: 0;
   background:
-    repeating-linear-gradient(97deg, rgba(23, 20, 15, 0.010) 0 1px, transparent 1px 28px),
-    linear-gradient(102deg, transparent 0 22%, rgba(255, 250, 240, 0.22) 22% 35%, transparent 35% 100%),
-    linear-gradient(135deg, #f8f2e7, #efe4d4 55%, #f7efe3),
+    repeating-linear-gradient(97deg, rgba(255, 246, 232, 0.018) 0 1px, transparent 1px 28px),
+    radial-gradient(circle at 50% 20%, rgba(216, 170, 79, 0.15), transparent 24rem),
+    linear-gradient(135deg, #0b0705, #150c08 55%, #080504),
     var(--deep-ink);
 }
 
@@ -62,9 +62,9 @@ a.button {
 
 button.primary,
 a.primary {
-  border-color: rgba(23, 20, 15, 0.86);
+  border-color: rgba(216, 170, 79, 0.86);
   background: var(--amber);
-  color: var(--rice);
+  color: #120b07;
   font-weight: 650;
 }
 

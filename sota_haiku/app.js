@@ -247,7 +247,7 @@ function startPracticeAudioSequence() {
   state.timer.voiceReady = false;
   state.timer.lastPromptIndex = -1;
 
-  const voiceDelay = gongEnabled() ? 4600 : 1500;
+  const voiceDelay = gongEnabled() ? 2400 : 1000;
   if (gongEnabled()) {
     playGongAudio(0.58);
     state.timer.gongTimer = window.setTimeout(() => {
@@ -261,7 +261,7 @@ function startPracticeAudioSequence() {
     if (!state.timer) return;
     state.timer.voiceReady = true;
     speakCurrentPrompt();
-  }, voiceDelay + (gongEnabled() ? 820 : 0));
+  }, voiceDelay + (gongEnabled() ? 520 : 0));
 }
 
 function schedulePracticeGongLoop() {
@@ -275,7 +275,7 @@ function schedulePracticeGongLoop() {
 
 function startGateIntro(gate) {
   const voiceOn = localStorage.getItem(storage.haikuVoice) !== "false";
-  const settleDelay = gongEnabled() ? 4600 : 2200;
+  const settleDelay = gongEnabled() ? 2400 : 1200;
   if (gongEnabled()) playGongAudio(0.70);
   state.gateIntroTimers.push(window.setTimeout(() => {
     if (state.view !== "gate") return;
@@ -305,7 +305,7 @@ function startGateIntro(gate) {
       }, { once: true });
       if (player.readyState >= 1) scheduleFromDuration();
       if (!scheduled) scheduleGateControls(18000);
-    }, gongEnabled() ? 820 : 0));
+    }, gongEnabled() ? 520 : 0));
   }, settleDelay));
 }
 
@@ -465,7 +465,7 @@ function renderArrival() {
   return `
     <main class="haiku-flow-shell arrival-shell">
       <section class="haiku-anchor arrival-art" data-anchor-mark aria-hidden="true">
-        <img class="brush-gate-image" src="./shared/brush-lines-only.png?v=21-sequence" alt="" aria-hidden="true" />
+        <img class="brush-gate-image" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" aria-hidden="true" />
         ${renderSotaSeal("arrival-seal")}
       </section>
 
@@ -486,7 +486,7 @@ function renderGateList() {
   return `
     <main class="haiku-flow-shell line-menu-shell">
       <section class="haiku-anchor line-menu-anchor" aria-hidden="true">
-        <img class="anchor-mark painted-static" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
+        <img class="anchor-mark painted-static" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
         ${renderSotaSeal("arrival-seal line-menu-seal")}
       </section>
       <nav class="line-menu-actions" aria-label="Local app areas">
@@ -557,9 +557,9 @@ function renderGateArt(gate) {
   return `
     <section class="haiku-anchor gate-art three-line-art gate-order-${order}" aria-label="Haiku poem for ${escapeHTML(gate.title)}">
       <div class="three-line-stage" aria-hidden="true">
-        <img class="gate-logo-line gate-line-one" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
-        <img class="gate-logo-line gate-line-two" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
-        <img class="gate-logo-line gate-line-three" src="./shared/brush-lines-only.png?v=21-sequence" alt="" />
+        <img class="gate-logo-line gate-line-one" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
+        <img class="gate-logo-line gate-line-two" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
+        <img class="gate-logo-line gate-line-three" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
         <span class="gate-seal-ghost-cover"></span>
       </div>
       <div class="three-line-poem" data-fit-poem>
@@ -604,7 +604,7 @@ function renderSotaSeal(className = "") {
 }
 
 function renderMiniLineMark(className = "mini-line-mark") {
-  return `<span class="${className}" aria-hidden="true"><img src="./shared/brush-lines-only.png?v=21-sequence" alt="" /></span>`;
+  return `<span class="${className}" aria-hidden="true"><img src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" /></span>`;
 }
 
 function renderPracticeShell() {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "sota-haiku-v21-sequence";
+const CACHE_NAME = "sota-haiku-v22-gold-audio";
 const APP_SHELL = [
   "./",
   "./index.html",
