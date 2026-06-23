@@ -118,7 +118,7 @@
   ];
 
   const soundPresets = [
-    { id: "tone", label: "Current Tone", frequency: null },
+    { id: "tone", label: "Current Audio", frequency: null },
     { id: "solfeggio-396", label: "396 Hz", frequency: 396 },
     { id: "solfeggio-432", label: "432 Hz", frequency: 432 },
     { id: "solfeggio-528", label: "528 Hz", frequency: 528 },
@@ -282,7 +282,7 @@
   const controlTabCopy = {
     form: "Form",
     matter: "Matter",
-    tone: "Tone",
+    tone: "Audio",
     motion: "Motion",
     ritual: "Ritual",
     layers: "Layers",
@@ -291,7 +291,7 @@
 
   const actionCopy = {
     none: { label: "Tone Glyph", tab: "form" },
-    tune: { label: "Tune", tab: "tone" },
+    tune: { label: "Audio", tab: "tone" },
     shape: { label: "Shape", tab: "form" },
     seal: { label: "Seal", tab: "ritual" },
     save: { label: "Save", tab: "save" }
@@ -1228,7 +1228,7 @@
     state.sound.frequency = preset.frequency || currentTone().freq;
     updateUI();
     pulse(state.sound.frequency, 0.04 + state.sound.volume * 0.012);
-    showToast("Sound: " + preset.label);
+    showToast("Audio: " + preset.label);
   }
 
   function playSoundGlyph() {
@@ -1236,9 +1236,12 @@
       const audio = new Audio(state.sound.objectUrl);
       audio.volume = clampFloat(state.sound.volume / 9, 0.05, 1);
       audio.play().catch(() => pulse(soundFrequency(), 0.05));
+      showToast("Playing audio file");
       return;
     }
-    pulse(soundFrequency(), 0.045 + state.sound.volume * 0.014);
+    const frequency = soundFrequency();
+    pulse(frequency, 0.045 + state.sound.volume * 0.014);
+    showToast(`Playing audio ${Math.round(frequency)} Hz`);
   }
 
   function soundFrequency() {
@@ -1253,7 +1256,7 @@
     state.sound.recordedName = "";
     state.sound.preset = "custom";
     updateUI();
-    showToast("Sound uploaded");
+    showToast("Audio uploaded");
   }
 
   async function recordSoundGlyph() {
@@ -1277,11 +1280,11 @@
         const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
         if (state.sound.objectUrl) URL.revokeObjectURL(state.sound.objectUrl);
         state.sound.objectUrl = URL.createObjectURL(blob);
-        state.sound.recordedName = "Recorded tone";
+        state.sound.recordedName = "Recorded audio";
         state.sound.uploadedName = "";
         stream.getTracks().forEach((track) => track.stop());
         updateUI();
-        showToast("Sound recorded");
+        showToast("Audio recorded");
       });
       state.sound.recorder = recorder;
       recorder.start();
@@ -1708,7 +1711,10 @@
 
   function currentSoundPresetLabel() {
     const preset = soundPresets.find((item) => item.id === state.sound.preset);
-    return preset ? preset.label + " oscillator" : "Custom oscillator";
+    if (!preset) {
+      return "Custom audio";
+    }
+    return preset.id === "tone" ? "Current audio tone" : `${preset.label} audio`;
   }
 
   function layerEnabled(id) {
