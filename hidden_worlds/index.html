@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Hidden Worlds - Every Person Lives in a World You Cannot See</title>
   <meta name="description" content="Hidden Worlds is a standalone iOS app for practicing empathy by discovering the possible hidden worlds behind human behavior.">
-  <meta name="theme-color" content="#080b0c">
+  <meta name="theme-color" content="#050808">
   <link rel="canonical" href="https://coherence-nikolai.app/hidden_worlds/">
   <meta property="og:title" content="Hidden Worlds">
   <meta property="og:description" content="Every Person Lives in a World You Cannot See.">
@@ -22,47 +22,62 @@
 
   <header class="site-header" aria-label="Hidden Worlds navigation">
     <a class="brand" href="/" aria-label="Coherence Nikolai home">
-      <img src="/hidden_worlds/assets/app-icon.png" alt="">
-      <span>coherence nikolai</span>
+      <span class="brand-mark" aria-hidden="true">
+        <img src="/hidden_worlds/assets/app-icon.png" alt="">
+      </span>
+      <span>coherence &middot; nikolai</span>
     </a>
     <nav class="nav" aria-label="Page navigation">
-      <a href="#lens">World Lens</a>
-      <a href="#experiences">Experiences</a>
+      <a href="#overview">Overview</a>
       <a href="#principles">Principles</a>
+      <a href="#details">Details</a>
     </nav>
+    <a class="preview-button" href="#details" aria-label="View iOS preview build details">
+      <span aria-hidden="true">iOS</span>
+      <strong>Preview Build</strong>
+    </a>
   </header>
 
   <main id="main">
     <section class="hero" id="overview" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="quiet-mark">Hidden Worlds</p>
-        <h1 id="hero-title">Hidden Worlds</h1>
-        <p class="tagline">Every Person Lives in a World You Cannot See</p>
+        <h1 id="hero-title">Hidden<br>Worlds</h1>
+        <p class="tagline">Every Person Lives in a World You Cannot See.</p>
+        <span class="gold-rule" aria-hidden="true"></span>
         <p class="hero-text">
-          A standalone iOS app for practicing the pause before judgment.
-          It helps you imagine the worlds behind what you see.
+          An iOS app that trains curiosity without certainty. See perspectives.
+          Hold wonder. Stay human.
         </p>
         <div class="hero-actions" aria-label="Primary actions">
-          <a class="button primary" href="#lens">Explore the lens</a>
-          <a class="button secondary" href="#principles">AI boundaries</a>
+          <a class="store-button" href="#lens">
+            <span class="store-icon" aria-hidden="true">HW</span>
+            <span>
+              <small>Begin with</small>
+              <strong>World Lens</strong>
+            </span>
+          </a>
         </div>
-        <p class="availability">Private by default. Built for curiosity, not certainty.</p>
+        <p class="availability">iOS 17+ &middot; Works offline &middot; Private by default</p>
       </div>
 
-      <div class="device-stage" aria-label="Interactive Hidden Worlds app preview">
-        <div class="phone" aria-label="World Lens preview">
-          <div class="phone-bar" aria-hidden="true">
-            <span></span><span></span><span></span>
+      <div class="device-stage" aria-label="Hidden Worlds app preview">
+        <div class="phone hero-phone" aria-label="Hidden Worlds iPhone preview">
+          <div class="phone-status" aria-hidden="true">
+            <span>9:41</span>
+            <span class="status-dots">|||</span>
           </div>
           <div class="phone-content">
-            <p class="phone-label">World Lens</p>
-            <h2>Look beneath the surface.</h2>
-            <div class="world-symbol" aria-hidden="true">
-              <img src="/hidden_worlds/assets/app-icon.png" alt="">
+            <p class="phone-title">Hidden Worlds</p>
+            <p class="phone-subtitle">Look deeper. Assume less.</p>
+            <div class="tunnel-art" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+              <svg viewBox="0 0 180 180" focusable="false">
+                <path d="M91 156 C118 133 52 128 87 105 C122 82 66 78 98 59 C113 50 96 42 91 30"></path>
+              </svg>
             </div>
-            <article class="lens-preview" aria-live="polite">
+            <article class="phone-card" aria-live="polite">
               <p id="hero-lens-kicker">Visible behavior</p>
-              <h3 id="hero-lens-title">A guarded reply</h3>
+              <h2 id="hero-lens-title">A guarded reply</h2>
               <p id="hero-lens-copy">
                 The surface may be sharp. The world underneath may be protecting
                 someone from feeling exposed.
@@ -73,38 +88,52 @@
               <button type="button" data-lens="world" aria-pressed="false">World</button>
               <button type="button" data-lens="question" aria-pressed="false">Question</button>
             </div>
+            <div class="phone-nav" aria-hidden="true">
+              <span>Lens</span><span>Swap</span><span>Daily</span><span>Journal</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <a class="next-hint" href="#lens">World Lens begins with one moment</a>
+      <a class="next-hint" href="#lens">Scroll to explore</a>
     </section>
 
-    <section class="principle-section" aria-labelledby="principle-title">
-      <div class="principle-copy">
-        <h2 id="principle-title">People do not simply react to reality.</h2>
+    <section class="feature-section lens-section" id="lens" aria-labelledby="lens-title">
+      <div class="section-phone">
+        <div class="phone small-phone" aria-hidden="true">
+          <div class="phone-status"><span>9:41</span><span class="status-dots">|||</span></div>
+          <div class="phone-content">
+            <p class="phone-title">World Lens</p>
+            <div class="tunnel-art compact">
+              <span></span><span></span><span></span><span></span>
+              <svg viewBox="0 0 180 180" focusable="false">
+                <path d="M91 156 C118 133 52 128 87 105 C122 82 66 78 98 59 C113 50 96 42 91 30"></path>
+              </svg>
+            </div>
+            <p class="screen-question">How might this shape what they say, or do not say?</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-copy">
+        <div class="section-icon" aria-hidden="true">O</div>
+        <h2 id="lens-title">World Lens</h2>
         <p>
-          They react to the world they are living inside: the memory, fear,
-          longing, pressure, loyalty, role, and private logic that may be
-          invisible from the outside.
+          Choose a lens. Step gently into someone else's world. Not to judge it,
+          but to understand it better.
         </p>
-      </div>
-      <div class="founder-guardrail">
-        <p>Protected core</p>
-        <strong>Behavior is a doorway, not a verdict.</strong>
+        <ul>
+          <li>Short, thoughtful perspectives</li>
+          <li>No right answers</li>
+          <li>Built for reflection, not reaction</li>
+        </ul>
       </div>
     </section>
 
-    <section class="lens-section" id="lens" aria-labelledby="lens-title">
+    <section class="workbench-section" aria-labelledby="workbench-title">
       <div class="section-head">
-        <p class="quiet-mark">World Lens</p>
-        <h2 id="lens-title">Practice seeing more than one possible world.</h2>
-        <p>
-          Choose a moment. Hidden Worlds widens the frame with humility,
-          then returns you to one cleaner question.
-        </p>
+        <h2 id="workbench-title">Try one moment.</h2>
+        <p>Hidden Worlds turns a surface story into several possible worlds, then leaves you with a better question.</p>
       </div>
-
       <div class="lens-workbench">
         <div class="moment-chooser" aria-label="Choose a moment">
           <button class="moment-button is-active" type="button" data-moment="guarded" aria-pressed="true">
@@ -120,13 +149,10 @@
             <small>Your message sits unread.</small>
           </button>
         </div>
-
         <article class="world-panel" aria-live="polite">
           <p class="panel-label" id="moment-label">Visible behavior</p>
           <h3 id="moment-title">A guarded reply</h3>
-          <p id="moment-surface">
-            The surface story says: they are being difficult.
-          </p>
+          <p id="moment-surface">The surface story says: they are being difficult.</p>
           <div class="possibility-block">
             <p>Possible hidden world</p>
             <strong id="moment-world">
@@ -141,110 +167,110 @@
       </div>
     </section>
 
-    <section class="experiences-section" id="experiences" aria-labelledby="experiences-title">
-      <div class="section-head">
-        <p class="quiet-mark">Small MVP, protected depth</p>
-        <h2 id="experiences-title">Three experiences. Nothing that weakens the core.</h2>
+    <section class="feature-section swap-section" aria-labelledby="swap-title">
+      <div class="section-copy">
+        <div class="section-icon" aria-hidden="true">X</div>
+        <h2 id="swap-title">World Swap</h2>
+        <p>
+          Explore the same moment through different eyes. Perspective is not
+          weakness. It is wisdom.
+        </p>
+        <ul>
+          <li>Same situation, many worlds</li>
+          <li>See how meaning changes</li>
+          <li>Expand without losing yourself</li>
+        </ul>
       </div>
-
-      <div class="experience-grid">
-        <article class="experience-card">
-          <div class="experience-icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" role="img">
-              <path d="M9 24c4.8-8.2 9.8-12.3 15-12.3S34.2 15.8 39 24c-4.8 8.2-9.8 12.3-15 12.3S13.8 32.2 9 24Z"></path>
-              <circle cx="24" cy="24" r="5.5"></circle>
-            </svg>
+      <div class="section-phone">
+        <div class="phone small-phone" aria-hidden="true">
+          <div class="phone-status"><span>9:41</span><span class="status-dots">|||</span></div>
+          <div class="phone-content">
+            <p class="phone-title">World Swap</p>
+            <h3 class="phone-heading">The missed message</h3>
+            <p class="phone-subtitle">One moment. Different worlds.</p>
+            <div class="swap-list">
+              <p><strong>The Student</strong><span>They hid their question.</span></p>
+              <p><strong>The Teacher</strong><span>They noticed the silence.</span></p>
+              <p><strong>The Parent</strong><span>They were worried all day.</span></p>
+            </div>
           </div>
-          <h3>World Lens</h3>
-          <p>
-            Reframe one human moment through visible surface, possible hidden
-            world, and a wiser next question.
-          </p>
-        </article>
+        </div>
+      </div>
+    </section>
 
-        <article class="experience-card">
-          <div class="experience-icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" role="img">
-              <path d="M13 15h18l4 4-4 4H13"></path>
-              <path d="M35 33H17l-4-4 4-4h18"></path>
-            </svg>
-          </div>
-          <h3>World Swap</h3>
-          <p>
-            See the same event through several possible inner worlds without
-            reducing anyone to a single explanation.
-          </p>
-        </article>
-
-        <article class="experience-card">
-          <div class="experience-icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" role="img">
-              <circle cx="24" cy="24" r="8"></circle>
-              <path d="M24 6v7M24 35v7M6 24h7M35 24h7M11.3 11.3l5 5M31.7 31.7l5 5M36.7 11.3l-5 5M16.3 31.7l-5 5"></path>
-            </svg>
-          </div>
-          <h3>Daily Hidden Worlds</h3>
-          <p>
-            One contemplative invitation each day. No streak pressure. No
-            score. Just a practiced widening of attention.
-          </p>
-        </article>
+    <section class="feature-section daily-section" aria-labelledby="daily-title">
+      <div class="section-phone">
+        <div class="daily-card" aria-hidden="true">
+          <p>Daily</p>
+          <h3>Take a quiet moment.<br>See one world you<br>have not considered.</h3>
+          <span>Reveal Today's World</span>
+        </div>
+      </div>
+      <div class="section-copy">
+        <div class="section-icon" aria-hidden="true">*</div>
+        <h2 id="daily-title">Daily Hidden Worlds</h2>
+        <p>
+          One new perspective each day. A quiet invitation to widen your view.
+        </p>
+        <ul>
+          <li>Short daily perspectives</li>
+          <li>No pressure. No tracking.</li>
+          <li>A habit of attention</li>
+        </ul>
       </div>
     </section>
 
     <section class="principles-section" id="principles" aria-labelledby="principles-title">
-      <div class="principles-intro">
-        <p class="quiet-mark">AI with humility</p>
-        <h2 id="principles-title">The app must never pretend to know the unseen.</h2>
-        <p>
-          Hidden Worlds uses AI only to generate possibilities that increase
-          cognitive flexibility. It is constrained to protect dignity.
-        </p>
-      </div>
-
-      <div class="principles-list">
-        <article>
-          <span>01</span>
-          <h3>No diagnosis</h3>
-          <p>It never labels a person, condition, pathology, or hidden motive.</p>
-        </article>
-        <article>
-          <span>02</span>
-          <h3>No certainty</h3>
-          <p>It frames every output as a possibility, not an explanation.</p>
-        </article>
-        <article>
-          <span>03</span>
-          <h3>No persuasion pattern</h3>
-          <p>It avoids streaks, leaderboards, feeds, urgency loops, and social proof.</p>
-        </article>
-        <article>
-          <span>04</span>
-          <h3>Human first</h3>
-          <p>It returns the user to a respectful next question or action.</p>
-        </article>
+      <div class="principles-panel">
+        <h2 id="principles-title">Safety by Design. Principles by Choice.</h2>
+        <div class="principles-grid">
+          <article>
+            <span aria-hidden="true">01</span>
+            <h3>Private by Default</h3>
+            <p>No accounts. No tracking. Your reflections stay on your device.</p>
+          </article>
+          <article>
+            <span aria-hidden="true">02</span>
+            <h3>AI with Boundaries</h3>
+            <p>AI-generated perspectives, grounded in principles, not persuasion.</p>
+          </article>
+          <article>
+            <span aria-hidden="true">03</span>
+            <h3>Designed for Good</h3>
+            <p>No manipulation. No addiction patterns. No dark patterns.</p>
+          </article>
+          <article>
+            <span aria-hidden="true">04</span>
+            <h3>Human First</h3>
+            <p>This is not therapy. It is a tool for empathy, curiosity, and connection.</p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="build-section" aria-labelledby="build-title">
+    <section class="details-section" id="details" aria-labelledby="details-title">
       <div>
-        <p class="quiet-mark">Standalone iOS app</p>
-        <h2 id="build-title">Designed to leave the user with a changed way of seeing.</h2>
+        <h2 id="details-title">Built around the founder principle.</h2>
+        <p>Every feature earns its place by protecting one idea: behavior is only the visible edge of a world you cannot fully see.</p>
       </div>
-      <p>
-        The product succeeds when someone leaves a moment thinking:
-        "I see people differently now." Not because they completed an exercise,
-        but because the invisible became imaginable.
-      </p>
+      <a class="store-button quiet" href="#overview">
+        <span class="store-icon" aria-hidden="true">HW</span>
+        <span>
+          <small>Return to</small>
+          <strong>Overview</strong>
+        </span>
+      </a>
     </section>
   </main>
 
   <footer class="site-footer">
     <a class="brand" href="/" aria-label="Coherence Nikolai home">
-      <img src="/hidden_worlds/assets/app-icon.png" alt="">
-      <span>coherence nikolai</span>
+      <span class="brand-mark" aria-hidden="true">
+        <img src="/hidden_worlds/assets/app-icon.png" alt="">
+      </span>
+      <span>coherence &middot; nikolai</span>
     </a>
-    <p>Hidden Worlds - Every Person Lives in a World You Cannot See.</p>
+    <p>Tools for a more conscious world.</p>
   </footer>
 </body>
 </html>
