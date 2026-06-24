@@ -32,9 +32,9 @@
       <a href="#principles">Principles</a>
       <a href="#details">Details</a>
     </nav>
-    <a class="preview-button" href="#details" aria-label="View iOS preview build details">
-      <span aria-hidden="true">iOS</span>
-      <strong>Preview Build</strong>
+    <a class="preview-button" href="/hidden_worlds/app/" aria-label="Open Hidden Worlds web app">
+      <span aria-hidden="true">HW</span>
+      <strong>Try Web App</strong>
     </a>
   </header>
 
@@ -45,19 +45,26 @@
         <p class="tagline">Every Person Lives in a World You Cannot See.</p>
         <span class="gold-rule" aria-hidden="true"></span>
         <p class="hero-text">
-          An iOS app that trains curiosity without certainty. See perspectives.
+          A web and iOS app that trains curiosity without certainty. See perspectives.
           Hold wonder. Stay human.
         </p>
         <div class="hero-actions" aria-label="Primary actions">
-          <a class="store-button" href="#lens">
+          <a class="store-button" href="/hidden_worlds/app/">
             <span class="store-icon" aria-hidden="true">HW</span>
             <span>
-              <small>Begin with</small>
-              <strong>World Lens</strong>
+              <small>Enter</small>
+              <strong>Hidden Worlds</strong>
+            </span>
+          </a>
+          <a class="store-button quiet-link" href="hiddenworlds://">
+            <span class="store-icon" aria-hidden="true">iOS</span>
+            <span>
+              <small>Open installed</small>
+              <strong>iOS Preview</strong>
             </span>
           </a>
         </div>
-        <p class="availability">iOS 17+ &middot; Works offline &middot; Private by default</p>
+        <p class="availability">Web app live &middot; iOS preview &middot; Private by default</p>
       </div>
 
       <div class="device-stage" aria-label="Hidden Worlds app preview">
@@ -69,10 +76,24 @@
           <div class="phone-content">
             <p class="phone-title">Hidden Worlds</p>
             <p class="phone-subtitle">Look deeper. Assume less.</p>
-            <div class="tunnel-art" aria-hidden="true">
+            <div class="tunnel-art story-portal" aria-hidden="true">
               <span></span><span></span><span></span><span></span><span></span>
               <svg viewBox="0 0 180 180" focusable="false">
-                <path d="M91 156 C118 133 52 128 87 105 C122 82 66 78 98 59 C113 50 96 42 91 30"></path>
+                <defs>
+                  <radialGradient id="heroDoorGlow" cx="50%" cy="38%" r="24%">
+                    <stop offset="0" stop-color="#f3d18e" stop-opacity="0.95"></stop>
+                    <stop offset="0.45" stop-color="#d9a04c" stop-opacity="0.38"></stop>
+                    <stop offset="1" stop-color="#d9a04c" stop-opacity="0"></stop>
+                  </radialGradient>
+                </defs>
+                <ellipse class="door-glow" cx="90" cy="88" rx="19" ry="25" fill="url(#heroDoorGlow)"></ellipse>
+                <path class="doorway" d="M82 111 V91 C82 82 87 75 90 75 C94 75 99 82 99 91 V111"></path>
+                <path class="walking-path shadow" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+                <path class="walking-path" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+                <g class="walker" transform="translate(90 105) scale(0.62)">
+                  <circle cx="0" cy="-9" r="2.3"></circle>
+                  <path d="M0 -6 L0 6 M0 0 L-5 5 M0 0 L5 5 M0 6 L-4 14 M0 6 L4 14"></path>
+                </g>
               </svg>
             </div>
             <article class="phone-card" aria-live="polite">
@@ -104,10 +125,24 @@
           <div class="phone-status"><span>9:41</span><span class="status-dots">|||</span></div>
           <div class="phone-content">
             <p class="phone-title">World Lens</p>
-            <div class="tunnel-art compact">
+            <div class="tunnel-art compact story-portal">
               <span></span><span></span><span></span><span></span>
               <svg viewBox="0 0 180 180" focusable="false">
-                <path d="M91 156 C118 133 52 128 87 105 C122 82 66 78 98 59 C113 50 96 42 91 30"></path>
+                <defs>
+                  <radialGradient id="lensDoorGlow" cx="50%" cy="38%" r="24%">
+                    <stop offset="0" stop-color="#f3d18e" stop-opacity="0.95"></stop>
+                    <stop offset="0.45" stop-color="#d9a04c" stop-opacity="0.36"></stop>
+                    <stop offset="1" stop-color="#d9a04c" stop-opacity="0"></stop>
+                  </radialGradient>
+                </defs>
+                <ellipse class="door-glow" cx="90" cy="88" rx="19" ry="25" fill="url(#lensDoorGlow)"></ellipse>
+                <path class="doorway" d="M82 111 V91 C82 82 87 75 90 75 C94 75 99 82 99 91 V111"></path>
+                <path class="walking-path shadow" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+                <path class="walking-path" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+                <g class="walker" transform="translate(90 105) scale(0.62)">
+                  <circle cx="0" cy="-9" r="2.3"></circle>
+                  <path d="M0 -6 L0 6 M0 0 L-5 5 M0 0 L5 5 M0 6 L-4 14 M0 6 L4 14"></path>
+                </g>
               </svg>
             </div>
             <p class="screen-question">How might this shape what they say, or do not say?</p>
@@ -257,7 +292,7 @@
         <span class="store-icon" aria-hidden="true">HW</span>
         <span>
           <small>Return to</small>
-          <strong>Overview</strong>
+          <strong>Hidden Worlds</strong>
         </span>
       </a>
     </section>
