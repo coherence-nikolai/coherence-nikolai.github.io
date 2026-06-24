@@ -35,7 +35,7 @@ const swapMoments = [
     id: "quiet-room",
     title: "The quiet room",
     surface: "Someone says little in a group.",
-    query: "quiet group meeting student accent belonging",
+    query: "quiet group meeting accent belonging",
     ids: ["newcomer", "meeting-silencer", "accent-guard"]
   }
 ];
@@ -156,7 +156,7 @@ function revealWorlds() {
   els.resultCount.textContent = String(results.length);
   els.worldResults.innerHTML = results.length
     ? results.map((entry) => renderWorldCard(entry, { surface: query })).join("")
-    : `<div class="empty-state">No close match yet. Try a simpler surface word like silence, deadline, grief, family, or control.</div>`;
+    : `<div class="empty-state">No close match yet. Try a simpler surface word like silence, boundary, work, family, grief, culture, or control.</div>`;
 }
 
 function renderSwapChooser() {

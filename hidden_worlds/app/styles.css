@@ -247,6 +247,24 @@ h3 {
   height: 100%;
 }
 
+.life-rooms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  border-bottom: 1px solid var(--line);
+  padding: 1rem 0;
+}
+
+.life-rooms span {
+  border: 1px solid rgba(217, 160, 76, 0.2);
+  border-radius: 999px;
+  padding: 0.42rem 0.7rem;
+  color: var(--soft);
+  background: rgba(6, 13, 14, 0.58);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
 .door-glow {
   fill: rgba(240, 202, 130, 0.36);
   filter: blur(2px);
