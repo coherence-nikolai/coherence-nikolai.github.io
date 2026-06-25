@@ -7,7 +7,84 @@ const state = {
   selectedSwap: "missed-message"
 };
 
-const stopWords = new Set(["the", "and", "for", "with", "that", "this", "they", "them", "their", "you", "your", "one", "are", "but", "not"]);
+const stopWords = new Set([
+  "the", "and", "for", "with", "that", "this", "they", "them", "their", "you", "your", "one", "are", "but",
+  "not", "does", "do", "did", "doing", "has", "have", "had", "was", "were", "been", "being", "from", "into",
+  "about", "after", "before", "again", "just", "very", "really", "keeps", "keep", "someone", "on", "off", "to",
+  "of", "in", "at", "as", "by", "my", "our", "we", "us"
+]);
+
+const aliasMap = new Map([
+  ["text", ["message", "reply", "digital"]],
+  ["texts", ["message", "reply", "digital"]],
+  ["texting", ["message", "reply", "digital"]],
+  ["ghost", ["silent", "message", "avoid"]],
+  ["ghosted", ["silent", "message", "avoid"]],
+  ["ghosting", ["silent", "message", "avoid"]],
+  ["read", ["seen", "unread", "message"]],
+  ["left", ["unread", "message", "seen"]],
+  ["ignored", ["silent", "avoid", "message"]],
+  ["ignores", ["silent", "avoid", "message"]],
+  ["ignore", ["silent", "avoid", "message"]],
+  ["shutdown", ["quiet", "withdraw", "silent"]],
+  ["shuts", ["quiet", "withdraw", "silent"]],
+  ["shut", ["quiet", "withdraw", "silent"]],
+  ["boundaries", ["boundary", "no", "choice"]],
+  ["limits", ["boundary", "choice", "respect"]],
+  ["boss", ["manager", "work", "authority"]],
+  ["manager", ["work", "authority"]],
+  ["coworker", ["work", "teammate"]],
+  ["colleague", ["work", "teammate"]],
+  ["rude", ["sharp", "abrupt", "tone"]],
+  ["mean", ["sharp", "tone", "conflict"]],
+  ["angry", ["conflict", "loud", "safety"]],
+  ["yells", ["loud", "unheard", "conflict"]],
+  ["yelling", ["loud", "unheard", "conflict"]],
+  ["money", ["cost", "bill", "price", "class"]],
+  ["cash", ["money", "cost", "bill"]],
+  ["expensive", ["money", "cost", "price"]],
+  ["doctor", ["medical", "body", "appointment"]],
+  ["hospital", ["medical", "body", "waiting"]],
+  ["noise", ["busy", "sensory", "body"]],
+  ["overstimulated", ["busy", "noise", "sensory"]],
+  ["home", ["house", "privacy", "threshold"]],
+  ["aging", ["age", "older", "future"]],
+  ["old", ["aging", "age", "older"]],
+  ["online", ["digital", "message", "seen"]],
+  ["social", ["digital", "online", "visibility"]],
+  ["stranger", ["public", "brief", "unknown"]],
+  ["late", ["delay", "deadline", "time"]],
+  ["apology", ["repair", "sorry", "trust"]],
+  ["sorry", ["apology", "repair", "trust"]]
+]);
+
+const phraseAliases = [
+  { phrase: "left on read", terms: ["seen", "unread", "message"] },
+  { phrase: "text back", terms: ["message", "reply", "unread"] },
+  { phrase: "does not reply", terms: ["message", "silent", "reply"] },
+  { phrase: "no response", terms: ["silent", "message", "reply"] },
+  { phrase: "shuts down", terms: ["quiet", "withdraw", "family"] },
+  { phrase: "shared costs", terms: ["money", "bill", "fairness"] },
+  { phrase: "small talk", terms: ["neighbor", "strangers", "privacy"] },
+  { phrase: "public transport", terms: ["train", "seat", "stranger"] }
+];
+
+const unsafeTokens = new Set([
+  "abuse", "abused", "abusive", "assault", "violence", "violent", "hit", "hits", "hitting", "harm",
+  "unsafe", "danger", "dangerous", "threat", "threaten", "threatened", "coercion", "coerce", "stalking",
+  "stalk", "suicide", "selfharm", "self-harm", "weapon", "emergency"
+]);
+
+const defaultSuggestions = [
+  "left on read",
+  "sharp tone",
+  "shared costs",
+  "avoids conflict",
+  "medical spaces",
+  "never invites me over",
+  "public mask",
+  "quiet neighbor"
+];
 
 const swapMoments = [
   {
@@ -22,7 +99,7 @@ const swapMoments = [
     title: "Late again",
     surface: "Someone arrives after everyone waited.",
     query: "late deadline delay shame pressure",
-    ids: ["late-assignment", "deadline-defender", "commitment-hesitation"]
+    ids: ["delayed-work", "deadline-defender", "commitment-hesitation"]
   },
   {
     id: "sharp-reply",
@@ -53,6 +130,7 @@ const els = {
   dailyCard: document.querySelector("#daily-card"),
   dailyLibrary: document.querySelector("#daily-library"),
   librarySearch: document.querySelector("#library-search"),
+  searchSuggestions: document.querySelector("#search-suggestions"),
   categoryList: document.querySelector("#category-list"),
   librarySummary: document.querySelector("#library-summary"),
   libraryCount: document.querySelector("#library-count"),
@@ -68,47 +146,182 @@ function normalize(text) {
     .trim();
 }
 
-function tokens(text) {
+function baseTokens(text) {
   return normalize(text)
     .split(" ")
     .filter((token) => token.length > 1 && !stopWords.has(token));
 }
 
-function scoreEntry(entry, query) {
-  const queryTokens = tokens(query);
-  if (!queryTokens.length) return 0;
-
-  const fields = [
-    [entry.title, 9],
-    [entry.visibleBehavior, 8],
-    [entry.tags.join(" "), 7],
-    [entry.categoryName, 5],
-    [entry.needs.join(" "), 4],
-    [entry.worldHypothesis, 3],
-    [entry.protectiveMove, 2],
-    [entry.wiseQuestion, 2]
-  ];
-
-  return fields.reduce((total, [value, weight]) => {
-    const haystack = normalize(value);
-    const matches = queryTokens.filter((token) => haystack.includes(token)).length;
-    return total + matches * weight;
-  }, 0);
+function tokens(text) {
+  return baseTokens(text).flatMap((token) => tokenVariants(token));
 }
 
-function searchEntries(query, category = "all") {
-  const scoped = category === "all" ? entries : entries.filter((entry) => entry.category === category);
-  const queryTokens = tokens(query);
+function tokenVariants(token, includeAliases = true) {
+  const variants = new Set([token]);
 
-  if (!queryTokens.length) {
-    return [...scoped].sort((a, b) => a.title.localeCompare(b.title));
+  if (token.endsWith("ies") && token.length > 4) variants.add(`${token.slice(0, -3)}y`);
+  if (token.endsWith("es") && token.length > 4) variants.add(token.slice(0, -2));
+  if (token.endsWith("s") && token.length > 3) variants.add(token.slice(0, -1));
+  if (token.endsWith("ed") && token.length > 4) variants.add(token.slice(0, -1));
+  if (token.endsWith("ing") && token.length > 5) variants.add(token.slice(0, -3));
+
+  if (includeAliases) {
+    (aliasMap.get(token) || []).forEach((alias) => variants.add(alias));
+  }
+  return [...variants];
+}
+
+function queryTerms(query) {
+  const normalized = normalize(query);
+  const terms = new Set(tokens(query));
+
+  phraseAliases.forEach((alias) => {
+    if (normalized.includes(alias.phrase)) {
+      alias.terms.forEach((term) => terms.add(term));
+    }
+  });
+
+  return [...terms];
+}
+
+function categoryDisplayName(entry) {
+  return categories.find((category) => category.id === entry.category)?.name || entry.categoryName;
+}
+
+function entrySearchFields(entry) {
+  return [
+    { label: "title", value: entry.title, weight: 10 },
+    { label: "visible behavior", value: entry.visibleBehavior, weight: 9 },
+    { label: "plain-language alias", value: (entry.searchAliases || []).join(" "), weight: 9 },
+    { label: "tag", value: entry.tags.join(" "), weight: 7 },
+    { label: "life room", value: `${categoryDisplayName(entry)} ${(entry.domains || []).join(" ")}`, weight: 6 },
+    { label: "need", value: entry.needs.join(" "), weight: 5 },
+    { label: "lens", value: (entry.lenses || []).join(" "), weight: 4 },
+    { label: "possible world", value: entry.worldHypothesis, weight: 3 },
+    { label: "protective pattern", value: entry.protectiveMove, weight: 2 },
+    { label: "wise question", value: entry.wiseQuestion, weight: 2 },
+    { label: "alternate door", value: (entry.alternateWorlds || []).join(" "), weight: 2 }
+  ];
+}
+
+function matchField(value, terms) {
+  const fieldTokens = new Set(baseTokens(value).flatMap((token) => tokenVariants(token, false)));
+  return terms.filter((term) => fieldTokens.has(term));
+}
+
+function scoreEntry(entry, query) {
+  const terms = queryTerms(query);
+  if (!terms.length) return { score: 0, reasons: [], matches: [] };
+
+  const reasons = [];
+  const matches = new Set();
+  const score = entrySearchFields(entry).reduce((total, field) => {
+    const fieldMatches = matchField(field.value || "", terms);
+    if (!fieldMatches.length) return total;
+    fieldMatches.forEach((match) => matches.add(match));
+    reasons.push({ label: field.label, terms: [...new Set(fieldMatches)].slice(0, 3) });
+    return total + fieldMatches.length * field.weight;
+  }, 0);
+
+  return {
+    score,
+    reasons: reasons.slice(0, 3),
+    matches: [...matches].slice(0, 6)
+  };
+}
+
+function rankedEntries(query, category = "all") {
+  const scoped = category === "all" ? entries : entries.filter((entry) => entry.category === category);
+  const terms = queryTerms(query);
+
+  if (!terms.length) {
+    return [...scoped]
+      .sort((a, b) => categoryDisplayName(a).localeCompare(categoryDisplayName(b)) || a.title.localeCompare(b.title))
+      .map((entry) => ({ entry, score: 0, reasons: [], matches: [] }));
   }
 
   return scoped
-    .map((entry) => ({ entry, score: scoreEntry(entry, query) }))
+    .map((entry) => ({ entry, ...scoreEntry(entry, query) }))
     .filter((result) => result.score > 0)
     .sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title))
-    .map((result) => result.entry);
+    .map((result) => ({
+      ...result,
+      reasons: result.reasons.length ? result.reasons : [{ label: "nearby world", terms: result.matches }]
+    }));
+}
+
+function searchEntries(query, category = "all") {
+  return rankedEntries(query, category).map((result) => result.entry);
+}
+
+function hasUnsafeTerms(query) {
+  return queryTerms(query).some((term) => unsafeTokens.has(term));
+}
+
+function safetyNotice(query) {
+  if (!hasUnsafeTerms(query)) return "";
+  return `
+    <div class="safety-note">
+      If someone may be unsafe, prioritize immediate safety and trusted support before interpretation.
+      Hidden Worlds is not emergency, medical, legal, or therapy guidance.
+    </div>
+  `;
+}
+
+function relatedEntries(entry, limit = 3) {
+  const entrySignals = new Set([
+    entry.category,
+    ...entry.needs,
+    ...entry.tags,
+    ...(entry.domains || []),
+    ...(entry.lenses || [])
+  ].map(normalize));
+
+  return entries
+    .filter((candidate) => candidate.id !== entry.id)
+    .map((candidate) => {
+      const candidateSignals = [
+        candidate.category,
+        ...candidate.needs,
+        ...candidate.tags,
+        ...(candidate.domains || []),
+        ...(candidate.lenses || [])
+      ].map(normalize);
+      const shared = candidateSignals.filter((signal) => entrySignals.has(signal));
+      return { entry: candidate, score: shared.length, shared };
+    })
+    .filter((result) => result.score > 0)
+    .sort((a, b) => b.score - a.score || a.entry.title.localeCompare(b.entry.title))
+    .slice(0, limit);
+}
+
+function renderReasonPills(reasons = []) {
+  if (!reasons.length) return "";
+  const pills = reasons
+    .flatMap((reason) => reason.terms.map((term) => `${reason.label}: ${term}`))
+    .slice(0, 4)
+    .map((reason) => `<span>${escapeHtml(reason)}</span>`)
+    .join("");
+
+  return `<div class="match-row" aria-label="Why this appeared"><strong>Matched because</strong>${pills}</div>`;
+}
+
+function renderRelatedDoors(entry) {
+  const related = relatedEntries(entry);
+  if (!related.length) return "";
+
+  return `
+    <div class="related-doors">
+      <p>Nearby doors</p>
+      <div>
+        ${related.map((result) => `
+          <button type="button" data-library-entry="${escapeHtml(result.entry.id)}">
+            ${escapeHtml(result.entry.title)}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
 }
 
 function escapeHtml(value) {
@@ -123,18 +336,34 @@ function escapeHtml(value) {
 function renderWorldCard(entry, options = {}) {
   const needs = entry.needs.slice(0, 3).map((need) => `<span>${escapeHtml(need)}</span>`).join("");
   const surface = options.surface || entry.visibleBehavior;
+  const alternateWorlds = (entry.alternateWorlds || []).slice(0, 3);
+  const boundaryReminder = entry.boundaryReminder || "This is one possible world, not the explanation. Understanding behavior does not excuse harm, remove boundaries, or replace direct communication.";
 
   return `
     <article class="world-card">
-      <button type="button" data-library-entry="${escapeHtml(entry.id)}" aria-label="Open ${escapeHtml(entry.title)} in library">
-        <p class="meta-line">${escapeHtml(entry.categoryName)}</p>
-        <h3>${escapeHtml(entry.title)}</h3>
-        <p><strong>Visible:</strong> ${escapeHtml(surface)}</p>
-        <p><strong>Possible world:</strong> ${escapeHtml(entry.worldHypothesis)}</p>
-        <p><strong>Protective move:</strong> ${escapeHtml(entry.protectiveMove)}</p>
-        <p class="question">${escapeHtml(entry.wiseQuestion)}</p>
-        <div class="tag-row">${needs}</div>
-      </button>
+      ${renderReasonPills(options.reasons)}
+      <p class="meta-line">${escapeHtml(categoryDisplayName(entry))}</p>
+      <h3>${escapeHtml(entry.title)}</h3>
+      <p><strong>Visible:</strong> ${escapeHtml(surface)}</p>
+      <p><strong>Possible world:</strong> ${escapeHtml(entry.worldHypothesis)}</p>
+      <p><strong>What this may be protecting:</strong> ${escapeHtml(entry.protectiveMove)}</p>
+      ${alternateWorlds.length ? `
+        <div class="alternate-worlds">
+          <p>Other possible doors</p>
+          <ul>
+            ${alternateWorlds.map((world) => `<li>${escapeHtml(world)}</li>`).join("")}
+          </ul>
+        </div>
+      ` : ""}
+      <p class="question">${escapeHtml(entry.wiseQuestion)}</p>
+      <p class="boundary-reminder">${escapeHtml(boundaryReminder)}</p>
+      <div class="tag-row">${needs}</div>
+      <div class="card-actions">
+        <button class="entry-open" type="button" data-library-entry="${escapeHtml(entry.id)}">
+          Open in atlas
+        </button>
+      </div>
+      ${options.related === false ? "" : renderRelatedDoors(entry)}
     </article>
   `;
 }
@@ -152,11 +381,11 @@ function setMode(mode) {
 
 function revealWorlds() {
   const query = els.surfaceInput.value.trim() || els.surfaceInput.placeholder;
-  const results = searchEntries(query).slice(0, 3);
+  const results = rankedEntries(query).slice(0, 3);
   els.resultCount.textContent = String(results.length);
-  els.worldResults.innerHTML = results.length
-    ? results.map((entry) => renderWorldCard(entry, { surface: query })).join("")
-    : `<div class="empty-state">No close match yet. Try a simpler surface word like silence, boundary, work, family, grief, culture, or control.</div>`;
+  els.worldResults.innerHTML = safetyNotice(query) + (results.length
+    ? results.map((result) => renderWorldCard(result.entry, { surface: query, reasons: result.reasons })).join("")
+    : `<div class="empty-state">No close match yet. Try a simpler surface word like silence, boundary, work, family, grief, culture, or control.</div>`);
 }
 
 function renderSwapChooser() {
@@ -191,13 +420,20 @@ function renderDaily() {
     <h3>${escapeHtml(entry.title)}</h3>
     <p><strong>Visible:</strong> ${escapeHtml(entry.visibleBehavior)}</p>
     <p><strong>Possible world:</strong> ${escapeHtml(entry.worldHypothesis)}</p>
+    <p><strong>Life room:</strong> ${escapeHtml(categoryDisplayName(entry))}</p>
     <p class="question">${escapeHtml(entry.wiseQuestion)}</p>
   `;
 }
 
 function renderCategories() {
   const allCount = entries.length;
-  const buttons = [{ id: "all", name: "All", count: allCount }, ...categories];
+  const buttons = [
+    { id: "all", name: "All", count: allCount },
+    ...categories.map((category) => ({
+      ...category,
+      count: entries.filter((entry) => entry.category === category.id).length
+    }))
+  ];
   els.categoryList.innerHTML = buttons.map((category) => `
     <button type="button" data-category="${escapeHtml(category.id)}" class="${category.id === state.selectedCategory ? "is-active" : ""}">
       ${escapeHtml(category.name)} <span>${category.count}</span>
@@ -206,16 +442,33 @@ function renderCategories() {
 }
 
 function renderLibrary() {
-  const results = searchEntries(state.libraryQuery, state.selectedCategory);
+  const results = rankedEntries(state.libraryQuery, state.selectedCategory);
   const categoryName = state.selectedCategory === "all"
     ? "World Atlas"
     : categories.find((category) => category.id === state.selectedCategory)?.name || "World Atlas";
 
-  els.librarySummary.textContent = state.libraryQuery ? "Search Results" : categoryName;
+  els.librarySummary.textContent = state.libraryQuery ? `Search: ${state.libraryQuery}` : categoryName;
   els.libraryCount.textContent = String(results.length);
-  els.entryList.innerHTML = results.length
-    ? results.map((entry) => renderWorldCard(entry)).join("")
-    : `<div class="empty-state">No world found. Try a visible behavior, a need, or a simpler word.</div>`;
+  els.entryList.innerHTML = safetyNotice(state.libraryQuery) + (results.length
+    ? results.map((result) => renderWorldCard(result.entry, { reasons: result.reasons })).join("")
+    : `<div class="empty-state">No world found. Try a visible behavior, a need, or a simpler word.</div>`);
+  renderSearchSuggestions();
+}
+
+function renderSearchSuggestions() {
+  const activeTerms = queryTerms(state.libraryQuery).slice(0, 5);
+  const suggestions = activeTerms.length
+    ? [...new Set([
+      ...activeTerms,
+      ...rankedEntries(state.libraryQuery).slice(0, 4).flatMap((result) => result.entry.needs.slice(0, 1))
+    ])].slice(0, 8)
+    : defaultSuggestions;
+
+  els.searchSuggestions.innerHTML = suggestions.map((suggestion) => `
+    <button type="button" data-suggestion="${escapeHtml(suggestion)}">
+      ${escapeHtml(suggestion)}
+    </button>
+  `).join("");
 }
 
 function openEntryInLibrary(entryId) {
@@ -270,6 +523,14 @@ els.dailyLibrary.addEventListener("click", () => {
 
 els.librarySearch.addEventListener("input", () => {
   state.libraryQuery = els.librarySearch.value;
+  renderLibrary();
+});
+
+els.searchSuggestions.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-suggestion]");
+  if (!button) return;
+  state.libraryQuery = button.dataset.suggestion;
+  els.librarySearch.value = state.libraryQuery;
   renderLibrary();
 });
 

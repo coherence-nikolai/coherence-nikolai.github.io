@@ -34,7 +34,7 @@
       <section class="hero-panel" aria-labelledby="app-title">
         <div>
           <h1 id="app-title">Every person lives in a world you cannot see.</h1>
-          <p>Use it for work, family, friendship, learning, grief, culture, and the small strange moments with people you barely know.</p>
+          <p>Use it for work, family, love, friendship, money, body, culture, grief, and the small strange moments with people you barely know.</p>
         </div>
         <div class="world-mark" aria-hidden="true">
           <span></span><span></span><span></span><span></span><span></span>
@@ -54,10 +54,14 @@
       <section class="life-rooms" aria-label="Life rooms Hidden Worlds can explore">
         <span>Work</span>
         <span>Family</span>
+        <span>Love</span>
         <span>Friendship</span>
+        <span>Money</span>
+        <span>Body</span>
         <span>Learning</span>
         <span>Culture</span>
         <span>Grief</span>
+        <span>Digital</span>
         <span>Change</span>
         <span>Strangers</span>
       </section>
@@ -69,13 +73,15 @@
             <h2 id="lens-title">What world might create this behavior?</h2>
             <label for="surface-input">Visible behavior</label>
             <textarea id="surface-input" rows="5" placeholder="Someone does not reply to a message"></textarea>
+            <p class="guardrail-note">These are possibilities, not diagnoses or facts. Use them to ask better questions, keep boundaries, and stay accountable.</p>
             <div class="example-row" aria-label="Example behaviors">
               <button type="button" data-example="My friend leaves my messages unread">Unread messages</button>
               <button type="button" data-example="A teammate sounds sharp in meetings">Sharp tone</button>
               <button type="button" data-example="A family member shuts down at dinner">Family silence</button>
+              <button type="button" data-example="Someone gets precise about shared costs">Shared costs</button>
               <button type="button" data-example="Someone becomes irritable in a busy place">Busy place</button>
             </div>
-            <button class="primary-action" type="button" id="reveal-worlds">Reveal possible worlds</button>
+            <button class="primary-action" type="button" id="reveal-worlds">Explore possible worlds</button>
           </section>
 
           <section class="result-panel" aria-live="polite">
@@ -116,15 +122,16 @@
         <div class="library-layout">
           <aside class="library-tools">
             <p class="eyebrow">Hidden Library</p>
-            <h2 id="library-title">Search 72 possible worlds.</h2>
+            <h2 id="library-title">Search the World Atlas.</h2>
             <label for="library-search">Search behavior, need, or tag</label>
-            <input id="library-search" type="search" placeholder="silence, boundaries, work, family">
+            <input id="library-search" type="search" placeholder="left on read, money, conflict, body, home">
+            <div class="search-suggestions" id="search-suggestions" aria-label="Suggested searches"></div>
             <div class="category-list" id="category-list" aria-label="Library categories"></div>
           </aside>
           <section class="library-results" aria-live="polite">
             <div class="result-head">
               <p id="library-summary">World Atlas</p>
-              <span id="library-count">72</span>
+              <span id="library-count">112</span>
             </div>
             <div class="entry-list" id="entry-list"></div>
           </section>
