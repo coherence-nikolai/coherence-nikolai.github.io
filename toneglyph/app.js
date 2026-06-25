@@ -281,7 +281,7 @@
 
   const controlTabCopy = {
     form: "Form",
-    matter: "Matter",
+    matter: "World",
     tone: "Audio",
     motion: "Motion",
     ritual: "Ritual",
@@ -291,17 +291,19 @@
 
   const actionCopy = {
     none: { label: "Tone Glyph", tab: "form" },
-    tune: { label: "Audio", tab: "tone" },
     shape: { label: "Shape", tab: "form" },
-    seal: { label: "Seal", tab: "ritual" },
+    tune: { label: "Audio", tab: "tone" },
+    world: { label: "World", tab: "matter" },
+    motion: { label: "Motion", tab: "motion" },
+    seal: { label: "Ritual", tab: "ritual" },
     save: { label: "Save", tab: "save" }
   };
 
   const tabToAction = {
     form: "shape",
-    matter: "tune",
+    matter: "world",
     tone: "tune",
-    motion: "shape",
+    motion: "motion",
     ritual: "seal",
     layers: "shape",
     save: "save"
@@ -1115,7 +1117,10 @@
       title.textContent = item.label;
       const summary = document.createElement("span");
       summary.textContent = item.summary;
-      button.append(title, summary);
+      const effect = document.createElement("span");
+      effect.className = "context-effect";
+      effect.textContent = "Applies shape, motion, world, breath, tags, and a visible glyph layer.";
+      button.append(title, summary, effect);
       button.addEventListener("click", () => applySymbolContext(item));
       refs.symbolContext.append(button);
     });
@@ -1750,24 +1755,26 @@
 
   function glyphLineStyle(model, line, index, settings) {
     const depth = averageLineDepth(model, line);
+    const isContext = line.role && line.role.startsWith("context-");
     const isPrimary = line.weight >= 0.58 || line.role === "edge";
     const isBack = depth < -0.12;
-    const color = isPrimary ? toneFamilyPalette.gold : isBack ? toneFamilyPalette.teal : toneFamilyPalette.parchment;
-    const opacityBase = isBack ? 0.08 : isPrimary ? 0.22 : 0.14;
+    const color = isContext ? toneFamilyPalette.rose : isPrimary ? toneFamilyPalette.gold : isBack ? toneFamilyPalette.teal : toneFamilyPalette.parchment;
+    const opacityBase = isContext ? 0.28 : isBack ? 0.08 : isPrimary ? 0.22 : 0.14;
     return {
       color,
-      emissive: isPrimary ? toneFamilyPalette.gold : toneFamilyPalette.teal,
+      emissive: isContext ? toneFamilyPalette.gold : isPrimary ? toneFamilyPalette.gold : toneFamilyPalette.teal,
       opacity: (opacityBase + line.weight * 0.18) * settings.lineOpacity,
-      radius: (0.004 + line.weight * (isPrimary ? 0.006 : 0.004)) * settings.thickness,
+      radius: (0.004 + line.weight * (isPrimary || isContext ? 0.006 : 0.004)) * settings.thickness,
       travelPhase: index * 0.33 + Math.abs(depth) * 1.7
     };
   }
 
   function glyphNodeStyle(node, index) {
     const isCenter = index === 0 || node.ring === "center";
+    const isContext = node.ring && node.ring.startsWith("context-");
     return {
-      color: isCenter ? toneFamilyPalette.gold : index % 3 === 0 ? toneFamilyPalette.rose : toneFamilyPalette.teal,
-      scale: isCenter ? 1.22 : Math.max(0.7, Math.min(1.55, node.radius || 1))
+      color: isContext ? toneFamilyPalette.gold : isCenter ? toneFamilyPalette.gold : index % 3 === 0 ? toneFamilyPalette.rose : toneFamilyPalette.teal,
+      scale: isCenter ? 1.22 : isContext ? Math.max(0.88, Math.min(1.7, node.radius || 1)) : Math.max(0.7, Math.min(1.55, node.radius || 1))
     };
   }
 
@@ -1848,6 +1855,9 @@
       button.type = "button";
       button.className = "saved-chip";
       button.addEventListener("click", () => loadSavedGlyph(record));
+      const details = savedGlyphDetails(record);
+      button.title = details;
+      button.setAttribute("aria-label", "Restore saved glyph: " + details);
       const dot = document.createElement("span");
       dot.style.setProperty("--chip-color", record.colors && record.colors[0] ? record.colors[0] : "#f6d27a");
       const seed = record.recipe && record.recipe.seed ? seedLabel(record.recipe.seed) : toneLabel(record.tone);
@@ -1856,6 +1866,23 @@
       button.append(dot, text);
       refs.savedGlyphs.append(button);
     });
+  }
+
+  function savedGlyphDetails(record) {
+    const recipe = record && record.recipe ? record.recipe : legacyRecipeFromRecord(record || {});
+    const context = symbolContextItems.find((item) => item.id === recipe.symbolContext);
+    const scene = scenePresets.find((item) => item.id === (recipe.scene && recipe.scene.preset));
+    const particle = particleMotionOptions.find((item) => item.id === (recipe.particles && recipe.particles.motion));
+    const frequency = recipe.sound && recipe.sound.frequency ? Math.round(recipe.sound.frequency) + " Hz" : toneLabel(recipe.tone);
+    const journal = recipe.journal ? "Journal: " + recipe.journal.replace(/\s+/g, " ").slice(0, 72) : "";
+    return [
+      recipe.intention || seedLabel(recipe.seed) || "Tone Glyph",
+      context ? "Context: " + context.label : "",
+      scene ? "World: " + scene.label : "",
+      particle ? "Orbs: " + particle.label : "",
+      "Audio: " + frequency,
+      journal
+    ].filter(Boolean).join(" - ");
   }
 
   function toneLabel(id) {
@@ -2169,6 +2196,11 @@
   }
 
   function buildGlyphModel(recipeState) {
+    const model = buildBaseGlyphModel(recipeState);
+    return enhanceModelWithContext(model, recipeState);
+  }
+
+  function buildBaseGlyphModel(recipeState) {
     const seed = recipeState.seed;
     if (seed === "metatron") return createMetatronGeometry();
     if (seed === "seed") return createSeedGeometry(recipeState);
@@ -2185,6 +2217,147 @@
     if (["harmonic", "octave", "chord"].includes(seed)) return createToneGeometry(recipeState);
     if (["seal", "release", "protect", "open", "remember"].includes(seed)) return createRitualGeometry(recipeState);
     return createRadialGeometry(recipeState, { id: seed, label: seedLabel(seed), symmetry: recipeState.builder.symmetry });
+  }
+
+  function enhanceModelWithContext(model, recipeState) {
+    const context = symbolContextItems.find((item) => item.id === recipeState.symbolContext);
+    if (!context) return model;
+    const overlay = createContextOverlay(context, recipeState);
+    if (!overlay.nodes.length && !overlay.lines.length && !overlay.circles.length) return model;
+    const nodeOffset = model.nodes.length;
+    overlay.nodes.forEach((node, index) => {
+      model.nodes.push({
+        id: "context-" + context.id + "-" + index,
+        ring: "context-" + context.id,
+        x: node.x,
+        y: node.y,
+        z: recipeState.trueGlyph ? 0 : node.z || 0,
+        radius: node.radius || 0.92
+      });
+    });
+    overlay.lines.forEach((line) => {
+      model.lines.push({
+        from: nodeOffset + line.from,
+        to: nodeOffset + line.to,
+        weight: line.weight || 0.78,
+        role: "context-" + context.id
+      });
+    });
+    overlay.circles.forEach((circle) => {
+      model.circles.push({
+        node: nodeOffset + circle.node,
+        radius: circle.radius || 0.4,
+        weight: circle.weight || 0.44,
+        role: "context-" + context.id
+      });
+    });
+    model.context = { id: context.id, label: context.label };
+    return normalizeModel(model);
+  }
+
+  function createContextOverlay(context, recipeState) {
+    const depth = recipeState.trueGlyph ? 0 : 0.18 + recipeState.builder.depth * 0.045;
+    if (context.id === "spiral") return createContextSpiral(depth);
+    if (context.id === "eye") return createContextEye(depth);
+    if (context.id === "ankh") return createContextAnkh(depth);
+    if (context.id === "labyrinth") return createContextLabyrinth(depth);
+    if (context.id === "tree") return createContextTree(depth);
+    if (context.id === "caduceus") return createContextCaduceus(depth);
+    return { nodes: [], lines: [], circles: [] };
+  }
+
+  function createContextSpiral(depth) {
+    const nodes = [];
+    const lines = [];
+    for (let index = 0; index < 18; index += 1) {
+      const t = index / 17;
+      const angle = -Math.PI / 2 + t * Math.PI * 4.6;
+      const radius = 0.16 + t * 1.72;
+      nodes.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, z: Math.sin(t * Math.PI * 2) * depth, radius: 0.72 + t * 0.28 });
+      if (index > 0) lines.push({ from: index - 1, to: index, weight: 0.86 - t * 0.18 });
+    }
+    return { nodes, lines, circles: [{ node: 0, radius: 0.28, weight: 0.44 }] };
+  }
+
+  function createContextEye(depth) {
+    const nodes = [
+      { x: 0, y: 0, z: depth, radius: 1.18 },
+      { x: -1.18, y: 0, z: 0, radius: 0.9 },
+      { x: 1.18, y: 0, z: 0, radius: 0.9 },
+      { x: 0, y: 0.42, z: depth * 0.4, radius: 0.78 },
+      { x: 0, y: -0.42, z: -depth * 0.4, radius: 0.78 }
+    ];
+    const lines = [
+      { from: 1, to: 3, weight: 0.84 },
+      { from: 3, to: 2, weight: 0.84 },
+      { from: 2, to: 4, weight: 0.84 },
+      { from: 4, to: 1, weight: 0.84 },
+      { from: 0, to: 1, weight: 0.42 },
+      { from: 0, to: 2, weight: 0.42 }
+    ];
+    return { nodes, lines, circles: [{ node: 0, radius: 0.24, weight: 0.68 }, { node: 0, radius: 0.58, weight: 0.36 }] };
+  }
+
+  function createContextAnkh(depth) {
+    const nodes = [
+      { x: 0, y: 0.82, z: depth, radius: 1 },
+      { x: 0, y: 0.18, z: depth * 0.4, radius: 0.88 },
+      { x: 0, y: -1.18, z: -depth, radius: 0.88 },
+      { x: -0.72, y: 0.02, z: 0, radius: 0.8 },
+      { x: 0.72, y: 0.02, z: 0, radius: 0.8 }
+    ];
+    const lines = [
+      { from: 0, to: 1, weight: 0.72 },
+      { from: 1, to: 2, weight: 0.86 },
+      { from: 3, to: 4, weight: 0.82 }
+    ];
+    return { nodes, lines, circles: [{ node: 0, radius: 0.46, weight: 0.62 }] };
+  }
+
+  function createContextLabyrinth(depth) {
+    const nodes = [];
+    const lines = [];
+    for (let index = 0; index < 24; index += 1) {
+      const t = index / 23;
+      const angle = -Math.PI / 2 + t * Math.PI * 6;
+      const radius = 1.58 - t * 1.18;
+      nodes.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, z: Math.cos(t * Math.PI * 2) * depth * 0.45, radius: 0.72 });
+      if (index > 0) lines.push({ from: index - 1, to: index, weight: 0.72 });
+    }
+    return { nodes, lines, circles: [{ node: 0, radius: 1.62, weight: 0.24 }, { node: nodes.length - 1, radius: 0.22, weight: 0.48 }] };
+  }
+
+  function createContextTree(depth) {
+    const coords = [
+      [0, 1.35], [-0.62, 0.58], [0.62, 0.58], [0, 0.05], [-0.52, -0.72], [0.52, -0.72], [0, -1.38]
+    ];
+    const nodes = coords.map(([x, y], index) => ({ x, y, z: (index % 2 ? -depth : depth) * 0.45, radius: index === 0 || index === 6 ? 1.05 : 0.86 }));
+    const lines = [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4], [3, 5], [4, 6], [5, 6], [1, 2], [4, 5]].map(([from, to]) => ({ from, to, weight: 0.68 }));
+    const circles = nodes.map((_, index) => ({ node: index, radius: index === 3 ? 0.22 : 0.16, weight: 0.34 }));
+    return { nodes, lines, circles };
+  }
+
+  function createContextCaduceus(depth) {
+    const nodes = [];
+    const lines = [];
+    for (let index = 0; index < 18; index += 1) {
+      const t = index / 17;
+      const y = 1.35 - t * 2.7;
+      const angle = t * Math.PI * 4;
+      nodes.push({ x: Math.sin(angle) * 0.42, y, z: Math.cos(angle) * depth, radius: 0.72 });
+      nodes.push({ x: -Math.sin(angle) * 0.42, y, z: -Math.cos(angle) * depth, radius: 0.72 });
+      if (index > 0) {
+        lines.push({ from: (index - 1) * 2, to: index * 2, weight: 0.72 });
+        lines.push({ from: (index - 1) * 2 + 1, to: index * 2 + 1, weight: 0.72 });
+      }
+      if (index % 3 === 0) lines.push({ from: index * 2, to: index * 2 + 1, weight: 0.34 });
+    }
+    const top = nodes.length;
+    nodes.push({ x: 0, y: 1.58, z: 0, radius: 0.86 });
+    const bottom = nodes.length;
+    nodes.push({ x: 0, y: -1.58, z: 0, radius: 0.86 });
+    lines.push({ from: top, to: bottom, weight: 0.82 });
+    return { nodes, lines, circles: [{ node: top, radius: 0.18, weight: 0.4 }] };
   }
 
   function createMetatronGeometry() {

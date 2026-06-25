@@ -302,7 +302,7 @@ body[data-scene="water-veil"] .orbital-shade {
   bottom: calc(78px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
   width: min(520px, calc(100vw - 28px));
   padding: 7px;
@@ -331,7 +331,7 @@ body[data-scene="water-veil"] .orbital-shade {
 
 .action-button {
   min-height: 42px;
-  padding: 0 12px;
+  padding: 0 9px;
   border: 1px solid rgba(242, 234, 223, 0.1);
   color: rgba(242, 234, 223, 0.78);
   background: rgba(242, 234, 223, 0.055);
@@ -832,8 +832,17 @@ body[data-scene="paper-ink"] select option:checked {
   line-height: 1.25;
 }
 
+.context-card .context-effect {
+  color: rgba(232, 196, 109, 0.72);
+  font-size: 0.66rem;
+}
+
 .context-card.active span {
   color: rgba(18, 9, 8, 0.72);
+}
+
+.context-card.active .context-effect {
+  color: rgba(18, 9, 8, 0.82);
 }
 
 .upload-action {
@@ -1212,6 +1221,16 @@ body[data-control-tab="save"] .export-panel {
     transform: none;
     width: 100%;
     margin: 0 0 7px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 5px;
+    padding: 6px;
+    border-radius: 18px;
+  }
+
+  .action-button {
+    min-height: 42px;
+    padding: 0 4px;
+    font-size: 0.68rem;
   }
 
   .stage-hint {
@@ -1333,6 +1352,16 @@ body[data-control-tab="save"] .export-panel {
 
   .tone-panel {
     grid-column: 1 / -1;
+  }
+
+  .action-rail {
+    gap: 4px;
+    padding: 5px;
+  }
+
+  .action-button {
+    min-height: 40px;
+    font-size: 0.62rem;
   }
 
   .control-tabs {

@@ -14,7 +14,7 @@
   <meta property="og:image" content="https://coherence-nikolai.app/toneglyph/icon.svg">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./styles.css?v=20260623-audio-labels">
+  <link rel="stylesheet" href="./styles.css?v=20260625-upgrade-loop-1">
 </head>
 <body data-mode="ritual" data-view="living" data-control-tab="form" data-action="none">
   <main class="app-shell">
@@ -51,12 +51,14 @@
     </nav>
 
     <nav id="action-rail" class="action-rail" aria-label="Tone Glyph actions">
-      <button class="action-button" type="button" data-action-button="tune" aria-expanded="false">Audio</button>
       <button class="action-button" type="button" data-action-button="shape" aria-expanded="false">Shape</button>
-      <button class="action-button primary-action-button" type="button" data-action-button="seal" aria-expanded="false">Seal</button>
+      <button class="action-button" type="button" data-action-button="tune" aria-expanded="false">Audio</button>
+      <button class="action-button" type="button" data-action-button="world" aria-expanded="false">World</button>
+      <button class="action-button" type="button" data-action-button="motion" aria-expanded="false">Motion</button>
+      <button class="action-button" type="button" data-action-button="seal" aria-expanded="false">Ritual</button>
       <button class="action-button" type="button" data-action-button="save" aria-expanded="false">Save</button>
     </nav>
-    <p id="stage-hint" class="stage-hint">Drag to turn. Tap Audio to listen. Seal when it feels right.</p>
+    <p id="stage-hint" class="stage-hint">Choose Shape, Audio, World, Motion, Ritual, or Save. Drag the glyph when it feels alive.</p>
 
     <section id="control-drawer" class="control-dock" aria-label="Tone Glyph creator controls" hidden>
       <div class="drawer-head">
@@ -68,7 +70,7 @@
       </div>
       <div id="control-tabs" class="control-tabs" aria-label="Creator sections">
         <button class="control-tab" type="button" data-control-tab="form">Form</button>
-        <button class="control-tab" type="button" data-control-tab="matter">Matter</button>
+        <button class="control-tab" type="button" data-control-tab="matter">World</button>
         <button class="control-tab" type="button" data-control-tab="tone">Audio</button>
         <button class="control-tab" type="button" data-control-tab="motion">Motion</button>
         <button class="control-tab" type="button" data-control-tab="ritual">Ritual</button>
@@ -301,6 +303,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
 
-  <script src="./app.js?v=20260623-audio-labels" defer></script>
+  <script src="./app.js?v=20260625-upgrade-loop-1" defer></script>
 </body>
 </html>
