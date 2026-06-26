@@ -992,6 +992,14 @@ dd {
     rgba(255, 255, 255, 0.032);
 }
 
+.app-card.tone-loom-card {
+  background:
+    radial-gradient(circle at 50% 17%, rgba(232, 215, 178, 0.24), transparent 14rem),
+    radial-gradient(circle at 44% 48%, rgba(230, 201, 133, 0.12), transparent 15rem),
+    radial-gradient(circle at 67% 62%, rgba(255, 246, 232, 0.08), transparent 16rem),
+    rgba(255, 255, 255, 0.032);
+}
+
 .app-card:hover {
   transform: translateY(-2px);
   border-color: rgba(232, 215, 178, 0.36);

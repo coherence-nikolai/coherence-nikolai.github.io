@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Tone Loom</title>
+  <desc id="desc">A luminous spiral orb for Tone Loom.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="52%" r="62%">
+      <stop offset="0%" stop-color="#e9ddc9"/>
+      <stop offset="28%" stop-color="#a88f68"/>
+      <stop offset="64%" stop-color="#3a2a20"/>
+      <stop offset="100%" stop-color="#170704"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="48%">
+      <stop offset="0%" stop-color="#fff8e7" stop-opacity=".95"/>
+      <stop offset="36%" stop-color="#ecd7aa" stop-opacity=".45"/>
+      <stop offset="100%" stop-color="#ecd7aa" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="thread" x1="18%" x2="86%" y1="62%" y2="36%">
+      <stop offset="0%" stop-color="#fff8e7" stop-opacity=".68"/>
+      <stop offset="45%" stop-color="#fffef5"/>
+      <stop offset="100%" stop-color="#d5b57a" stop-opacity=".82"/>
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="13" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="#160704"/>
+  <circle cx="512" cy="512" r="368" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="230" fill="url(#glow)" opacity=".85"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="512" cy="512" r="363" stroke="#fff4df" stroke-width="13" opacity=".94"/>
+    <circle cx="512" cy="512" r="290" stroke="#fff4df" stroke-width="5" opacity=".25"/>
+    <path d="M512 270c82 40 88 115 18 154s-148 92-81 167 177 13 177-104c0-98-86-178-206-156-120 21-211 134-157 262 39 94 145 149 267 129 142-23 243-134 233-281" stroke="#fff4df" stroke-width="6" opacity=".18"/>
+    <path d="M512 754c-125-49-167-150-116-247 44-84 156-112 221-64 54 40 53 117-4 155-61 40-148 9-150-67-2-70 76-112 121-69 37 35 12 91-38 88-40-2-60-43-39-71 17-23 53-22 64 2" stroke="#fff8e7" stroke-width="20" opacity=".9" filter="url(#softGlow)"/>
+    <path d="M512 754c-125-49-167-150-116-247 44-84 156-112 221-64 54 40 53 117-4 155-61 40-148 9-150-67-2-70 76-112 121-69 37 35 12 91-38 88-40-2-60-43-39-71 17-23 53-22 64 2" stroke="url(#thread)" stroke-width="12" opacity=".96"/>
+    <g opacity=".22" stroke="#fff4df" stroke-width="7">
+      <path d="M296 510c76-75 154-75 232 0s154 75 231 0"/>
+      <path d="M512 296c75 76 75 154 0 232s-75 154 0 231"/>
+      <path d="M340 340c108 4 162 59 162 166s54 162 162 166"/>
+      <path d="M684 340c-108 4-162 59-162 166s-54 162-162 166"/>
+    </g>
+  </g>
+  <g fill="#fff8e7" filter="url(#softGlow)">
+    <circle cx="440" cy="331" r="21"/>
+    <circle cx="585" cy="446" r="15"/>
+    <circle cx="379" cy="524" r="13"/>
+    <circle cx="507" cy="583" r="15"/>
+    <circle cx="651" cy="595" r="18"/>
+  </g>
+  <g fill="none" stroke="#fff8e7" stroke-width="7" opacity=".92">
+    <circle cx="440" cy="331" r="30"/>
+    <circle cx="585" cy="446" r="23"/>
+    <circle cx="379" cy="524" r="21"/>
+    <circle cx="507" cy="583" r="23"/>
+    <circle cx="651" cy="595" r="29"/>
+  </g>
+</svg>

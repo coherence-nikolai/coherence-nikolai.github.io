@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#160704">
+  <meta name="description" content="Tone Loom is a free browser instrument for weaving tone lore into luminous spell paths.">
+  <title>Tone Loom | Coherence Nikolai</title>
+  <link rel="icon" href="/tone_loom/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/tone_loom/manifest.webmanifest">
+  <link rel="stylesheet" href="/tone_loom/styles.css">
+</head>
+<body>
+  <div class="page-glow" aria-hidden="true"></div>
+
+  <section class="landing-screen" id="landingScreen" aria-label="Tone Loom landing">
+    <a class="family-link" href="/">Tone family</a>
+    <div class="landing-orb" aria-hidden="true">
+      <img src="/tone_loom/icon.svg" alt="">
+      <span class="orb-runner"></span>
+    </div>
+    <div class="landing-copy">
+      <h1><span>TONE</span><span>LOOM</span></h1>
+      <p>A living instrument of tone and light.</p>
+    </div>
+    <button class="primary-entry" type="button" id="enterButton">Enter the loom</button>
+  </section>
+
+  <main class="loom-app" id="loomApp" hidden>
+    <header class="app-topbar" aria-label="Tone Loom controls">
+      <a class="back-link" href="/" aria-label="Back to Tone family">Tone family</a>
+      <div class="topbar-actions">
+        <button class="icon-button" id="seedButton" type="button" title="Seed audio" aria-label="Seed audio">Seed</button>
+        <button class="icon-button" id="archiveButton" type="button" title="Spellbook" aria-label="Spellbook">Spells</button>
+        <button class="icon-button" id="homeButton" type="button" title="Landing" aria-label="Landing">Orb</button>
+      </div>
+    </header>
+
+    <section class="instrument-shell" aria-label="Playable Tone Loom wheel">
+      <canvas id="loomCanvas" aria-label="Tone Loom wheel. Tap, hold, or drag to play tones."></canvas>
+      <div class="loom-hint" id="hintText" aria-live="polite">Run your finger around the wheel</div>
+    </section>
+
+    <section class="current-strip" aria-label="Current spell state">
+      <span id="wheelName">Low to High</span>
+      <span id="toneCount">24 tones</span>
+      <span id="spellState">Free play</span>
+    </section>
+
+    <section class="wheel-rail" aria-label="Magic Wheels">
+      <div class="rail-head">
+        <span>Magic Wheels</span>
+        <span id="wheelDescription">The mythic scale in low-to-high order.</span>
+      </div>
+      <div class="pill-row" id="wheelButtons"></div>
+    </section>
+
+    <section class="mode-rail" aria-label="Instrument modes">
+      <div class="pill-row compact" id="modeButtons"></div>
+    </section>
+
+    <section class="action-rail" aria-label="Spell actions">
+      <button class="action-button" id="weaveButton" type="button">Weave</button>
+      <button class="action-button" id="playButton" type="button">Play</button>
+      <button class="action-button" id="keepButton" type="button">Keep</button>
+      <button class="action-button quiet" id="clearButton" type="button">Clear</button>
+    </section>
+
+    <section class="seed-strip" id="seedStrip" hidden aria-label="Imported seed actions">
+      <span id="seedName">Seed ready</span>
+      <button type="button" id="playSeedButton">Play Seed</button>
+      <button type="button" id="loopSeedButton">Loop Seed</button>
+      <button type="button" id="clearSeedButton">Clear Seed</button>
+    </section>
+
+    <input id="seedInput" type="file" accept="audio/*,video/*" hidden>
+  </main>
+
+  <dialog class="loom-dialog" id="saveDialog" aria-labelledby="saveTitle">
+    <form method="dialog">
+      <h2 id="saveTitle">Keep this spell</h2>
+      <label>
+        Spell name
+        <input id="spellNameInput" maxlength="48" autocomplete="off" placeholder="Gold Thread Spell">
+      </label>
+      <label>
+        Intention
+        <textarea id="intentionInput" maxlength="180" rows="3" placeholder="A short phrase held inside the spell"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button value="cancel" type="submit">Cancel</button>
+        <button class="dialog-primary" id="saveSpellButton" value="save" type="submit">Keep</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="loom-dialog archive-dialog" id="archiveDialog" aria-labelledby="archiveTitle">
+    <form method="dialog">
+      <div class="dialog-heading">
+        <h2 id="archiveTitle">Spellbook</h2>
+        <button value="close" type="submit">Done</button>
+      </div>
+      <div class="archive-list" id="archiveList"></div>
+    </form>
+  </dialog>
+
+  <script src="/tone_loom/app.js" defer></script>
+</body>
+</html>
