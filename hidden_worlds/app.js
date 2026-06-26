@@ -2,7 +2,7 @@ const heroLens = {
   surface: {
     kicker: "Visible behavior",
     title: "A guarded reply",
-    copy: "The surface may be sharp. The world underneath may be protecting someone from feeling exposed."
+    copy: "The surface may be sharp. One possible world beneath it may be protecting someone from feeling exposed."
   },
   world: {
     kicker: "Possible hidden world",

@@ -12,6 +12,8 @@
   --gold-2: #f0ca82;
   --gold-dim: rgba(217, 160, 76, 0.26);
   --teal: #1f4a4a;
+  --world-violet: #2a263e;
+  --world-rose: #8f5f68;
   --line: rgba(243, 231, 207, 0.12);
   --line-gold: rgba(217, 160, 76, 0.44);
   --shadow: 0 30px 90px rgba(0, 0, 0, 0.54);
@@ -35,8 +37,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(ellipse at 50% 32rem, rgba(217, 160, 76, 0.12), transparent 26rem),
-    linear-gradient(180deg, rgba(6, 13, 14, 0.96), var(--bg) 34rem),
+    radial-gradient(circle at 48% 18rem, rgba(217, 160, 76, 0.1), transparent 28rem),
+    radial-gradient(circle at 78% 18rem, rgba(42, 38, 62, 0.2), transparent 27rem),
+    radial-gradient(circle at 12% 42rem, rgba(31, 74, 74, 0.12), transparent 26rem),
+    linear-gradient(180deg, rgba(4, 8, 8, 0.98), var(--bg) 38rem),
     var(--bg);
   color: var(--ink);
   font-family: var(--sans);
@@ -614,7 +618,7 @@ h1 {
   right: 1rem;
   bottom: 0.78rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.2rem;
   border-top: 1px solid rgba(243, 231, 207, 0.08);
   padding-top: 0.48rem;
@@ -758,7 +762,9 @@ h1 {
   border: 1px solid rgba(243, 231, 207, 0.08);
   border-radius: var(--radius);
   padding: 0.68rem;
-  background: rgba(31, 74, 74, 0.32);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(143, 95, 104, 0.12), transparent 7rem),
+    rgba(31, 74, 74, 0.24);
 }
 
 .swap-list strong,

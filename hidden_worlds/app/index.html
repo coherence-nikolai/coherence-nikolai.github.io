@@ -24,17 +24,18 @@
       </a>
       <nav class="mode-tabs" aria-label="App sections">
         <button class="is-active" type="button" data-mode="lens">Lens</button>
-        <button type="button" data-mode="swap">Swap</button>
+        <button type="button" data-mode="library">Atlas</button>
         <button type="button" data-mode="daily">Daily</button>
-        <button type="button" data-mode="library">Library</button>
       </nav>
     </header>
 
     <main>
       <section class="hero-panel" aria-labelledby="app-title">
-        <div>
-          <h1 id="app-title">Every person lives in a world you cannot see.</h1>
-          <p>Use it for work, family, love, friendship, money, body, culture, grief, and the small strange moments with people you barely know.</p>
+        <div class="hero-copy">
+          <p class="app-kicker">Begin with the surface</p>
+          <h1 id="app-title">Start with one moment.</h1>
+          <p class="founder-line">Every Person Lives in a World You Cannot See.</p>
+          <p>Describe only what happened. Hidden Worlds will offer possible worlds, not verdicts, so you can respond with more curiosity and less certainty.</p>
         </div>
         <div class="world-mark" aria-hidden="true">
           <span></span><span></span><span></span><span></span><span></span>
@@ -51,29 +52,21 @@
         </div>
       </section>
 
-      <section class="life-rooms" aria-label="Life rooms Hidden Worlds can explore">
-        <span>Work</span>
-        <span>Family</span>
-        <span>Love</span>
-        <span>Friendship</span>
-        <span>Money</span>
-        <span>Body</span>
-        <span>Learning</span>
-        <span>Culture</span>
-        <span>Grief</span>
-        <span>Digital</span>
-        <span>Change</span>
-        <span>Strangers</span>
+      <section class="ritual-strip" aria-label="How to use Hidden Worlds">
+        <span><strong>01</strong> Name the surface</span>
+        <span><strong>02</strong> Reveal possible worlds</span>
+        <span><strong>03</strong> Step into one</span>
+        <span><strong>04</strong> Ask a better question</span>
       </section>
 
       <section class="mode-view is-active" id="lens" data-view="lens" aria-labelledby="lens-title">
         <div class="split-layout">
           <section class="input-panel">
             <p class="eyebrow">World Lens</p>
-            <h2 id="lens-title">What world might create this behavior?</h2>
-            <label for="surface-input">Visible behavior</label>
-            <textarea id="surface-input" rows="5" placeholder="Someone does not reply to a message"></textarea>
-            <p class="guardrail-note">These are possibilities, not diagnoses or facts. Use them to ask better questions, keep boundaries, and stay accountable.</p>
+            <h2 id="lens-title">Describe only what happened.</h2>
+            <label for="surface-input">Surface moment</label>
+            <textarea id="surface-input" rows="5" placeholder="Someone does not reply after seeing my message"></textarea>
+            <p class="guardrail-note">Reflection prompts, not diagnoses, facts, therapy, medical, legal, or emergency guidance.</p>
             <div class="example-row" aria-label="Example behaviors">
               <button type="button" data-example="My friend leaves my messages unread">Unread messages</button>
               <button type="button" data-example="A teammate sounds sharp in meetings">Sharp tone</button>
@@ -81,27 +74,16 @@
               <button type="button" data-example="Someone gets precise about shared costs">Shared costs</button>
               <button type="button" data-example="Someone becomes irritable in a busy place">Busy place</button>
             </div>
-            <button class="primary-action" type="button" id="reveal-worlds">Explore possible worlds</button>
+            <button class="primary-action" type="button" id="reveal-worlds">Reveal possible worlds</button>
           </section>
 
           <section class="result-panel" aria-live="polite">
             <div class="result-head">
-              <p class="eyebrow">Possibilities</p>
-              <span id="result-count">3</span>
+              <p class="eyebrow">Possible worlds</p>
+              <span id="result-count">3 prompts</span>
             </div>
             <div class="world-results" id="world-results"></div>
           </section>
-        </div>
-      </section>
-
-      <section class="mode-view" id="swap" data-view="swap" aria-labelledby="swap-title">
-        <div class="section-head">
-          <p class="eyebrow">World Swap</p>
-          <h2 id="swap-title">Same moment. Different worlds.</h2>
-        </div>
-        <div class="swap-grid">
-          <div class="swap-chooser" id="swap-chooser" aria-label="Choose a moment"></div>
-          <div class="swap-results" id="swap-results" aria-live="polite"></div>
         </div>
       </section>
 
@@ -113,7 +95,7 @@
           <div class="daily-copy">
             <h2 id="daily-title">A quiet invitation to widen your view.</h2>
             <p>One world each day. No streaks. No pressure. Just a practice of attention.</p>
-            <button class="primary-action" type="button" id="daily-library">Find related worlds</button>
+            <button class="primary-action" type="button" id="daily-library">Open in Atlas</button>
           </div>
         </div>
       </section>
@@ -121,9 +103,10 @@
       <section class="mode-view" id="library" data-view="library" aria-labelledby="library-title">
         <div class="library-layout">
           <aside class="library-tools">
-            <p class="eyebrow">Hidden Library</p>
-            <h2 id="library-title">Search the World Atlas.</h2>
-            <label for="library-search">Search behavior, need, or tag</label>
+            <p class="eyebrow">World Atlas</p>
+            <h2 id="library-title">Search 112 hidden worlds.</h2>
+            <p class="atlas-note">A large, searchable map of human situations. Every result is a door, never a label.</p>
+            <label for="library-search">Search behavior, need, life room, or tag</label>
             <input id="library-search" type="search" placeholder="left on read, money, conflict, body, home">
             <div class="search-suggestions" id="search-suggestions" aria-label="Suggested searches"></div>
             <div class="category-list" id="category-list" aria-label="Library categories"></div>
@@ -131,7 +114,7 @@
           <section class="library-results" aria-live="polite">
             <div class="result-head">
               <p id="library-summary">World Atlas</p>
-              <span id="library-count">112</span>
+              <span id="library-count">112 prompts</span>
             </div>
             <div class="entry-list" id="entry-list"></div>
           </section>

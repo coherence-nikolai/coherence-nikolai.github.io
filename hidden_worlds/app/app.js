@@ -4,7 +4,7 @@ const state = {
   mode: "lens",
   selectedCategory: "all",
   libraryQuery: "",
-  selectedSwap: "missed-message"
+  selectedLensEntryId: ""
 };
 
 const stopWords = new Set([
@@ -72,7 +72,8 @@ const phraseAliases = [
 const unsafeTokens = new Set([
   "abuse", "abused", "abusive", "assault", "violence", "violent", "hit", "hits", "hitting", "harm",
   "unsafe", "danger", "dangerous", "threat", "threaten", "threatened", "coercion", "coerce", "stalking",
-  "stalk", "suicide", "selfharm", "self-harm", "weapon", "emergency"
+  "stalk", "suicide", "selfharm", "self-harm", "weapon", "emergency", "doctor", "hospital", "medical",
+  "pain", "illness", "symptom", "symptoms", "health"
 ]);
 
 const defaultSuggestions = [
@@ -86,37 +87,6 @@ const defaultSuggestions = [
   "quiet neighbor"
 ];
 
-const swapMoments = [
-  {
-    id: "missed-message",
-    title: "The missed message",
-    surface: "Someone does not reply.",
-    query: "message silent overwhelmed friend attention",
-    ids: ["overwhelmed-responder", "notification-avoider", "low-bandwidth-friend"]
-  },
-  {
-    id: "late-again",
-    title: "Late again",
-    surface: "Someone arrives after everyone waited.",
-    query: "late deadline delay shame pressure",
-    ids: ["delayed-work", "deadline-defender", "commitment-hesitation"]
-  },
-  {
-    id: "sharp-reply",
-    title: "A sharp reply",
-    surface: "Their tone suddenly closes.",
-    query: "guarded sharp tone criticism safety",
-    ids: ["guarded-reply", "threat-reader", "shame-spiral"]
-  },
-  {
-    id: "quiet-room",
-    title: "The quiet room",
-    surface: "Someone says little in a group.",
-    query: "quiet group meeting accent belonging",
-    ids: ["newcomer", "meeting-silencer", "accent-guard"]
-  }
-];
-
 const els = {
   modeButtons: document.querySelectorAll("[data-mode]"),
   views: document.querySelectorAll("[data-view]"),
@@ -125,8 +95,6 @@ const els = {
   resultCount: document.querySelector("#result-count"),
   worldResults: document.querySelector("#world-results"),
   exampleButtons: document.querySelectorAll("[data-example]"),
-  swapChooser: document.querySelector("#swap-chooser"),
-  swapResults: document.querySelector("#swap-results"),
   dailyCard: document.querySelector("#daily-card"),
   dailyLibrary: document.querySelector("#daily-library"),
   librarySearch: document.querySelector("#library-search"),
@@ -160,8 +128,8 @@ function tokenVariants(token, includeAliases = true) {
   const variants = new Set([token]);
 
   if (token.endsWith("ies") && token.length > 4) variants.add(`${token.slice(0, -3)}y`);
-  if (token.endsWith("es") && token.length > 4) variants.add(token.slice(0, -2));
-  if (token.endsWith("s") && token.length > 3) variants.add(token.slice(0, -1));
+  else if (token.endsWith("es") && token.length > 4) variants.add(token.slice(0, -2));
+  else if (token.endsWith("s") && token.length > 3) variants.add(token.slice(0, -1));
   if (token.endsWith("ed") && token.length > 4) variants.add(token.slice(0, -1));
   if (token.endsWith("ing") && token.length > 5) variants.add(token.slice(0, -3));
 
@@ -298,12 +266,13 @@ function relatedEntries(entry, limit = 3) {
 function renderReasonPills(reasons = []) {
   if (!reasons.length) return "";
   const pills = reasons
-    .flatMap((reason) => reason.terms.map((term) => `${reason.label}: ${term}`))
+    .flatMap((reason) => reason.terms)
+    .filter((term, index, all) => all.indexOf(term) === index)
     .slice(0, 4)
     .map((reason) => `<span>${escapeHtml(reason)}</span>`)
     .join("");
 
-  return `<div class="match-row" aria-label="Why this appeared"><strong>Matched because</strong>${pills}</div>`;
+  return `<div class="match-row" aria-label="Why this appeared"><strong>This prompt touches</strong>${pills}</div>`;
 }
 
 function renderRelatedDoors(entry) {
@@ -312,7 +281,7 @@ function renderRelatedDoors(entry) {
 
   return `
     <div class="related-doors">
-      <p>Nearby doors</p>
+      <p>Adjacent prompts</p>
       <div>
         ${related.map((result) => `
           <button type="button" data-library-entry="${escapeHtml(result.entry.id)}">
@@ -340,16 +309,16 @@ function renderWorldCard(entry, options = {}) {
   const boundaryReminder = entry.boundaryReminder || "This is one possible world, not the explanation. Understanding behavior does not excuse harm, remove boundaries, or replace direct communication.";
 
   return `
-    <article class="world-card">
+    <article class="world-card ${options.featured ? "featured-world" : ""}">
       ${renderReasonPills(options.reasons)}
       <p class="meta-line">${escapeHtml(categoryDisplayName(entry))}</p>
       <h3>${escapeHtml(entry.title)}</h3>
-      <p><strong>Visible:</strong> ${escapeHtml(surface)}</p>
+      <p><strong>Surface:</strong> ${escapeHtml(surface)}</p>
       <p><strong>Possible world:</strong> ${escapeHtml(entry.worldHypothesis)}</p>
-      <p><strong>What this may be protecting:</strong> ${escapeHtml(entry.protectiveMove)}</p>
+      <p><strong>Possible protection:</strong> ${escapeHtml(entry.protectiveMove)}</p>
       ${alternateWorlds.length ? `
         <div class="alternate-worlds">
-          <p>Other possible doors</p>
+          <p>Other possible worlds</p>
           <ul>
             ${alternateWorlds.map((world) => `<li>${escapeHtml(world)}</li>`).join("")}
           </ul>
@@ -360,7 +329,7 @@ function renderWorldCard(entry, options = {}) {
       <div class="tag-row">${needs}</div>
       <div class="card-actions">
         <button class="entry-open" type="button" data-library-entry="${escapeHtml(entry.id)}">
-          Open in atlas
+          Open reflection
         </button>
       </div>
       ${options.related === false ? "" : renderRelatedDoors(entry)}
@@ -379,32 +348,50 @@ function setMode(mode) {
   history.replaceState(null, "", `#${mode}`);
 }
 
-function revealWorlds() {
+function renderLensAlternates(results, selectedEntryId) {
+  const alternates = results.filter((result) => result.entry.id !== selectedEntryId).slice(0, 2);
+  if (!alternates.length) return "";
+
+  return `
+    <div class="alternate-stack">
+      <p>Other possible worlds to hold lightly</p>
+      ${alternates.map((result) => `
+        <button type="button" data-lens-entry="${escapeHtml(result.entry.id)}">
+          <span>${escapeHtml(result.entry.title)}</span>
+          <small>${escapeHtml(result.entry.worldHypothesis)}</small>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderLensResults(results, query) {
+  if (!results.length) {
+    return `<div class="empty-state">No close prompt yet. Try a simpler surface word like silence, boundary, work, family, grief, culture, or control.</div>`;
+  }
+
+  if (!results.some((result) => result.entry.id === state.selectedLensEntryId)) {
+    state.selectedLensEntryId = results[0].entry.id;
+  }
+
+  const selected = results.find((result) => result.entry.id === state.selectedLensEntryId) || results[0];
+  return `
+    ${renderWorldCard(selected.entry, {
+      surface: query,
+      reasons: selected.reasons,
+      featured: true,
+      related: false
+    })}
+    ${renderLensAlternates(results, selected.entry.id)}
+  `;
+}
+
+function revealWorlds(options = {}) {
   const query = els.surfaceInput.value.trim() || els.surfaceInput.placeholder;
   const results = rankedEntries(query).slice(0, 3);
-  els.resultCount.textContent = String(results.length);
-  els.worldResults.innerHTML = safetyNotice(query) + (results.length
-    ? results.map((result) => renderWorldCard(result.entry, { surface: query, reasons: result.reasons })).join("")
-    : `<div class="empty-state">No close match yet. Try a simpler surface word like silence, boundary, work, family, grief, culture, or control.</div>`);
-}
-
-function renderSwapChooser() {
-  els.swapChooser.innerHTML = swapMoments.map((moment) => `
-    <button type="button" data-swap="${escapeHtml(moment.id)}" class="${moment.id === state.selectedSwap ? "is-active" : ""}">
-      <strong>${escapeHtml(moment.title)}</strong>
-      <span>${escapeHtml(moment.surface)}</span>
-    </button>
-  `).join("");
-}
-
-function renderSwap() {
-  const moment = swapMoments.find((item) => item.id === state.selectedSwap) || swapMoments[0];
-  const explicitEntries = moment.ids
-    .map((id) => entries.find((entry) => entry.id === id))
-    .filter(Boolean);
-  const fallbackEntries = searchEntries(moment.query).filter((entry) => !moment.ids.includes(entry.id));
-  const results = [...explicitEntries, ...fallbackEntries].slice(0, 3);
-  els.swapResults.innerHTML = results.map((entry) => renderWorldCard(entry, { surface: moment.surface })).join("");
+  if (!options.keepSelection) state.selectedLensEntryId = results[0]?.entry.id || "";
+  els.resultCount.textContent = results.length ? `${results.length} prompts` : "0 prompts";
+  els.worldResults.innerHTML = safetyNotice(query) + renderLensResults(results, query);
 }
 
 function dailyEntry() {
@@ -418,7 +405,7 @@ function renderDaily() {
   els.dailyCard.innerHTML = `
     <p class="eyebrow">Daily Hidden World</p>
     <h3>${escapeHtml(entry.title)}</h3>
-    <p><strong>Visible:</strong> ${escapeHtml(entry.visibleBehavior)}</p>
+    <p><strong>Surface:</strong> ${escapeHtml(entry.visibleBehavior)}</p>
     <p><strong>Possible world:</strong> ${escapeHtml(entry.worldHypothesis)}</p>
     <p><strong>Life room:</strong> ${escapeHtml(categoryDisplayName(entry))}</p>
     <p class="question">${escapeHtml(entry.wiseQuestion)}</p>
@@ -448,7 +435,7 @@ function renderLibrary() {
     : categories.find((category) => category.id === state.selectedCategory)?.name || "World Atlas";
 
   els.librarySummary.textContent = state.libraryQuery ? `Search: ${state.libraryQuery}` : categoryName;
-  els.libraryCount.textContent = String(results.length);
+  els.libraryCount.textContent = `${results.length} prompts`;
   els.entryList.innerHTML = safetyNotice(state.libraryQuery) + (results.length
     ? results.map((result) => renderWorldCard(result.entry, { reasons: result.reasons })).join("")
     : `<div class="empty-state">No world found. Try a visible behavior, a need, or a simpler word.</div>`);
@@ -471,7 +458,7 @@ function renderSearchSuggestions() {
   `).join("");
 }
 
-function openEntryInLibrary(entryId) {
+function openEntryInAtlas(entryId) {
   const entry = entries.find((item) => item.id === entryId);
   if (!entry) return;
   state.libraryQuery = entry.title;
@@ -489,11 +476,15 @@ els.modeButtons.forEach((button) => {
 els.exampleButtons.forEach((button) => {
   button.addEventListener("click", () => {
     els.surfaceInput.value = button.dataset.example;
+    state.selectedLensEntryId = "";
     revealWorlds();
   });
 });
 
-els.revealButton.addEventListener("click", revealWorlds);
+els.revealButton.addEventListener("click", () => {
+  state.selectedLensEntryId = "";
+  revealWorlds();
+});
 
 els.surfaceInput.addEventListener("keydown", (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
@@ -501,24 +492,9 @@ els.surfaceInput.addEventListener("keydown", (event) => {
   }
 });
 
-els.swapChooser.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-swap]");
-  if (!button) return;
-  state.selectedSwap = button.dataset.swap;
-  renderSwapChooser();
-  renderSwap();
-});
-
 els.dailyLibrary.addEventListener("click", () => {
   const entryId = els.dailyCard.dataset.entryId;
-  const entry = entries.find((item) => item.id === entryId);
-  if (!entry) return;
-  state.libraryQuery = "";
-  state.selectedCategory = entry.category;
-  els.librarySearch.value = "";
-  renderCategories();
-  renderLibrary();
-  setMode("library");
+  openEntryInAtlas(entryId);
 });
 
 els.librarySearch.addEventListener("input", () => {
@@ -543,21 +519,26 @@ els.categoryList.addEventListener("click", (event) => {
 });
 
 document.addEventListener("click", (event) => {
+  const lensButton = event.target.closest("[data-lens-entry]");
+  if (lensButton) {
+    state.selectedLensEntryId = lensButton.dataset.lensEntry;
+    revealWorlds({ keepSelection: true });
+    return;
+  }
+
   const button = event.target.closest("[data-library-entry]");
   if (!button) return;
-  openEntryInLibrary(button.dataset.libraryEntry);
+  openEntryInAtlas(button.dataset.libraryEntry);
 });
 
 function init() {
   renderCategories();
-  renderSwapChooser();
-  renderSwap();
   renderDaily();
   revealWorlds();
   renderLibrary();
 
   const initialMode = location.hash.replace("#", "");
-  if (["lens", "swap", "daily", "library"].includes(initialMode)) {
+  if (["lens", "daily", "library"].includes(initialMode)) {
     setMode(initialMode);
   }
 }
