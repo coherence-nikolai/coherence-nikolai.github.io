@@ -371,6 +371,10 @@ h3 {
   display: block;
 }
 
+.lens-workbench {
+  padding-top: clamp(0.4rem, 1.5vw, 0.85rem);
+}
+
 .split-layout,
 .library-layout,
 .daily-layout {
@@ -414,6 +418,10 @@ h3 {
   padding: clamp(1rem, 3vw, 1.4rem);
 }
 
+.instrument-layout {
+  grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1.22fr);
+}
+
 .eyebrow,
 label,
 .result-head,
@@ -429,6 +437,12 @@ label,
   text-transform: uppercase;
 }
 
+.input-panel h1 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(2.35rem, 5.4vw, 4.1rem);
+  line-height: 0.92;
+}
+
 .input-panel h2,
 .section-head h2,
 .library-tools h2,
@@ -436,6 +450,17 @@ label,
   margin-bottom: 1rem;
   font-size: clamp(2rem, 5vw, 3.4rem);
   line-height: 1;
+}
+
+.input-panel .founder-line {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.02rem, 2.1vw, 1.3rem);
+}
+
+.lens-intro {
+  margin-bottom: 0.82rem;
+  color: var(--soft);
+  font-size: 0.95rem;
 }
 
 label {
@@ -497,6 +522,10 @@ input:focus {
   transition: transform 180ms ease, filter 180ms ease;
 }
 
+.input-panel .primary-action {
+  margin-top: 0.8rem;
+}
+
 .primary-action:hover,
 .primary-action:focus-visible {
   transform: translateY(-1px);
@@ -517,6 +546,26 @@ input:focus {
 
 .result-head span {
   color: var(--muted);
+}
+
+.result-orbit {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(243, 231, 207, 0.09);
+  padding-bottom: 1rem;
+}
+
+.result-orbit p:last-child {
+  margin: 0;
+  color: var(--soft);
+}
+
+.lens-mark {
+  width: clamp(4.9rem, 9vw, 6.4rem);
+  flex: 0 0 auto;
 }
 
 .search-suggestions {
@@ -594,6 +643,13 @@ input:focus {
 .world-card p {
   margin-bottom: 0.68rem;
   color: var(--soft);
+}
+
+.hold-lightly-card {
+  border-left: 1px solid rgba(240, 202, 130, 0.52);
+  padding-left: 0.64rem;
+  color: var(--gold-2) !important;
+  font-size: 0.86rem;
 }
 
 .world-card .question {
@@ -709,6 +765,58 @@ input:focus {
 .related-doors button:focus-visible {
   border-color: rgba(240, 202, 130, 0.68);
   color: var(--gold-2);
+}
+
+.atlas-door {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+  border: 1px solid rgba(243, 231, 207, 0.09);
+  border-radius: var(--radius-chamber);
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 94% 0%, rgba(240, 202, 130, 0.075), transparent 10rem),
+    linear-gradient(145deg, rgba(31, 74, 74, 0.13), rgba(255, 255, 255, 0.012)),
+    rgba(5, 12, 12, 0.72);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+}
+
+.atlas-door h3 {
+  margin-bottom: 0.28rem;
+  font-size: clamp(1.28rem, 3vw, 1.72rem);
+  line-height: 1.05;
+}
+
+.atlas-door .match-row {
+  margin-bottom: 0.5rem;
+}
+
+.atlas-door .tag-row {
+  margin-top: 0.62rem;
+}
+
+.door-surface,
+.door-world {
+  margin-bottom: 0.34rem;
+  color: var(--soft);
+  font-size: 0.92rem;
+}
+
+.door-surface {
+  color: var(--ink);
+}
+
+.door-world {
+  max-width: 42rem;
+}
+
+.atlas-door .entry-open {
+  min-width: 5.25rem;
+  align-self: stretch;
+  background:
+    linear-gradient(180deg, rgba(217, 160, 76, 0.12), rgba(31, 74, 74, 0.12)),
+    rgba(3, 8, 8, 0.58);
 }
 
 .alternate-stack {
@@ -860,6 +968,28 @@ input:focus {
   color: var(--soft);
 }
 
+.daily-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.daily-actions .primary-action,
+.daily-actions .entry-open {
+  width: auto;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.85rem;
+}
+
+.daily-actions .primary-action {
+  flex: 1 1 11rem;
+}
+
+.daily-actions .entry-open {
+  flex: 1 1 8rem;
+}
+
 .atlas-note {
   margin-top: -0.35rem;
   margin-bottom: 1rem;
@@ -908,6 +1038,180 @@ input:focus {
   background: rgba(6, 13, 14, 0.76);
 }
 
+.has-entry-detail {
+  overflow: hidden;
+}
+
+.entry-detail-shell[hidden] {
+  display: none;
+}
+
+.entry-detail-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.8rem, 3vw, 2rem);
+}
+
+.entry-detail-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(217, 160, 76, 0.12), transparent 25rem),
+    rgba(1, 3, 3, 0.82);
+  backdrop-filter: blur(14px);
+}
+
+.entry-detail-card {
+  position: relative;
+  width: min(100%, 52rem);
+  max-height: min(86vh, 54rem);
+  overflow: auto;
+  border: 1px solid rgba(217, 160, 76, 0.36);
+  border-radius: var(--radius-chamber);
+  padding: clamp(1rem, 4vw, 2rem);
+  background:
+    radial-gradient(circle at 72% 0%, rgba(143, 95, 104, 0.15), transparent 18rem),
+    radial-gradient(circle at 18% 0%, rgba(240, 202, 130, 0.12), transparent 18rem),
+    linear-gradient(145deg, rgba(31, 74, 74, 0.18), rgba(217, 160, 76, 0.045)),
+    rgba(5, 10, 10, 0.98);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.62);
+}
+
+.detail-close {
+  float: right;
+  min-height: 2.25rem;
+  border: 1px solid rgba(243, 231, 207, 0.12);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.68rem;
+  color: var(--soft);
+  background: rgba(1, 3, 3, 0.52);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.entry-detail-card h2 {
+  clear: both;
+  margin-bottom: 0.58rem;
+  font-size: clamp(2.25rem, 6vw, 4.6rem);
+  line-height: 0.95;
+}
+
+.detail-principle {
+  max-width: 38rem;
+  margin-bottom: 1.25rem;
+  color: var(--gold-2);
+  font-family: var(--serif);
+  font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+}
+
+.detail-map {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgba(243, 231, 207, 0.1);
+  border-radius: var(--radius);
+  background: rgba(243, 231, 207, 0.09);
+}
+
+.detail-map section {
+  min-height: 8rem;
+  padding: 1rem;
+  background: rgba(1, 5, 5, 0.74);
+}
+
+.detail-map span,
+.detail-boundary h3,
+.detail-alt-worlds h3,
+.detail-related h3,
+.detail-pill-group p {
+  display: block;
+  margin: 0 0 0.42rem;
+  color: var(--gold-2);
+  font-size: 0.72rem;
+  font-weight: 840;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detail-map p,
+.detail-boundary p,
+.detail-alt-worlds li {
+  margin: 0;
+  color: var(--soft);
+}
+
+.detail-boundary,
+.detail-alt-worlds,
+.detail-related {
+  margin-top: 1rem;
+  border: 1px solid rgba(243, 231, 207, 0.09);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: rgba(1, 4, 4, 0.38);
+}
+
+.detail-alt-worlds ul {
+  display: grid;
+  gap: 0.42rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.detail-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.72rem;
+  margin-top: 1rem;
+}
+
+.detail-pill-group {
+  border: 1px solid rgba(243, 231, 207, 0.08);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  background: rgba(1, 4, 4, 0.26);
+}
+
+.detail-pill-group div,
+.detail-related div,
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.detail-pill-group span {
+  border: 1px solid rgba(217, 160, 76, 0.22);
+  border-radius: 999px;
+  padding: 0.24rem 0.5rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.detail-related button {
+  min-height: 2.25rem;
+  border: 1px solid rgba(217, 160, 76, 0.28);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.58rem;
+  color: var(--soft);
+  background: rgba(1, 4, 4, 0.5);
+  font-weight: 760;
+}
+
+.detail-actions {
+  margin-top: 1rem;
+}
+
+.compact-action {
+  width: auto;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.8rem;
+}
+
 @media (max-width: 860px) {
   .topbar,
   .hero-panel,
@@ -925,6 +1229,10 @@ input:focus {
 
   .world-mark {
     justify-self: center;
+  }
+
+  .result-orbit {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .library-tools {
@@ -955,6 +1263,20 @@ input:focus {
   .entry-list {
     max-height: none;
     overflow: visible;
+  }
+
+  .atlas-door {
+    grid-template-columns: 1fr;
+  }
+
+  .atlas-door .entry-open {
+    align-self: auto;
+    width: 100%;
+  }
+
+  .detail-map,
+  .detail-meta {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -999,12 +1321,24 @@ input:focus {
     font-size: 0.95rem;
   }
 
+  .input-panel h1 {
+    font-size: clamp(2.35rem, 12vw, 3.2rem);
+  }
+
+  .lens-intro {
+    font-size: 0.92rem;
+  }
+
   .app-kicker {
     margin-bottom: 0.5rem;
   }
 
   .world-mark {
     width: 7.65rem;
+  }
+
+  .lens-mark {
+    width: 4.8rem;
   }
 
   .ritual-strip {
@@ -1022,12 +1356,12 @@ input:focus {
   .library-results,
   .daily-card,
   .daily-copy,
-  .world-card {
+  .world-card,
+  .atlas-door {
     padding: 1rem;
   }
 
   .search-suggestions,
-  .example-row,
   .ritual-strip,
   .life-rooms {
     flex-wrap: nowrap;
@@ -1035,11 +1369,21 @@ input:focus {
     padding-bottom: 0.2rem;
   }
 
+  .example-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .search-suggestions button,
-  .example-row button,
   .ritual-strip span,
   .life-rooms span {
     flex: 0 0 auto;
+  }
+
+  .example-row button {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
   }
 }
 

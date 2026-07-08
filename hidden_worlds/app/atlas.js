@@ -132,7 +132,16 @@ export const entries = [
       "quiet",
       "belonging",
       "shy"
-    ]
+    ],
+    "domains": ["group", "work", "learning"],
+    "lenses": ["belonging", "safety", "voice"],
+    "searchAliases": ["quiet in group", "new person", "doesn't speak up", "new to the room"],
+    "alternateWorlds": [
+      "They may be studying the room before trusting it.",
+      "They may want connection but need a low-risk way to enter.",
+      "They may simply be listening, tired, or not ready to speak."
+    ],
+    "boundaryReminder": "Welcome should lower pressure, not put them on display."
   },
   {
     "id": "outsider",
@@ -195,7 +204,16 @@ export const entries = [
       "face",
       "reassurance",
       "checking"
-    ]
+    ],
+    "domains": ["group", "work", "friendship"],
+    "lenses": ["belonging", "reassurance", "social safety"],
+    "searchAliases": ["keeps checking reactions", "looks for approval", "checks faces", "wants reassurance"],
+    "alternateWorlds": [
+      "They may be looking for permission to keep being themselves.",
+      "They may have learned that small expressions predict rejection.",
+      "They may be socially attuned in a way that is tiring, not manipulative."
+    ],
+    "boundaryReminder": "Steadiness is not the same as constant reassurance."
   },
   {
     "id": "invisible-contributor",
@@ -343,7 +361,16 @@ export const entries = [
       "neutral",
       "threat",
       "safety"
-    ]
+    ],
+    "domains": ["work", "family", "friendship"],
+    "lenses": ["safety", "tone", "repair"],
+    "searchAliases": ["takes things as criticism", "misreads neutral comment", "hears criticism", "gets defensive"],
+    "alternateWorlds": [
+      "You may have sounded sharper than intended.",
+      "They may be carrying a history where neutral words were not neutral.",
+      "They may be reacting to something else in the moment, not only to you."
+    ],
+    "boundaryReminder": "Clarifying impact matters more than proving neutrality."
   },
   {
     "id": "quiet-exit",
@@ -370,7 +397,7 @@ export const entries = [
     "id": "shame-spiral",
     "title": "The Shame Spiral",
     "category": "shame",
-    "categoryName": "Shame",
+    "categoryName": "Dignity",
     "visibleBehavior": "Someone reacts strongly to a small correction.",
     "worldHypothesis": "They may be in a world where correction quickly becomes evidence of defect.",
     "protectiveMove": "Defensiveness protects them from collapsing into shame.",
@@ -385,7 +412,16 @@ export const entries = [
       "defensive",
       "shame",
       "mistake"
-    ]
+    ],
+    "domains": ["work", "learning", "family"],
+    "lenses": ["dignity", "repair", "accountability"],
+    "searchAliases": ["overreacts to correction", "gets defensive", "small feedback big reaction", "can't take correction"],
+    "alternateWorlds": [
+      "Correction may feel like a verdict on who they are.",
+      "They may need the mistake named without being reduced to it.",
+      "They may still be responsible for the impact of their reaction."
+    ],
+    "boundaryReminder": "Dignity and accountability have to stay in the same room."
   },
   {
     "id": "perfection-mask",
@@ -427,7 +463,16 @@ export const entries = [
       "sorry",
       "mistake",
       "shame"
-    ]
+    ],
+    "domains": ["friendship", "work", "family"],
+    "lenses": ["reassurance", "closure", "dignity"],
+    "searchAliases": ["keeps apologizing", "says sorry too much", "apology spiral", "won't stop saying sorry"],
+    "alternateWorlds": [
+      "They may be asking whether connection survived.",
+      "They may not know how to let a repaired moment end.",
+      "They may need a clear close, while you still get to keep your energy."
+    ],
+    "boundaryReminder": "Reassurance should close the loop, not turn you into the keeper of their fear."
   },
   {
     "id": "deflection-shield",
@@ -513,7 +558,16 @@ export const entries = [
       "message",
       "text",
       "overwhelmed"
-    ]
+    ],
+    "domains": ["friendship", "attention", "digital"],
+    "lenses": ["capacity", "care", "boundaries"],
+    "searchAliases": ["left on read", "doesn't text back", "silent friend", "unanswered message"],
+    "alternateWorlds": [
+      "They may care and still not have reply-energy available.",
+      "They may be avoiding the pressure of saying the wrong thing.",
+      "They may also be showing a pattern that needs a kinder agreement."
+    ],
+    "boundaryReminder": "Low-pressure contact still allows your own limits."
   },
   {
     "id": "scattered-caretaker",
@@ -555,7 +609,16 @@ export const entries = [
       "avoid",
       "phone",
       "attention"
-    ]
+    ],
+    "domains": ["digital", "work", "friendship"],
+    "lenses": ["attention", "pressure", "capacity"],
+    "searchAliases": ["doesn't open notifications", "ignores phone", "avoids messages", "notification anxiety"],
+    "alternateWorlds": [
+      "The phone may feel like many rooms calling at once.",
+      "They may be avoiding one hard message by avoiding all messages.",
+      "A different channel or clearer expectation may reduce the pressure."
+    ],
+    "boundaryReminder": "Understanding avoidance does not require you to accept endless uncertainty."
   },
   {
     "id": "depth-diver",
@@ -639,7 +702,16 @@ export const entries = [
       "rigid",
       "control",
       "order"
-    ]
+    ],
+    "domains": ["work", "family", "public"],
+    "lenses": ["order", "fairness", "control"],
+    "searchAliases": ["too rigid", "won't bend rules", "insists on rules", "strict about process"],
+    "alternateWorlds": [
+      "Rules may be how they keep chaos from entering.",
+      "They may be protecting fairness for someone less visible.",
+      "They may also be using structure to avoid a human exception."
+    ],
+    "boundaryReminder": "Rules can create safety; they can also hide control."
   },
   {
     "id": "certainty-seeker",
@@ -786,7 +858,16 @@ export const entries = [
       "silent",
       "work",
       "ideas"
-    ]
+    ],
+    "domains": ["work", "learning", "group"],
+    "lenses": ["voice", "safety", "processing time"],
+    "searchAliases": ["quiet in meeting", "has thoughts later", "doesn't speak up", "silent at work"],
+    "alternateWorlds": [
+      "They may think best after the public speed of the room has passed.",
+      "They may have learned that early thoughts get interrupted or exposed.",
+      "They may also need a clearer invitation or a different format."
+    ],
+    "boundaryReminder": "A quiet room is not always an empty mind."
   },
   {
     "id": "credit-watcher",
@@ -962,7 +1043,7 @@ export const entries = [
     "categoryName": "Learning & Growth",
     "visibleBehavior": "Someone becomes tense before feedback.",
     "worldHypothesis": "They may be in a world where feedback has meant humiliation.",
-    "protectiveMove": "Bracing protects them from impact.",
+    "protectiveMove": "Bracing protects them from being turned into the feedback.",
     "wiseQuestion": "How can feedback arrive as information rather than identity threat?",
     "needs": [
       "specific feedback",
@@ -974,7 +1055,16 @@ export const entries = [
       "tense",
       "learning",
       "critique"
-    ]
+    ],
+    "domains": ["learning", "work"],
+    "lenses": ["growth", "dignity", "safety"],
+    "searchAliases": ["tense before feedback", "afraid of critique", "feedback anxiety", "braces for criticism"],
+    "alternateWorlds": [
+      "Feedback may have arrived as humiliation before.",
+      "They may need specificity so the critique does not become identity.",
+      "They may still need honest information, delivered with enough ground to use it."
+    ],
+    "boundaryReminder": "Kind feedback is still clear feedback."
   },
   {
     "id": "exam-freezer",
@@ -1005,7 +1095,7 @@ export const entries = [
     "visibleBehavior": "Someone manages everyone's mood at home.",
     "worldHypothesis": "They may be in a world where peace depends on noticing shifts early.",
     "protectiveMove": "Monitoring protects the family system from eruption.",
-    "wiseQuestion": "Who lets this person stop managing the weather?",
+    "wiseQuestion": "What would let this person rest without the room falling apart?",
     "needs": [
       "rest",
       "shared responsibility",
@@ -1016,7 +1106,16 @@ export const entries = [
       "caregiver",
       "mood",
       "home"
-    ]
+    ],
+    "domains": ["family", "home"],
+    "lenses": ["responsibility", "rest", "early vigilance"],
+    "searchAliases": ["manages everyone's mood", "family peacekeeper", "caretaker child", "walks on eggshells"],
+    "alternateWorlds": [
+      "They may notice emotional weather before others do.",
+      "They may confuse rest with danger because someone else might erupt.",
+      "They may need shared responsibility, not praise for overfunctioning."
+    ],
+    "boundaryReminder": "Care should not require one person to become the household alarm system."
   },
   {
     "id": "parent-weather-system",
@@ -1142,7 +1241,16 @@ export const entries = [
       "cancel",
       "plan",
       "capacity"
-    ]
+    ],
+    "domains": ["friendship", "attention"],
+    "lenses": ["capacity", "reliability", "boundaries"],
+    "searchAliases": ["cancelled last minute", "friend cancels", "plans cancelled", "flaky friend"],
+    "alternateWorlds": [
+      "Their desire to come may be real while their capacity is gone.",
+      "They may be ashamed to explain the actual limit.",
+      "A repeated pattern still needs a clear agreement."
+    ],
+    "boundaryReminder": "One cancellation is context; a pattern still needs an agreement."
   },
   {
     "id": "jealous-witness",
@@ -1268,7 +1376,16 @@ export const entries = [
       "opportunity",
       "hesitate",
       "threshold"
-    ]
+    ],
+    "domains": ["change", "work", "identity"],
+    "lenses": ["transition", "loss", "choice"],
+    "searchAliases": ["hesitates at opportunity", "afraid to move forward", "won't take opportunity", "stuck at threshold"],
+    "alternateWorlds": [
+      "Forward may also mean losing an old belonging.",
+      "They may not actually want the opportunity everyone else sees.",
+      "They may need a smaller crossing before the larger one."
+    ],
+    "boundaryReminder": "Encouragement should not erase the losses inside change."
   },
   {
     "id": "old-identity",
@@ -1340,7 +1457,7 @@ export const entries = [
     "categoryName": "Change",
     "visibleBehavior": "Someone delays a decision they say they want.",
     "worldHypothesis": "They may be in a world where choosing one path means grieving the others.",
-    "protectiveMove": "Delay protects them from finality.",
+    "protectiveMove": "Delay protects the unchosen lives from disappearing too quickly.",
     "wiseQuestion": "What loss inside the yes needs to be acknowledged?",
     "needs": [
       "choice",
@@ -1352,7 +1469,16 @@ export const entries = [
       "delay",
       "decision",
       "change"
-    ]
+    ],
+    "domains": ["change", "relationship", "work"],
+    "lenses": ["choice", "grief", "agency"],
+    "searchAliases": ["can't decide", "delays commitment", "decision hesitation", "says they want it but delays"],
+    "alternateWorlds": [
+      "The yes may contain quiet grief for every no.",
+      "They may need to name what will be lost before they can choose.",
+      "They may also need a deadline or support to stop drifting."
+    ],
+    "boundaryReminder": "Empathy for hesitation should not become indefinite suspension for everyone else."
   },
   {
     "id": "ending-avoider",
@@ -1379,7 +1505,7 @@ export const entries = [
     "id": "grief-timekeeper",
     "title": "The Grief Timekeeper",
     "category": "grief",
-    "categoryName": "Grief",
+    "categoryName": "Loss",
     "visibleBehavior": "Someone reacts to a date others forgot.",
     "worldHypothesis": "They may be in a world where the calendar still holds the body of loss.",
     "protectiveMove": "Marking time protects love from being erased.",
@@ -1394,7 +1520,16 @@ export const entries = [
       "date",
       "anniversary",
       "loss"
-    ]
+    ],
+    "domains": ["loss", "family", "friendship"],
+    "lenses": ["remembrance", "time", "love"],
+    "searchAliases": ["anniversary grief", "date others forgot", "reacts to date", "loss date"],
+    "alternateWorlds": [
+      "The date may still arrive in their body before anyone mentions it.",
+      "They may be protecting love from being treated as old news.",
+      "They may want witness more than advice."
+    ],
+    "boundaryReminder": "Remembering with them is care; making grief perform on schedule is not."
   },
   {
     "id": "anniversary-shadow",
@@ -1562,7 +1697,16 @@ export const entries = [
       "voice",
       "culture",
       "group"
-    ]
+    ],
+    "domains": ["culture", "group", "work"],
+    "lenses": ["voice", "dignity", "belonging"],
+    "searchAliases": ["avoids speaking because of accent", "doesn't speak in group", "voice judged", "accent anxiety"],
+    "alternateWorlds": [
+      "Their silence may protect identity from becoming the subject.",
+      "They may be translating more than words in real time.",
+      "They may need slower listening, not public curiosity about their voice."
+    ],
+    "boundaryReminder": "Do not turn someone's voice into a spectacle while asking them to speak."
   },
   {
     "id": "tradition-holder",
@@ -1914,7 +2058,7 @@ export const entries = [
     "lenses": ["safety", "trust"],
     "searchAliases": ["hates doctors", "medical worry", "medical tension", "waiting room"],
     "alternateWorlds": ["They may fear bad news.", "They may have been dismissed.", "They may be managing cost or access."],
-    "boundaryReminder": "This app does not provide medical advice; safety and professional care come first."
+    "boundaryReminder": "This prompt is not medical advice. If health, symptoms, medication, or urgent care are involved, use qualified medical care first."
   },
   {
     "id": "symptom-minimizer",
@@ -1931,7 +2075,7 @@ export const entries = [
     "lenses": ["dignity", "safety"],
     "searchAliases": ["says they're fine", "hides pain", "minimizes symptoms"],
     "alternateWorlds": ["They may not want attention.", "They may have been dismissed before.", "They may be protecting others from worry."],
-    "boundaryReminder": "When health may be at risk, practical support matters more than interpretation."
+    "boundaryReminder": "When health may be at risk, prioritize timely medical care and practical support over interpretation."
   },
   {
     "id": "accessibility-planner",
@@ -1982,7 +2126,7 @@ export const entries = [
     "lenses": ["safety", "power"],
     "searchAliases": ["freezes around authority", "officials", "compliant"],
     "alternateWorlds": ["They may be cautious around systems.", "They may fear consequences.", "They may be trying to get through safely."],
-    "boundaryReminder": "When power is uneven, curiosity should include real-world risk."
+    "boundaryReminder": "When power, policing, immigration, benefits, housing, school discipline, or legal rights are involved, prioritize qualified help and real-world safety over interpretation."
   },
   {
     "id": "form-avoider",
