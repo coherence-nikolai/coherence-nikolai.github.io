@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tone: Hidden Worlds</title>
+  <meta name="description" content="A Tone-family web app for practicing curiosity about the hidden worlds beneath visible behavior.">
+  <meta name="theme-color" content="#030606">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone_hidden_worlds/">
+  <meta property="og:title" content="Tone: Hidden Worlds">
+  <meta property="og:description" content="Every Person Lives in a World You Cannot See. A Tone-family empathy instrument.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/tone_hidden_worlds/">
+  <meta property="og:image" content="https://coherence-nikolai.app/tone_hidden_worlds/assets/app-icon.png">
+  <link rel="icon" href="/tone_hidden_worlds/assets/app-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/tone_hidden_worlds/assets/app-icon.png">
+  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260708">
+  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260708"></script>
+</head>
+<body>
+  <a class="skip-link" href="#lens">Skip to app</a>
+
+  <div class="app-shell">
+    <header class="topbar" aria-label="Tone: Hidden Worlds web app">
+      <a class="brand" href="/tone/" aria-label="Tone family">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="/tone_hidden_worlds/assets/app-icon.png" alt="">
+        </span>
+        <span>Tone: Hidden Worlds</span>
+      </a>
+      <nav class="mode-tabs" aria-label="App sections">
+        <button class="is-active" type="button" data-mode="lens">Lens</button>
+        <button type="button" data-mode="library">Atlas</button>
+        <button type="button" data-mode="daily">Daily</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="mode-view is-active lens-workbench" id="lens" data-view="lens" aria-labelledby="app-title">
+        <div class="split-layout instrument-layout">
+          <section class="input-panel">
+            <p class="app-kicker">World Lens</p>
+            <h1 id="app-title">Start with one moment.</h1>
+            <p class="founder-line">Every Person Lives in a World You Cannot See.</p>
+            <p class="lens-intro">Describe only what happened. Receive possibilities, not verdicts, so you can respond with more curiosity and less certainty.</p>
+            <label for="surface-input">Surface moment</label>
+            <textarea id="surface-input" rows="3" placeholder="Someone does not reply after seeing my message"></textarea>
+            <button class="primary-action" type="button" id="reveal-worlds">Consider possible worlds</button>
+            <div class="example-row" aria-label="Example behaviors">
+              <button type="button" data-example="My friend leaves my messages unread">Unread messages</button>
+              <button type="button" data-example="A teammate sounds sharp in meetings">Sharp tone</button>
+              <button type="button" data-example="A family member shuts down at dinner">Family silence</button>
+              <button type="button" data-example="Someone gets precise about shared costs">Shared costs</button>
+              <button type="button" data-example="Someone becomes irritable in a busy place">Busy place</button>
+            </div>
+            <p class="guardrail-note">Reflection prompts, not diagnoses, facts, therapy, medical, legal, crisis, or emergency guidance. Intended for older teens and adults; younger users should use it with a trusted adult.</p>
+          </section>
+
+          <section class="result-panel" aria-live="polite">
+            <div class="result-orbit">
+              <div class="world-mark lens-mark" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <svg viewBox="0 0 180 180" focusable="false">
+                  <ellipse class="door-glow" cx="90" cy="88" rx="19" ry="25"></ellipse>
+                  <path class="doorway" d="M82 111 V91 C82 82 87 75 90 75 C94 75 99 82 99 91 V111"></path>
+                  <path class="walking-path shadow" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+                  <path class="walking-path" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+                  <g class="walker" transform="translate(90 105) scale(0.62)">
+                    <circle cx="0" cy="-9" r="2.3"></circle>
+                    <path d="M0 -6 L0 6 M0 0 L-5 5 M0 0 L5 5 M0 6 L-4 14 M0 6 L4 14"></path>
+                  </g>
+                </svg>
+              </div>
+              <div>
+                <p class="eyebrow">Hold lightly</p>
+                <p>One door into the moment. Never the answer.</p>
+              </div>
+            </div>
+            <div class="result-head">
+              <p class="eyebrow">Possible worlds</p>
+              <span id="result-count">3 prompts</span>
+            </div>
+            <div class="world-results" id="world-results"></div>
+          </section>
+        </div>
+        <section class="ritual-strip" aria-label="How to use Tone: Hidden Worlds">
+          <span><strong>01</strong> Name the surface</span>
+          <span><strong>02</strong> Consider possible worlds</span>
+          <span><strong>03</strong> Step into one</span>
+          <span><strong>04</strong> Ask a better question</span>
+        </section>
+      </section>
+
+      <section class="mode-view" id="daily" data-view="daily" aria-labelledby="daily-title">
+        <div class="daily-layout">
+          <div class="daily-card" id="daily-card">
+            <p class="eyebrow">Daily Hidden World</p>
+          </div>
+          <div class="daily-copy">
+            <h2 id="daily-title">A quiet invitation to widen your view.</h2>
+            <p>One world each day. No streaks. No pressure. A quiet return to attention.</p>
+            <div class="daily-actions">
+              <button class="primary-action" type="button" id="daily-library">Open reflection</button>
+              <button class="entry-open" type="button" id="daily-lens">Try in Lens</button>
+              <button class="entry-open" type="button" id="daily-atlas">Find in Atlas</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mode-view" id="library" data-view="library" aria-labelledby="library-title">
+        <div class="library-layout">
+          <aside class="library-tools">
+            <p class="eyebrow">World Atlas</p>
+            <h2 id="library-title">Search 112 hidden worlds.</h2>
+            <p class="atlas-note">A large, searchable map of human situations. Every result is a door, never a label.</p>
+            <label for="library-search">Search behavior, need, life room, or tag</label>
+            <input id="library-search" type="search" placeholder="left on read, money, conflict, body, home">
+            <div class="search-suggestions" id="search-suggestions" aria-label="Suggested searches"></div>
+            <div class="category-list" id="category-list" aria-label="Library categories"></div>
+          </aside>
+          <section class="library-results" aria-live="polite">
+            <div class="result-head">
+              <p id="library-summary">World Atlas</p>
+              <span id="library-count">112 prompts</span>
+            </div>
+            <div class="entry-list" id="entry-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="entry-detail-shell" id="entry-detail" hidden aria-labelledby="entry-detail-title">
+        <button class="entry-detail-backdrop" type="button" data-detail-close aria-label="Close reflection"></button>
+        <article class="entry-detail-card" role="dialog" aria-modal="true" aria-labelledby="entry-detail-title">
+          <button class="detail-close" type="button" data-detail-close>Close</button>
+          <div id="entry-detail-content"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
