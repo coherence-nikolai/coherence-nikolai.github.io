@@ -6,11 +6,13 @@ const storage = {
   audio: "haikuGates.audioPrompts",
   haikuVoice: "haikuGates.haikuVoice",
   gong: "haikuGates.zenGong",
-  sessions: "haikuGates.sessions"
+  sessions: "haikuGates.sessions",
+  customHaiku: "sotaHaiku.customLines"
 };
 
 const state = {
   gates: [],
+  customHaiku: [],
   view: "loading",
   activeGateID: null,
   activeDepth: "standard",
@@ -37,6 +39,7 @@ init();
 async function init() {
   try {
     state.gates = await loadGates();
+    state.customHaiku = getCustomHaiku();
     state.view = "arrival";
     render();
     registerServiceWorker();
@@ -83,6 +86,8 @@ app.addEventListener("click", (event) => {
   if (action === "gates") setView("gates");
   if (action === "journal") setView("journal");
   if (action === "settings") setView("settings");
+  if (action === "about") setView("about");
+  if (action === "your-lines") setView("your-lines");
   if (action === "gate") openGate(gate);
   if (action === "select-duration") {
     state.selectedDurationSeconds = Number(target.dataset.seconds || 0);
@@ -99,6 +104,8 @@ app.addEventListener("click", (event) => {
   if (action === "export") exportJournal();
   if (action === "delete-all") deleteAll();
   if (action === "reset") resetApp();
+  if (action === "save-custom-haiku") saveCustomHaiku();
+  if (action === "delete-custom-haiku") deleteCustomHaiku(target.dataset.id);
 });
 
 app.addEventListener("change", (event) => {
@@ -119,6 +126,13 @@ app.addEventListener("change", (event) => {
     state.journalFilter = event.target.value;
     render();
   }
+});
+
+app.addEventListener("input", (event) => {
+  if (!event.target.matches("[data-syllable-target]")) return;
+  const hint = app.querySelector(`[data-syllable-for='${event.target.id}']`);
+  if (!hint) return;
+  hint.textContent = `${countSyllables(event.target.value)} / ${event.target.dataset.syllableTarget}`;
 });
 
 function setView(view) {
@@ -286,7 +300,7 @@ function startGateIntro(gate) {
         scheduleGateControls(3600);
         return;
       }
-      const player = playVoiceAudio(`./audio/Haiku/haiku-${pad2(gate.order)}.mp3`);
+      const player = playHaikuAudio(gate);
       if (!player) {
         scheduleGateControls(7200);
         return;
@@ -338,10 +352,12 @@ function updateDurationControls() {
 }
 
 function playHaikuAudio(gate) {
+  if (gate.isCustom) return null;
   return playVoiceAudio(`./audio/Haiku/haiku-${pad2(gate.order)}.mp3`);
 }
 
 function playInstructionAudio(gate, promptIndex) {
+  if (gate.isCustom) return null;
   return playVoiceAudio(`./audio/Instructions/instruction-${pad2(gate.order)}-${pad2(promptIndex + 1)}.mp3`);
 }
 
@@ -418,7 +434,9 @@ function render() {
     practice: renderPracticeShell,
     reflection: renderReflection,
     journal: renderJournal,
-    settings: renderSettings
+    settings: renderSettings,
+    about: renderAbout,
+    "your-lines": renderYourLines
   }[state.view]();
 
   app.innerHTML = `${renderTopbar()}${body}${renderToolbar()}`;
@@ -465,7 +483,7 @@ function renderArrival() {
   return `
     <main class="haiku-flow-shell arrival-shell">
       <section class="haiku-anchor arrival-art" data-anchor-mark aria-hidden="true">
-        <img class="brush-gate-image" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" aria-hidden="true" />
+        <img class="brush-gate-image" src="./shared/brush-lines-only.png?v=23-about-lines" alt="" aria-hidden="true" />
         ${renderSotaSeal("arrival-seal")}
       </section>
 
@@ -486,10 +504,12 @@ function renderGateList() {
   return `
     <main class="haiku-flow-shell line-menu-shell">
       <section class="haiku-anchor line-menu-anchor" aria-hidden="true">
-        <img class="anchor-mark painted-static" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
+        <img class="anchor-mark painted-static" src="./shared/brush-lines-only.png?v=23-about-lines" alt="" />
         ${renderSotaSeal("arrival-seal line-menu-seal")}
       </section>
       <nav class="line-menu-actions" aria-label="Local app areas">
+        <button data-action="about">About</button>
+        <button data-action="your-lines">Your Lines</button>
         <button data-action="journal">Journal</button>
         <button data-action="settings">Settings</button>
       </nav>
@@ -498,6 +518,18 @@ function renderGateList() {
         <p class="lead">Let one poem meet the moment.</p>
       </section>
       <section class="line-menu-list">
+        <button class="card gate-row your-lines-row" data-action="your-lines">
+          <span class="row-line-mark plus-tile" aria-hidden="true">+</span>
+          <span class="number">•</span>
+          <span><strong>Your Lines</strong><br><span class="muted">Write a private practice haiku</span></span>
+        </button>
+        ${state.customHaiku.map((item) => `
+          <button class="card gate-row" data-action="gate" data-gate="${escapeHTML(item.gate.id)}">
+            ${renderMiniLineMark("row-line-mark")}
+            <span class="number">•</span>
+            <span><strong>${escapeHTML(item.title)}</strong><br><span class="muted">Private haiku</span></span>
+          </button>
+        `).join("")}
         ${state.gates.map((gate) => `
           <button class="card gate-row" data-action="gate" data-gate="${gate.id}">
             ${renderMiniLineMark(`row-line-mark gate-order-${gate.order}`)}
@@ -511,10 +543,10 @@ function renderGateList() {
 }
 
 function renderGateDetail() {
-  const gate = findGate(state.activeGateID) || state.gates[0];
+  const gate = findGate(state.activeGateID) || allHaiku()[0];
   const index = state.gates.findIndex((candidate) => candidate.id === gate.id);
-  const previousGate = state.gates[index - 1];
-  const nextGate = state.gates[index + 1];
+  const previousGate = gate.isCustom ? null : state.gates[index - 1];
+  const nextGate = gate.isCustom ? null : state.gates[index + 1];
   const navButtons = [
     previousGate ? `<button data-action="gate" data-gate="${previousGate.id}">Previous</button>` : `<button disabled>Previous</button>`,
     nextGate ? `<button data-action="gate" data-gate="${nextGate.id}">Next</button>` : `<button disabled>Next</button>`
@@ -524,7 +556,7 @@ function renderGateDetail() {
       ${renderGateArt(gate)}
       <section class="gate-controls reveal-after-poem ${state.gateControlsVisible ? "is-revealed" : ""}">
         <section class="gate-title-lockup">
-          <p class="eyebrow">Haiku ${gate.order}</p>
+          <p class="eyebrow">${displayOrdinal(gate)}</p>
           <h1>${escapeHTML(gate.title)}</h1>
         </section>
         <div class="timer-choice-row" aria-label="Timer choices">
@@ -557,9 +589,9 @@ function renderGateArt(gate) {
   return `
     <section class="haiku-anchor gate-art three-line-art gate-order-${order}" aria-label="Haiku poem for ${escapeHTML(gate.title)}">
       <div class="three-line-stage" aria-hidden="true">
-        <img class="gate-logo-line gate-line-one" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
-        <img class="gate-logo-line gate-line-two" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
-        <img class="gate-logo-line gate-line-three" src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" />
+        <img class="gate-logo-line gate-line-one" src="./shared/brush-lines-only.png?v=23-about-lines" alt="" />
+        <img class="gate-logo-line gate-line-two" src="./shared/brush-lines-only.png?v=23-about-lines" alt="" />
+        <img class="gate-logo-line gate-line-three" src="./shared/brush-lines-only.png?v=23-about-lines" alt="" />
         <span class="gate-seal-ghost-cover"></span>
       </div>
       <div class="three-line-poem" data-fit-poem>
@@ -604,7 +636,7 @@ function renderSotaSeal(className = "") {
 }
 
 function renderMiniLineMark(className = "mini-line-mark") {
-  return `<span class="${className}" aria-hidden="true"><img src="./shared/brush-lines-only.png?v=22-gold-audio" alt="" /></span>`;
+  return `<span class="${className}" aria-hidden="true"><img src="./shared/brush-lines-only.png?v=23-about-lines" alt="" /></span>`;
 }
 
 function renderPracticeShell() {
@@ -629,7 +661,7 @@ function practiceMarkup() {
   return `
     <section class="timer">
       <div>
-        <p class="eyebrow">Haiku ${timer.gate.order} · ${escapeHTML(timer.gate.title)}</p>
+        <p class="eyebrow">${displayOrdinal(timer.gate)} · ${escapeHTML(timer.gate.title)}</p>
         <h1 class="practice-time">${isFree ? `Free · ${formatTime(timer.elapsed)}` : formatTime(remaining)}</h1>
         ${isFree ? "" : `<div class="progress" aria-label="Practice progress"><span style="--progress:${progress}%"></span></div>`}
       </div>
@@ -715,6 +747,86 @@ function renderJournalRow(session) {
   `;
 }
 
+function renderAbout() {
+  return `
+    <main class="stack">
+      <section>
+        <h1>About</h1>
+        <p class="lead">Three lines for mind and body.</p>
+      </section>
+      ${aboutCard("What it is", "Sota Haiku is a poetic noticing practice from the Sota family. Each haiku is a small doorway into sensation, thought, feeling tone, self-sense, reaction, sound, space, and ordinary experience.")}
+      ${aboutCard("How to use it", "Choose one haiku. Let the three lines land. Practice for Free, 1, 5, or 10 minutes. You do not need to be calm first. The state you are in is part of the material.")}
+      ${aboutCard("What it is not", "This is not therapy, diagnosis, medical care, or an attainment promise. It does not claim to cause awakening, stream entry, path, fruition, or any clinical change.")}
+      ${aboutCard("Privacy", "Journal entries and your own haiku stay local in this browser by default. Sota Haiku uses no accounts, AI, cloud sync, or analytics.")}
+      <section class="card">
+        <p class="eyebrow">Voiceover</p>
+        <p class="muted">A spoken About intro can be added later from a real recording. Suggested script:</p>
+        <p class="serif">Sota Haiku is a practice of three lines.<br>Each poem is a small place to look.<br>Body, thought, feeling, self, sound, space.<br>Nothing needs to be fixed first.<br>Choose one haiku, let it arrive, and notice what is already here.</p>
+      </section>
+    </main>
+  `;
+}
+
+function aboutCard(title, body) {
+  return `
+    <section class="card">
+      <p class="eyebrow">${escapeHTML(title)}</p>
+      <p class="muted">${escapeHTML(body)}</p>
+    </section>
+  `;
+}
+
+function renderYourLines() {
+  return `
+    <main class="stack your-lines-page">
+      <section>
+        <h1>Your Lines</h1>
+        <p class="lead">Write a private practice haiku. Try 5 / 7 / 5 if useful; clarity matters more than strict counting.</p>
+      </section>
+      <section class="card custom-haiku-form">
+        <p class="eyebrow">Make a Practice Haiku</p>
+        <label>Title
+          <input id="custom-title" placeholder="Waiting for the train">
+        </label>
+        ${customLineField(1, "What is noticed?", 5)}
+        ${customLineField(2, "What changes, reacts, or separates?", 7)}
+        ${customLineField(3, "What includes or returns?", 5)}
+        <label>Practice question
+          <input id="custom-question" placeholder="What is influencing what?">
+        </label>
+        <label>Marginal note
+          <textarea id="custom-note" placeholder="A short teacher note to yourself."></textarea>
+        </label>
+        <button class="primary" data-action="save-custom-haiku">Save Private Haiku</button>
+      </section>
+      <section class="stack">
+        <p class="eyebrow">Private Haiku</p>
+        ${state.customHaiku.length ? state.customHaiku.map(renderCustomHaikuRow).join("") : `<section class="card"><p class="muted">Saved haiku will appear here. They stay in this browser.</p></section>`}
+      </section>
+    </main>
+  `;
+}
+
+function customLineField(number, placeholder, target) {
+  return `
+    <label>Line ${number} <span class="syllable-hint" data-syllable-for="custom-line-${number}">0 / ${target}</span>
+      <input id="custom-line-${number}" data-syllable-target="${target}" placeholder="${escapeHTML(placeholder)}">
+    </label>
+  `;
+}
+
+function renderCustomHaikuRow(item) {
+  return `
+    <article class="card custom-haiku-row">
+      <button data-action="gate" data-gate="${escapeHTML(item.gate.id)}">
+        <strong>${escapeHTML(item.title)}</strong><br>
+        <span class="muted">${item.lines.map(escapeHTML).join(" / ")}</span>
+      </button>
+      <button class="danger" data-action="delete-custom-haiku" data-id="${escapeHTML(item.id)}">Delete</button>
+    </article>
+  `;
+}
+
 function renderSettings() {
   return `
     <main class="stack">
@@ -733,11 +845,94 @@ function renderSettings() {
         </div>
       </section>
       <section class="card controls">
+        <button data-action="about">About Sota Haiku</button>
+        <button data-action="your-lines">Your Lines</button>
         <a class="button" href="https://coherence-nikolai.app/privacy/" rel="noopener">Privacy Policy</a>
         <a class="button" href="https://coherence-nikolai.app/support/" rel="noopener">Support</a>
       </section>
     </main>
   `;
+}
+
+function saveCustomHaiku() {
+  const lines = [1, 2, 3].map((number) => document.querySelector(`#custom-line-${number}`)?.value.trim() || "");
+  if (lines.some((line) => !line)) {
+    window.alert("Write all three lines first.");
+    return;
+  }
+
+  const titleValue = document.querySelector("#custom-title")?.value.trim() || "";
+  const item = {
+    id: makeID(),
+    title: titleValue || lines[0],
+    lines,
+    practiceQuestion: document.querySelector("#custom-question")?.value.trim() || "",
+    note: document.querySelector("#custom-note")?.value.trim() || "",
+    createdAt: new Date().toISOString()
+  };
+  const customHaiku = [item, ...getCustomHaiku()];
+  writeCustomHaiku(customHaiku);
+  state.customHaiku = customHaiku.map(customToGateWrapper);
+  render();
+  scrollToTop();
+}
+
+function deleteCustomHaiku(id) {
+  const customHaiku = getCustomHaiku().filter((item) => item.id !== id);
+  writeCustomHaiku(customHaiku);
+  state.customHaiku = customHaiku.map(customToGateWrapper);
+  render();
+}
+
+function getCustomHaiku() {
+  try {
+    return JSON.parse(localStorage.getItem(storage.customHaiku) || "[]").map(customToGateWrapper);
+  } catch {
+    return [];
+  }
+}
+
+function writeCustomHaiku(items) {
+  const plainItems = items.map((item) => ({
+    id: item.id,
+    title: item.title,
+    lines: item.lines,
+    practiceQuestion: item.practiceQuestion || "",
+    note: item.note || "",
+    createdAt: item.createdAt || new Date().toISOString()
+  }));
+  localStorage.setItem(storage.customHaiku, JSON.stringify(plainItems));
+}
+
+function customToGateWrapper(item) {
+  const lines = [...(item.lines || []).slice(0, 3)];
+  while (lines.length < 3) lines.push("");
+  const question = (item.practiceQuestion || "").trim();
+  const prompts = [
+    "Let the three lines arrive slowly.",
+    "Notice what the poem points toward now.",
+    question || "What is already known in body, thought, or sound?",
+    "Return to one ordinary detail."
+  ];
+  const gate = {
+    id: `custom-${item.id}`,
+    order: 0,
+    title: item.title || lines.find(Boolean) || "Your Lines",
+    stanza: lines,
+    theme: "Private haiku",
+    art: { motif: "private three lines", accentHex: "#D8AA4F", motion: "three lines held quietly" },
+    purpose: item.note || "A private haiku for noticing this moment.",
+    reflectionPrompt: question || "What did these lines reveal?",
+    dailyCarry: lines.find(Boolean) || "Carry one line into the day.",
+    safetyNote: "Keep it simple. Stop when ordinary life needs you.",
+    exercises: ["gentle", "standard", "deepen"].map((depth) => ({
+      depth,
+      defaultDurationMinutes: 10,
+      prompts
+    })),
+    isCustom: true
+  };
+  return { ...item, lines, gate };
 }
 
 function saveReflection() {
@@ -831,6 +1026,7 @@ function deleteAll() {
 function resetApp() {
   if (!confirm("Reset Sota Haiku on this browser?")) return;
   Object.values(storage).forEach((key) => localStorage.removeItem(key));
+  state.customHaiku = [];
   state.view = "arrival";
   render();
   scrollToTop();
@@ -841,7 +1037,15 @@ function scrollToTop() {
 }
 
 function findGate(id) {
-  return state.gates.find((gate) => gate.id === id);
+  return allHaiku().find((gate) => gate.id === id);
+}
+
+function allHaiku() {
+  return [...state.customHaiku.map((item) => item.gate), ...state.gates];
+}
+
+function displayOrdinal(gate) {
+  return gate?.isCustom ? "Your Lines" : `Haiku ${gate.order}`;
 }
 
 function getExercise(gate, depth) {
@@ -870,6 +1074,16 @@ function formatTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
   const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
+}
+
+function countSyllables(line) {
+  const words = String(line).toLowerCase().match(/[a-z]+/g) || [];
+  return words.reduce((total, word) => total + Math.max(1, syllablesInWord(word)), 0);
+}
+
+function syllablesInWord(word) {
+  const matches = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, "").match(/[aeiouy]{1,2}/g);
+  return matches ? matches.length : 1;
 }
 
 function escapeHTML(value) {

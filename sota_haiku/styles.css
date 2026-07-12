@@ -1355,6 +1355,8 @@ label {
 }
 
 select,
+input:not([type]),
+input[type="text"],
 textarea {
   width: 100%;
   border: 1px solid var(--line);
@@ -1367,6 +1369,48 @@ textarea {
 textarea {
   min-height: 8rem;
   resize: vertical;
+}
+
+.custom-haiku-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.custom-haiku-form input,
+.custom-haiku-form textarea {
+  font-size: 1rem;
+}
+
+.syllable-hint {
+  float: right;
+  color: rgba(216, 170, 79, 0.86);
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 0.8rem;
+}
+
+.plus-tile {
+  color: rgba(216, 170, 79, 0.92);
+  font-size: 1.55rem;
+  font-weight: 650;
+}
+
+.your-lines-row {
+  border-color: rgba(216, 170, 79, 0.34);
+}
+
+.custom-haiku-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.custom-haiku-row button:first-child {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
 }
 
 input[type="range"] {
