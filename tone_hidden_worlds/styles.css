@@ -321,6 +321,7 @@ h3 {
 .threshold-arch,
 .threshold-horizon,
 .threshold-path,
+.threshold-trace,
 .threshold-center-path {
   fill: none;
   stroke-linecap: round;
@@ -341,7 +342,10 @@ h3 {
 }
 
 .threshold-ring-2 {
-  animation-delay: 900ms;
+  stroke-dasharray: 230 18;
+  animation:
+    threshold-ring-breathe 9s ease-in-out infinite 900ms,
+    threshold-ring-drift 28s linear infinite;
 }
 
 .threshold-ring-3 {
@@ -382,6 +386,16 @@ h3 {
   stroke-width: 1.65;
   filter: drop-shadow(0 0 8px rgba(217, 160, 76, 0.2));
   animation: threshold-line-glow 6.8s ease-in-out infinite;
+}
+
+.threshold-trace {
+  stroke: rgba(240, 202, 130, 0.96);
+  stroke-width: 2.35;
+  stroke-dasharray: 16 116;
+  stroke-dashoffset: 0;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 10px rgba(240, 202, 130, 0.58));
+  animation: threshold-trace-travel 3.9s ease-in-out infinite;
 }
 
 .threshold-center-path {
@@ -1958,6 +1972,12 @@ input:focus {
   }
 }
 
+@keyframes threshold-ring-drift {
+  to {
+    stroke-dashoffset: -248;
+  }
+}
+
 @keyframes threshold-line-glow {
   0%, 100% {
     opacity: 0.72;
@@ -1965,6 +1985,26 @@ input:focus {
 
   50% {
     opacity: 1;
+  }
+}
+
+@keyframes threshold-trace-travel {
+  0% {
+    stroke-dashoffset: 132;
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 0.92;
+  }
+
+  72% {
+    opacity: 0.92;
+  }
+
+  100% {
+    stroke-dashoffset: -132;
+    opacity: 0;
   }
 }
 
@@ -2060,8 +2100,13 @@ input:focus {
   .threshold-arch,
   .threshold-horizon,
   .threshold-path,
+  .threshold-trace,
   .threshold-center-path {
     stroke-dashoffset: 0;
+  }
+
+  .threshold-trace {
+    opacity: 0.35;
   }
 }
 
