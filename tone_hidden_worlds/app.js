@@ -1,7 +1,7 @@
 import { categories, entries } from "./atlas.js";
 
 const state = {
-  mode: "lens",
+  mode: "home",
   selectedCategory: "all",
   libraryQuery: "",
   selectedLensEntryId: "",
@@ -690,8 +690,10 @@ function setMode(mode) {
   state.mode = mode;
   els.modeButtons.forEach((button) => {
     const isActive = button.dataset.mode === mode;
-    button.classList.toggle("is-active", isActive);
-    button.setAttribute("aria-pressed", String(isActive));
+    const isTab = Boolean(button.closest(".mode-tabs"));
+    button.classList.toggle("is-active", isTab && isActive);
+    if (isTab) button.setAttribute("aria-pressed", String(isActive));
+    else button.removeAttribute("aria-pressed");
   });
   els.views.forEach((view) => view.classList.toggle("is-active", view.dataset.view === mode));
   history.replaceState(null, "", `#${mode}`);
@@ -732,6 +734,17 @@ function renderLensResults(results, query) {
       related: false
     })}
     ${renderLensAlternates(results, selected.entry.id)}
+  `;
+}
+
+function renderLensEmpty() {
+  state.selectedLensEntryId = "";
+  els.resultCount.textContent = "Ready";
+  els.worldResults.innerHTML = `
+    <div class="empty-state calm-empty">
+      <strong>Start small.</strong>
+      <p>Write one visible behavior, or choose an example. Nothing needs to be solved yet.</p>
+    </div>
   `;
 }
 
@@ -866,6 +879,9 @@ els.modeButtons.forEach((button) => {
   button.addEventListener("click", () => {
     setMode(button.dataset.mode);
     document.querySelector(`#${button.dataset.mode}`)?.scrollIntoView({ block: "start" });
+    if (button.hasAttribute("data-focus-lens")) {
+      window.setTimeout(() => els.surfaceInput?.focus({ preventScroll: true }), 180);
+    }
   });
 });
 
@@ -987,7 +1003,11 @@ document.addEventListener("keydown", (event) => {
 
 function routeFromHash() {
   const currentHash = location.hash.replace("#", "");
-  if (["lens", "daily", "library", "notes"].includes(currentHash)) {
+  if (!currentHash) {
+    setMode("home");
+    return;
+  }
+  if (["home", "lens", "daily", "library", "notes"].includes(currentHash)) {
     setMode(currentHash);
     return;
   }
@@ -1001,7 +1021,7 @@ window.addEventListener("hashchange", routeFromHash);
 function init() {
   renderCategories();
   renderDaily();
-  revealWorlds();
+  renderLensEmpty();
   renderLibrary();
   renderNotes();
   routeFromHash();

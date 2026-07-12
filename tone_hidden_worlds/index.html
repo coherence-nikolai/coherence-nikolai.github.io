@@ -15,22 +15,22 @@
   <link rel="icon" href="/tone_hidden_worlds/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/tone_hidden_worlds/assets/app-icon.png">
   <link rel="manifest" href="/tone_hidden_worlds/manifest.webmanifest">
-  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712">
-  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712"></script>
+  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712-arrival">
+  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712-arrival"></script>
 </head>
 <body>
-  <a class="skip-link" href="#lens">Skip to app</a>
+  <a class="skip-link" href="#home">Skip to app</a>
 
   <div class="app-shell">
     <header class="topbar" aria-label="Tone: Hidden Worlds web app">
-      <a class="brand" href="/tone/" aria-label="Tone family">
+      <a class="brand" href="/tone_hidden_worlds/#home" aria-label="Tone: Hidden Worlds home">
         <span class="brand-mark" aria-hidden="true">
           <img src="/tone_hidden_worlds/icon.svg" alt="">
         </span>
         <span>Tone: Hidden Worlds</span>
       </a>
       <nav class="mode-tabs" aria-label="App sections">
-        <button class="is-active" type="button" data-mode="lens">Lens</button>
+        <button type="button" data-mode="lens">Lens</button>
         <button type="button" data-mode="library">Atlas</button>
         <button type="button" data-mode="daily">Daily</button>
         <button type="button" data-mode="notes">Notes</button>
@@ -38,13 +38,57 @@
     </header>
 
     <main>
-      <section class="mode-view is-active lens-workbench" id="lens" data-view="lens" aria-labelledby="app-title">
+      <section class="mode-view is-active arrival-view" id="home" data-view="home" aria-labelledby="arrival-title">
+        <div class="arrival-stack">
+          <div class="arrival-mark world-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+            <svg viewBox="0 0 180 180" focusable="false">
+              <ellipse class="door-glow" cx="90" cy="88" rx="19" ry="25"></ellipse>
+              <path class="doorway" d="M82 111 V91 C82 82 87 75 90 75 C94 75 99 82 99 91 V111"></path>
+              <path class="walking-path shadow" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+              <path class="walking-path" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
+              <g class="walker" transform="translate(90 105) scale(0.62)">
+                <circle cx="0" cy="-9" r="2.3"></circle>
+                <path d="M0 -6 L0 6 M0 0 L-5 5 M0 0 L5 5 M0 6 L-4 14 M0 6 L4 14"></path>
+              </g>
+            </svg>
+          </div>
+          <p class="app-kicker">Tone: Hidden Worlds</p>
+          <h1 id="arrival-title">Look deeper. Assume less.</h1>
+          <p class="arrival-principle">Every Person Lives in a World You Cannot See.</p>
+          <div class="arrival-doors" aria-label="Choose where to begin">
+            <button class="arrival-door primary-door" type="button" data-mode="lens" data-focus-lens>
+              <span>01</span>
+              <strong>I have a moment</strong>
+              <small>Look beneath one visible behavior.</small>
+            </button>
+            <button class="arrival-door" type="button" data-mode="library">
+              <span>02</span>
+              <strong>Search worlds</strong>
+              <small>Find patterns by word or situation.</small>
+            </button>
+            <button class="arrival-door" type="button" data-mode="daily">
+              <span>03</span>
+              <strong>One quiet prompt</strong>
+              <small>Let today offer a doorway.</small>
+            </button>
+            <button class="arrival-door" type="button" data-mode="notes">
+              <span>04</span>
+              <strong>Saved shifts</strong>
+              <small>Return to what changed your seeing.</small>
+            </button>
+          </div>
+          <p class="arrival-footnote">No score. No feed. No certainty.</p>
+        </div>
+      </section>
+
+      <section class="mode-view lens-workbench" id="lens" data-view="lens" aria-labelledby="app-title">
         <div class="split-layout instrument-layout">
           <section class="input-panel">
             <p class="app-kicker">Tone Lens</p>
-            <h1 id="app-title">Change the tone of perception.</h1>
+            <h1 id="app-title">One moment.</h1>
             <p class="founder-line">Every Person Lives in a World You Cannot See.</p>
-            <p class="lens-intro">Begin with a visible moment. Receive possible worlds, never verdicts, so your next response can carry more curiosity and less certainty.</p>
+            <p class="lens-intro">Describe only what happened. The app will offer possible worlds, never verdicts.</p>
             <label for="surface-input">Surface moment</label>
             <textarea id="surface-input" rows="3" placeholder="Someone does not reply after seeing my message"></textarea>
             <button class="primary-action" type="button" id="reveal-worlds">Consider possible worlds</button>

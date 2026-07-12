@@ -237,6 +237,140 @@ h3 {
   z-index: 1;
 }
 
+.arrival-view {
+  min-height: calc(100svh - 6rem);
+  display: none;
+  place-items: center;
+  padding-top: clamp(1rem, 4vw, 2.5rem);
+}
+
+.arrival-view.is-active {
+  display: grid;
+}
+
+.arrival-stack {
+  width: min(100%, 44rem);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  isolation: isolate;
+}
+
+.arrival-mark {
+  width: clamp(11rem, 30vw, 18rem);
+  margin-bottom: clamp(1.15rem, 3vw, 1.8rem);
+}
+
+.arrival-mark::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 160, 76, 0.18);
+  box-shadow:
+    0 0 0 1.5rem rgba(217, 160, 76, 0.025),
+    0 0 6rem rgba(31, 74, 74, 0.24);
+  animation: arrival-halo 10s ease-in-out infinite;
+}
+
+.arrival-mark .walking-path:not(.shadow) {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  animation: arrival-path 5.5s ease-in-out infinite;
+}
+
+.arrival-stack h1 {
+  max-width: 42rem;
+  margin-bottom: 0.5rem;
+  font-size: clamp(3.1rem, 9vw, 6.1rem);
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.arrival-principle {
+  max-width: 32rem;
+  margin-bottom: clamp(1rem, 3vw, 1.55rem);
+  color: var(--gold-2);
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2.8vw, 1.52rem);
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+.arrival-doors {
+  width: min(100%, 38rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.72rem;
+}
+
+.arrival-door {
+  min-height: 6.25rem;
+  border: 1px solid rgba(217, 160, 76, 0.22);
+  border-radius: var(--radius-chamber);
+  padding: 1rem;
+  color: var(--soft);
+  background:
+    radial-gradient(circle at 84% 0%, rgba(240, 202, 130, 0.08), transparent 9rem),
+    linear-gradient(145deg, rgba(31, 74, 74, 0.13), rgba(255, 255, 255, 0.012)),
+    rgba(5, 12, 12, 0.72);
+  text-align: left;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.arrival-door:hover,
+.arrival-door:focus-visible {
+  border-color: rgba(240, 202, 130, 0.68);
+  background:
+    radial-gradient(circle at 84% 0%, rgba(240, 202, 130, 0.14), transparent 9rem),
+    linear-gradient(145deg, rgba(31, 74, 74, 0.18), rgba(217, 160, 76, 0.05)),
+    rgba(5, 12, 12, 0.86);
+  transform: translateY(-1px);
+}
+
+.arrival-door span,
+.arrival-door strong,
+.arrival-door small {
+  display: block;
+}
+
+.arrival-door span {
+  margin-bottom: 0.35rem;
+  color: var(--gold-2);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.arrival-door strong {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(1.28rem, 3vw, 1.72rem);
+  font-weight: 500;
+  line-height: 1.04;
+}
+
+.arrival-door small {
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.36;
+}
+
+.primary-door {
+  border-color: rgba(240, 202, 130, 0.56);
+  background:
+    radial-gradient(circle at 86% 8%, rgba(240, 202, 130, 0.16), transparent 10rem),
+    linear-gradient(145deg, rgba(31, 74, 74, 0.16), rgba(217, 160, 76, 0.08)),
+    rgba(6, 13, 14, 0.86);
+}
+
+.arrival-footnote {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
 .app-kicker {
   margin-bottom: 0.8rem;
   color: rgba(240, 202, 130, 0.8);
@@ -383,6 +517,10 @@ h3 {
 
 .mode-view.is-active {
   display: block;
+}
+
+.mode-view.arrival-view.is-active {
+  display: grid;
 }
 
 .lens-workbench {
@@ -1517,6 +1655,33 @@ input:focus {
     font-size: 0.74rem;
   }
 
+  .arrival-view {
+    min-height: auto;
+    padding-top: 2.25rem;
+  }
+
+  .arrival-mark {
+    width: clamp(10rem, 52vw, 13rem);
+  }
+
+  .arrival-stack h1 {
+    font-size: clamp(2.9rem, 13vw, 4rem);
+  }
+
+  .arrival-principle {
+    font-size: 1.05rem;
+  }
+
+  .arrival-doors {
+    grid-template-columns: 1fr;
+    gap: 0.58rem;
+  }
+
+  .arrival-door {
+    min-height: 5.35rem;
+    padding: 0.88rem;
+  }
+
   .hero-panel {
     gap: 0.85rem;
     padding-top: 1.05rem;
@@ -1615,6 +1780,49 @@ input:focus {
   50% {
     transform: scale(1.015);
     opacity: 1;
+  }
+}
+
+@keyframes arrival-halo {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.48;
+  }
+
+  50% {
+    transform: scale(1.02);
+    opacity: 0.82;
+  }
+}
+
+@keyframes arrival-path {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0.42;
+  }
+
+  34%, 62% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -240;
+    opacity: 0.46;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  .arrival-mark .walking-path:not(.shadow) {
+    stroke-dashoffset: 0;
   }
 }
 
