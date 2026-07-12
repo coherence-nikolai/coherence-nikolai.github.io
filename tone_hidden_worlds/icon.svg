@@ -1,27 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Tone Hidden Worlds">
   <defs>
     <radialGradient id="bg" cx="50%" cy="56%" r="64%">
-      <stop offset="0" stop-color="#173233"/>
-      <stop offset="0.58" stop-color="#071314"/>
-      <stop offset="1" stop-color="#010303"/>
+      <stop offset="0" stop-color="#1a2d2a"/>
+      <stop offset="0.58" stop-color="#0a1110"/>
+      <stop offset="1" stop-color="#020101"/>
     </radialGradient>
     <radialGradient id="light" cx="50%" cy="63%" r="24%">
-      <stop offset="0" stop-color="#f0ca82"/>
-      <stop offset="0.38" stop-color="#d9a04c" stop-opacity=".54"/>
-      <stop offset="1" stop-color="#d9a04c" stop-opacity="0"/>
+      <stop offset="0" stop-color="#f0cc88"/>
+      <stop offset="0.38" stop-color="#c9a96e" stop-opacity=".54"/>
+      <stop offset="1" stop-color="#c9a96e" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <rect width="128" height="128" rx="28" fill="#030606"/>
-  <circle cx="64" cy="64" r="47" fill="url(#bg)" stroke="#d9a04c" stroke-width="2"/>
-  <circle cx="64" cy="64" r="36" fill="none" stroke="#f0ca82" stroke-opacity=".46" stroke-width="1.5"/>
-  <circle cx="64" cy="64" r="27" fill="none" stroke="#f0ca82" stroke-opacity=".34" stroke-width="1.35"/>
-  <circle cx="64" cy="64" r="18" fill="none" stroke="#f0ca82" stroke-opacity=".26" stroke-width="1.2"/>
-  <path d="M47 92V56c0-14 8-23 17-23s17 9 17 23v36" fill="none" stroke="#020404" stroke-opacity=".58" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M47 92V56c0-14 8-23 17-23s17 9 17 23v36" fill="none" stroke="#f0ca82" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M31 82h66" fill="none" stroke="#f0ca82" stroke-opacity=".54" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M34 111 64 82l30 29" fill="#020404" fill-opacity=".22" stroke="#020404" stroke-opacity=".62" stroke-width="3.4" stroke-linejoin="round"/>
-  <path d="M34 111 64 82l30 29" fill="none" stroke="#f0ca82" stroke-opacity=".82" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M64 111V82" fill="none" stroke="#f0ca82" stroke-opacity=".46" stroke-width="1.2" stroke-linecap="round"/>
+  <rect width="128" height="128" rx="28" fill="#080403"/>
+  <circle cx="64" cy="64" r="47" fill="url(#bg)" stroke="#c9a96e" stroke-width="2"/>
+  <circle cx="64" cy="64" r="36" fill="none" stroke="#86bdb4" stroke-opacity=".46" stroke-width="1.5"/>
+  <circle cx="64" cy="64" r="27" fill="none" stroke="#86bdb4" stroke-opacity=".34" stroke-width="1.35"/>
+  <circle cx="64" cy="64" r="18" fill="none" stroke="#86bdb4" stroke-opacity=".26" stroke-width="1.2"/>
+  <path d="M47 92V56c0-14 8-23 17-23s17 9 17 23v36" fill="none" stroke="#080403" stroke-opacity=".62" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M47 92V56c0-14 8-23 17-23s17 9 17 23v36" fill="none" stroke="#f2eadf" stroke-opacity=".9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M31 82h66" fill="none" stroke="#c9a96e" stroke-opacity=".58" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M34 111 64 82l30 29" fill="#080403" fill-opacity=".24" stroke="#080403" stroke-opacity=".66" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M34 111 64 82l30 29" fill="none" stroke="#c9a96e" stroke-opacity=".84" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M64 111V82" fill="none" stroke="#c9a96e" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"/>
   <circle cx="64" cy="82" r="16" fill="url(#light)"/>
-  <circle cx="64" cy="82" r="4.2" fill="#f0ca82"/>
+  <circle cx="64" cy="82" r="4.2" fill="#f0cc88"/>
 </svg>
