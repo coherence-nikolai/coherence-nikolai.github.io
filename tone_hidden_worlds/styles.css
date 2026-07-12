@@ -260,10 +260,10 @@ h3 {
   display: grid;
   gap: 0.04em;
   justify-items: center;
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.68rem;
   color: #f3e7cf;
   font-family: var(--serif);
-  font-size: 6.05rem;
+  font-size: clamp(4.95rem, 7.6vw, 5.75rem);
   font-weight: 500;
   letter-spacing: 0.045em;
   line-height: 0.96;
@@ -280,11 +280,11 @@ h3 {
 
 .arrival-mark {
   position: relative;
-  width: 12.4rem;
+  width: 10.35rem;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  margin: 0.65rem 0 0.92rem;
+  margin: 0.42rem 0 0.68rem;
   border-radius: 999px;
   background:
     radial-gradient(circle at 50% 63%, rgba(240, 202, 130, 0.18), transparent 1.35rem),
@@ -413,7 +413,7 @@ h3 {
 
 .arrival-principle {
   max-width: 38rem;
-  margin-bottom: 0;
+  margin-bottom: 0.55rem;
   color: var(--gold-2);
   font-family: var(--serif);
   font-size: 1.52rem;
@@ -421,12 +421,23 @@ h3 {
   text-wrap: balance;
 }
 
+.arrival-purpose {
+  max-width: 42rem;
+  margin: 0;
+  color: rgba(243, 231, 207, 0.74);
+  font-size: 1rem;
+  line-height: 1.46;
+  text-wrap: balance;
+}
+
 .arrival-quiet-line {
+  max-width: 36rem;
   margin: 0 0 1rem;
   color: rgba(243, 231, 207, 0.68);
   font-size: 0.92rem;
   font-weight: 760;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
   text-transform: uppercase;
 }
 
@@ -1814,10 +1825,17 @@ input:focus {
     font-size: 1.12rem;
   }
 
+  .arrival-purpose {
+    max-width: 21rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
   .arrival-quiet-line {
+    max-width: 20rem;
     margin-bottom: 0.82rem;
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
   }
 
   .arrival-doors {
