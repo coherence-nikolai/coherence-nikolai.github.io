@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#160704">
   <meta name="description" content="Tone Loom is a free browser instrument for weaving tone lore into luminous spell paths.">
   <title>Tone Loom | Coherence Nikolai</title>
-  <link rel="icon" href="/tone_loom/icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="/tone_loom/manifest.webmanifest">
-  <link rel="stylesheet" href="/tone_loom/styles.css">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <div class="page-glow" aria-hidden="true"></div>
@@ -16,7 +16,7 @@
   <section class="landing-screen" id="landingScreen" aria-label="Tone Loom landing">
     <a class="family-link" href="/">Tone family</a>
     <div class="landing-orb" aria-hidden="true">
-      <img src="/tone_loom/icon.svg" alt="">
+      <img src="./icon.svg" alt="">
       <span class="orb-runner"></span>
     </div>
     <div class="landing-copy">
@@ -30,6 +30,9 @@
     <header class="app-topbar" aria-label="Tone Loom controls">
       <a class="back-link" href="/" aria-label="Back to Tone family">Tone family</a>
       <div class="topbar-actions">
+        <button class="icon-button" id="constellationButton" type="button" title="Hide constellation guide" aria-label="Hide constellation guide">Eye</button>
+        <button class="icon-button" id="libraryButton" type="button" title="Magic Wheels" aria-label="Magic Wheels">Wheels</button>
+        <button class="icon-button" id="atelierButton" type="button" title="Loom Atelier" aria-label="Loom Atelier">Atelier</button>
         <button class="icon-button" id="seedButton" type="button" title="Seed audio" aria-label="Seed audio">Seed</button>
         <button class="icon-button" id="archiveButton" type="button" title="Spellbook" aria-label="Spellbook">Spells</button>
         <button class="icon-button" id="homeButton" type="button" title="Landing" aria-label="Landing">Orb</button>
@@ -59,10 +62,17 @@
       <div class="pill-row compact" id="modeButtons"></div>
     </section>
 
+    <section class="effect-rail" aria-label="Tone effects">
+      <div class="pill-row compact" id="effectButtons"></div>
+    </section>
+
     <section class="action-rail" aria-label="Spell actions">
+      <button class="action-button" id="recordButton" type="button">Record</button>
       <button class="action-button" id="weaveButton" type="button">Weave</button>
       <button class="action-button" id="playButton" type="button">Play</button>
       <button class="action-button" id="keepButton" type="button">Keep</button>
+      <button class="action-button quiet" id="shareButton" type="button">Send</button>
+      <button class="action-button quiet" id="undoButton" type="button">Undo</button>
       <button class="action-button quiet" id="clearButton" type="button">Clear</button>
     </section>
 
@@ -70,10 +80,11 @@
       <span id="seedName">Seed ready</span>
       <button type="button" id="playSeedButton">Play Seed</button>
       <button type="button" id="loopSeedButton">Loop Seed</button>
+      <button type="button" id="weaveSeedButton">Weave With Seed</button>
       <button type="button" id="clearSeedButton">Clear Seed</button>
     </section>
 
-    <input id="seedInput" type="file" accept="audio/*,video/*" hidden>
+    <input id="seedInput" type="file" accept="audio/*,video/*,.json,.txt,.toneloom" hidden>
   </main>
 
   <dialog class="loom-dialog" id="saveDialog" aria-labelledby="saveTitle">
@@ -104,6 +115,111 @@
     </form>
   </dialog>
 
-  <script src="/tone_loom/app.js" defer></script>
+  <dialog class="loom-dialog sheet-dialog" id="libraryDialog" aria-labelledby="libraryTitle">
+    <form method="dialog">
+      <div class="dialog-heading">
+        <h2 id="libraryTitle">Magic Wheels</h2>
+        <button value="close" type="submit">Done</button>
+      </div>
+      <p class="dialog-copy">Choose the tone order around the rim. Drag in a circle to hear each wheel's path.</p>
+      <div class="sheet-section">
+        <h3>Magic Wheels</h3>
+        <div class="option-list" id="libraryWheelList"></div>
+      </div>
+      <div class="sheet-section">
+        <h3>Constellations</h3>
+        <p>Constellations guide the light pattern without restricting the wheel.</p>
+        <div class="option-list" id="constellationList"></div>
+      </div>
+      <div class="sheet-section">
+        <h3>Mythic Scale</h3>
+        <div class="chamber-list" id="mythicScaleList"></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="loom-dialog sheet-dialog" id="atelierDialog" aria-labelledby="atelierTitle">
+    <form method="dialog">
+      <div class="dialog-heading">
+        <h2 id="atelierTitle">Loom Atelier</h2>
+        <button value="close" type="submit">Done</button>
+      </div>
+      <p class="dialog-copy">Craft custom Magic Wheels, spell cards, layered paths, rare sound families, visual skins, and custom constellations. Local web studio only.</p>
+
+      <div class="sheet-section">
+        <h3>Loom Skins</h3>
+        <div class="token-grid" id="skinButtons"></div>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Sound Families</h3>
+        <div class="token-grid" id="timbreButtons"></div>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Atelier Effects</h3>
+        <label class="range-row">
+          Depth
+          <input id="effectDepthInput" type="range" min="0" max="1" step="0.05" value="0.5">
+        </label>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Create a Spell Wheel</h3>
+        <p>Choose 1 to 24 tones. Tap them in the order you want them to appear around the rim.</p>
+        <input id="wheelNameInput" maxlength="44" autocomplete="off" placeholder="Wheel name">
+        <div class="selected-strip" id="wheelOrderPreview">No tones chosen yet</div>
+        <div class="tone-token-grid" id="wheelToneGrid"></div>
+        <div class="builder-actions">
+          <button id="clearWheelBuilderButton" type="button">Clear order</button>
+          <button class="dialog-primary" id="saveWheelButton" type="button">Keep wheel</button>
+        </div>
+        <div class="option-list" id="customWheelList"></div>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Reweave</h3>
+        <div class="token-grid" id="reweaveButtons"></div>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Atelier Layer</h3>
+        <div class="layer-row" id="layerRow"></div>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Custom Constellations</h3>
+        <p>Shape a guide from your own tone threads. All 24 tones stay playable.</p>
+        <input id="constellationNameInput" maxlength="44" autocomplete="off" placeholder="Constellation name">
+        <div class="selected-strip" id="constellationPreview">Choose at least 3 tones</div>
+        <div class="tone-token-grid" id="constellationToneGrid"></div>
+        <div class="builder-actions">
+          <button id="clearConstellationBuilderButton" type="button">Clear tones</button>
+          <button class="dialog-primary" id="saveConstellationButton" type="button">Keep constellation</button>
+        </div>
+        <div class="option-list" id="customConstellationList"></div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="loom-dialog" id="editSpellDialog" aria-labelledby="editSpellTitle">
+    <form method="dialog">
+      <h2 id="editSpellTitle">Edit Spell</h2>
+      <label>
+        Spell name
+        <input id="editSpellNameInput" maxlength="48" autocomplete="off">
+      </label>
+      <label>
+        Intention seed
+        <textarea id="editIntentionInput" maxlength="180" rows="3"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button value="cancel" type="submit">Cancel</button>
+        <button class="dialog-primary" value="save" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js" defer></script>
 </body>
 </html>
