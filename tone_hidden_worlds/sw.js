@@ -1,9 +1,9 @@
-const CACHE_NAME = "tone-hidden-worlds-20260712-arrival";
+const CACHE_NAME = "tone-hidden-worlds-20260712-brandhero";
 const APP_SHELL = [
   "/tone_hidden_worlds/",
   "/tone_hidden_worlds/index.html",
-  "/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712-arrival",
-  "/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712-arrival",
+  "/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712-brandhero",
+  "/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712-brandhero",
   "/tone_hidden_worlds/atlas.js",
   "/tone_hidden_worlds/icon.svg",
   "/tone_hidden_worlds/assets/app-icon.png",

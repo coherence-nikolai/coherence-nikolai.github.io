@@ -15,8 +15,8 @@
   <link rel="icon" href="/tone_hidden_worlds/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/tone_hidden_worlds/assets/app-icon.png">
   <link rel="manifest" href="/tone_hidden_worlds/manifest.webmanifest">
-  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712-arrival">
-  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712-arrival"></script>
+  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712-brandhero">
+  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712-brandhero"></script>
 </head>
 <body>
   <a class="skip-link" href="#home">Skip to app</a>
@@ -40,22 +40,28 @@
     <main>
       <section class="mode-view is-active arrival-view" id="home" data-view="home" aria-labelledby="arrival-title">
         <div class="arrival-stack">
-          <div class="arrival-mark world-mark" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
+          <h1 class="arrival-brand-heading" id="arrival-title" aria-label="Tone Hidden Worlds">
+            <span>TONE</span>
+            <span>HIDDEN</span>
+            <span>WORLDS</span>
+          </h1>
+          <p class="arrival-principle">Every Person Lives in a World You Cannot See.</p>
+          <div class="arrival-mark threshold-mark" aria-hidden="true">
             <svg viewBox="0 0 180 180" focusable="false">
-              <ellipse class="door-glow" cx="90" cy="88" rx="19" ry="25"></ellipse>
-              <path class="doorway" d="M82 111 V91 C82 82 87 75 90 75 C94 75 99 82 99 91 V111"></path>
-              <path class="walking-path shadow" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
-              <path class="walking-path" d="M91 166 C125 148 50 141 84 122 C119 102 68 99 91 86"></path>
-              <g class="walker" transform="translate(90 105) scale(0.62)">
-                <circle cx="0" cy="-9" r="2.3"></circle>
-                <path d="M0 -6 L0 6 M0 0 L-5 5 M0 0 L5 5 M0 6 L-4 14 M0 6 L4 14"></path>
-              </g>
+              <circle class="threshold-outer" cx="90" cy="90" r="73"></circle>
+              <circle class="threshold-ring threshold-ring-1" cx="90" cy="90" r="57"></circle>
+              <circle class="threshold-ring threshold-ring-2" cx="90" cy="90" r="43"></circle>
+              <circle class="threshold-ring threshold-ring-3" cx="90" cy="90" r="30"></circle>
+              <path class="threshold-arch-shadow" d="M64 130 V78 C64 57 77 44 90 44 C103 44 116 57 116 78 V130"></path>
+              <path class="threshold-arch" d="M64 130 V78 C64 57 77 44 90 44 C103 44 116 57 116 78 V130"></path>
+              <path class="threshold-horizon" d="M46 114 H134"></path>
+              <path class="threshold-path-shadow" d="M50 154 L90 114 L130 154"></path>
+              <path class="threshold-path" d="M50 154 L90 114 L130 154"></path>
+              <path class="threshold-center-path" d="M90 154 V114"></path>
+              <circle class="threshold-light" cx="90" cy="114" r="5.7"></circle>
             </svg>
           </div>
-          <p class="app-kicker">Tone: Hidden Worlds</p>
-          <h1 id="arrival-title">Look deeper. Assume less.</h1>
-          <p class="arrival-principle">Every Person Lives in a World You Cannot See.</p>
+          <p class="arrival-quiet-line">Look deeper. Assume less.</p>
           <div class="arrival-doors" aria-label="Choose where to begin">
             <button class="arrival-door primary-door" type="button" data-mode="lens" data-focus-lens>
               <span>01</span>

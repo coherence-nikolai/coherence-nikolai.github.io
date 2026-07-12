@@ -238,10 +238,10 @@ h3 {
 }
 
 .arrival-view {
-  min-height: calc(100svh - 6rem);
+  min-height: calc(100svh - 5.25rem);
   display: none;
   place-items: center;
-  padding-top: clamp(1rem, 4vw, 2.5rem);
+  padding-top: 1.35rem;
 }
 
 .arrival-view.is-active {
@@ -249,16 +249,47 @@ h3 {
 }
 
 .arrival-stack {
-  width: min(100%, 44rem);
+  width: min(100%, 48rem);
   display: grid;
   justify-items: center;
   text-align: center;
   isolation: isolate;
 }
 
+.arrival-brand-heading {
+  display: grid;
+  gap: 0.04em;
+  justify-items: center;
+  margin: 0 0 0.85rem;
+  color: #f3e7cf;
+  font-family: var(--serif);
+  font-size: 6.05rem;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+  line-height: 0.96;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 0 rgba(255, 253, 248, 0.16),
+    0 0 22px rgba(240, 202, 130, 0.14),
+    0 0 68px rgba(217, 160, 76, 0.18);
+}
+
+.arrival-brand-heading span {
+  display: block;
+}
+
 .arrival-mark {
-  width: clamp(11rem, 30vw, 18rem);
-  margin-bottom: clamp(1.15rem, 3vw, 1.8rem);
+  position: relative;
+  width: 12.4rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  margin: 0.65rem 0 0.92rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 63%, rgba(240, 202, 130, 0.18), transparent 1.35rem),
+    radial-gradient(circle at 50% 52%, rgba(31, 74, 74, 0.54), transparent 56%),
+    radial-gradient(circle at 50% 54%, rgba(1, 3, 3, 0.26), transparent 72%);
 }
 
 .arrival-mark::after {
@@ -273,28 +304,116 @@ h3 {
   animation: arrival-halo 10s ease-in-out infinite;
 }
 
-.arrival-mark .walking-path:not(.shadow) {
-  stroke-dasharray: 240;
-  stroke-dashoffset: 240;
-  animation: arrival-path 5.5s ease-in-out infinite;
+.arrival-mark svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.arrival-stack h1 {
-  max-width: 42rem;
-  margin-bottom: 0.5rem;
-  font-size: clamp(3.1rem, 9vw, 6.1rem);
-  line-height: 0.9;
-  text-wrap: balance;
+.threshold-mark svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.threshold-outer,
+.threshold-ring,
+.threshold-arch,
+.threshold-horizon,
+.threshold-path,
+.threshold-center-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.threshold-outer {
+  stroke: rgba(240, 202, 130, 0.9);
+  stroke-width: 1.35;
+  filter: drop-shadow(0 0 7px rgba(217, 160, 76, 0.2));
+}
+
+.threshold-ring {
+  stroke: rgba(240, 202, 130, 0.4);
+  stroke-width: 1.05;
+  transform-origin: 90px 90px;
+  animation: threshold-ring-breathe 9s ease-in-out infinite;
+}
+
+.threshold-ring-2 {
+  animation-delay: 900ms;
+}
+
+.threshold-ring-3 {
+  animation-delay: 1800ms;
+}
+
+.threshold-arch-shadow {
+  fill: none;
+  stroke: rgba(1, 3, 3, 0.18);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.threshold-arch {
+  stroke: rgba(240, 202, 130, 0.9);
+  stroke-width: 2.25;
+  filter: drop-shadow(0 0 9px rgba(217, 160, 76, 0.2));
+  animation: threshold-line-glow 6.8s ease-in-out infinite;
+}
+
+.threshold-horizon {
+  stroke: rgba(240, 202, 130, 0.45);
+  stroke-width: 1;
+  animation: threshold-line-glow 6.8s ease-in-out infinite;
+}
+
+.threshold-path-shadow {
+  fill: transparent;
+  stroke: rgba(1, 3, 3, 0.2);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.threshold-path {
+  fill: none;
+  stroke: rgba(240, 202, 130, 0.78);
+  stroke-width: 1.65;
+  filter: drop-shadow(0 0 8px rgba(217, 160, 76, 0.2));
+  animation: threshold-line-glow 6.8s ease-in-out infinite;
+}
+
+.threshold-center-path {
+  stroke: rgba(240, 202, 130, 0.42);
+  stroke-width: 1;
+  animation: threshold-line-glow 6.8s ease-in-out infinite;
+}
+
+.threshold-light {
+  fill: var(--gold-2);
+  filter: drop-shadow(0 0 10px rgba(240, 202, 130, 0.7));
+  transform-origin: 90px 114px;
+  animation: threshold-light-pulse 4.8s ease-in-out infinite;
 }
 
 .arrival-principle {
-  max-width: 32rem;
-  margin-bottom: clamp(1rem, 3vw, 1.55rem);
+  max-width: 38rem;
+  margin-bottom: 0;
   color: var(--gold-2);
   font-family: var(--serif);
-  font-size: clamp(1.1rem, 2.8vw, 1.52rem);
+  font-size: 1.52rem;
   line-height: 1.16;
   text-wrap: balance;
+}
+
+.arrival-quiet-line {
+  margin: 0 0 1rem;
+  color: rgba(243, 231, 207, 0.68);
+  font-size: 0.92rem;
+  font-weight: 760;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .arrival-doors {
@@ -1577,6 +1696,10 @@ input:focus {
     grid-template-columns: repeat(4, 1fr);
   }
 
+  .arrival-brand-heading {
+    font-size: 4.85rem;
+  }
+
   .world-mark {
     justify-self: center;
   }
@@ -1657,19 +1780,30 @@ input:focus {
 
   .arrival-view {
     min-height: auto;
-    padding-top: 2.25rem;
+    padding-top: 4.15rem;
   }
 
   .arrival-mark {
-    width: clamp(10rem, 52vw, 13rem);
+    width: 11.25rem;
+    margin-top: 0.38rem;
   }
 
-  .arrival-stack h1 {
-    font-size: clamp(2.9rem, 13vw, 4rem);
+  .arrival-brand-heading {
+    gap: 0.02em;
+    margin-bottom: 0.62rem;
+    font-size: 3.35rem;
+    line-height: 0.98;
   }
 
   .arrival-principle {
-    font-size: 1.05rem;
+    max-width: 22rem;
+    font-size: 1.12rem;
+  }
+
+  .arrival-quiet-line {
+    margin-bottom: 0.82rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
   }
 
   .arrival-doors {
@@ -1812,6 +1946,108 @@ input:focus {
   }
 }
 
+@keyframes threshold-ring-breathe {
+  0%, 100% {
+    opacity: 0.42;
+    transform: scale(0.992);
+  }
+
+  50% {
+    opacity: 0.78;
+    transform: scale(1.012);
+  }
+}
+
+@keyframes threshold-line-glow {
+  0%, 100% {
+    opacity: 0.72;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes threshold-draw {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0.52;
+  }
+
+  32%, 72% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -240;
+    opacity: 0.58;
+  }
+}
+
+@keyframes threshold-horizon {
+  0%, 12% {
+    stroke-dashoffset: 88;
+    opacity: 0.2;
+  }
+
+  36%, 78% {
+    stroke-dashoffset: 0;
+    opacity: 0.72;
+  }
+
+  100% {
+    stroke-dashoffset: -88;
+    opacity: 0.22;
+  }
+}
+
+@keyframes threshold-path-draw {
+  0%, 8% {
+    stroke-dashoffset: 120;
+    opacity: 0.28;
+  }
+
+  40%, 78% {
+    stroke-dashoffset: 0;
+    opacity: 0.92;
+  }
+
+  100% {
+    stroke-dashoffset: -120;
+    opacity: 0.34;
+  }
+}
+
+@keyframes threshold-center-draw {
+  0%, 18% {
+    stroke-dashoffset: 44;
+    opacity: 0;
+  }
+
+  42%, 76% {
+    stroke-dashoffset: 0;
+    opacity: 0.7;
+  }
+
+  100% {
+    stroke-dashoffset: -44;
+    opacity: 0;
+  }
+}
+
+@keyframes threshold-light-pulse {
+  0%, 100% {
+    transform: scale(0.86);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1821,7 +2057,10 @@ input:focus {
     scroll-behavior: auto !important;
   }
 
-  .arrival-mark .walking-path:not(.shadow) {
+  .threshold-arch,
+  .threshold-horizon,
+  .threshold-path,
+  .threshold-center-path {
     stroke-dashoffset: 0;
   }
 }
