@@ -5,10 +5,12 @@ const state = {
   selectedCategory: "all",
   libraryQuery: "",
   selectedLensEntryId: "",
-  detailEntryId: ""
+  detailEntryId: "",
+  detailSurface: ""
 };
 
 const entryIndex = new Map(entries.map((entry) => [entry.id, entry]));
+const notesStorageKey = "toneHiddenWorldNotes.v1";
 
 const stopWords = new Set([
   "the", "and", "for", "with", "that", "this", "they", "them", "their", "you", "your", "one", "are", "but",
@@ -108,6 +110,11 @@ const els = {
   librarySummary: document.querySelector("#library-summary"),
   libraryCount: document.querySelector("#library-count"),
   entryList: document.querySelector("#entry-list"),
+  notesSummary: document.querySelector("#notes-summary"),
+  notesCount: document.querySelector("#notes-count"),
+  notesList: document.querySelector("#notes-list"),
+  exportNotes: document.querySelector("#export-notes"),
+  clearNotes: document.querySelector("#clear-notes"),
   entryDetail: document.querySelector("#entry-detail"),
   entryDetailContent: document.querySelector("#entry-detail-content")
 };
@@ -277,13 +284,22 @@ function hasUnsafeTerms(query) {
   return queryTerms(query).some((term) => unsafeTokens.has(term));
 }
 
-function safetyNotice(query) {
-  if (!hasUnsafeTerms(query)) return "";
+function renderSafetyBlock(query, context = "Tone: Hidden Worlds") {
   return `
-    <div class="safety-note">
-      If there is immediate danger, abuse, self-harm, a medical emergency, or a legal/safety crisis, use local emergency services or qualified support now.
-      Tone: Hidden Worlds is for reflection only, not emergency, medical, legal, crisis, or therapy guidance.
-    </div>
+    <section class="safety-note hard-stop" aria-label="Safety boundary">
+      <p class="eyebrow">Safety first</p>
+      <h3>This is outside the reflection space.</h3>
+      <p>
+        ${escapeHtml(context)} will not interpret ${query ? `&quot;${escapeHtml(query)}&quot;` : "this moment"}.
+        If there is immediate danger, abuse, self-harm, coercion, a medical issue, a legal issue, or a crisis,
+        use local emergency services or qualified support now.
+      </p>
+      <p>Tone: Hidden Worlds is for curiosity and reflection only. It is not therapy, diagnosis, medical advice, legal advice, crisis support, or an emergency service.</p>
+      <div class="safety-actions">
+        <a href="/tone_hidden_worlds/boundaries/">Read boundaries</a>
+        <a href="/tone_hidden_worlds/support/">Support notes</a>
+      </div>
+    </section>
   `;
 }
 
@@ -465,6 +481,17 @@ function renderEntryDetail(entry, surface = entry.visibleBehavior) {
       ${renderPillGroup("Needs", entry.needs)}
     </div>
 
+    <section class="detail-note">
+      <h3>Private note</h3>
+      <p>What changed in how you see this moment? Save the shift, not a judgment about the person.</p>
+      <label class="visually-hidden" for="detail-note-input">Private note</label>
+      <textarea id="detail-note-input" rows="4" placeholder="I can hold that this may be about protection, pressure, history, or a need I cannot see."></textarea>
+      <div class="note-control-row">
+        <button class="primary-action compact-action" type="button" data-save-note="${escapeHtml(entry.id)}">Save note</button>
+        <span id="note-save-status" aria-live="polite"></span>
+      </div>
+    </section>
+
     ${related.length ? `
       <section class="detail-related">
         <h3>Adjacent prompts</h3>
@@ -481,18 +508,21 @@ function renderEntryDetail(entry, surface = entry.visibleBehavior) {
     <div class="detail-actions">
       <button class="primary-action compact-action" type="button" data-lens-from-detail="${escapeHtml(entry.id)}">Try this in Lens</button>
       <button class="entry-open" type="button" data-find-in-atlas="${escapeHtml(entry.id)}">Find in Atlas</button>
+      <button class="entry-open" type="button" data-copy-world-link="${escapeHtml(entry.id)}">Copy world link</button>
     </div>
   `;
 }
 
-function openEntryDetail(entryId, surface = "") {
+function openEntryDetail(entryId, surface = "", options = {}) {
   const entry = entryIndex.get(entryId);
   if (!entry || !els.entryDetail || !els.entryDetailContent) return;
   state.detailEntryId = entryId;
-  els.entryDetailContent.innerHTML = renderEntryDetail(entry, surface || entry.visibleBehavior);
+  state.detailSurface = surface || entry.visibleBehavior;
+  els.entryDetailContent.innerHTML = renderEntryDetail(entry, state.detailSurface);
   els.entryDetail.hidden = false;
   els.entryDetail.querySelector(".entry-detail-card")?.scrollTo({ top: 0 });
   document.body.classList.add("has-entry-detail");
+  if (!options.preserveHash) history.replaceState(null, "", `#world=${encodeURIComponent(entryId)}`);
   els.entryDetail.querySelector("#entry-detail-title")?.focus({ preventScroll: true });
 }
 
@@ -501,6 +531,159 @@ function closeEntryDetail() {
   els.entryDetail.hidden = true;
   document.body.classList.remove("has-entry-detail");
   state.detailEntryId = "";
+  state.detailSurface = "";
+  history.replaceState(null, "", `#${state.mode}`);
+}
+
+function loadNotes() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(notesStorageKey) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistNotes(notes) {
+  try {
+    localStorage.setItem(notesStorageKey, JSON.stringify(notes));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function formatNoteDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Saved note";
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+}
+
+function noteId() {
+  return `note-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function renderNotes() {
+  if (!els.notesList || !els.notesCount || !els.notesSummary) return;
+  const notes = loadNotes().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  els.notesCount.textContent = `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
+  els.notesSummary.textContent = notes.length ? "Saved perspectives" : "Private notebook";
+
+  if (!notes.length) {
+    els.notesList.innerHTML = `
+      <div class="empty-state">
+        No saved notes yet. Open a Reflection Room and save only the perspective you want to remember.
+      </div>
+    `;
+    return;
+  }
+
+  els.notesList.innerHTML = notes.map((note) => `
+    <article class="note-card">
+      <p class="meta-line">${escapeHtml(formatNoteDate(note.createdAt))}</p>
+      <h3>${escapeHtml(note.title || "Hidden world")}</h3>
+      <p><strong>Surface:</strong> ${escapeHtml(note.surface || "A moment you were considering")}</p>
+      <p>${escapeHtml(note.note || "")}</p>
+      <div class="card-actions">
+        <button class="entry-open" type="button" data-entry-detail="${escapeHtml(note.entryId || "")}" data-detail-surface="${escapeHtml(note.surface || "")}">Open reflection</button>
+        <button class="entry-open danger-action" type="button" data-delete-note="${escapeHtml(note.id)}">Delete</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function saveCurrentNote(entryId) {
+  const entry = entryIndex.get(entryId);
+  const input = document.querySelector("#detail-note-input");
+  const status = document.querySelector("#note-save-status");
+  const note = input?.value.trim() || "";
+  if (!entry || !input || !status) return;
+
+  if (!note) {
+    status.textContent = "Write a note first.";
+    return;
+  }
+
+  const notes = loadNotes();
+  notes.unshift({
+    id: noteId(),
+    entryId: entry.id,
+    title: entry.title,
+    surface: state.detailSurface || entry.visibleBehavior,
+    note,
+    createdAt: new Date().toISOString()
+  });
+
+  if (!persistNotes(notes)) {
+    status.textContent = "Could not save in this browser.";
+    return;
+  }
+
+  input.value = "";
+  status.textContent = "Saved to Notes.";
+  renderNotes();
+}
+
+function deleteNote(noteIdToDelete) {
+  const notes = loadNotes().filter((note) => note.id !== noteIdToDelete);
+  persistNotes(notes);
+  renderNotes();
+}
+
+function exportNotes() {
+  const notes = loadNotes();
+  if (!notes.length) return;
+  const body = [
+    "Tone: Hidden Worlds notes",
+    "Every Person Lives in a World You Cannot See.",
+    "",
+    ...notes.map((note) => [
+      `# ${note.title || "Hidden world"}`,
+      `Saved: ${formatNoteDate(note.createdAt)}`,
+      `Surface: ${note.surface || ""}`,
+      "",
+      note.note || "",
+      ""
+    ].join("\n"))
+  ].join("\n");
+  const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `tone-hidden-worlds-notes-${new Date().toISOString().slice(0, 10)}.txt`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function clearNotes() {
+  if (!loadNotes().length) return;
+  if (!window.confirm("Clear all local Tone: Hidden Worlds notes? This cannot be undone.")) return;
+  persistNotes([]);
+  renderNotes();
+}
+
+function copyWorldLink(entryId) {
+  const status = document.querySelector("#note-save-status");
+  const url = `${location.origin}${location.pathname}#world=${encodeURIComponent(entryId)}`;
+  if (!navigator.clipboard) {
+    if (status) status.textContent = url;
+    return;
+  }
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      if (status) status.textContent = "World link copied.";
+    })
+    .catch(() => {
+      if (status) status.textContent = url;
+    });
 }
 
 function setMode(mode) {
@@ -554,6 +737,13 @@ function renderLensResults(results, query) {
 
 function revealWorlds(options = {}) {
   const query = els.surfaceInput.value.trim() || els.surfaceInput.placeholder;
+  if (hasUnsafeTerms(query)) {
+    state.selectedLensEntryId = "";
+    els.resultCount.textContent = "Safety first";
+    els.worldResults.innerHTML = renderSafetyBlock(query, "World Lens");
+    return;
+  }
+
   const ranked = rankedEntries(query);
   let results = ranked.slice(0, 3);
   if (options.keepSelection && state.selectedLensEntryId && !results.some((result) => result.entry.id === state.selectedLensEntryId)) {
@@ -567,7 +757,7 @@ function revealWorlds(options = {}) {
   }
   if (!options.keepSelection) state.selectedLensEntryId = results[0]?.entry.id || "";
   els.resultCount.textContent = results.length ? `${results.length} prompts` : "0 prompts";
-  els.worldResults.innerHTML = safetyNotice(query) + renderLensResults(results, query);
+  els.worldResults.innerHTML = renderLensResults(results, query);
 }
 
 function dailyEntry() {
@@ -610,15 +800,32 @@ function renderLibrary() {
     ? "World Atlas"
     : categories.find((category) => category.id === state.selectedCategory)?.name || "World Atlas";
 
+  if (state.libraryQuery && hasUnsafeTerms(state.libraryQuery)) {
+    els.librarySummary.textContent = "Safety first";
+    els.libraryCount.textContent = "No interpretations";
+    els.entryList.innerHTML = renderSafetyBlock(state.libraryQuery, "World Atlas");
+    renderSearchSuggestions();
+    return;
+  }
+
   els.librarySummary.textContent = state.libraryQuery ? `Search: ${state.libraryQuery}` : categoryName;
   els.libraryCount.textContent = `${results.length} prompts`;
-  els.entryList.innerHTML = safetyNotice(state.libraryQuery) + (results.length
+  els.entryList.innerHTML = (results.length
     ? results.map((result) => renderAtlasDoor(result)).join("")
     : `<div class="empty-state">No world found. Try a visible behavior, a need, or a simpler word.</div>`);
   renderSearchSuggestions();
 }
 
 function renderSearchSuggestions() {
+  if (state.libraryQuery && hasUnsafeTerms(state.libraryQuery)) {
+    els.searchSuggestions.innerHTML = defaultSuggestions.slice(0, 5).map((suggestion) => `
+      <button type="button" data-suggestion="${escapeHtml(suggestion)}">
+        ${escapeHtml(suggestion)}
+      </button>
+    `).join("");
+    return;
+  }
+
   const activeTerms = queryTerms(state.libraryQuery).slice(0, 5);
   const suggestions = activeTerms.length
     ? [...new Set([
@@ -656,7 +863,10 @@ function openEntryInAtlas(entryId) {
 }
 
 els.modeButtons.forEach((button) => {
-  button.addEventListener("click", () => setMode(button.dataset.mode));
+  button.addEventListener("click", () => {
+    setMode(button.dataset.mode);
+    document.querySelector(`#${button.dataset.mode}`)?.scrollIntoView({ block: "start" });
+  });
 });
 
 els.exampleButtons.forEach((button) => {
@@ -714,6 +924,9 @@ els.categoryList.addEventListener("click", (event) => {
   renderLibrary();
 });
 
+els.exportNotes?.addEventListener("click", exportNotes);
+els.clearNotes?.addEventListener("click", clearNotes);
+
 document.addEventListener("click", (event) => {
   const closeButton = event.target.closest("[data-detail-close]");
   if (closeButton) {
@@ -741,6 +954,24 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const saveNote = event.target.closest("[data-save-note]");
+  if (saveNote) {
+    saveCurrentNote(saveNote.dataset.saveNote);
+    return;
+  }
+
+  const deleteNoteButton = event.target.closest("[data-delete-note]");
+  if (deleteNoteButton) {
+    deleteNote(deleteNoteButton.dataset.deleteNote);
+    return;
+  }
+
+  const copyLink = event.target.closest("[data-copy-world-link]");
+  if (copyLink) {
+    copyWorldLink(copyLink.dataset.copyWorldLink);
+    return;
+  }
+
   const lensButton = event.target.closest("[data-lens-entry]");
   if (lensButton) {
     state.selectedLensEntryId = lensButton.dataset.lensEntry;
@@ -754,15 +985,29 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+function routeFromHash() {
+  const currentHash = location.hash.replace("#", "");
+  if (["lens", "daily", "library", "notes"].includes(currentHash)) {
+    setMode(currentHash);
+    return;
+  }
+  if (currentHash.startsWith("world=")) {
+    openEntryDetail(decodeURIComponent(currentHash.slice(6)), "", { preserveHash: true });
+  }
+}
+
+window.addEventListener("hashchange", routeFromHash);
+
 function init() {
   renderCategories();
   renderDaily();
   revealWorlds();
   renderLibrary();
+  renderNotes();
+  routeFromHash();
 
-  const initialMode = location.hash.replace("#", "");
-  if (["lens", "daily", "library"].includes(initialMode)) {
-    setMode(initialMode);
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    navigator.serviceWorker.register("/tone_hidden_worlds/sw.js").catch(() => {});
   }
 }
 

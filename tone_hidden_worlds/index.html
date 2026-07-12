@@ -12,10 +12,11 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://coherence-nikolai.app/tone_hidden_worlds/">
   <meta property="og:image" content="https://coherence-nikolai.app/tone_hidden_worlds/assets/app-icon.png">
-  <link rel="icon" href="/tone_hidden_worlds/assets/app-icon.png" type="image/png">
+  <link rel="icon" href="/tone_hidden_worlds/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/tone_hidden_worlds/assets/app-icon.png">
-  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260708">
-  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260708"></script>
+  <link rel="manifest" href="/tone_hidden_worlds/manifest.webmanifest">
+  <link rel="stylesheet" href="/tone_hidden_worlds/styles.css?v=tone-hidden-worlds-20260712">
+  <script type="module" src="/tone_hidden_worlds/app.js?v=tone-hidden-worlds-20260712"></script>
 </head>
 <body>
   <a class="skip-link" href="#lens">Skip to app</a>
@@ -24,7 +25,7 @@
     <header class="topbar" aria-label="Tone: Hidden Worlds web app">
       <a class="brand" href="/tone/" aria-label="Tone family">
         <span class="brand-mark" aria-hidden="true">
-          <img src="/tone_hidden_worlds/assets/app-icon.png" alt="">
+          <img src="/tone_hidden_worlds/icon.svg" alt="">
         </span>
         <span>Tone: Hidden Worlds</span>
       </a>
@@ -32,6 +33,7 @@
         <button class="is-active" type="button" data-mode="lens">Lens</button>
         <button type="button" data-mode="library">Atlas</button>
         <button type="button" data-mode="daily">Daily</button>
+        <button type="button" data-mode="notes">Notes</button>
       </nav>
     </header>
 
@@ -39,10 +41,10 @@
       <section class="mode-view is-active lens-workbench" id="lens" data-view="lens" aria-labelledby="app-title">
         <div class="split-layout instrument-layout">
           <section class="input-panel">
-            <p class="app-kicker">World Lens</p>
-            <h1 id="app-title">Start with one moment.</h1>
+            <p class="app-kicker">Tone Lens</p>
+            <h1 id="app-title">Change the tone of perception.</h1>
             <p class="founder-line">Every Person Lives in a World You Cannot See.</p>
-            <p class="lens-intro">Describe only what happened. Receive possibilities, not verdicts, so you can respond with more curiosity and less certainty.</p>
+            <p class="lens-intro">Begin with a visible moment. Receive possible worlds, never verdicts, so your next response can carry more curiosity and less certainty.</p>
             <label for="surface-input">Surface moment</label>
             <textarea id="surface-input" rows="3" placeholder="Someone does not reply after seeing my message"></textarea>
             <button class="primary-action" type="button" id="reveal-worlds">Consider possible worlds</button>
@@ -115,7 +117,7 @@
             <h2 id="library-title">Search 112 hidden worlds.</h2>
             <p class="atlas-note">A large, searchable map of human situations. Every result is a door, never a label.</p>
             <label for="library-search">Search behavior, need, life room, or tag</label>
-            <input id="library-search" type="search" placeholder="left on read, money, conflict, body, home">
+            <input id="library-search" type="search" placeholder="left on read, money, body, home">
             <div class="search-suggestions" id="search-suggestions" aria-label="Suggested searches"></div>
             <div class="category-list" id="category-list" aria-label="Library categories"></div>
           </aside>
@@ -129,6 +131,27 @@
         </div>
       </section>
 
+      <section class="mode-view" id="notes" data-view="notes" aria-labelledby="notes-title">
+        <div class="notes-layout">
+          <aside class="notes-intro">
+            <p class="eyebrow">World Notes</p>
+            <h2 id="notes-title">Keep what changed your seeing.</h2>
+            <p>Your notes stay in this browser. No account, no feed, no score. Save only the perspectives you want to return to.</p>
+            <div class="notes-actions">
+              <button class="entry-open" type="button" id="export-notes">Export notes</button>
+              <button class="entry-open danger-action" type="button" id="clear-notes">Clear notes</button>
+            </div>
+          </aside>
+          <section class="notes-panel" aria-live="polite">
+            <div class="result-head">
+              <p id="notes-summary">Private notebook</p>
+              <span id="notes-count">0 notes</span>
+            </div>
+            <div class="notes-list" id="notes-list"></div>
+          </section>
+        </div>
+      </section>
+
       <section class="entry-detail-shell" id="entry-detail" hidden aria-labelledby="entry-detail-title">
         <button class="entry-detail-backdrop" type="button" data-detail-close aria-label="Close reflection"></button>
         <article class="entry-detail-card" role="dialog" aria-modal="true" aria-labelledby="entry-detail-title">
@@ -137,6 +160,16 @@
         </article>
       </section>
     </main>
+
+    <footer class="app-footer">
+      <p><strong>Tone: Hidden Worlds</strong> is a local-first empathy instrument. It offers possibilities, not certainty.</p>
+      <nav aria-label="Tone: Hidden Worlds footer">
+        <a href="/tone/">Tone family</a>
+        <a href="/tone_hidden_worlds/privacy/">Privacy</a>
+        <a href="/tone_hidden_worlds/boundaries/">Boundaries</a>
+        <a href="/tone_hidden_worlds/support/">Support</a>
+      </nav>
+    </footer>
   </div>
 </body>
 </html>

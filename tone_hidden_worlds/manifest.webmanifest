@@ -1,0 +1,19 @@
+{
+  "name": "Tone: Hidden Worlds",
+  "short_name": "Hidden Worlds",
+  "description": "A local-first Tone-family empathy instrument for practicing curiosity without certainty.",
+  "start_url": "/tone_hidden_worlds/",
+  "scope": "/tone_hidden_worlds/",
+  "display": "standalone",
+  "background_color": "#030606",
+  "theme_color": "#030606",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/tone_hidden_worlds/assets/app-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

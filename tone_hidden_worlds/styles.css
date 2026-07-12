@@ -103,7 +103,9 @@ h3 {
   left: 1rem;
   top: 1rem;
   z-index: 40;
-  transform: translateY(-150%);
+  transform: translateY(calc(-100% - 2rem));
+  opacity: 0;
+  pointer-events: none;
   border-radius: var(--radius);
   background: var(--ink);
   color: var(--bg);
@@ -111,8 +113,19 @@ h3 {
   font-weight: 800;
 }
 
-.skip-link:focus {
+.skip-link:focus-visible {
   transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .app-shell {
@@ -164,7 +177,7 @@ h3 {
 .mode-tabs {
   justify-self: end;
   display: inline-grid;
-  grid-template-columns: repeat(3, minmax(4.9rem, auto));
+  grid-template-columns: repeat(4, minmax(4.2rem, auto));
   gap: 0.35rem;
   border: 1px solid rgba(243, 231, 207, 0.1);
   border-radius: var(--radius);
@@ -364,6 +377,7 @@ h3 {
 
 .mode-view {
   display: none;
+  scroll-margin-top: 5.4rem;
   padding: clamp(1.5rem, 4vw, 2.5rem) 0 0;
 }
 
@@ -377,7 +391,8 @@ h3 {
 
 .split-layout,
 .library-layout,
-.daily-layout {
+.daily-layout,
+.notes-layout {
   display: grid;
   grid-template-columns: minmax(18rem, 0.72fr) minmax(0, 1.28fr);
   gap: clamp(1rem, 3vw, 1.65rem);
@@ -388,6 +403,7 @@ h3 {
 .split-layout > *,
 .library-layout > *,
 .daily-layout > *,
+.notes-layout > *,
 .swap-grid > * {
   min-width: 0;
 }
@@ -396,6 +412,9 @@ h3 {
 .result-panel,
 .library-tools,
 .library-results,
+.notes-intro,
+.notes-panel,
+.note-card,
 .daily-card,
 .world-card,
 .swap-chooser,
@@ -413,6 +432,8 @@ h3 {
 .result-panel,
 .library-tools,
 .library-results,
+.notes-intro,
+.notes-panel,
 .daily-card,
 .daily-copy {
   padding: clamp(1rem, 3vw, 1.4rem);
@@ -771,7 +792,7 @@ input:focus {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.9rem;
-  align-items: center;
+  align-items: start;
   border: 1px solid rgba(243, 231, 207, 0.09);
   border-radius: var(--radius-chamber);
   padding: 1rem;
@@ -813,7 +834,8 @@ input:focus {
 
 .atlas-door .entry-open {
   min-width: 5.25rem;
-  align-self: stretch;
+  align-self: start;
+  min-height: 2.5rem;
   background:
     linear-gradient(180deg, rgba(217, 160, 76, 0.12), rgba(31, 74, 74, 0.12)),
     rgba(3, 8, 8, 0.58);
@@ -882,6 +904,49 @@ input:focus {
   background:
     linear-gradient(145deg, rgba(217, 160, 76, 0.1), rgba(31, 74, 74, 0.18)),
     rgba(6, 13, 14, 0.9);
+}
+
+.safety-note h3 {
+  margin-bottom: 0.52rem;
+  color: var(--ink);
+  font-size: clamp(1.45rem, 4vw, 2.1rem);
+  line-height: 1.05;
+}
+
+.safety-note p {
+  margin-bottom: 0.72rem;
+}
+
+.safety-note p:last-child {
+  margin-bottom: 0;
+}
+
+.hard-stop {
+  border-color: rgba(240, 202, 130, 0.58);
+  box-shadow: inset 0 0 0 1px rgba(240, 202, 130, 0.08);
+}
+
+.safety-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.safety-actions a,
+.button-link {
+  min-height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(217, 160, 76, 0.32);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.72rem;
+  color: var(--gold-2);
+  background: rgba(3, 8, 8, 0.54);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 780;
 }
 
 .section-head {
@@ -1030,6 +1095,61 @@ input:focus {
   padding-right: 0.25rem;
 }
 
+.notes-layout {
+  grid-template-columns: minmax(17rem, 0.62fr) minmax(0, 1.38fr);
+}
+
+.notes-intro {
+  position: sticky;
+  top: 5.5rem;
+}
+
+.notes-intro h2 {
+  margin-bottom: 0.78rem;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1;
+}
+
+.notes-intro p:not(.eyebrow),
+.note-card p {
+  color: var(--soft);
+}
+
+.notes-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.notes-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.note-card {
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(240, 202, 130, 0.075), transparent 12rem),
+    linear-gradient(145deg, rgba(31, 74, 74, 0.12), rgba(255, 255, 255, 0.012)),
+    rgba(5, 12, 12, 0.72);
+}
+
+.note-card h3 {
+  margin-bottom: 0.46rem;
+  font-size: clamp(1.32rem, 3vw, 1.85rem);
+  line-height: 1.08;
+}
+
+.note-card p {
+  margin-bottom: 0.52rem;
+}
+
+.danger-action {
+  border-color: rgba(143, 95, 104, 0.48);
+  color: rgba(243, 231, 207, 0.76);
+}
+
 .empty-state {
   border: 1px solid rgba(217, 160, 76, 0.22);
   border-radius: var(--radius);
@@ -1128,6 +1248,7 @@ input:focus {
 .detail-boundary h3,
 .detail-alt-worlds h3,
 .detail-related h3,
+.detail-note h3,
 .detail-pill-group p {
   display: block;
   margin: 0 0 0.42rem;
@@ -1147,7 +1268,8 @@ input:focus {
 
 .detail-boundary,
 .detail-alt-worlds,
-.detail-related {
+.detail-related,
+.detail-note {
   margin-top: 1rem;
   border: 1px solid rgba(243, 231, 207, 0.09);
   border-radius: var(--radius);
@@ -1160,6 +1282,31 @@ input:focus {
   gap: 0.42rem;
   margin: 0;
   padding-left: 1.1rem;
+}
+
+.detail-note p {
+  margin-bottom: 0.72rem;
+  color: var(--soft);
+}
+
+.detail-note textarea {
+  min-height: 7rem;
+  background:
+    linear-gradient(145deg, rgba(31, 74, 74, 0.1), rgba(217, 160, 76, 0.03)),
+    rgba(1, 4, 4, 0.72);
+}
+
+.note-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.72rem;
+  margin-top: 0.7rem;
+}
+
+.note-control-row span {
+  color: var(--gold-2);
+  font-size: 0.82rem;
 }
 
 .detail-meta {
@@ -1212,19 +1359,84 @@ input:focus {
   padding: 0.45rem 0.8rem;
 }
 
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  margin-top: clamp(2rem, 5vw, 4rem);
+  padding: 1.25rem 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+.app-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.72rem;
+}
+
+.app-footer a {
+  color: var(--soft);
+  text-decoration: none;
+}
+
+.app-footer a:hover,
+.app-footer a:focus-visible {
+  color: var(--gold-2);
+}
+
+.simple-page {
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+.simple-brand {
+  margin-bottom: clamp(2rem, 7vw, 5rem);
+}
+
+.simple-card {
+  border: 1px solid rgba(217, 160, 76, 0.32);
+  border-radius: var(--radius-chamber);
+  padding: clamp(1.2rem, 5vw, 2.2rem);
+  background:
+    radial-gradient(circle at 82% 0%, rgba(240, 202, 130, 0.12), transparent 18rem),
+    radial-gradient(circle at 20% 0%, rgba(31, 74, 74, 0.16), transparent 15rem),
+    rgba(5, 11, 11, 0.86);
+  box-shadow: var(--shadow-soft);
+}
+
+.simple-card h1 {
+  margin-bottom: 0.8rem;
+  font-size: clamp(2.5rem, 8vw, 4.8rem);
+  line-height: 0.94;
+}
+
+.simple-card p {
+  color: var(--soft);
+}
+
 @media (max-width: 860px) {
   .topbar,
   .hero-panel,
   .split-layout,
   .library-layout,
   .daily-layout,
+  .notes-layout,
   .swap-grid {
     grid-template-columns: 1fr;
   }
 
   .mode-tabs {
     justify-self: stretch;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .world-mark {
@@ -1236,6 +1448,10 @@ input:focus {
   }
 
   .library-tools {
+    position: static;
+  }
+
+  .notes-intro {
     position: static;
   }
 
@@ -1354,6 +1570,9 @@ input:focus {
   .result-panel,
   .library-tools,
   .library-results,
+  .notes-intro,
+  .notes-panel,
+  .note-card,
   .daily-card,
   .daily-copy,
   .world-card,
