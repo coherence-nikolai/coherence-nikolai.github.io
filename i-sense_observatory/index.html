@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://coherence-nikolai.app/i-sense_observatory/">
   <link rel="icon" href="/i-sense_observatory/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/i-sense_observatory/manifest.webmanifest">
-  <link rel="stylesheet" href="/i-sense_observatory/styles.css?v=20260620-family-gold-interior-pass">
+  <link rel="stylesheet" href="/i-sense_observatory/styles.css?v=20260712-inquiry-depth-pass">
 </head>
 <body>
   <canvas id="field-canvas" class="field-canvas" aria-hidden="true"></canvas>
@@ -46,6 +46,46 @@
         <button class="tab" type="button" data-view-target="patterns">Patterns</button>
         <button class="tab" type="button" data-view-target="about">About</button>
       </nav>
+
+      <div class="top-actions">
+        <button class="focus-mode-button" id="focus-mode-button" type="button" aria-pressed="false">
+          <span class="focus-mode-dot" aria-hidden="true"></span>
+          <span id="focus-mode-label">Focus mode off</span>
+        </button>
+        <div class="audio-controls" id="audio-controls">
+          <button class="audio-menu-button" id="audio-menu-button" type="button" aria-expanded="false" aria-controls="audio-panel">
+            <span class="audio-menu-glyph" aria-hidden="true"></span>
+            <span>Audio</span>
+          </button>
+        <div class="audio-panel" id="audio-panel" role="dialog" aria-label="Audio settings" hidden>
+          <div class="audio-panel-head">
+            <strong>Audio</strong>
+            <button class="audio-close-button" id="audio-close-button" type="button">Done</button>
+          </div>
+          <div class="audio-setting-row">
+            <span>
+              <strong>Voice guidance</strong>
+              <small>Speaks the current prompt when you move through the experiment.</small>
+            </span>
+            <button class="audio-toggle" type="button" data-audio-toggle="voice" aria-pressed="false">
+              <span class="audio-toggle-dot" aria-hidden="true"></span>
+              <span data-audio-state="voice">Voice off</span>
+            </button>
+          </div>
+          <div class="audio-setting-row">
+            <span>
+              <strong>Gong</strong>
+              <small>Plays a soft tone on major transitions.</small>
+            </span>
+            <button class="audio-toggle" type="button" data-audio-toggle="gong" aria-pressed="false">
+              <span class="audio-toggle-dot" aria-hidden="true"></span>
+              <span data-audio-state="gong">Gong off</span>
+            </button>
+          </div>
+          <p class="audio-status" id="audio-status">Voice off. Gong off.</p>
+        </div>
+        </div>
+      </div>
     </header>
 
     <main>
@@ -106,10 +146,10 @@
           <section class="about-hero">
             <div>
               <p class="stage-kicker">experiment stance</p>
-              <h1 id="about-title">A quiet self-inquiry guide for the felt sense of me.</h1>
+              <h1 id="about-title">A self-inquiry guide for the felt sense of me.</h1>
               <p>
-                I-Sense Observatory does not tell you what the self is. It gives attention a set of
-                clean lenses, then asks you to record what you actually notice.
+                The app does not tell you what the self is. It asks direct questions and records
+                what you notice.
               </p>
             </div>
             <div class="about-sigil" aria-hidden="true">
@@ -121,17 +161,17 @@
             <article>
               <span>01</span>
               <strong>First Read</strong>
-              <p>A short calibration angles attention through location, texture, stability, boundary, ownership, observer, agency, tone, and story.</p>
+              <p>Answer direct questions about location, texture, boundary, ownership, observer, agency, tone, and story.</p>
             </article>
             <article>
               <span>02</span>
               <strong>Lens Library</strong>
-              <p>Choose freely or follow a suggestion into location, noting, seer-seen, I-thought, agency, boundary, narrative, emotion, field, or absence.</p>
+              <p>Choose a lens: location, noting, observer, I-thought, agency, boundary, narrative, emotion, field, or absence.</p>
             </article>
             <article>
               <span>03</span>
               <strong>Pattern Map</strong>
-              <p>Saved notes become neutral summaries of repeated lenses, locations, boundaries, ownership tones, shifts, remains, and after-effects.</p>
+              <p>Saved notes show repeated locations, textures, shifts, and after-effects.</p>
             </article>
           </div>
 
@@ -187,6 +227,6 @@
     </div>
   </noscript>
 
-  <script src="/i-sense_observatory/app.js?v=20260620-family-gold-interior-pass" type="module"></script>
+  <script src="/i-sense_observatory/app.js?v=20260712-inquiry-depth-pass" type="module"></script>
 </body>
 </html>

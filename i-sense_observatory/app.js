@@ -9,9 +9,18 @@ import {
   resultMarkers as resultOptions,
   suggestLensIds,
   summarizePatterns
-} from "./lens-model.mjs?v=20260620-family-gold-interior-pass";
+} from "./lens-model.mjs?v=20260712-inquiry-depth-pass";
 
 const storageKey = "i-sense-observatory.sessions.v1";
+const audioStorageKey = "i-sense-observatory.audio.v1";
+const supportStorageKey = "i-sense-observatory.support.v1";
+const defaultAudioPreferences = Object.freeze({
+  voice: false,
+  gong: false
+});
+const defaultSupportPreferences = Object.freeze({
+  focusMode: false
+});
 
 const stageOrder = [
   "Arrive",
@@ -20,6 +29,7 @@ const stageOrder = [
   "Lens",
   "Observe",
   "Result",
+  "Ground",
   "Note"
 ];
 
@@ -30,7 +40,19 @@ const stageKeys = [
   "lens",
   "observe",
   "result",
+  "ground",
   "note"
+];
+
+const defaultLoopLength = 3;
+const loopLengthOptions = [3, 5, 7];
+const groundingMarkers = [
+  "feet or seat",
+  "one sound",
+  "one object",
+  "room seen",
+  "breath felt",
+  "ordinary task"
 ];
 
 const state = {
@@ -40,6 +62,8 @@ const state = {
   firstRead: createEmptyFirstRead(),
   selectedLensId: "",
   lensPromptIndex: 0,
+  loopLength: defaultLoopLength,
+  loopIndex: 0,
   lensMarkers: new Set(),
   resultMarkers: new Set(),
   remainsMarkers: new Set(),
@@ -47,11 +71,15 @@ const state = {
   note: "",
   isObservingDirectly: false,
   observationStartedAt: 0,
+  audio: loadAudioPreferences(),
+  support: loadSupportPreferences(),
   sessions: loadSessions()
 };
 
 let lastStageAnimationKey = "";
 let transitionFrame = 0;
+let audioContext = null;
+let lastSpokenPromptKey = "";
 
 const els = {
   tabs: Array.from(document.querySelectorAll("[data-view-target]")),
@@ -73,6 +101,14 @@ const els = {
   patternGrid: document.getElementById("pattern-grid"),
   exportNotes: document.getElementById("export-notes"),
   clearNotes: document.getElementById("clear-notes"),
+  focusModeButton: document.getElementById("focus-mode-button"),
+  focusModeLabel: document.getElementById("focus-mode-label"),
+  audioControls: document.getElementById("audio-controls"),
+  audioMenuButton: document.getElementById("audio-menu-button"),
+  audioPanel: document.getElementById("audio-panel"),
+  audioCloseButton: document.getElementById("audio-close-button"),
+  audioToggles: Array.from(document.querySelectorAll("[data-audio-toggle]")),
+  audioStatus: document.getElementById("audio-status"),
   canvas: document.getElementById("field-canvas")
 };
 
@@ -117,6 +153,41 @@ function loadSessions() {
   }
 }
 
+function loadAudioPreferences() {
+  try {
+    const saved = localStorage.getItem(audioStorageKey);
+    const parsed = saved ? JSON.parse(saved) : {};
+    return {
+      ...defaultAudioPreferences,
+      voice: Boolean(parsed.voice),
+      gong: Boolean(parsed.gong)
+    };
+  } catch {
+    return { ...defaultAudioPreferences };
+  }
+}
+
+function loadSupportPreferences() {
+  try {
+    const saved = localStorage.getItem(supportStorageKey);
+    const parsed = saved ? JSON.parse(saved) : {};
+    return {
+      ...defaultSupportPreferences,
+      focusMode: Boolean(parsed.focusMode)
+    };
+  } catch {
+    return { ...defaultSupportPreferences };
+  }
+}
+
+function saveAudioPreferences() {
+  localStorage.setItem(audioStorageKey, JSON.stringify(state.audio));
+}
+
+function saveSupportPreferences() {
+  localStorage.setItem(supportStorageKey, JSON.stringify(state.support));
+}
+
 function normalizeSession(session) {
   const lens = getLensById(session.lensId || "location");
   if (session.firstRead) {
@@ -144,6 +215,8 @@ function normalizeSession(session) {
     firstRead: {
       ...createEmptyFirstRead(),
       location: session.location || "",
+      bodyLocation: "",
+      existenceLocation: "",
       textures: session.textureMarkers || [],
       stability: "",
       boundary: "",
@@ -168,12 +241,163 @@ function saveSessions() {
   localStorage.setItem(storageKey, JSON.stringify(state.sessions));
 }
 
+function setAudioPanelOpen(open) {
+  if (!els.audioPanel || !els.audioMenuButton) return;
+  els.audioPanel.hidden = !open;
+  els.audioPanel.classList.toggle("is-open", open);
+  els.audioMenuButton.setAttribute("aria-expanded", String(open));
+}
+
+function updateAudioControls() {
+  if (!els.audioToggles.length) return;
+  els.audioControls?.classList.toggle("has-audio-on", state.audio.voice || state.audio.gong);
+  els.audioToggles.forEach((button) => {
+    const key = button.dataset.audioToggle;
+    const isOn = Boolean(state.audio[key]);
+    button.classList.toggle("is-on", isOn);
+    button.setAttribute("aria-pressed", String(isOn));
+    const label = button.querySelector(`[data-audio-state="${key}"]`);
+    if (label) label.textContent = `${capitalize(key)} ${isOn ? "on" : "off"}`;
+  });
+  if (els.audioStatus) {
+    els.audioStatus.textContent = `Voice ${state.audio.voice ? "on" : "off"}. Gong ${state.audio.gong ? "on" : "off"}.`;
+  }
+}
+
+function updateSupportControls() {
+  const isOn = Boolean(state.support.focusMode);
+  document.documentElement.classList.toggle("focus-mode", isOn);
+  if (!els.focusModeButton) return;
+  els.focusModeButton.classList.toggle("is-on", isOn);
+  els.focusModeButton.setAttribute("aria-pressed", String(isOn));
+  if (els.focusModeLabel) els.focusModeLabel.textContent = `Focus mode ${isOn ? "on" : "off"}`;
+}
+
+function toggleFocusMode() {
+  state.support.focusMode = !state.support.focusMode;
+  saveSupportPreferences();
+  updateSupportControls();
+}
+
+function toggleAudioPreference(key) {
+  if (!Object.hasOwn(defaultAudioPreferences, key)) return;
+  state.audio[key] = !state.audio[key];
+  saveAudioPreferences();
+  updateAudioControls();
+  if (key === "gong" && state.audio.gong) playGong();
+  if (key === "voice" && state.audio.voice) speakCurrentPrompt(true);
+}
+
+function playGong() {
+  if (!state.audio.gong || motionState.reducedMotion) return;
+  try {
+    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextConstructor) return;
+    audioContext = audioContext || new AudioContextConstructor();
+    if (audioContext.state === "suspended") audioContext.resume();
+
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const overtone = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const overtoneGain = audioContext.createGain();
+
+    oscillator.type = "sine";
+    overtone.type = "sine";
+    oscillator.frequency.setValueAtTime(196, now);
+    overtone.frequency.setValueAtTime(392, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.09, now + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
+    overtoneGain.gain.setValueAtTime(0.0001, now);
+    overtoneGain.gain.exponentialRampToValueAtTime(0.024, now + 0.026);
+    overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.82);
+
+    oscillator.connect(gain);
+    overtone.connect(overtoneGain);
+    gain.connect(audioContext.destination);
+    overtoneGain.connect(audioContext.destination);
+    oscillator.start(now);
+    overtone.start(now);
+    oscillator.stop(now + 1.28);
+    overtone.stop(now + 0.86);
+  } catch {
+    // Browser audio can be unavailable; keep the preference visible either way.
+  }
+}
+
+function speakCurrentPrompt(force = false) {
+  if (!state.audio.voice || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
+  const key = getPromptSpeechKey();
+  if (!force && key === lastSpokenPromptKey) return;
+  lastSpokenPromptKey = key;
+  const text = getPromptSpeechText();
+  if (!text) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.84;
+  utterance.pitch = 0.88;
+  utterance.volume = 0.72;
+  window.speechSynthesis.speak(utterance);
+}
+
+function cueAudio(forceVoice = false) {
+  playGong();
+  speakCurrentPrompt(forceVoice);
+}
+
+function getPromptSpeechKey() {
+  return [
+    state.view,
+    state.stage,
+    state.calibrationIndex,
+    state.selectedLensId,
+    state.lensPromptIndex,
+    state.isObservingDirectly ? "observing" : "ready"
+  ].join(":");
+}
+
+function getPromptSpeechText() {
+  if (state.view !== "observatory") {
+    const labels = {
+      notes: "Field Notes. Saved only in this browser.",
+      patterns: "Patterns. Repeated observations, without interpretation.",
+      about: "I-Sense Observatory. A quiet self-inquiry guide for the felt sense of me."
+    };
+    return labels[state.view] || "";
+  }
+
+  if (state.stage === 1) {
+    const question = firstReadQuestions[state.calibrationIndex];
+    return question ? `${question.title}. ${question.question}` : "";
+  }
+  if (state.stage === 3) {
+    const lens = getSelectedLens();
+    const prompt = lens.prompts[state.lensPromptIndex % lens.prompts.length];
+    return `${lens.shortTitle}. ${prompt}`;
+  }
+  if (state.stage === 4) {
+    const lens = getSelectedLens();
+    const loopPrompt = lens.prompts[(state.lensPromptIndex + state.loopIndex) % lens.prompts.length];
+    return state.isObservingDirectly
+      ? `Stay with this prompt. ${loopPrompt}`
+      : "No timer. Use a short prompt loop and record the result.";
+  }
+  return `${els.title?.textContent || ""}. ${els.prompt?.textContent || ""}`.trim();
+}
+
+function capitalize(value) {
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+}
+
 function resetDraft() {
   stopObservation();
   state.calibrationIndex = 0;
   state.firstRead = createEmptyFirstRead();
   state.selectedLensId = "";
   state.lensPromptIndex = 0;
+  state.loopLength = defaultLoopLength;
+  state.loopIndex = 0;
   state.lensMarkers = new Set();
   state.resultMarkers = new Set();
   state.remainsMarkers = new Set();
@@ -203,16 +427,20 @@ function setView(view) {
     if (view === "notes") renderNotes();
     if (view === "patterns") renderPatterns();
   });
+  cueAudio();
 }
 
 function setStage(stage) {
   const nextStage = Math.max(0, Math.min(stage, stageOrder.length - 1));
+  const stageChanged = nextStage !== state.stage;
   mutateWithTransition(() => {
     if (state.stage === 4 && nextStage !== 4) stopObservation();
     if (nextStage === 3 && !state.selectedLensId) chooseLens(suggestLensIds(state.firstRead)[0], false);
+    if (nextStage === 4 && state.stage !== 4) state.loopIndex = 0;
     state.stage = nextStage;
     render();
   });
+  if (stageChanged) cueAudio();
 }
 
 function goBack() {
@@ -236,6 +464,7 @@ function render() {
     renderLens,
     renderObserve,
     renderResult,
+    renderGround,
     renderNote
   ][state.stage];
 
@@ -276,7 +505,7 @@ function updateStageChrome() {
 function renderSummary() {
   const lens = getSelectedLens();
   const lines = [
-    ...firstReadQuestions.slice(0, 5).map((question) => [
+    ...firstReadQuestions.slice(0, 6).map((question) => [
       question.title,
       summarizeFirstReadValue(question, state.firstRead[question.id])
     ]),
@@ -349,15 +578,17 @@ function renderFirstRead() {
   const question = firstReadQuestions[state.calibrationIndex];
   const isLast = state.calibrationIndex === firstReadQuestions.length - 1;
   const canAdvance = firstReadHasAnswer(question);
+  const isLocationAngle = ["location", "bodyLocation", "existenceLocation"].includes(question.id);
   const progressDots = firstReadQuestions.map((_, index) => (
     `<span class="${index === state.calibrationIndex ? "is-active" : ""}"></span>`
   )).join("");
   const choices = question.options.map((option) => renderFirstReadChoice(question, option)).join("");
+  const summary = renderFirstReadSummary();
 
   setStageContent(
     "first read",
     "Answer from what you notice.",
-    "Choose the closest answer for each question. Your answers help suggest a starting lens; you can still choose freely.",
+    "One question at a time. Choose the closest report.",
     `<div class="calibration-chamber">
       <section class="question-lens calibration-lens" aria-label="First read question">
         <span class="lens-label">${escapeHtml(question.title)} ${state.calibrationIndex + 1} / ${firstReadQuestions.length}</span>
@@ -365,14 +596,40 @@ function renderFirstRead() {
         <small>${escapeHtml(question.help)}</small>
         <div class="lens-dots" aria-hidden="true">${progressDots}</div>
       </section>
+      ${isLocationAngle ? renderBodyMap(question) : ""}
       <div class="choice-grid calibration-grid ${question.mode === "multi" ? "is-multi" : ""}">
         ${choices}
       </div>
-      <div class="first-read-summary">${renderFirstReadSummary()}</div>
+      ${summary ? `<div class="first-read-summary">${summary}</div>` : ""}
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
      <button class="primary-button" type="button" data-action="next-calibration" ${canAdvance ? "" : "disabled"}>${isLast ? "Suggest lenses" : "Continue"}</button>`
   );
+}
+
+function renderBodyMap(question) {
+  const points = [
+    ["behind the eyes", "eyes"],
+    ["throat", "throat"],
+    ["chest", "chest"],
+    ["abdomen", "abdomen"]
+  ];
+  const selected = state.firstRead[question.id];
+  return `<div class="body-map location-body-map" aria-label="Body map quick choices">
+    <div class="body-figure">
+      ${points.map(([value, className]) => (
+        `<button class="body-point ${className} ${selected === value ? "is-selected" : ""}" type="button" data-first-read-single="${question.id}" data-value="${escapeHtml(value)}" aria-label="${escapeHtml(value)}" aria-pressed="${selected === value ? "true" : "false"}"></button>`
+      )).join("")}
+    </div>
+    <div class="body-map-choices">
+      <span class="lens-label">quick map</span>
+      <div class="choice-row">
+        ${points.map(([value]) => (
+          `<button class="chip-button ${selected === value ? "is-selected" : ""}" type="button" data-first-read-single="${question.id}" data-value="${escapeHtml(value)}" aria-pressed="${selected === value ? "true" : "false"}">${escapeHtml(value)}</button>`
+        )).join("")}
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderFirstReadChoice(question, option) {
@@ -470,6 +727,10 @@ function renderLens() {
         <span class="lens-label">direct markers</span>
         <div class="choice-row">${markers}</div>
       </div>
+      <div class="loop-picker">
+        <span class="lens-label">untimed prompt loop</span>
+        <div class="choice-row">${renderLoopLengthButtons()}</div>
+      </div>
       <div class="lens-reflection">
         <span class="lens-label">recording angle</span>
         <p>${escapeHtml(lens.reflection)}</p>
@@ -481,20 +742,35 @@ function renderLens() {
   );
 }
 
+function renderLoopLengthButtons() {
+  return loopLengthOptions.map((count) => (
+    `<button class="chip-button ${state.loopLength === count ? "is-selected" : ""}" type="button" data-loop-length="${count}" aria-pressed="${state.loopLength === count ? "true" : "false"}">${count} prompts</button>`
+  )).join("");
+}
+
 function renderObserve() {
   const lens = getSelectedLens();
   const observing = state.isObservingDirectly;
+  const loopTotal = state.loopLength || defaultLoopLength;
+  const loopPrompt = lens.prompts[(state.lensPromptIndex + state.loopIndex) % lens.prompts.length];
+  const dots = Array.from({ length: loopTotal }, (_, index) => `<span class="${index === state.loopIndex ? "is-active" : ""}"></span>`).join("");
+  const canAdvanceLoop = state.loopIndex < loopTotal - 1;
 
   setStageContent(
     observing ? "observing" : "observe",
-    observing ? "Stay with what is actually here." : "Observe through the lens.",
-    observing ? "When something is clear enough, record it. If nothing changes, record that too." : "No timer. Let the lens point attention, then watch what happens directly.",
+    observing ? "Stay with the prompt." : "Observe through the lens.",
+    observing ? "Look directly. Then move to the next prompt or record what happened." : "No timer. Use a short prompt loop and record the result.",
     `<div class="observe-field">
       <div class="timer-disc untimed-disc ${observing ? "is-active" : "is-ready"}" style="--angle:0deg">
         ${renderSignalMark("timer-mark")}
-        <strong>${observing ? "now" : "open"}</strong>
+        <strong>${observing ? `${state.loopIndex + 1}/${loopTotal}` : "open"}</strong>
         <span>${escapeHtml(lens.shortTitle)}</span>
       </div>
+      <section class="question-lens observe-prompt">
+        <span class="lens-label">${observing ? `prompt ${state.loopIndex + 1} / ${loopTotal}` : "ready"}</span>
+        <p>${escapeHtml(observing ? loopPrompt : lens.directAction)}</p>
+        <div class="lens-dots" aria-hidden="true">${dots}</div>
+      </section>
       <div class="observe-readout">
         <span>${escapeHtml(lens.title)}</span>
         <b>${escapeHtml(joinOrNone(selectedArray(state.lensMarkers)))}</b>
@@ -502,6 +778,7 @@ function renderObserve() {
     </div>`,
     observing
       ? `<button class="secondary-button" type="button" data-action="back">Back</button>
+         ${canAdvanceLoop ? `<button class="secondary-button" type="button" data-action="next-observe-prompt">Next prompt</button>` : ""}
          <button class="primary-button" type="button" data-action="end-observe">Record what happened</button>`
       : `<button class="secondary-button" type="button" data-action="back">Back</button>
          <button class="primary-button" type="button" data-action="start-observe">Begin observing</button>`
@@ -511,7 +788,9 @@ function renderObserve() {
 function startObservation() {
   state.isObservingDirectly = true;
   state.observationStartedAt = Date.now();
+  state.loopIndex = 0;
   renderWithTransition();
+  cueAudio();
 }
 
 function stopObservation() {
@@ -533,7 +812,7 @@ function renderResult() {
     "Record what happened under observation without deciding what it means.",
     `<div class="result-chamber">
       <section class="marker-field">
-        <span class="lens-label">what it seemed made of</span>
+        <span class="lens-label">components noticed</span>
         <div class="choice-row">${renderChipButtons(componentOptions, state.lensMarkers, "lens")}</div>
       </section>
       <section class="marker-field">
@@ -550,7 +829,27 @@ function renderResult() {
       </section>
     </div>`,
     `<button class="secondary-button" type="button" data-action="back">Back</button>
-     <button class="primary-button" type="button" data-action="next">Continue to note</button>`
+     <button class="primary-button" type="button" data-action="next">Ground first</button>`
+  );
+}
+
+function renderGround() {
+  setStageContent(
+    "ground",
+    "Come back to the room.",
+    "Before writing, mark one ordinary thing that is clear.",
+    `<div class="grounding-chamber">
+      <section class="question-lens grounding-card">
+        <span class="lens-label">simple check</span>
+        <p>Notice the body, the room, or one sound. Then write from steadier contact.</p>
+      </section>
+      <section class="marker-field">
+        <span class="lens-label">grounding markers</span>
+        <div class="choice-row">${renderChipButtons(groundingMarkers, state.integrationMarkers, "integration")}</div>
+      </section>
+    </div>`,
+    `<button class="secondary-button" type="button" data-action="back">Back</button>
+     <button class="primary-button" type="button" data-action="next">Write note</button>`
   );
 }
 
@@ -666,6 +965,8 @@ function renderNotes() {
     ];
     const readout = [
       ["location", firstRead.location || "unlocated"],
+      ["body", firstRead.bodyLocation || "unread"],
+      ["I am", firstRead.existenceLocation || "unread"],
       ["boundary", firstRead.boundary || "unread"],
       ["ownership", firstRead.ownership || "unread"],
       ["tone", firstRead.tone || "unread"]
@@ -698,6 +999,8 @@ function renderPatterns() {
     ["Sessions", "Total local field notes.", summary.total],
     ["Most used lens", "The lens most often explored.", labelLens(summary.topLens)],
     ["Common location", "Where me most often seemed to gather.", summary.topLocation],
+    ["Body location", "Where the user most often felt located.", summary.topBodyLocation],
+    ["I-am location", "Where existing-as-me felt strongest.", summary.topExistenceLocation],
     ["Common texture", "What the self-sense most often seemed made of.", summary.topTexture],
     ["Common boundary", "Where me most often seemed to end.", summary.topBoundary],
     ["Ownership tone", "How experience most often felt owned.", summary.topOwnership],
@@ -929,6 +1232,12 @@ function handleBodyClick(event) {
       const lens = getSelectedLens();
       state.lensPromptIndex = (state.lensPromptIndex + 1) % lens.prompts.length;
       renderWithTransition();
+      cueAudio();
+    }
+    if (action === "next-observe-prompt") {
+      state.loopIndex = Math.min(state.loopIndex + 1, (state.loopLength || defaultLoopLength) - 1);
+      renderWithTransition();
+      cueAudio();
     }
     if (action === "start-observe") startObservation();
     if (action === "end-observe") {
@@ -977,6 +1286,14 @@ function handleBodyClick(event) {
     return;
   }
 
+  const loopTarget = event.target.closest("[data-loop-length]");
+  if (loopTarget) {
+    state.loopLength = Number(loopTarget.dataset.loopLength) || defaultLoopLength;
+    state.loopIndex = 0;
+    renderWithTransition();
+    return;
+  }
+
   const deleteTarget = event.target.closest("[data-delete-session]");
   if (deleteTarget) {
     deleteSession(deleteTarget.dataset.deleteSession);
@@ -987,6 +1304,7 @@ function advanceCalibration() {
   if (state.calibrationIndex < firstReadQuestions.length - 1) {
     state.calibrationIndex += 1;
     renderWithTransition();
+    cueAudio();
     return;
   }
   setStage(2);
@@ -1004,9 +1322,32 @@ function escapeHtml(value) {
 els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => setView(tab.dataset.viewTarget));
 });
+els.audioMenuButton?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setAudioPanelOpen(els.audioPanel?.hidden ?? true);
+});
+els.audioCloseButton?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setAudioPanelOpen(false);
+});
+els.audioPanel?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  const toggle = event.target.closest("[data-audio-toggle]");
+  if (toggle) toggleAudioPreference(toggle.dataset.audioToggle);
+});
+els.focusModeButton?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleFocusMode();
+});
 els.exportNotes.addEventListener("click", exportNotes);
 els.clearNotes.addEventListener("click", clearNotes);
 document.addEventListener("click", handleBodyClick);
+document.addEventListener("click", (event) => {
+  if (!els.audioControls?.contains(event.target)) setAudioPanelOpen(false);
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setAudioPanelOpen(false);
+});
 window.addEventListener("resize", resizeCanvas);
 reduceMotionQuery.addEventListener("change", (event) => {
   motionState.reducedMotion = event.matches;
@@ -1021,6 +1362,8 @@ document.addEventListener("visibilitychange", () => {
 });
 
 resizeCanvas();
+updateAudioControls();
+updateSupportControls();
 render();
 renderNotes();
 renderPatterns();

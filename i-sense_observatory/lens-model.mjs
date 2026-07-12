@@ -97,6 +97,22 @@ export const firstReadQuestions = [
     options: locationOptions
   },
   {
+    id: "bodyLocation",
+    mode: "single",
+    title: "Body",
+    question: "Where do you feel mainly located in the body?",
+    help: "Answer from the felt sense, not from an idea of where you should be.",
+    options: locationOptions
+  },
+  {
+    id: "existenceLocation",
+    mode: "single",
+    title: "I am",
+    question: "Where is the felt sense of existing as you strongest?",
+    help: "If it is everywhere, nowhere, or unclear, choose the closest match.",
+    options: locationOptions
+  },
+  {
     id: "textures",
     mode: "multi",
     title: "Texture",
@@ -410,6 +426,8 @@ export function getLensById(id) {
 export function createEmptyFirstRead() {
   return {
     location: "",
+    bodyLocation: "",
+    existenceLocation: "",
     textures: [],
     stability: "",
     boundary: "",
@@ -424,7 +442,11 @@ export function createEmptyFirstRead() {
 export function suggestLensIds(firstRead) {
   const scores = Object.fromEntries(lensLibrary.map((lens) => [lens.id, 0]));
   const textures = new Set(firstRead.textures || []);
-  const location = firstRead.location || "";
+  const locationReports = [
+    firstRead.location,
+    firstRead.bodyLocation,
+    firstRead.existenceLocation
+  ].filter(Boolean);
   const stability = firstRead.stability || "";
   const boundary = firstRead.boundary || "";
   const ownership = firstRead.ownership || "";
@@ -437,16 +459,19 @@ export function suggestLensIds(firstRead) {
     scores[id] += score;
   };
 
-  if (["behind the eyes", "face", "head", "throat", "chest", "abdomen"].includes(location)) add("location", 4);
-  if (["whole body", "around the body"].includes(location)) {
-    add("field", 3);
-    add("boundary", 3);
-    add("location", 1);
-  }
-  if (["no clear location", "not present"].includes(location)) {
-    add("absence", 6);
-    add("field", 2);
-  }
+  locationReports.forEach((location, index) => {
+    const weight = index === 0 ? 1 : 0.72;
+    if (["behind the eyes", "face", "head", "throat", "chest", "abdomen"].includes(location)) add("location", 4 * weight);
+    if (["whole body", "around the body"].includes(location)) {
+      add("field", 3 * weight);
+      add("boundary", 3 * weight);
+      add("location", 1 * weight);
+    }
+    if (["no clear location", "not present"].includes(location)) {
+      add("absence", 6 * weight);
+      add("field", 2 * weight);
+    }
+  });
 
   if (textures.has("watcher")) {
     add("seer-seen", 14);
@@ -528,6 +553,8 @@ export function summarizePatterns(sessions) {
   const normalized = sessions || [];
   const lensCounts = countBy(normalized.map((session) => session.lensId || "unlensed"));
   const locationCounts = countBy(normalized.map((session) => session.firstRead?.location || session.location).filter(Boolean));
+  const bodyLocationCounts = countBy(normalized.map((session) => session.firstRead?.bodyLocation).filter(Boolean));
+  const existenceLocationCounts = countBy(normalized.map((session) => session.firstRead?.existenceLocation).filter(Boolean));
   const textureCounts = countBy(normalized.flatMap((session) => session.firstRead?.textures || session.textureMarkers || []));
   const boundaryCounts = countBy(normalized.map((session) => session.firstRead?.boundary).filter(Boolean));
   const ownershipCounts = countBy(normalized.map((session) => session.firstRead?.ownership).filter(Boolean));
@@ -544,6 +571,8 @@ export function summarizePatterns(sessions) {
     total: normalized.length,
     topLens: topCount(lensCounts),
     topLocation: topCount(locationCounts),
+    topBodyLocation: topCount(bodyLocationCounts),
+    topExistenceLocation: topCount(existenceLocationCounts),
     topTexture: topCount(textureCounts),
     topBoundary: topCount(boundaryCounts),
     topOwnership: topCount(ownershipCounts),
@@ -601,6 +630,8 @@ function buildNeutralInsights(summary) {
     `Most reported texture: ${summary.topTexture}.`
   ];
 
+  if (summary.topBodyLocation !== "none yet") insights.push(`Most reported body location: ${summary.topBodyLocation}.`);
+  if (summary.topExistenceLocation !== "none yet") insights.push(`Most reported I-am location: ${summary.topExistenceLocation}.`);
   if (summary.topBoundary !== "none yet") insights.push(`Most reported boundary: ${summary.topBoundary}.`);
   if (summary.topOwnership !== "none yet") insights.push(`Most reported ownership: ${summary.topOwnership}.`);
   if (summary.topResult !== "none yet") insights.push(`Most repeated result: ${summary.topResult}.`);

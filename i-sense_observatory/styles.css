@@ -5687,3 +5687,614 @@ html:not([data-stage="arrive"]) .about-sigil::after,
 html:not([data-stage="arrive"]) .about-sigil span {
   background: linear-gradient(180deg, transparent, rgba(232, 196, 110, 0.54), transparent);
 }
+
+/* I-Sense audio instrument: explicit readable states, no bright-white toggles. */
+.topbar {
+  position: relative;
+}
+
+.audio-controls {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 20;
+}
+
+.audio-menu-button,
+.audio-close-button,
+.audio-toggle {
+  min-height: 36px;
+  border: 1px solid rgba(232, 196, 110, 0.22);
+  border-radius: 999px;
+  color: rgba(242, 234, 223, 0.78);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 196, 110, 0.08), transparent 58%),
+    rgba(10, 4, 3, 0.62);
+  box-shadow:
+    inset 0 1px rgba(255, 247, 210, 0.035),
+    0 16px 44px rgba(0, 0, 0, 0.28);
+  font-family: var(--family-body, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.audio-menu-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+}
+
+.audio-menu-button[aria-expanded="true"],
+.audio-controls.has-audio-on .audio-menu-button {
+  color: rgba(243, 217, 138, 0.96);
+  border-color: rgba(232, 196, 110, 0.56);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 196, 110, 0.18), transparent 60%),
+    linear-gradient(180deg, rgba(232, 196, 110, 0.12), rgba(18, 9, 8, 0.78));
+  box-shadow:
+    inset 0 1px rgba(255, 247, 210, 0.06),
+    0 0 26px rgba(232, 196, 110, 0.12),
+    0 18px 54px rgba(0, 0, 0, 0.36);
+}
+
+.audio-menu-glyph {
+  width: 14px;
+  height: 14px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  opacity: 0.92;
+}
+
+.audio-menu-glyph::before,
+.audio-menu-glyph::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: 0 50%;
+  opacity: 0.72;
+}
+
+.audio-menu-glyph::before {
+  transform: rotate(-35deg) translate(2px, -50%);
+}
+
+.audio-menu-glyph::after {
+  transform: rotate(35deg) translate(2px, -50%);
+}
+
+.audio-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid rgba(232, 196, 110, 0.26);
+  border-radius: 18px;
+  color: rgba(242, 234, 223, 0.82);
+  background:
+    radial-gradient(circle at 24% 0%, rgba(232, 196, 110, 0.16), transparent 46%),
+    linear-gradient(180deg, rgba(22, 11, 8, 0.98), rgba(5, 2, 1, 0.98));
+  box-shadow:
+    0 0 0 1px rgba(232, 196, 110, 0.06),
+    0 26px 86px rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(20px);
+}
+
+.audio-panel[hidden] {
+  display: none;
+}
+
+.audio-panel-head,
+.audio-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.audio-panel-head {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(232, 196, 110, 0.14);
+}
+
+.audio-panel-head strong,
+.audio-setting-row strong {
+  color: rgba(243, 217, 138, 0.96);
+  font-family: var(--family-body, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.audio-close-button {
+  min-height: 30px;
+  padding: 0 11px;
+  color: rgba(242, 234, 223, 0.72);
+  font-size: 0.66rem;
+}
+
+.audio-setting-row {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(232, 196, 110, 0.09);
+}
+
+.audio-setting-row > span {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.audio-setting-row small,
+.audio-status {
+  color: rgba(242, 234, 223, 0.58);
+  font-family: var(--family-body, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.audio-toggle {
+  flex: 0 0 auto;
+  min-width: 112px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 12px;
+  color: rgba(242, 234, 223, 0.68);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(242, 234, 223, 0.04), transparent 60%),
+    rgba(8, 3, 2, 0.74);
+}
+
+.audio-toggle.is-on {
+  color: rgba(243, 217, 138, 0.98);
+  border-color: rgba(232, 196, 110, 0.72);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(243, 217, 138, 0.22), transparent 60%),
+    linear-gradient(180deg, rgba(232, 196, 110, 0.16), rgba(18, 9, 8, 0.9));
+  box-shadow:
+    inset 0 1px rgba(255, 247, 210, 0.07),
+    0 0 22px rgba(232, 196, 110, 0.16);
+}
+
+.audio-toggle-dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.audio-toggle.is-on .audio-toggle-dot {
+  background: currentColor;
+  box-shadow: 0 0 14px rgba(232, 196, 110, 0.72);
+}
+
+.audio-status {
+  margin: 12px 0 0;
+  color: rgba(243, 217, 138, 0.74);
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .audio-controls {
+    justify-self: end;
+  }
+
+  .view-tabs {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 100%;
+  }
+
+  .audio-panel {
+    right: 0;
+  }
+
+  .audio-setting-row {
+    align-items: flex-start;
+  }
+
+  html[data-stage="arrive"] .audio-controls {
+    position: absolute;
+    top: 18px;
+    right: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .audio-panel {
+    width: calc(100vw - 24px);
+    right: -4px;
+  }
+
+  .audio-setting-row {
+    gap: 10px;
+  }
+
+  .audio-toggle {
+    min-width: 104px;
+    padding-inline: 10px;
+    font-size: 0.66rem;
+  }
+}
+
+/* Final inquiry-depth pass: clearer support controls, body map, prompt loops, and low-text mode. */
+.top-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.focus-mode-button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid rgba(232, 196, 110, 0.22);
+  border-radius: 999px;
+  color: rgba(242, 234, 223, 0.72);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 196, 110, 0.08), transparent 58%),
+    rgba(10, 4, 3, 0.62);
+  box-shadow:
+    inset 0 1px rgba(255, 247, 210, 0.035),
+    0 16px 44px rgba(0, 0, 0, 0.28);
+  font-family: var(--family-body, ui-sans-serif, system-ui, sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.focus-mode-button.is-on {
+  color: rgba(243, 217, 138, 0.98);
+  border-color: rgba(232, 196, 110, 0.72);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(243, 217, 138, 0.2), transparent 60%),
+    linear-gradient(180deg, rgba(232, 196, 110, 0.15), rgba(18, 9, 8, 0.88));
+  box-shadow:
+    inset 0 1px rgba(255, 247, 210, 0.07),
+    0 0 22px rgba(232, 196, 110, 0.16);
+}
+
+.focus-mode-dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+
+.focus-mode-button.is-on .focus-mode-dot {
+  background: currentColor;
+  box-shadow: 0 0 14px rgba(232, 196, 110, 0.72);
+}
+
+.calibration-chamber:has(.location-body-map) {
+  grid-template-columns: minmax(260px, 0.86fr) minmax(300px, 1.14fr);
+}
+
+.location-body-map {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 260px;
+  padding: 16px;
+  border: 1px solid rgba(232, 196, 110, 0.16);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(232, 196, 110, 0.12), transparent 62%),
+    rgba(18, 9, 8, 0.28);
+}
+
+.calibration-chamber:has(.location-body-map) .calibration-grid {
+  grid-column: 1 / -1;
+}
+
+.body-map-choices {
+  display: grid;
+  gap: 12px;
+}
+
+.body-figure {
+  width: 156px;
+  height: 250px;
+}
+
+.body-figure::before {
+  top: 10px;
+}
+
+.body-figure::after {
+  top: 76px;
+  height: 160px;
+}
+
+.body-point {
+  padding: 0;
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.body-point:hover,
+.body-point.is-selected {
+  transform: scale(1.28);
+  background: var(--family-gold-bright);
+  box-shadow:
+    0 0 0 5px rgba(232, 196, 110, 0.11),
+    0 0 18px rgba(232, 196, 110, 0.9),
+    0 0 52px rgba(232, 196, 110, 0.28);
+}
+
+.body-point.eyes { top: 30px; }
+.body-point.throat { top: 90px; }
+.body-point.chest { top: 132px; }
+.body-point.abdomen { top: 184px; }
+
+.loop-picker,
+.grounding-chamber {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+}
+
+.loop-picker {
+  padding: 14px 16px;
+  border: 1px solid rgba(232, 196, 110, 0.14);
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgba(232, 196, 110, 0.065), transparent 32%),
+    rgba(18, 9, 8, 0.22);
+}
+
+.observe-field {
+  grid-template-columns: minmax(160px, 0.6fr) minmax(260px, 1fr);
+  min-height: 300px;
+}
+
+.observe-prompt {
+  width: min(560px, 100%);
+  justify-self: start;
+}
+
+.observe-prompt p {
+  font-size: clamp(1.42rem, 3.2vw, 2.32rem);
+}
+
+.observe-readout {
+  grid-column: 1 / -1;
+}
+
+.grounding-chamber {
+  grid-template-columns: minmax(260px, 0.9fr) minmax(260px, 1.1fr);
+  align-items: stretch;
+}
+
+.grounding-card {
+  min-height: 100%;
+}
+
+html.focus-mode .stage-prompt {
+  max-width: 48rem;
+  margin-bottom: 16px;
+  font-size: clamp(1rem, 1.6vw, 1.22rem);
+}
+
+html.focus-mode .question-lens small,
+html.focus-mode .first-read-summary,
+html.focus-mode .rack-head p,
+html.focus-mode .lens-card small,
+html.focus-mode .lens-card em,
+html.focus-mode .lens-instruction,
+html.focus-mode .lens-reflection,
+html.focus-mode .observe-readout,
+html.focus-mode .about-flow article p,
+html.focus-mode .principle-grid span,
+html.focus-mode .grounding-note span {
+  display: none !important;
+}
+
+html.focus-mode .question-lens,
+html.focus-mode .lens-card,
+html.focus-mode .marker-field,
+html.focus-mode .loop-picker {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 247, 210, 0.025),
+    0 14px 46px rgba(0, 0, 0, 0.28);
+}
+
+html.focus-mode .calibration-chamber,
+html.focus-mode .lens-chamber,
+html.focus-mode .result-chamber,
+html.focus-mode .note-chamber,
+html.focus-mode .grounding-chamber {
+  gap: 14px;
+}
+
+html.focus-mode .choice-button,
+html.focus-mode .chip-button {
+  min-height: 48px;
+  padding-block: 9px;
+}
+
+.pattern-item {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pattern-item b {
+  max-width: 100%;
+  color: #f2eadf;
+  font-size: clamp(1.38rem, 2.1vw, 2.2rem);
+  line-height: 0.98;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+}
+
+@media (min-width: 980px) {
+  .pattern-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .calibration-chamber:has(.location-body-map),
+  .grounding-chamber,
+  .observe-field {
+    grid-template-columns: 1fr;
+  }
+
+  .location-body-map,
+  .calibration-chamber:has(.location-body-map) .calibration-grid,
+  .observe-readout {
+    grid-column: auto;
+  }
+
+  .location-body-map {
+    grid-row: auto;
+  }
+
+  .observe-prompt {
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 720px) {
+  .top-actions {
+    justify-self: end;
+    gap: 7px;
+  }
+
+  .focus-mode-button,
+  .audio-menu-button {
+    min-height: 34px;
+    padding-inline: 10px;
+    font-size: 0.66rem;
+  }
+
+  html[data-stage="arrive"] .top-actions {
+    position: absolute;
+    top: 18px;
+    right: 0;
+  }
+
+  html[data-stage="arrive"] .audio-controls {
+    position: static;
+  }
+
+  .calibration-chamber:has(.location-body-map) {
+    gap: 12px;
+  }
+
+  .location-body-map {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .location-body-map .body-figure {
+    display: none;
+  }
+
+  .location-body-map .choice-row {
+    gap: 7px;
+  }
+
+  .location-body-map .chip-button {
+    min-height: 34px;
+    padding: 7px 9px;
+    font-size: 0.72rem;
+  }
+
+  .observe-field {
+    min-height: 0;
+    gap: 12px;
+  }
+
+  .untimed-disc {
+    width: min(190px, 50vw);
+  }
+
+  .observe-prompt {
+    padding: 15px;
+  }
+
+  .observe-prompt p {
+    font-size: clamp(1.18rem, 6.2vw, 1.58rem);
+  }
+
+  .grounding-chamber .choice-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.focus-mode .stage-prompt {
+    display: none;
+  }
+
+  html.focus-mode:not([data-stage="arrive"]) .stage-body {
+    max-height: calc(100svh - 366px);
+  }
+
+  html:not([data-stage="arrive"]) .stage-body {
+    max-height: calc(100svh - 390px);
+    padding-bottom: 104px;
+  }
+
+  html[data-stage="calibrate"] .stage-body {
+    max-height: calc(100svh - 350px);
+  }
+
+  html[data-stage="calibrate"] #observatory-title {
+    font-size: clamp(2.45rem, 10.4vw, 2.9rem);
+    line-height: 0.96;
+  }
+
+  html[data-stage="calibrate"] .stage-prompt {
+    margin-bottom: 14px;
+    font-size: 1rem;
+    line-height: 1.34;
+  }
+}
+
+@media (max-width: 430px) {
+  .focus-mode-button #focus-mode-label,
+  .audio-menu-button span:last-child {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .focus-mode-button #focus-mode-label {
+    font-size: 0;
+  }
+
+  .focus-mode-button #focus-mode-label::after {
+    content: "Focus off";
+    font-size: 0.66rem;
+  }
+
+  html.focus-mode .focus-mode-button #focus-mode-label::after {
+    content: "Focus on";
+  }
+}
