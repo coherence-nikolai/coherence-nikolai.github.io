@@ -1,18 +1,11 @@
-const CACHE_NAME = "tone-sovereign-v2";
+const CACHE_NAME = "tone-sovereign-v1";
 const ASSETS = [
   "./",
   "./index.html",
+  "./styles.css",
+  "./app.js",
   "./manifest.webmanifest",
-  "./tone-sovereign-logo.png",
-  "./try/",
-  "./try/index.html",
-  "./try/styles.css",
-  "./try/app.js",
-  "./try/manifest.webmanifest",
-  "./try/sw.js",
-  "./try/tone-sovereign-logo.png",
-  "/assets/site.css",
-  "/assets/site.js"
+  "./tone-sovereign-logo.png"
 ];
 
 self.addEventListener("install", event => {

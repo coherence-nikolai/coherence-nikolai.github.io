@@ -2,35 +2,195 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Tone Sovereign</title>
-  <meta name="description" content="A private five-step instrument for reclaiming authority, choosing a tone, holding it, and saving the shift locally.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tone Sovereign - Choose what governs you.</title>
+  <meta name="description" content="Tone Sovereign is a private web instrument for noticing what has authority, revoking it, choosing a new tone, holding it, and saving the shift locally.">
   <meta name="theme-color" content="#050301">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone_sovereign/">
   <meta property="og:title" content="Tone Sovereign">
   <meta property="og:description" content="Choose what governs you.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="./tone-sovereign-logo.png">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./tone-sovereign-logo.png">
-  <link rel="apple-touch-icon" href="./tone-sovereign-logo.png">
-  <link rel="stylesheet" href="./styles.css">
+  <meta property="og:url" content="https://coherence-nikolai.app/tone_sovereign/">
+  <meta property="og:image" content="https://coherence-nikolai.app/tone_sovereign/tone-sovereign-logo.png">
+  <link rel="manifest" href="/tone_sovereign/manifest.webmanifest">
+  <link rel="icon" href="/tone_sovereign/tone-sovereign-logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/tone_sovereign/tone-sovereign-logo.png">
+  <link rel="stylesheet" href="/assets/site.css">
+  <style>
+    .sovereign-hero-mark {
+      width: min(220px, 52vw);
+      aspect-ratio: 1;
+      object-fit: contain;
+      margin: 0 auto 22px;
+      filter: drop-shadow(0 0 34px rgba(212, 175, 55, 0.22));
+    }
+
+    .sovereign-symbol-strip {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .sovereign-symbol-strip span {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(212, 175, 55, 0.38);
+      border-radius: 999px;
+      color: rgba(246, 226, 182, 0.96);
+      background: rgba(212, 175, 55, 0.055);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.08);
+    }
+  </style>
 </head>
 <body>
-  <canvas id="field-canvas" class="field-canvas" aria-hidden="true"></canvas>
+  <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
 
-  <main class="sovereign-shell" id="app" aria-live="polite"></main>
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
+      <span>coherence</span>
+      <span>nikolai</span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/#apps">Tone apps</a>
+      <a href="/#labs">Labs</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </header>
 
-  <template id="session-template">
-    <article class="history-row">
-      <div>
-        <p class="history-kicker"></p>
-        <h3></h3>
-        <p></p>
+  <main>
+    <section class="hero page-hero">
+      <img class="sovereign-hero-mark" src="/tone_sovereign/tone-sovereign-logo.png" alt="">
+      <div class="eyebrow">web app</div>
+      <h1 class="brand-heading" aria-label="Tone Sovereign">
+        <span>TONE</span>
+        <span>SOVEREIGN</span>
+      </h1>
+      <p class="hero-line">Choose what governs you.</p>
+      <p class="hero-copy">
+        Tone Sovereign is a private five-step instrument for noticing what has
+        authority, revoking it, choosing a new tone, holding it, and saving the
+        shift locally.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="/tone_sovereign/try/">Open Tone Sovereign</a>
+        <a class="button ghost" href="/privacy/">Privacy first</a>
       </div>
-      <time></time>
-    </article>
-  </template>
+      <div class="sovereign-symbol-strip" aria-hidden="true">
+        <span>?</span>
+        <span>x</span>
+        <span>*</span>
+        <span>~</span>
+        <span>✓</span>
+      </div>
+    </section>
 
-  <script src="./app.js" type="module"></script>
+    <section class="tone-card detail-card">
+      <div class="tone-orb" aria-hidden="true">
+        <img class="app-icon-logo" src="/tone_sovereign/tone-sovereign-logo.png" alt="">
+      </div>
+      <div class="tone-card-copy">
+        <p class="label">What it does</p>
+        <h2>Strip suffering of its authority.</h2>
+        <p>
+          Name the pressure, fear, story, or demand that has been steering your
+          attention. Then choose the tone you want to govern the next moment.
+        </p>
+        <p>
+          The web app plays a simple holding tone, guides a short breath-like
+          hold, and saves sessions only on your device unless you export them.
+        </p>
+        <a class="button ghost" href="/tone_sovereign/try/">Try the web instrument</a>
+      </div>
+    </section>
+
+    <section class="section process">
+      <p class="label">Ritual flow</p>
+      <h2>Five chambers, one changed field.</h2>
+      <div class="steps">
+        <article><span>01</span><h3>Notice</h3><p>Name what has authority over your attention.</p></article>
+        <article><span>02</span><h3>Revoke</h3><p>Let the old governor lose its right to command the field.</p></article>
+        <article><span>03</span><h3>Choose</h3><p>Select a tone that feels like you, only clearer.</p></article>
+        <article><span>04</span><h3>Hold</h3><p>Stay with the tone until it has weight.</p></article>
+        <article><span>05</span><h3>Integrate</h3><p>Save what changed so it can return.</p></article>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div>
+        <p class="label">Local-first</p>
+        <h2>No account, no feed, no cloud requirement.</h2>
+        <p>Saved sessions live in browser storage on the device you use.</p>
+      </div>
+      <div>
+        <p class="label">Exportable</p>
+        <h2>Keep your archive portable.</h2>
+        <p>Export and import sessions as JSON when you want to move or back them up.</p>
+      </div>
+    </section>
+
+    <section class="section plain-language">
+      <p class="label">Boundaries</p>
+      <h2>A personal reflection tool.</h2>
+      <p>
+        Tone Sovereign is for self-reflection and state practice. It is not
+        medical advice, therapy, diagnosis, crisis support, or an emergency service.
+      </p>
+    </section>
+
+    <section class="section app-suite">
+      <div class="section-head">
+        <p class="label">Tone suite</p>
+        <h2>Other ways to return.</h2>
+      </div>
+      <div class="app-grid">
+        <a class="app-card" href="/tone/">
+          <span class="app-card-mark"><img src="/assets/tone-recall-icon.png" alt=""></span>
+          <span class="lab-kicker">audio state practice</span>
+          <strong>Tone Recall</strong>
+          <span>Choose, shape, hold, and return to a mind state through sound.</span>
+        </a>
+        <a class="app-card" href="/tone-ritual/">
+          <span class="app-card-mark"><img src="/assets/tone-ritual-icon.png" alt=""></span>
+          <span class="lab-kicker">daily practice</span>
+          <strong>Tone Ritual</strong>
+          <span>Choose a ritual, receive ten small acts, and save a quiet field note.</span>
+        </a>
+        <a class="app-card" href="/tone-steady/">
+          <span class="app-card-mark"><img src="/assets/tone-steady-icon.png" alt=""></span>
+          <span class="lab-kicker">before reaction</span>
+          <strong>Tone Steady</strong>
+          <span>Return before reaction. Find the strongest state and steady your direction.</span>
+        </a>
+        <a class="app-card tone-mirror-card" href="/tone-mirror-journal/">
+          <span class="app-card-mark"><img src="/tone-mirror/icon.svg" alt=""></span>
+          <span class="lab-kicker">symbolic reflection</span>
+          <strong>Tone Mirror</strong>
+          <span>A private browser instrument for signal, glyph, breath, tone, and harmonic memory.</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Tone Sovereign is part of the Tone app family.</p>
+    <nav aria-label="Footer navigation">
+      <a href="/tone_sovereign/try/">Open app</a>
+      <a href="/tone/">Tone Recall</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </footer>
+
+  <script src="/assets/site.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/tone_sovereign/sw.js").catch(function () {});
+    }
+  </script>
 </body>
 </html>

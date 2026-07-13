@@ -2,7 +2,7 @@
   "name": "Tone Sovereign",
   "short_name": "Sovereign",
   "description": "Choose what governs you.",
-  "start_url": "./try/",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#050301",

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tone Sovereign</title>
+  <meta name="description" content="A private five-step instrument for reclaiming authority, choosing a tone, holding it, and saving the shift locally.">
+  <meta name="theme-color" content="#050301">
+  <meta property="og:title" content="Tone Sovereign">
+  <meta property="og:description" content="Choose what governs you.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="./tone-sovereign-logo.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./tone-sovereign-logo.png">
+  <link rel="apple-touch-icon" href="./tone-sovereign-logo.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <canvas id="field-canvas" class="field-canvas" aria-hidden="true"></canvas>
+
+  <main class="sovereign-shell" id="app" aria-live="polite"></main>
+
+  <template id="session-template">
+    <article class="history-row">
+      <div>
+        <p class="history-kicker"></p>
+        <h3></h3>
+        <p></p>
+      </div>
+      <time></time>
+    </article>
+  </template>
+
+  <script src="./app.js" type="module"></script>
+</body>
+</html>
