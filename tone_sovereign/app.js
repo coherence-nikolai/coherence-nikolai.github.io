@@ -1,4 +1,14 @@
 const ROOT = "./";
+const FIRST_LIGHT = Object.freeze({
+  duration: 16.20,
+  voiceDelay: 13.48,
+  ambienceDelay: 15.18
+});
+const NOTICE = Object.freeze({
+  duration: 60,
+  cueDuration: 10,
+  manualCueDuration: 4
+});
 const STORAGE = {
   preferences: "tone-sovereign.preferences.v1",
   traces: "tone-sovereign.traces.v1",
@@ -139,8 +149,20 @@ const movements = [
 ];
 
 const noticeCues = {
-  en: ["Feel one place where your body meets support.", "Hear the nearest sound.", "Notice light, colour, or darkness.", "Notice a thought appearing.", "Now notice what arrives."],
-  es: ["Siente un lugar donde tu cuerpo recibe apoyo.", "Escucha el sonido más cercano.", "Nota la luz, el color o la oscuridad.", "Nota cómo aparece un pensamiento.", "Ahora nota lo que llega."]
+  en: [
+    "Feel where your body touches the chair, floor, or bed.",
+    "Let one sound come to you.",
+    "Notice one area of light, colour, or darkness.",
+    "Notice a thought, image, or mood appearing.",
+    "Now notice what arrives."
+  ],
+  es: [
+    "Siente dónde tu cuerpo toca la silla, el suelo o la cama.",
+    "Deja que un sonido llegue a ti.",
+    "Observa una zona de luz, color u oscuridad.",
+    "Observa cómo aparece un pensamiento, una imagen o un estado de ánimo.",
+    "Ahora observa lo que aparece."
+  ]
 };
 
 const noticeVoiceCues = [
@@ -322,7 +344,7 @@ const state = {
   view: "landing",
   stack: [],
   lang: savedPreferences.lang === "es" ? "es" : "en",
-  sound: Boolean(savedPreferences.sound),
+  sound: savedPreferences.sound !== false,
   voice: savedPreferences.voice !== false,
   reduceMotion: Boolean(savedPreferences.reduceMotion),
   quietWords: savedPreferences.quietWords !== false,
@@ -342,6 +364,9 @@ function newPractice() {
     noticeStarted: false,
     noticeStartedAt: 0,
     noticeCue: 0,
+    noticeManualCue: -1,
+    noticeManualUntil: 0,
+    noticeLastManualCue: -1,
     steadyState: "",
     breathStartedAt: 0,
     facts: "",
@@ -377,15 +402,17 @@ class SoundEngine {
     this.context = null;
     this.nodes = new Set();
     this.master = null;
-    this.voiceAudio = null;
-    this.voiceTimer = 0;
+    this.bufferCache = new Map();
+    this.voiceSource = null;
+    this.voiceToken = 0;
+    this.firstLightSources = [];
   }
 
   async ready() {
     if (!this.context || this.context.state === "closed") {
       this.context = new (window.AudioContext || window.webkitAudioContext)();
       this.master = this.context.createGain();
-      this.master.gain.value = 0.7;
+      this.master.gain.value = 0.82;
       this.master.connect(this.context.destination);
     }
     if (this.context.state === "suspended") await this.context.resume();
@@ -395,6 +422,7 @@ class SoundEngine {
   stop() {
     this.stopTones();
     this.stopVoice();
+    this.stopFirstLight();
   }
 
   stopTones() {
@@ -403,47 +431,90 @@ class SoundEngine {
   }
 
   stopVoice() {
-    window.clearTimeout(this.voiceTimer);
-    this.voiceTimer = 0;
-    if (this.voiceAudio) {
-      this.voiceAudio.pause();
-      this.voiceAudio.currentTime = 0;
-      this.voiceAudio = null;
+    this.voiceToken += 1;
+    if (!this.voiceSource) return;
+    try { this.voiceSource.stop(); } catch {}
+    this.voiceSource = null;
+  }
+
+  stopFirstLight() {
+    this.firstLightSources.forEach(({ source }) => {
+      try { source.stop(); } catch {}
+    });
+    this.firstLightSources = [];
+  }
+
+  async loadBuffer(url, context = this.context) {
+    if (this.bufferCache.has(url)) return this.bufferCache.get(url);
+    const request = fetch(url, { cache: "force-cache" })
+      .then(response => {
+        if (!response.ok) throw new Error(`Audio request failed: ${response.status}`);
+        return response.arrayBuffer();
+      })
+      .then(bytes => context.decodeAudioData(bytes));
+    this.bufferCache.set(url, request);
+    try {
+      return await request;
+    } catch (error) {
+      this.bufferCache.delete(url);
+      throw error;
     }
   }
 
-  playVoice(cue, delay = 0) {
-    if (!state.voice) return;
-    this.stopVoice();
-    const audio = new Audio(`${ROOT}assets/voice/${state.lang}/${cue}.mp3`);
-    const targetTime = performance.now() + Math.max(0, delay * 1000);
-    audio.preload = "auto";
-    audio.volume = delay > 0 ? 0 : 0.88;
-    audio.addEventListener("ended", () => {
-      if (this.voiceAudio === audio) this.voiceAudio = null;
-    });
-    this.voiceAudio = audio;
+  voiceURL(cue, language = state.lang) {
+    return `${ROOT}assets/voice/${language}/${cue}.mp3`;
+  }
 
-    const beginAtTarget = () => {
-      if (this.voiceAudio !== audio) return;
-      audio.pause();
-      audio.currentTime = 0;
-      this.voiceTimer = window.setTimeout(() => {
-        if (this.voiceAudio !== audio) return;
-        audio.volume = 0.88;
-        audio.play().catch(() => {
-          if (this.voiceAudio === audio) this.voiceAudio = null;
-        });
-      }, Math.max(0, targetTime - performance.now()));
-    };
+  async prepareFirstLight() {
+    const context = await this.ready();
+    const requests = [];
+    if (state.sound) {
+      requests.push(this.loadBuffer(`${ROOT}assets/sound/ts_first_light_arrival_full.wav`, context));
+      requests.push(this.loadBuffer(`${ROOT}assets/sound/ts_first_light_living_ambience.wav`, context));
+    }
+    if (state.voice) requests.push(this.loadBuffer(this.voiceURL("ts_first_light_tagline_v1"), context));
+    await Promise.all(requests);
+    return context;
+  }
 
-    if (delay > 0) {
-      audio.play().then(beginAtTarget).catch(beginAtTarget);
-    } else {
-      audio.play().catch(() => {
-        if (this.voiceAudio === audio) this.voiceAudio = null;
+  async prepareVoiceCues(cues) {
+    const context = await this.ready();
+    const language = state.lang;
+    await Promise.all(cues.map(cue => this.loadBuffer(this.voiceURL(cue, language), context)));
+    return context;
+  }
+
+  scheduleBuffer(buffer, when, gainValue, { loop = false, firstLight = false } = {}) {
+    const source = this.context.createBufferSource();
+    const gain = this.context.createGain();
+    source.buffer = buffer;
+    source.loop = loop;
+    gain.gain.setValueAtTime(gainValue, when);
+    source.connect(gain).connect(this.master);
+    source.start(when);
+    if (firstLight) {
+      this.firstLightSources.push({ source, gain });
+      source.addEventListener("ended", () => {
+        this.firstLightSources = this.firstLightSources.filter(item => item.source !== source);
       });
     }
+    return { source, gain };
+  }
+
+  async playVoice(cue, delay = 0) {
+    if (!state.voice) return false;
+    this.stopVoice();
+    const token = this.voiceToken;
+    const language = state.lang;
+    const context = await this.ready();
+    const buffer = await this.loadBuffer(this.voiceURL(cue, language), context);
+    if (!state.voice || token !== this.voiceToken || language !== state.lang) return false;
+    const { source } = this.scheduleBuffer(buffer, context.currentTime + Math.max(0, delay), 0.86);
+    this.voiceSource = source;
+    source.addEventListener("ended", () => {
+      if (this.voiceSource === source) this.voiceSource = null;
+    });
+    return true;
   }
 
   note(frequency, when, duration, gain = 0.035, type = "sine", endFrequency = null) {
@@ -466,19 +537,39 @@ class SoundEngine {
 
   async ceremony() {
     this.stop();
-    this.playVoice("ts_first_light_tagline_v1", 8.55);
-    if (!state.sound) return;
-    await this.ready();
-    const now = this.context.currentTime + .06;
-    this.note(110, now + .5, 2.4, .025, "sine", 165);
-    this.note(220, now + 1.7, 1.6, .025);
-    this.note(330, now + 1.72, 1.8, .018);
-    [0, .34, .68, 1.02, 1.36, 1.7, 2.04, 2.38].forEach((offset, index) => {
-      this.note([440, 528, 594, 660][index % 4], now + 2.35 + offset, .8, .013);
-    });
-    this.note(180, now + 5.7, 2.05, .045, "sine", 880);
-    this.note(360, now + 6.1, 1.65, .022, "triangle", 1320);
-    [440, 550, 660, 880].forEach((frequency, index) => this.note(frequency, now + 7.05 + index * .05, 4.4, .025));
+    if (!state.sound && !state.voice) return;
+    const context = await this.prepareFirstLight();
+    const start = context.currentTime + 0.06;
+
+    if (state.sound) {
+      const [arrival, ambience] = await Promise.all([
+        this.loadBuffer(`${ROOT}assets/sound/ts_first_light_arrival_full.wav`, context),
+        this.loadBuffer(`${ROOT}assets/sound/ts_first_light_living_ambience.wav`, context)
+      ]);
+      const arrivalNode = this.scheduleBuffer(arrival, start, 0.52, { firstLight: true });
+      arrivalNode.gain.gain.setValueAtTime(0.52, start + FIRST_LIGHT.voiceDelay - 0.30);
+      arrivalNode.gain.gain.linearRampToValueAtTime(0.125, start + FIRST_LIGHT.voiceDelay);
+
+      const ambienceNode = this.scheduleBuffer(
+        ambience,
+        start + FIRST_LIGHT.ambienceDelay,
+        state.voice ? 0.0125 : 0.052,
+        { loop: true, firstLight: true }
+      );
+      if (state.voice) {
+        ambienceNode.gain.gain.setValueAtTime(0.0125, start + FIRST_LIGHT.voiceDelay + 4.08);
+        ambienceNode.gain.gain.linearRampToValueAtTime(0.052, start + FIRST_LIGHT.voiceDelay + 4.80);
+      }
+    }
+
+    if (state.voice) {
+      const buffer = await this.loadBuffer(this.voiceURL("ts_first_light_tagline_v1"), context);
+      const { source } = this.scheduleBuffer(buffer, start + FIRST_LIGHT.voiceDelay, 0.86);
+      this.voiceSource = source;
+      source.addEventListener("ended", () => {
+        if (this.voiceSource === source) this.voiceSource = null;
+      });
+    }
   }
 
   async breath() {
@@ -622,6 +713,10 @@ function renderLanding() {
       </section>
       <div class="mark-stage" aria-hidden="true">
         <div class="sun-rays"></div>
+        <img class="sword-construction-mark sword-blade-mark" src="${ROOT}sword-mark.png" alt="">
+        <img class="sword-construction-mark sword-hilt-mark" src="${ROOT}sword-mark.png" alt="">
+        <img class="sword-construction-mark sword-handle-mark" src="${ROOT}sword-mark.png" alt="">
+        <img class="sword-construction-mark sword-triskelion-mark" src="${ROOT}sword-mark.png" alt="">
         <img class="sword-mark" src="${ROOT}sword-mark.png" alt="">
         <div class="ring-trace"></div>
         <div class="blade-current"></div>
@@ -642,7 +737,7 @@ function renderLanding() {
 
 function settleCeremonyLater() {
   window.clearTimeout(ceremonyTimer);
-  const duration = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : 10600;
+  const duration = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : FIRST_LIGHT.duration * 1000;
   ceremonyTimer = window.setTimeout(() => {
     state.ceremonySettled = true;
     const ceremony = document.querySelector(".ceremony");
@@ -652,11 +747,22 @@ function settleCeremonyLater() {
   }, duration);
 }
 
-function replayCeremony(withSound = true) {
+async function replayCeremony(withAudio = true) {
+  sound.stop();
+  const shouldPlayAudio = withAudio && (state.sound || state.voice);
+  if (shouldPlayAudio) {
+    try {
+      await sound.prepareFirstLight();
+    } catch {
+      showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
+    }
+  }
   state.ceremonyKey += 1;
   state.ceremonySettled = false;
-  if (withSound) sound.ceremony().catch(() => {});
   render();
+  if (shouldPlayAudio) sound.ceremony().catch(() => {
+    showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
+  });
 }
 
 function renderHome() {
@@ -838,18 +944,31 @@ function stopPracticeTimers() {
 }
 
 function startNoticeTimer(reset = true) {
-  if (reset) state.practice.noticeStartedAt = Date.now();
+  if (reset) {
+    state.practice.noticeStartedAt = Date.now();
+    state.practice.noticeManualCue = -1;
+    state.practice.noticeManualUntil = 0;
+    state.practice.noticeLastManualCue = -1;
+    state.practice.noticeCue = 0;
+  }
   state.practice.noticeStarted = true;
   window.clearInterval(practiceTimer);
   const update = () => {
-    const elapsed = (Date.now() - state.practice.noticeStartedAt) / 1000;
-    const cue = elapsed < 10 ? 0 : elapsed < 20 ? 1 : elapsed < 30 ? 2 : elapsed < 40 ? 3 : 4;
+    const now = Date.now();
+    const elapsed = (now - state.practice.noticeStartedAt) / 1000;
+    const automaticCue = Math.min(4, Math.floor(elapsed / NOTICE.cueDuration));
+    const manualIsActive = state.practice.noticeManualCue >= 0 && now < state.practice.noticeManualUntil;
+    const cue = manualIsActive ? state.practice.noticeManualCue : automaticCue;
+    if (!manualIsActive && state.practice.noticeManualCue >= 0) {
+      state.practice.noticeManualCue = -1;
+      state.practice.noticeManualUntil = 0;
+    }
     if (cue !== state.practice.noticeCue) {
       state.practice.noticeCue = cue;
       sound.playVoice(noticeVoiceCues[cue]);
       announce(noticeCues[state.lang][cue]);
     }
-    const remaining = Math.max(0, 60 - Math.floor(elapsed));
+    const remaining = Math.max(0, NOTICE.duration - Math.floor(elapsed));
     const timer = document.querySelector("[data-notice-timer]");
     const cueNode = document.querySelector("[data-notice-cue]");
     if (timer) timer.textContent = `0:${String(remaining).padStart(2, "0")}`;
@@ -858,6 +977,38 @@ function startNoticeTimer(reset = true) {
   };
   update();
   practiceTimer = window.setInterval(update, 250);
+}
+
+async function beginNoticePractice() {
+  try {
+    if (state.voice) await sound.prepareVoiceCues(noticeVoiceCues);
+  } catch {
+    showToast(state.lang === "en" ? "Voice guidance could not start." : "No se pudo iniciar la guía de voz.");
+  }
+  state.practice.noticeStarted = true;
+  state.practice.noticeStartedAt = Date.now();
+  state.practice.noticeCue = 0;
+  state.practice.noticeManualCue = -1;
+  state.practice.noticeManualUntil = 0;
+  state.practice.noticeLastManualCue = -1;
+  render();
+  sound.playVoice(noticeVoiceCues[0]);
+  announce(noticeCues[state.lang][0]);
+}
+
+function offerAnotherNoticeCue() {
+  const currentGuidedCue = state.practice.noticeCue < 4 ? state.practice.noticeCue : -1;
+  const previousCue = state.practice.noticeLastManualCue >= 0
+    ? state.practice.noticeLastManualCue
+    : currentGuidedCue;
+  const cue = (previousCue + 1) % 4;
+  state.practice.noticeLastManualCue = cue;
+  state.practice.noticeManualCue = cue;
+  state.practice.noticeManualUntil = Date.now() + NOTICE.manualCueDuration * 1000;
+  state.practice.noticeCue = cue;
+  render();
+  sound.playVoice(noticeVoiceCues[cue]);
+  announce(noticeCues[state.lang][cue]);
 }
 
 function startBreathTimer(reset = true) {
@@ -1042,7 +1193,7 @@ app.addEventListener("click", event => {
   if (action === "home") goHome();
   if (action === "replay-ceremony") replayCeremony(true);
   if (action === "replay-from-home" || action === "replay-from-settings") { state.stack = []; state.view = "landing"; replayCeremony(true); }
-  if (action === "toggle-sound-replay") { state.sound = !state.sound; persistPreferences(); replayCeremony(state.sound); }
+  if (action === "toggle-sound-replay") { state.sound = !state.sound; persistPreferences(); replayCeremony(true); }
   if (action === "toggle-sound") { state.sound = !state.sound; if (!state.sound) sound.stop(); persistPreferences(); render(); }
   if (action === "toggle-language") { sound.stop(); state.lang = state.lang === "en" ? "es" : "en"; persistPreferences(); render(); }
   if (action === "toggle-voice") { state.voice = !state.voice; if (!state.voice) sound.stopVoice(); persistPreferences(); render(); }
@@ -1050,8 +1201,8 @@ app.addEventListener("click", event => {
   if (action === "toggle-words") { state.quietWords = !state.quietWords; persistPreferences(); render(); }
   if (action === "previous-movement") previousMovement();
   if (action === "next-movement") nextMovement();
-  if (action === "start-notice") { startNoticeTimer(true); sound.playVoice("ts_notice_contact_v1"); render(); }
-  if (action === "another-notice-cue") { state.practice.noticeCue = (state.practice.noticeCue + 1) % 4; sound.playVoice(noticeVoiceCues[state.practice.noticeCue]); render(); announce(noticeCues[state.lang][state.practice.noticeCue]); }
+  if (action === "start-notice") beginNoticePractice();
+  if (action === "another-notice-cue") offerAnotherNoticeCue();
   if (action === "notice-tap" && state.quietWords) showToast(state.lang === "en" ? "Noticed" : "Notado");
   if (action === "start-breath") { state.practice.breathStartedAt = Date.now(); sound.playVoice("ts_stabilise_inhale_v1"); render(); startBreathTimer(false); }
   if (action === "stop-breath") { state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }

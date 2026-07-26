@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v12";
+const CACHE = "tone-sovereign-v13";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_cross_open_question_v1",
@@ -22,6 +22,8 @@ const CORE = [
   "./manifest.webmanifest",
   "./sword-mark.png",
   "./tone-sovereign-logo.png",
+  "./assets/sound/ts_first_light_arrival_full.wav",
+  "./assets/sound/ts_first_light_living_ambience.wav",
   ...["en", "es"].flatMap(language => VOICE_CUES.map(cue => `./assets/voice/${language}/${cue}.mp3`))
 ];
 
