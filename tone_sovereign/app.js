@@ -593,6 +593,20 @@ function renderTopbar(title, subtitle = "") {
   </header>`;
 }
 
+function renderLivingApexStar() {
+  const rayAngles = [0, 18, 42, 67, 90, 112, 139, 161, 180, 204, 229, 252, 270, 293, 318, 341];
+  const rayLengths = [70, 38, 56, 30, 78, 42, 62, 34, 66, 46, 74, 36, 82, 40, 58, 32];
+  const raySpeeds = [1.31, 1.87, 1.09, 2.17, 1.43, 1.73, 1.19, 2.31, 1.57, 1.01, 1.97, 1.27, 1.69, 2.09, 1.13, 1.79];
+  const rays = rayAngles.map((angle, index) => (
+    `<span class="tip-ray" style="--ray-angle:${angle}deg;--ray-length:${rayLengths[index]}px;--ray-speed:${raySpeeds[index]}s;--ray-delay:-${(index * 0.17).toFixed(2)}s"></span>`
+  )).join("");
+  const sparkAngles = [12, 73, 137, 196, 258, 326];
+  const sparks = sparkAngles.map((angle, index) => (
+    `<span class="tip-spark" style="--spark-angle:${angle}deg;--spark-distance:${28 + index * 7}px;--spark-speed:${(1.37 + index * 0.29).toFixed(2)}s;--spark-delay:-${(index * 0.41).toFixed(2)}s"></span>`
+  )).join("");
+  return `<div class="tip-star"><span class="tip-core"></span>${rays}${sparks}</div>`;
+}
+
 function renderLanding() {
   return `<main class="landing ceremony ${state.ceremonySettled ? "is-settled" : "is-playing"}" data-ceremony="${state.ceremonyKey}">
     <div class="gold-wash" aria-hidden="true"></div>
@@ -612,7 +626,7 @@ function renderLanding() {
         <div class="ring-trace"></div>
         <div class="blade-current"></div>
         <div class="travelling-star"></div>
-        <div class="tip-star"></div>
+        ${renderLivingApexStar()}
       </div>
       <section class="landing-copy" ${state.ceremonySettled ? "" : "inert"}>
         <p>${tr("taglineLead")}</p>
