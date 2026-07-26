@@ -1,16 +1,18 @@
 {
   "name": "Tone Sovereign",
   "short_name": "Sovereign",
-  "description": "Choose what governs you.",
-  "start_url": "./try/",
+  "description": "Choose the tone of a Golden Age.",
+  "lang": "en",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050301",
-  "theme_color": "#050301",
+  "orientation": "any",
+  "background_color": "#030302",
+  "theme_color": "#030302",
   "icons": [
     {
       "src": "./tone-sovereign-logo.png",
-      "sizes": "1024x1024",
+      "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"
     }

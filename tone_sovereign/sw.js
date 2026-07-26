@@ -1,46 +1,54 @@
-const CACHE_NAME = "tone-sovereign-v2";
-const ASSETS = [
+const CACHE = "tone-sovereign-v11";
+const VOICE_CUES = [
+  "ts_about_introduction_v1",
+  "ts_cross_open_question_v1",
+  "ts_discern_direct_v1",
+  "ts_embody_enter_v1",
+  "ts_first_light_tagline_v1",
+  "ts_integrate_carry_v1",
+  "ts_notice_contact_v1",
+  "ts_notice_open_v1",
+  "ts_notice_sight_v1",
+  "ts_notice_sound_v1",
+  "ts_notice_thought_v1",
+  "ts_reclaim_centre_remains_v1",
+  "ts_stabilise_inhale_v1"
+];
+const CORE = [
   "./",
   "./index.html",
+  "./styles.css",
+  "./app.js",
   "./manifest.webmanifest",
+  "./sword-mark.png",
   "./tone-sovereign-logo.png",
-  "./try/",
-  "./try/index.html",
-  "./try/styles.css",
-  "./try/app.js",
-  "./try/manifest.webmanifest",
-  "./try/sw.js",
-  "./try/tone-sovereign-logo.png",
-  "/assets/site.css",
-  "/assets/site.js"
+  ...["en", "es"].flatMap(language => VOICE_CUES.map(cue => `./assets/voice/${language}/${cue}.mp3`))
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
   self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-    ))
+    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
   );
   self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") {
-    return;
-  }
+  if (event.request.method !== "GET") return;
 
   event.respondWith(
-    caches.match(event.request).then(cached => (
-      cached || fetch(event.request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+    fetch(event.request)
+      .then(response => {
+        if (response.ok && new URL(event.request.url).origin === self.location.origin) {
+          const copy = response.clone();
+          caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        }
         return response;
-      }).catch(() => caches.match("./index.html"))
-    ))
+      })
+      .catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
   );
 });
