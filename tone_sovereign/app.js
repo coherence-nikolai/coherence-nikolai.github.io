@@ -15,7 +15,8 @@ const STORAGE = {
   carriedAct: "tone-sovereign.carried-act.v1",
   ruleOfLife: "tone-sovereign.rule-of-life.v1",
   engineDrafts: "tone-sovereign.practice-engine-drafts.v1",
-  missions: "tone-sovereign.missions.v1"
+  missions: "tone-sovereign.missions.v1",
+  crossMarks: "tone-sovereign.cross-marks.v1"
 };
 
 const copy = {
@@ -41,13 +42,13 @@ const copy = {
     practice: "Enter the Practice",
     practiceSupport: "Meet this moment directly.",
     fields: "Walk the Seven Fields",
-    fieldsSupport: "Explore the nested spectrum of consciousness.",
+    fieldsSupport: "Explore the Living Cosmology.",
     library: "Practices & Teachings",
-    librarySupport: "Begin with one clear path.",
+    librarySupport: "Find something to practise or understand.",
     acts: "Perform a Sovereign Act",
     actsSupport: "Let one Golden Age quality enter the day.",
     threshold: "Enter the Threshold",
-    thresholdSupport: "Sit with a question before choosing.",
+    thresholdSupport: "Meet a deeper question or crossing.",
     about: "About Tone Sovereign",
     continue: "Continue",
     choose: "Choose",
@@ -83,13 +84,13 @@ const copy = {
     practice: "Entrar en la práctica",
     practiceSupport: "Encuentra este momento directamente.",
     fields: "Recorrer los Siete Campos",
-    fieldsSupport: "Descubre cómo cada Campo conserva los dones anteriores.",
+    fieldsSupport: "Explora la Cosmología Viva.",
     library: "Prácticas y enseñanzas",
-    librarySupport: "Comienza con un camino claro.",
+    librarySupport: "Encuentra algo para practicar o comprender.",
     acts: "Realizar un acto soberano",
     actsSupport: "Deja que una cualidad de la Edad Dorada entre en tu día.",
     threshold: "Entrar en el Umbral",
-    thresholdSupport: "Quédate con una pregunta antes de elegir.",
+    thresholdSupport: "Encuentra una pregunta más profunda o un cruce.",
     about: "Acerca de Tone Sovereign",
     continue: "Continuar",
     choose: "Elegir",
@@ -112,6 +113,41 @@ const doors = [
   { id: "acts", mark: "↗", key: "acts", support: "actsSupport" },
   { id: "threshold", mark: "∩", key: "threshold", support: "thresholdSupport" }
 ];
+
+const guidedLibraryPaths = {
+  en: [
+    {
+      id: "manifestation-as-participation",
+      title: "Manifestation as Participation",
+      subtitle: "Receive, include the whole self, and let capacity move through you.",
+      entryIDs: ["manifestation-as-participation", "receiving-can-become-giving", "love-without-self-abandonment", "you-manifest-from-the-whole-self", "integration-beyond-positivity"],
+      practiceID: "reciprocal-creation"
+    },
+    {
+      id: "overwhelm-to-contribution",
+      title: "From Overwhelm to Contribution",
+      subtitle: "Listen inwardly and outwardly, then take one honest, reversible step.",
+      entryIDs: ["attunement-listening-in-both-directions", "purpose-is-an-unfolding-relationship", "the-means-already-contain-the-world", "the-mission-does-not-require-self-destruction", "let-the-next-step-reveal-the-next"],
+      practiceID: "attunement-compass"
+    }
+  ],
+  es: [
+    {
+      id: "manifestation-as-participation",
+      title: "La manifestación como participación",
+      subtitle: "Recibe, incluye todo tu ser y deja que tu capacidad tome forma a través de ti.",
+      entryIDs: ["manifestation-as-participation", "receiving-can-become-giving", "love-without-self-abandonment", "you-manifest-from-the-whole-self", "integration-beyond-positivity"],
+      practiceID: "reciprocal-creation"
+    },
+    {
+      id: "overwhelm-to-contribution",
+      title: "Del agobio a la contribución",
+      subtitle: "Escucha hacia dentro y hacia fuera, y da un paso honesto y reversible.",
+      entryIDs: ["attunement-listening-in-both-directions", "purpose-is-an-unfolding-relationship", "the-means-already-contain-the-world", "the-mission-does-not-require-self-destruction", "let-the-next-step-reveal-the-next"],
+      practiceID: "attunement-compass"
+    }
+  ]
+};
 
 const movements = [
   {
@@ -225,6 +261,47 @@ const BREATH_PATTERNS = Object.freeze({
       { id: "breath-out", duration: 5.5, voice: "", sound: "observe" },
       { id: "natural", duration: 6, voice: "", sound: "observe" }
     ]
+  },
+  "478": {
+    rgb: "179,157,219",
+    en: { title: "4-7-8", cue: "Inhale. Optional hold. Exhale longer." },
+    es: { title: "4-7-8", cue: "Inhala. Pausa opcional. Exhala más largo." },
+    phases: [
+      { id: "inhale", duration: 4, voice: "ts_stabilise_inhale_v1", sound: "in" },
+      { id: "hold", duration: 7, voice: "", sound: "hold" },
+      { id: "exhale", duration: 8, voice: "ts_stabilise_long_exhale_v1", sound: "out" }
+    ]
+  },
+  fire: {
+    rgb: "255,140,105",
+    en: { title: "Breath of fire", cue: "Short pulses. Stop if dizzy." },
+    es: { title: "Respiración de fuego", cue: "Pulsos cortos. Detente si te mareas." },
+    phases: [
+      { id: "pulse", duration: .45, voice: "", sound: "in" },
+      { id: "release", duration: .45, voice: "", sound: "out" }
+    ]
+  },
+  twoone: {
+    rgb: "255,209,102",
+    en: { title: "Small ignition", cue: "Breathe in. Optional pause. Exhale longer." },
+    es: { title: "Pequeño encendido", cue: "Inhala. Pausa opcional. Exhala más largo." },
+    phases: [
+      { id: "inhale", duration: 2, voice: "ts_stabilise_inhale_v1", sound: "in" },
+      { id: "hold", duration: 1, voice: "", sound: "hold" },
+      { id: "exhale", duration: 4, voice: "ts_stabilise_long_exhale_v1", sound: "out" },
+      { id: "hold2", duration: 1, voice: "", sound: "hold2" }
+    ]
+  },
+  box: {
+    rgb: "126,200,227",
+    en: { title: "Box breathing", cue: "Inhale. Optional pause. Exhale. Optional pause." },
+    es: { title: "Respiración cuadrada", cue: "Inhala. Pausa opcional. Exhala. Pausa opcional." },
+    phases: [
+      { id: "inhale", duration: 4, voice: "ts_stabilise_inhale_v1", sound: "in" },
+      { id: "hold", duration: 4, voice: "", sound: "hold" },
+      { id: "exhale", duration: 4, voice: "ts_stabilise_exhale_v1", sound: "out" },
+      { id: "hold2", duration: 4, voice: "", sound: "hold2" }
+    ]
   }
 });
 
@@ -246,14 +323,93 @@ const doorways = [
   { id: "unknown", en: ["Unknown", "What cannot be forced yet.", "What becomes possible if you do not rush the answer?"], es: ["Lo desconocido", "Lo que todavía no puede forzarse.", "¿Qué se vuelve posible si no apuras la respuesta?"] }
 ];
 
+const crossFocuses = [
+  { id: "self", glyph: "○", questionKey: "self", en: ["Self", "How you are meeting this."], es: ["Tú", "Cómo estás viviendo esto."] },
+  { id: "body", glyph: "△", questionKey: "body", en: ["Body", "What is here in sensation."], es: ["Cuerpo", "Lo que está presente en la sensación."] },
+  { id: "silence", glyph: "—", questionKey: "silence", en: ["Silence", "What is here without words."], es: ["Silencio", "Lo que está aquí sin palabras."] },
+  { id: "relationship", glyph: "∞", questionKey: "relationship", en: ["Relation", "What is happening between."], es: ["Relación", "Lo que está ocurriendo entre ambos."] },
+  { id: "shadow", glyph: "◑", questionKey: "shadow", en: ["Shadow", "What is not yet clear."], es: ["Sombra", "Lo que todavía no está claro."] },
+  { id: "time", glyph: "⌛", questionKey: "time", en: ["Time", "What belongs to now."], es: ["Tiempo", "Lo que pertenece a este momento."] },
+  { id: "unknown", glyph: "?", questionKey: "silence", en: ["The Unknown", "What can remain unknown."], es: ["Lo desconocido", "Lo que puede seguir sin saberse."] },
+  { id: "control", glyph: "│", questionKey: "self", en: ["Control", "What you can hold or release."], es: ["Control", "Lo que puedes sostener o soltar."] },
+  { id: "grief", glyph: "·", questionKey: "shadow", en: ["Grief", "What you are carrying."], es: ["Duelo", "Lo que estás llevando."] },
+  { id: "desire", glyph: "◇", questionKey: "body", en: ["Desire", "What you want."], es: ["Deseo", "Lo que quieres."] },
+  { id: "ending", glyph: "∩", questionKey: "time", en: ["Ending", "What may be complete."], es: ["Final", "Lo que quizá ya está completo."] }
+];
+
+const crossQuestions = {
+  self: {
+    en: ["What matters most in this moment?", "What is yours to choose here?", "What feels honest without explanation?", "What would be enough for now?"],
+    es: ["¿Qué importa más en este momento?", "¿Qué te corresponde elegir aquí?", "¿Qué se siente honesto sin explicarlo?", "¿Qué sería suficiente por ahora?"]
+  },
+  body: {
+    en: ["What sensation is clearest right now?", "Where do you notice ease or effort?", "What changes with one unforced breath?", "What does your body need less of?"],
+    es: ["¿Qué sensación está más clara ahora?", "¿Dónde notas facilidad o esfuerzo?", "¿Qué cambia con una respiración sin forzar?", "¿De qué necesita menos tu cuerpo?"]
+  },
+  silence: {
+    en: ["What can remain unanswered for now?", "What remains when you stop explaining?", "What do you notice in the quiet?", "What is here before words?"],
+    es: ["¿Qué puede quedar sin respuesta por ahora?", "¿Qué queda cuando dejas de explicar?", "¿Qué notas en la quietud?", "¿Qué está aquí antes de las palabras?"]
+  },
+  relationship: {
+    en: ["What would make this contact clearer?", "What wants to be said simply?", "What boundary or opening is needed?", "What can you offer without ignoring your own needs?"],
+    es: ["¿Qué haría más claro este contacto?", "¿Qué quiere decirse con sencillez?", "¿Qué límite o apertura hace falta?", "¿Qué puedes ofrecer sin ignorar tus propias necesidades?"]
+  },
+  shadow: {
+    en: ["What is difficult to name without judging it?", "What have you set aside for later?", "What becomes clearer when nothing is forced?", "What deserves a little more room?"],
+    es: ["¿Qué cuesta nombrar sin juzgarlo?", "¿Qué has dejado para después?", "¿Qué se aclara cuando no fuerzas nada?", "¿Qué merece un poco más de espacio?"]
+  },
+  time: {
+    en: ["What belongs to now?", "What can wait?", "What is ready for one next step?", "What may already be complete?"],
+    es: ["¿Qué pertenece a este momento?", "¿Qué puede esperar?", "¿Qué está listo para un siguiente paso?", "¿Qué quizá ya está completo?"]
+  }
+};
+
+const capacityFlows = {
+  discern: [
+    {
+      en: ["What can you notice directly?", "Choose what you can observe without explaining why.", ["A body sensation", "A feeling", "A thought", "Something happening", "Nothing clear"]],
+      es: ["¿Qué puedes notar directamente?", "Elige lo que puedes observar sin explicar por qué.", ["Una sensación corporal", "Un sentimiento", "Un pensamiento", "Algo que está ocurriendo", "Nada claro"]]
+    },
+    {
+      en: ["What are you guessing or telling yourself?", "A thought can be here without being a fact.", ["A prediction", "A judgement", "A memory", "An explanation", "Nothing clear"]],
+      es: ["¿Qué estás suponiendo o diciéndote?", "Un pensamiento puede estar aquí sin ser un hecho.", ["Una predicción", "Un juicio", "Un recuerdo", "Una explicación", "Nada claro"]]
+    },
+    {
+      en: ["What remains honest now?", "Choose only what can guide the next moment.", ["Stay with what is here", "Seek one fact", "Wait before deciding", "Ask a clear question", "Uncertainty remains"]],
+      es: ["¿Qué sigue siendo honesto ahora?", "Elige solo lo que puede guiar el próximo momento.", ["Quedarme con lo que hay", "Buscar un hecho", "Esperar antes de decidir", "Hacer una pregunta clara", "La incertidumbre continúa"]]
+    }
+  ],
+  integrate: [
+    {
+      en: ["What else matters here?", "Body signals, feelings, limits, safety and other perspectives all count.", ["The body's signal", "A feeling", "Another perspective", "A practical limit", "A safety need", "Nothing more"]],
+      es: ["¿Qué más importa aquí?", "Las señales del cuerpo, los sentimientos, los límites, la seguridad y otras perspectivas cuentan.", ["La señal del cuerpo", "Un sentimiento", "Otra perspectiva", "Un límite práctico", "Una necesidad de seguridad", "Nada más"]]
+    },
+    {
+      en: ["What should not make the whole choice by itself?", "You can notice a signal without letting it decide everything.", ["Fear", "Urgency", "A familiar story", "Another person's demand", "The need to please", "Nothing is taking over"]],
+      es: ["¿Qué no debería tomar toda la decisión por sí solo?", "Puedes notar una señal sin dejar que lo decida todo.", ["El miedo", "La urgencia", "Una historia conocida", "La exigencia de otra persona", "La necesidad de agradar", "Nada está tomando el control"]]
+    },
+    {
+      en: ["What will you carry forward?", "Choose one response that respects everything you included.", ["Protect the boundary", "Seek support", "Consider a repair", "Rest before acting", "Take one safe step", "Finish here"]],
+      es: ["¿Qué llevarás contigo?", "Elige una respuesta que respete todo lo que incluiste.", ["Proteger el límite", "Buscar apoyo", "Considerar una reparación", "Descansar antes de actuar", "Dar un paso seguro", "Terminar aquí"]]
+    }
+  ]
+};
+
 const tones = [
-  { id: "courage", hz: 396, color: "#d59a73", en: "Courage", es: "Valentía" },
-  { id: "clarity", hz: 432, color: "#9ebdd2", en: "Clarity", es: "Claridad" },
   { id: "love", hz: 528, color: "#d39aa4", en: "Love", es: "Amor" },
-  { id: "compassion", hz: 594, color: "#d3a9bd", en: "Compassion", es: "Compasión" },
-  { id: "steadiness", hz: 285, color: "#86b7ad", en: "Steadiness", es: "Estabilidad" },
-  { id: "wonder", hz: 639, color: "#b8a5cc", en: "Wonder", es: "Asombro" },
-  { id: "truth", hz: 741, color: "#d8b45a", en: "Truth", es: "Verdad" }
+  { id: "peace", hz: 432, color: "#84b7a2", en: "Peace", es: "Paz" },
+  { id: "wonder", hz: 963, color: "#7e92e8", en: "Wonder", es: "Asombro" },
+  { id: "courage", hz: 396, color: "#ca825a", en: "Courage", es: "Valentía" },
+  { id: "gratitude", hz: 417, color: "#d6a95e", en: "Gratitude", es: "Gratitud" },
+  { id: "compassion", hz: 594, color: "#c68daf", en: "Compassion", es: "Compasión" },
+  { id: "trust", hz: 285, color: "#83b79a", en: "Trust", es: "Confianza" },
+  { id: "clarity", hz: 741, color: "#82b5d2", en: "Clarity", es: "Claridad" },
+  { id: "stillness", hz: 174, color: "#a4b8c6", en: "Stillness", es: "Quietud" },
+  { id: "patience", hz: 324, color: "#9baac8", en: "Patience", es: "Paciencia" },
+  { id: "hope", hz: 639, color: "#9e97e5", en: "Hope", es: "Esperanza" },
+  { id: "forgiveness", hz: 528, color: "#bfa76a", en: "Forgiveness", es: "Perdón" },
+  { id: "strength", hz: 396, color: "#7f8ae7", en: "Strength", es: "Fortaleza" },
+  { id: "joy", hz: 852, color: "#e59158", en: "Joy", es: "Alegría" }
 ];
 
 const fields = [
@@ -425,16 +581,20 @@ const state = {
   selectedLaw: "law-01",
   selectedPrinciple: "principle-01",
   selectedEntry: "separate-event-from-interpretation",
+  selectedPath: "manifestation-as-participation",
   selectedEngine: "congruence-compass",
   selectedMission: "",
   foundationMode: "laws",
-  libraryMode: "practices",
+  libraryMode: "",
   libraryQuery: "",
   libraryField: "all",
   libraryDomain: "all",
   libraryNeed: "all",
   teachingDepth: 1,
   showFullTeaching: false,
+  showAllPractices: false,
+  guidedKind: "",
+  guidedPhase: 0,
   engineStep: 0,
   engineDuration: 2,
   engineResponses: {},
@@ -455,22 +615,40 @@ const state = {
 function newPractice() {
   return {
     index: 0,
+    movement: "",
+    sequence: false,
+    stage: "",
+    capacityStep: 0,
+    capacityAnswers: [],
+    selectedOption: "",
     noticeStarted: false,
     noticeStartedAt: 0,
     noticeCue: 0,
     noticeManualCue: -1,
     noticeManualUntil: 0,
     noticeLastManualCue: -1,
+    noticeDuration: 60,
+    noticeOutcome: "",
+    steadyExpanded: false,
     steadyState: "",
+    breathPattern: "",
     breathStartedAt: 0,
     facts: "",
     story: "",
     pull: "",
     reclaimHolding: false,
+    reclaimComplete: false,
     relation: "",
+    customPull: "",
     doorway: "self",
     questionSaved: false,
+    crossFocus: "self",
+    crossQuestion: 0,
+    crossRecent: [],
+    crossSaved: false,
+    crossCrossed: false,
     tone: "love",
+    embodyStage: "choose",
     frequency: 528,
     amplitude: 34,
     tonePlaying: false,
@@ -488,6 +666,7 @@ let practiceTimer = 0;
 let toastTimer = 0;
 let fieldFrame = 0;
 let breathLastPhaseKey = "";
+let reclaimHoldTimer = 0;
 
 const tr = key => copy[state.lang][key] || key;
 const local = item => item[state.lang];
@@ -733,6 +912,15 @@ class SoundEngine {
     this.note(174, now, 50, .018);
     this.note(261.63, now + .2, 50, .009);
   }
+
+  async thresholdCrossing() {
+    if (!state.sound) return;
+    await this.ready();
+    const now = this.context.currentTime;
+    this.note(261.63, now, 1.8, .065, "sine", 392);
+    this.note(392, now + .16, 2.1, .045, "sine", 523.25);
+    this.note(784, now + .42, 1.25, .018);
+  }
 }
 
 const sound = new SoundEngine();
@@ -770,6 +958,11 @@ function navigate(view, options = {}) {
   if (options.law) state.selectedLaw = options.law;
   if (options.principle) state.selectedPrinciple = options.principle;
   if (options.entry) state.selectedEntry = options.entry;
+  if (options.path) state.selectedPath = options.path;
+  if (options.guidedKind) {
+    state.guidedKind = options.guidedKind;
+    state.guidedPhase = 0;
+  }
   if (options.engine) {
     state.selectedEngine = options.engine;
     state.engineStep = 0;
@@ -786,6 +979,7 @@ function navigate(view, options = {}) {
     if (view === "library") state.libraryMode = options.mode;
   }
   render();
+  if (view === "practiceEngine") playEngineStageVoice();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -810,9 +1004,13 @@ function render() {
     landing: renderLanding,
     home: renderHome,
     practice: renderPractice,
+    movement: renderMovementSession,
     fields: renderFields,
+    nestedFields: renderNestedFields,
     field: renderField,
+    guided: renderGuidedExperience,
     library: renderLibrary,
+    libraryPath: renderLibraryPath,
     teaching: renderTeaching,
     foundations: renderFoundations,
     law: renderLaw,
@@ -834,7 +1032,7 @@ function render() {
   app.innerHTML = `<div class="app-shell">${(renderers[state.view] || renderHome)()}</div>`;
   if (state.view === "symbol") observeSymbolSections();
   if (state.view === "landing" && !state.ceremonySettled) settleCeremonyLater();
-  if (state.view === "practice") resumePracticeView();
+  if (state.view === "movement") resumePracticeView();
   if (state.view === "threshold") sound.threshold().catch(() => {});
 }
 
@@ -960,43 +1158,377 @@ function renderHome() {
     </main>`;
 }
 
-function movementCopy() { return local(movements[state.practice.index]); }
-
 function renderPractice() {
-  const movement = movements[state.practice.index];
-  const movementCopy = local(movement);
-  if (movement.id === "stabilise" && state.practice.breathStartedAt) return renderStabiliseSession();
-  return `${renderTopbar(movementCopy.name, movementCopy.line)}
-    <main class="page practice-page">
-      <nav class="movement-strip" aria-label="${state.lang === "en" ? "Practice movements" : "Movimientos de la práctica"}">
-        ${movements.map((item, index) => `<button class="movement-dot ${index < state.practice.index ? "done" : ""} ${index === state.practice.index ? "active" : ""}" type="button" data-movement="${index}" aria-label="${local(item).name}" aria-current="${index === state.practice.index ? "step" : "false"}"></button>`).join("")}
-      </nav>
-      <section class="practice-stage" style="--movement-color:${movement.color}">
-        <header class="practice-copy">
-          <p class="eyebrow">${state.practice.index + 1} · ${escapeHTML(movementCopy.name)}</p>
-          <h1 class="practice-title">${escapeHTML(movementCopy.title)}</h1>
-          <p class="lede">${escapeHTML(movementCopy.body)}</p>
-        </header>
-        ${renderMovement(movement.id)}
+  const lang = state.lang;
+  return `${renderTopbar(lang === "en" ? "Practice" : "Práctica", lang === "en" ? "Each movement stands on its own" : "Cada movimiento funciona por sí solo")}
+    <main class="page wide movement-field-page">
+      <header class="section-intro movement-field-intro">
+        <p class="eyebrow">${lang === "en" ? "CHOOSE A MOVEMENT" : "ELIGE UN MOVIMIENTO"}</p>
+        <h1 class="display">${lang === "en" ? "What do you need now?" : "¿Qué necesitas ahora?"}</h1>
+        <p class="lede">${lang === "en" ? "Follow all seven steps, or choose one step below." : "Sigue los siete pasos o elige un paso a continuación."}</p>
+      </header>
+      <button class="full-practice-entry" type="button" data-action="start-full-practice"><span aria-hidden="true">✦</span><span><strong>${lang === "en" ? "Begin the full seven-step practice" : "Comenzar la práctica completa de siete pasos"}</strong><small>${lang === "en" ? "Notice → Stabilise → Discern → Reclaim → Cross → Embody → Integrate" : "Notar → Estabilizar → Discernir → Recuperar → Cruzar → Encarnar → Integrar"}</small></span><b>→</b></button>
+      <button class="guided-practice-entry" type="button" data-view="practiceEngines"><span aria-hidden="true">◌</span><span><strong>${lang === "en" ? "Short guided practices" : "Prácticas guiadas breves"}</strong><small>${lang === "en" ? "One-minute check-in, or choose a reusable practice" : "Una revisión de un minuto o una práctica para repetir"}</small></span><b>›</b></button>
+      <p class="movement-or-label">${lang === "en" ? "OR CHOOSE ONE STEP" : "O ELIGE UN PASO"}</p>
+      <section class="movement-field-grid" aria-label="${lang === "en" ? "Independent practices" : "Prácticas independientes"}">
+        ${movements.map(item => {
+          const itemCopy = local(item);
+          return `<button class="movement-field-choice" style="--movement-color:${item.color}" type="button" data-open-movement="${item.id}">
+            <span class="movement-field-mark" aria-hidden="true">${item.mark}</span>
+            <span><strong>${escapeHTML(itemCopy.name)}</strong><small>${escapeHTML(itemCopy.line)}</small></span>
+            <b aria-hidden="true">→</b>
+          </button>`;
+        }).join("")}
       </section>
-      <footer class="practice-actions">
-        <div class="button-row">
-          <button class="secondary-button" type="button" data-action="previous-movement" ${state.practice.index === 0 ? "disabled" : ""}>${tr("previousMovement")}</button>
-          <button class="primary-button" type="button" data-action="next-movement">${state.practice.index === movements.length - 1 ? tr("save") : tr("nextMovement")}</button>
-        </div>
-        <button class="text-button" type="button" data-action="home">${tr("returnHome")}</button>
-      </footer>
+      <p class="movement-field-note">${lang === "en" ? "Begin anywhere. Finishing one practice never requires starting another." : "Comienza donde quieras. Terminar una práctica nunca exige comenzar otra."}</p>
     </main>`;
+}
+
+function movementByID(id = state.practice.movement) {
+  return movements.find(item => item.id === id) || movements[0];
+}
+
+function movementTopbar(movement) {
+  const itemCopy = local(movement);
+  return `<header class="topbar">
+    <button class="icon-button" type="button" data-action="movement-back" aria-label="${escapeHTML(tr("back"))}" title="${escapeHTML(tr("back"))}">←</button>
+    <div class="topbar-title"><strong>${escapeHTML(itemCopy.name)}</strong><span>${escapeHTML(itemCopy.line)}</span></div>
+    <div class="topbar-actions"><button class="icon-button" type="button" data-action="home" aria-label="${escapeHTML(tr("home"))}" title="${escapeHTML(tr("home"))}">⌂</button></div>
+  </header>`;
+}
+
+function renderMovementSession() {
+  const p = state.practice;
+  const movement = movementByID();
+  if (movement.id === "stabilise" && p.stage === "breath" && p.breathStartedAt) return renderStabiliseSession();
+  if (p.stage === "continuity") return renderContinuityChoice(movement);
+  return `${movementTopbar(movement)}
+    <main class="page movement-session-page" style="--movement-color:${movement.color}">
+      ${renderIndependentMovement(movement.id)}
+    </main>`;
+}
+
+function renderContinuityChoice(movement) {
+  const lang = state.lang;
+  return `${movementTopbar(movement)}<main class="page continuity-page">
+    <div class="completion-seal"><div class="seal-orb"><span>${movement.mark}</span></div>
+      <h1 class="practice-title">${lang === "en" ? "Save this practice on this device?" : "¿Guardar esta práctica en este dispositivo?"}</h1>
+      <p class="lede">${lang === "en" ? "This saves the practice and the response you chose. Tone Sovereign will not tell you what your choices mean." : "Esto guarda la práctica y la respuesta que elegiste. Tone Sovereign no te dirá qué significan tus elecciones."}</p>
+    </div>
+    <div class="practice-actions"><button class="primary-button" type="button" data-action="finish-movement-save">${lang === "en" ? "Save on this device" : "Guardar en este dispositivo"}</button>
+    <button class="text-button" type="button" data-action="finish-movement-pass">${lang === "en" ? "Finish without saving" : "Terminar sin guardar"}</button></div>
+  </main>`;
+}
+
+function renderMovementHeading(title, support, eyebrow = "") {
+  return `<header class="practice-copy movement-heading">${eyebrow ? `<p class="eyebrow">${escapeHTML(eyebrow)}</p>` : ""}<h1 class="practice-title">${escapeHTML(title)}</h1><p class="lede">${escapeHTML(support)}</p></header>`;
+}
+
+function renderIndependentMovement(id) {
+  if (id === "notice") return renderNoticeMovement();
+  if (id === "stabilise") return renderStabiliseMovement();
+  if (id === "discern" || id === "integrate") return renderCapacityMovement(id);
+  if (id === "reclaim") return renderReclaimMovement();
+  if (id === "cross") return renderCrossMovement();
+  return renderEmbodyMovement();
+}
+
+function renderNoticeMovement() {
+  const p = state.practice;
+  const lang = state.lang;
+  if (p.stage === "arrive") return `<section class="practice-stage focused-stage">
+    ${renderMovementHeading(lang === "en" ? "Notice one simple feeling in your body." : "Nota una sensación sencilla en tu cuerpo.", lang === "en" ? "Four brief cues, then notice freely." : "Cuatro indicaciones breves y luego atención libre.")}
+    <div class="instrument-region notice-instrument still" aria-hidden="true"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></div>
+    <button class="primary-button" type="button" data-action="start-notice">${lang === "en" ? "Begin" : "Comenzar"}</button>
+    <div class="practice-settings-row"><button class="text-button" type="button" data-action="toggle-words">${state.quietWords ? (lang === "en" ? "Use quiet labels" : "Usar etiquetas suaves") : (lang === "en" ? "Without labels" : "Sin etiquetas")}</button>
+    <label>${lang === "en" ? "Duration" : "Duración"}<select data-notice-duration><option value="30" ${p.noticeDuration === 30 ? "selected" : ""}>30s</option><option value="60" ${p.noticeDuration === 60 ? "selected" : ""}>60s</option><option value="90" ${p.noticeDuration === 90 ? "selected" : ""}>90s</option></select></label></div>
+  </section>`;
+  if (p.stage === "close") {
+    const outcomes = lang === "en" ? ["Clearer", "Different", "No change", "Not sure"] : ["Más claro", "Diferente", "Sin cambio", "No lo sé"];
+    return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "What is different, if anything?" : "¿Qué ha cambiado, si algo cambió?", lang === "en" ? "A response is optional." : "Responder es opcional.")}
+      <div class="instrument-region notice-instrument still" aria-hidden="true"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></div>
+      <div class="choice-grid">${outcomes.map((item, index) => `<button class="choice ${p.noticeOutcome === String(index) ? "selected" : ""}" type="button" data-notice-outcome="${index}">${item}</button>`).join("")}</div>
+      <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button>
+      <button class="text-button" type="button" data-action="continue-stabilise">${lang === "en" ? "Continue with Stabilise" : "Continuar con Estabilizar"}</button>
+    </section>`;
+  }
+  const cue = noticeCues[lang][p.noticeCue];
+  return `<section class="practice-stage focused-stage notice-live-stage">
+    <button class="instrument-region notice-instrument" type="button" data-action="notice-tap" aria-label="${lang === "en" ? "Acknowledge what you noticed" : "Reconocer lo que notaste"}"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></button>
+    ${renderMovementHeading(cue, state.quietWords ? (lang === "en" ? "Tap the centre when you notice something." : "Toca el centro cuando notes algo.") : (lang === "en" ? "No naming is needed." : "No hace falta nombrarlo."))}
+    <p class="timer" data-notice-timer>1:00</p>
+    <div class="button-row"><button class="secondary-button" type="button" data-action="another-notice-cue">${lang === "en" ? "Another cue" : "Otra indicación"}</button><button class="text-button" type="button" data-action="end-notice">${lang === "en" ? "End practice" : "Terminar práctica"}</button></div>
+  </section>`;
+}
+
+function renderStabiliseMovement() {
+  const p = state.practice;
+  const lang = state.lang;
+  if (p.stage === "complete") return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "ENOUGH" : "SUFICIENTE", lang === "en" ? "Did this bring you closer?" : "¿Esto te acercó un poco?")}
+    <div class="completion-seal"><div class="seal-orb"><span>│</span></div></div>
+    <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button></section>`;
+  if (p.stage === "patterns") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a breath" : "Elige una respiración", lang === "en" ? "Choose the rhythm that asks least from you right now. Every hold is optional." : "Elige el ritmo que te pida menos ahora. Cada pausa es opcional.")}
+    <div class="state-list">${Object.entries(BREATH_PATTERNS).map(([key, item]) => `<button class="state-choice" type="button" data-breath-pattern="${key}"><span class="state-mini-orb" style="--pattern-rgb:${item.rgb}"></span><span><strong>${item[lang].title}</strong><small>${item[lang].cue}</small></span><b>›</b></button>`).join("")}</div></section>`;
+  if (!p.steadyState) {
+    const visible = p.steadyExpanded ? steadyStates : steadyStates.slice(0, 4);
+    return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "What feels difficult now?" : "¿Qué se siente difícil ahora?", lang === "en" ? "Choose the closest state. You can change it." : "Elige el estado más cercano. Puedes cambiarlo.")}
+      <div class="state-list">${visible.map(item => `<button class="state-choice" type="button" data-steady="${item.id}"><span class="state-mini-orb"></span><span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></span><b>›</b></button>`).join("")}</div>
+      ${p.steadyExpanded ? "" : `<button class="text-button" type="button" data-action="more-steady">${lang === "en" ? "More states" : "Más estados"} ↓</button>`}
+    </section>`;
+  }
+  const chosen = steadyStates.find(item => item.id === p.steadyState);
+  const pattern = BREATH_PATTERNS[p.breathPattern || chosen.pattern];
+  return `<section class="practice-stage focused-stage">
+    ${renderMovementHeading(pattern[lang].title, pattern[lang].cue, chosen[lang][0])}
+    <p class="consent-copy">${lang === "en" ? "Stop at any time. Let the breath return to its natural rhythm." : "Detente cuando quieras. Deja que la respiración vuelva a su ritmo natural."}</p>
+    <button class="primary-button" type="button" data-action="start-breath">${lang === "en" ? "Begin breathing" : "Comenzar respiración"}</button>
+    <button class="text-button" type="button" data-action="change-breath-pattern">${lang === "en" ? "Change breath" : "Cambiar respiración"}</button>
+    <button class="text-button" type="button" data-action="change-steady">${lang === "en" ? "Choose another state" : "Elegir otro estado"}</button>
+  </section>`;
+}
+
+function renderCapacityMovement(id) {
+  const p = state.practice;
+  const lang = state.lang;
+  const flow = capacityFlows[id];
+  const item = flow[p.capacityStep][lang];
+  return `<section class="practice-stage focused-stage capacity-stage">
+    <p class="eyebrow">${p.capacityStep + 1} ${lang === "en" ? "of" : "de"} ${flow.length}</p>
+    ${renderMovementHeading(item[0], item[1])}
+    <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
+    <button class="primary-button" type="button" data-action="capacity-continue" ${p.selectedOption ? "" : "disabled"}>${p.capacityStep === flow.length - 1 ? (lang === "en" ? "Complete practice" : "Completar práctica") : tr("continue")}</button>
+  </section>`;
+}
+
+function renderReclaimMovement() {
+  const p = state.practice;
+  const lang = state.lang;
+  if (p.stage === "authority") return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "What is pulling at your attention?" : "¿Qué está tirando de tu atención?", lang === "en" ? "Choose the closest name. You can leave it unclear." : "Elige el nombre más cercano. Puedes dejarlo sin aclarar.")}
+    <div class="choice-grid">${pulls[lang].map((item, index) => `<button class="choice" type="button" data-pull="${index}">${item}</button>`).join("")}</div>
+    <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button></section>`;
+  if (p.stage === "custom") return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Name it plainly." : "Nómbralo con sencillez.", lang === "en" ? "A few words are enough. You can leave it unclear." : "Bastan unas pocas palabras. Puedes dejarlo sin aclarar.")}
+    <label class="field-label reclaim-custom-field"><span>${lang === "en" ? "What is pulling at your attention?" : "¿Qué está tirando de tu atención?"}</span><input class="field-input" data-input="customPull" value="${escapeAttribute(p.customPull)}" maxlength="80" autocomplete="off"></label>
+    <button class="primary-button" type="button" data-action="reclaim-custom-continue" ${p.customPull.trim() ? "" : "disabled"}>${tr("continue")}</button>
+    <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button></section>`;
+  if (p.stage === "pause") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
+    <button class="instrument-region reclaim-instrument ${p.reclaimHolding ? "hold-active" : ""} ${p.reclaimComplete ? "is-complete" : ""}" type="button" data-action="reclaim-hold" aria-label="${lang === "en" ? "Press and hold through one natural breath" : "Mantén pulsado durante una respiración natural"}"><svg class="reclaim-spiral" viewBox="0 0 120 120" aria-hidden="true"><path d="M63 58 C72 54 76 63 72 70 C66 82 45 78 40 64 C33 44 51 27 72 31 C97 36 105 65 91 85 C74 109 37 103 24 77"></path></svg><span class="reclaim-line"></span><span class="reclaim-point"></span></button>
+    ${renderMovementHeading(p.reclaimComplete ? (lang === "en" ? "You can still choose." : "Todavía puedes elegir.") : (lang === "en" ? "Hold your centre for one breath." : "Mantén tu centro durante una respiración."), p.reclaimComplete ? (lang === "en" ? "The feeling may still be here. It does not have to choose for you." : "La sensación puede seguir aquí. No tiene que elegir por ti.") : (lang === "en" ? "Hold the spiral for one breath, or continue when ready." : "Mantén la espiral durante una respiración o continúa cuando estés listo."))}
+    <button class="primary-button" type="button" data-action="reclaim-to-relationship">${lang === "en" ? "Choose how to respond" : "Elegir cómo responder"}</button></section>`;
+  if (p.stage === "relationship") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
+    <div class="instrument-region reclaim-instrument small" aria-hidden="true"><span class="reclaim-line"></span><span class="reclaim-point"></span></div>
+    ${renderMovementHeading(lang === "en" ? "Choose how you will respond to it." : "Elige cómo responderás.", lang === "en" ? "You can notice every pull. Choose what gives you the most room to act." : "Puedes notar cada impulso. Elige lo que te dé más espacio para actuar.")}
+    <div class="choice-grid">${relations[lang].map(item => `<button class="choice ${p.relation === item ? "selected" : ""}" type="button" data-relation="${escapeAttribute(item)}">${item}</button>`).join("")}</div>
+    <button class="primary-button" type="button" data-action="reclaim-complete" ${p.relation ? "" : "disabled"}>${tr("continue")}</button></section>`;
+  const relationIndex = relations[lang].indexOf(p.relation);
+  const principles = lang === "en" ? ["You can hear the pull without letting it steer. You choose what leads.", "You can set this down without resolving it. You choose what leads.", "You can question a demand before giving it authority. You choose what leads.", "You do not have to decide this now. You choose what leads."] : ["Puedes escuchar el impulso sin dejar que dirija. Tú eliges qué guía.", "Puedes dejar esto por ahora sin resolverlo. Tú eliges qué guía.", "Puedes cuestionar una exigencia antes de darle autoridad. Tú eliges qué guía.", "No tienes que decidir esto ahora. Tú eliges qué guía."];
+  return `<section class="practice-stage focused-stage"><div class="instrument-region reclaim-instrument small" aria-hidden="true"><span class="reclaim-line"></span><span class="reclaim-point"></span></div>
+    ${renderMovementHeading(p.relation, principles[Math.max(0, relationIndex)])}
+    <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button>
+    <button class="text-button" type="button" data-action="continue-embody">${lang === "en" ? "Continue with Embody" : "Continuar con Encarnar"}</button></section>`;
+}
+
+function currentCrossFocus() { return crossFocuses.find(item => item.id === state.practice.crossFocus) || crossFocuses[0]; }
+function currentCrossQuestionKey() { return `${currentCrossFocus().questionKey}:${state.practice.crossQuestion % 4}`; }
+function currentCrossQuestion() { const focus = currentCrossFocus(); return crossQuestions[focus.questionKey][state.lang][state.practice.crossQuestion % 4]; }
+
+function chooseCrossQuestion({ avoidCurrent = false } = {}) {
+  const p = state.practice;
+  const focus = currentCrossFocus();
+  const all = [0, 1, 2, 3];
+  const recent = new Set(p.crossRecent);
+  let choices = all.filter(index => !recent.has(`${focus.questionKey}:${index}`) && (!avoidCurrent || index !== p.crossQuestion));
+  if (!choices.length) choices = all.filter(index => !avoidCurrent || index !== p.crossQuestion);
+  if (!choices.length) choices = all;
+  p.crossQuestion = choices[Math.floor(Math.random() * choices.length)];
+  p.crossRecent = [currentCrossQuestionKey(), ...p.crossRecent.filter(item => item !== currentCrossQuestionKey())].slice(0, 6);
+  p.crossSaved = crossQuestionIsSaved();
+  p.crossCrossed = false;
+}
+
+function crossQuestionIsSaved() {
+  const key = currentCrossQuestionKey();
+  return readJSON(STORAGE.crossMarks, []).some(item => item.id === key || (!item.id && item.question === crossQuestions[currentCrossFocus().questionKey].en[state.practice.crossQuestion]));
+}
+
+function renderCrossMovement() {
+  const p = state.practice;
+  const lang = state.lang;
+  const focus = currentCrossFocus();
+  if (p.stage === "focuses") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose the focus that best fits this moment. You can change it." : "Elige el enfoque que mejor encaje con este momento. Puedes cambiarlo.")}
+    <div class="cross-focus-grid">${crossFocuses.map(item => `<button class="cross-focus-choice" type="button" data-cross-focus="${item.id}"><span>${item.glyph}</span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></button>`).join("")}</div></section>`;
+  if (p.stage === "question" || p.stage === "crossed") return `<section class="practice-stage focused-stage cross-question-stage">
+    <div class="doorway-instrument cross-door ${p.stage === "crossed" ? "open" : ""}" aria-hidden="true"><span>${focus.glyph}</span></div>
+    <p class="eyebrow">${escapeHTML(focus[lang][0])} · ${lang === "en" ? "QUESTION" : "PREGUNTA"}</p>
+    <h1 class="practice-title cross-question">${escapeHTML(currentCrossQuestion())}</h1>
+    <p class="lede">${lang === "en" ? "Stay with this for one breath. No answer is required." : "Quédate con esto durante una respiración. No hace falta responder."}</p>
+    <div class="cross-tools"><button class="text-button" type="button" data-action="save-cross-question">${p.crossSaved ? (lang === "en" ? "Saved" : "Guardada") : (lang === "en" ? "Save question" : "Guardar pregunta")}</button><button class="text-button" type="button" data-action="another-cross-question">${lang === "en" ? "Another question" : "Otra pregunta"}</button></div>
+    <p class="consent-copy">${lang === "en" ? "No answer is required. Leave whenever you have enough." : "No hace falta responder. Sal cuando hayas tenido suficiente."}</p>
+    <button class="primary-button" type="button" data-action="cross-ready">${p.stage === "crossed" ? tr("continue") : (lang === "en" ? "Cross when ready" : "Cruzar cuando estés listo")}</button>
+  </section>`;
+  if (p.stage === "close") return `<section class="practice-stage focused-stage"><div class="doorway-instrument cross-door open" aria-hidden="true"><span>│</span></div><p class="eyebrow">${lang === "en" ? "RETURN" : "REGRESO"}</p>
+    ${renderMovementHeading(lang === "en" ? "Take only what feels useful." : "Quédate solo con lo que sea útil.", lang === "en" ? "Keep the question, or leave it here." : "Guarda la pregunta o déjala aquí.")}
+    <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button></section>`;
+  const focusIndex = crossFocuses.findIndex(item => item.id === focus.id);
+  return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose what feels closest." : "Elige lo que se sienta más cercano.")}
+    <div class="cross-focus-carousel"><button class="icon-button" type="button" data-action="previous-cross-focus">‹</button><div><span class="cross-focus-glyph">${focus.glyph}</span><h2>${focus[lang][0]}</h2><p>${focus[lang][1]}</p></div><button class="icon-button" type="button" data-action="next-cross-focus">›</button></div>
+    <button class="secondary-button" type="button" data-action="show-cross-focuses">${lang === "en" ? "Change focus" : "Cambiar enfoque"}</button>
+    ${readJSON(STORAGE.crossMarks, []).length ? `<button class="text-button" type="button" data-action="return-saved-cross">${lang === "en" ? "Return to saved question" : "Volver a una pregunta guardada"}</button>` : ""}
+    <button class="primary-button" type="button" data-action="open-cross-question">${lang === "en" ? `Open the ${focus.en[0]} question` : `Abrir la pregunta de ${focus.es[0]}`}</button>
+  </section>`;
+}
+
+function renderEmbodyMovement() {
+  const p = state.practice;
+  const lang = state.lang;
+  const tone = tones.find(item => item.id === p.tone) || tones[0];
+  const toneIndex = tones.findIndex(item => item.id === tone.id);
+  if (p.embodyStage === "all") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a tone" : "Elige un tono", lang === "en" ? "Choose the quality you want to practise." : "Elige la cualidad que quieres practicar.")}
+    <div class="choice-grid">${tones.map(item => `<button class="choice" type="button" data-tone="${item.id}" data-select-tone="1">${item[lang]}</button>`).join("")}</div></section>`;
+  if (p.embodyStage === "tune") return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
+    ${renderMovementHeading(tone[lang], lang === "en" ? `Adjust the sound until it feels close enough to ${tone.en}.` : `Ajusta el sonido hasta que se sienta suficientemente cercano a ${tone.es}.`)}
+    <div class="tone-controls"><label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="180" max="880" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label><label class="range-label">${lang === "en" ? "Strength" : "Intensidad"}<input type="range" min="10" max="70" value="${p.amplitude}" data-range="amplitude"><span>${p.amplitude}</span></label></div>
+    <button class="primary-button" type="button" data-action="embody-hold">${lang === "en" ? "This is it" : "Este es"}</button></section>`;
+  if (p.embodyStage === "hold") return `<section class="practice-stage focused-stage embody-hold-stage"><div class="tone-field large" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
+    ${renderMovementHeading(tone[lang], lang === "en" ? "Stay with the tone." : "Quédate con el tono.")}
+    <button class="primary-button" type="button" data-action="embody-complete">${lang === "en" ? "Complete practice" : "Completar práctica"}</button></section>`;
+  return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field compact" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div><p class="eyebrow">${lang === "en" ? "Choose the tone" : "Elige el tono"}</p><h1 class="practice-title" style="color:${tone.color}">${tone[lang]}</h1>
+    <div class="tone-carousel"><button class="icon-button" type="button" data-action="previous-tone">‹</button><button class="primary-button" type="button" data-action="enter-tone">${lang === "en" ? "Enter this tone" : "Entrar en este tono"}</button><button class="icon-button" type="button" data-action="next-tone">›</button></div>
+    <button class="text-button" type="button" data-action="show-all-tones">${lang === "en" ? "All tones" : "Todos los tonos"}</button></section>`;
+}
+
+function startMovement(id) {
+  stopPracticeTimers();
+  state.practice = newPractice();
+  state.practice.movement = id;
+  state.practice.stage = {
+    notice: "arrive",
+    stabilise: "chooser",
+    discern: "practice",
+    reclaim: "authority",
+    cross: "choose",
+    embody: "choose",
+    integrate: "practice"
+  }[id] || "practice";
+  state.view = "movement";
+  if (state.stack.at(-1) !== "practice") state.stack.push("practice");
+  render();
+  playCapacityStageVoice(id, state.practice.capacityStep);
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function playCapacityStageVoice(id, step) {
+  const cue = {
+    "discern:0": "ts_discern_direct_v1",
+    "discern:1": "ts_discern_added_v1",
+    "discern:2": "ts_discern_honest_v1",
+    "integrate:0": "ts_integrate_include_v1",
+    "integrate:2": "ts_integrate_carry_v1"
+  }[`${id}:${step}`];
+  if (cue) sound.playVoice(cue, state.reduceMotion ? 0 : 0.18);
+}
+
+function playEngineStageVoice() {
+  const engine = contentByID(catalogFor(state.lang).practiceEngines, state.selectedEngine);
+  const stepID = engine?.steps?.[state.engineStep]?.id;
+  const cue = {
+    "reciprocal-creation-desire": "ts_reciprocal_desire_v1",
+    "reciprocal-creation-nourishment": "ts_reciprocal_nourishment_v1",
+    "reciprocal-creation-contribution": "ts_reciprocal_contribution_v1",
+    "reciprocal-creation-feared-change": "ts_reciprocal_include_fear_v1",
+    "reciprocal-creation-action": "ts_reciprocal_action_v1",
+    "attunement-compass-pull": "ts_attunement_pull_v1",
+    "attunement-compass-capacity": "ts_attunement_capacity_v1",
+    "attunement-compass-context": "ts_attunement_context_v1",
+    "attunement-compass-meeting": "ts_attunement_meeting_v1",
+    "attunement-compass-next-step": "ts_attunement_next_step_v1"
+  }[stepID];
+  if (cue) sound.playVoice(cue, state.reduceMotion ? 0 : 0.18);
+}
+
+function startFullPractice() {
+  startMovement(movements[0].id);
+  state.practice.sequence = true;
+  render();
+}
+
+function advanceFullPractice() {
+  const current = movements.findIndex(item => item.id === state.practice.movement);
+  const next = movements[current + 1];
+  if (!next) { state.practice.stage = "continuity"; render(); return; }
+  const sequence = true;
+  startMovement(next.id);
+  state.practice.sequence = sequence;
+  render();
+}
+
+function returnToMovementField() {
+  stopPracticeTimers();
+  state.practice = newPractice();
+  state.view = "practice";
+  if (state.stack.at(-1) === "practice") state.stack.pop();
+  render();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+function movementBack() {
+  const p = state.practice;
+  const id = p.movement;
+  if (p.stage === "continuity") {
+    p.stage = id === "notice" ? "close" : id === "stabilise" ? "complete" : id === "reclaim" ? "complete" : id === "cross" ? "close" : id === "embody" ? "hold" : "practice";
+  } else if (id === "notice" && p.stage === "close") p.stage = "noting";
+  else if (id === "notice" && p.stage === "noting") p.stage = "arrive";
+  else if (id === "stabilise" && p.stage === "complete") p.stage = "setup";
+  else if (id === "stabilise" && p.stage === "patterns") p.stage = p.steadyState ? "setup" : "chooser";
+  else if (id === "stabilise" && p.steadyState) { p.steadyState = ""; p.breathPattern = ""; p.stage = "chooser"; }
+  else if ((id === "discern" || id === "integrate") && p.capacityStep > 0) {
+    p.capacityStep -= 1;
+    p.selectedOption = p.capacityAnswers[p.capacityStep] || "";
+  } else if (id === "reclaim" && p.stage === "complete") p.stage = "relationship";
+  else if (id === "reclaim" && p.stage === "relationship") p.stage = "pause";
+  else if (id === "reclaim" && p.stage === "pause") p.stage = p.customPull ? "custom" : "authority";
+  else if (id === "reclaim" && p.stage === "custom") p.stage = "authority";
+  else if (id === "cross" && p.stage === "close") p.stage = "question";
+  else if (id === "cross" && (p.stage === "question" || p.stage === "crossed" || p.stage === "focuses")) p.stage = "choose";
+  else if (id === "embody" && p.embodyStage === "hold") p.embodyStage = "tune";
+  else if (id === "embody" && p.embodyStage === "tune") p.embodyStage = "choose";
+  else if (id === "embody" && p.embodyStage === "all") p.embodyStage = "choose";
+  else { returnToMovementField(); return; }
+  stopPracticeTimers();
+  render();
+  playCapacityStageVoice(id, p.capacityStep);
+}
+
+function requestMovementCompletion() {
+  stopPracticeTimers();
+  if (state.practice.sequence && state.practice.movement !== movements.at(-1).id) { advanceFullPractice(); return; }
+  state.practice.stage = "continuity";
+  render();
+}
+
+function finishMovement(save) {
+  const p = state.practice;
+  const movement = movementByID();
+  if (save) {
+    const detail = p.movement === "cross" ? currentCrossQuestion()
+      : p.movement === "reclaim" ? p.relation
+      : p.movement === "embody" ? (tones.find(item => item.id === p.tone)?.[state.lang] || "")
+      : p.movement === "notice" ? (["Clearer", "Different", "No change", "Not sure"][Number(p.noticeOutcome)] || "")
+      : p.capacityAnswers.filter(Boolean).join(" · ");
+    addTrace({ type: "practice", title: local(movement).name, detail: detail || local(movement).line });
+    showToast(tr("saved"));
+  }
+  returnToMovementField();
 }
 
 function selectedBreathPattern() {
   const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
-  return BREATH_PATTERNS[selectedState?.pattern] || BREATH_PATTERNS.extended;
+  return BREATH_PATTERNS[state.practice.breathPattern || selectedState?.pattern] || BREATH_PATTERNS.extended;
 }
 
 function selectedBreathPatternKey() {
   const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
-  return BREATH_PATTERNS[selectedState?.pattern] ? selectedState.pattern : "extended";
+  const key = state.practice.breathPattern || selectedState?.pattern;
+  return BREATH_PATTERNS[key] ? key : "extended";
 }
 
 function breathInstrumentURL() {
@@ -1156,7 +1688,9 @@ function resumePracticeView() {
 
 function stopPracticeTimers() {
   window.clearInterval(practiceTimer);
+  window.clearTimeout(reclaimHoldTimer);
   practiceTimer = 0;
+  reclaimHoldTimer = 0;
   breathLastPhaseKey = "";
   sound.stop();
   state.practice.tonePlaying = false;
@@ -1175,7 +1709,8 @@ function startNoticeTimer(reset = true) {
   const update = () => {
     const now = Date.now();
     const elapsed = (now - state.practice.noticeStartedAt) / 1000;
-    const automaticCue = Math.min(4, Math.floor(elapsed / NOTICE.cueDuration));
+    const guidedCueDuration = state.practice.noticeDuration === 30 ? 5 : state.practice.noticeDuration === 90 ? 12 : 10;
+    const automaticCue = Math.min(4, Math.floor(elapsed / guidedCueDuration));
     const manualIsActive = state.practice.noticeManualCue >= 0 && now < state.practice.noticeManualUntil;
     const cue = manualIsActive ? state.practice.noticeManualCue : automaticCue;
     if (!manualIsActive && state.practice.noticeManualCue >= 0) {
@@ -1187,12 +1722,20 @@ function startNoticeTimer(reset = true) {
       sound.playVoice(noticeVoiceCues[cue]);
       announce(noticeCues[state.lang][cue]);
     }
-    const remaining = Math.max(0, NOTICE.duration - Math.floor(elapsed));
+    const remaining = Math.max(0, state.practice.noticeDuration - Math.floor(elapsed));
     const timer = document.querySelector("[data-notice-timer]");
     const cueNode = document.querySelector("[data-notice-cue]");
-    if (timer) timer.textContent = `0:${String(remaining).padStart(2, "0")}`;
+    if (timer) timer.textContent = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`;
     if (cueNode) cueNode.textContent = noticeCues[state.lang][cue];
-    if (remaining <= 0) { window.clearInterval(practiceTimer); practiceTimer = 0; announce(state.lang === "en" ? "Practice complete" : "Práctica completa"); }
+    if (remaining <= 0) {
+      window.clearInterval(practiceTimer);
+      practiceTimer = 0;
+      state.practice.noticeStarted = false;
+      state.practice.stage = "close";
+      announce(state.lang === "en" ? "Practice complete" : "Práctica completa");
+      render();
+      sound.playVoice("ts_notice_close_v1", state.reduceMotion ? 0 : 0.22);
+    }
   };
   update();
   practiceTimer = window.setInterval(update, 250);
@@ -1205,6 +1748,7 @@ async function beginNoticePractice() {
     showToast(state.lang === "en" ? "Voice guidance could not start." : "No se pudo iniciar la guía de voz.");
   }
   state.practice.noticeStarted = true;
+  state.practice.stage = "noting";
   state.practice.noticeStartedAt = Date.now();
   state.practice.noticeCue = 0;
   state.practice.noticeManualCue = -1;
@@ -1260,6 +1804,7 @@ async function beginBreathPractice() {
   } catch {
     showToast(state.lang === "en" ? "Breathing audio could not start." : "No se pudo iniciar el audio de respiración.");
   }
+  state.practice.stage = "breath";
   state.practice.breathStartedAt = Date.now();
   breathLastPhaseKey = "";
   render();
@@ -1309,8 +1854,27 @@ function renderFields() {
         ${catalog.fields.map((field, index) => `<span class="field-ring" style="--size:${18 + index * 11}%;--ring-color:${fieldColors[index]}" aria-hidden="true"></span>`).join("")}
         <div class="field-nodes">${catalog.fields.map((field, index) => `<button class="field-node" type="button" data-field="${field.id}" style="--field-color:${fieldColors[index]}"><span class="field-number">${field.dimension}D</span><span><strong>${escapeHTML(field.title)}</strong><small>${escapeHTML(field.archetype)} · ${escapeHTML(field.gift)}</small></span></button>`).join("")}</div>
       </section>
-      <section class="start-here"><p class="eyebrow">${phrase("The Principle of Nested Fields", "El principio de los Campos Anidados")}</p><p class="lede">${phrase("The Seven Fields are increasingly inclusive ways of participating in reality. Every wider Field carries forward the mature gifts of those before it.", "Los Siete Campos son formas cada vez más inclusivas de participar en la realidad. Cada Campo más amplio conserva los dones maduros de los anteriores.")}</p><button class="text-button" type="button" data-action="open-inclusion-principle">${phrase("Read the Principle of Inclusion", "Leer el principio de inclusión")}</button></section>
+      <section class="start-here"><p class="eyebrow">${phrase("The Principle of Nested Fields", "El principio de los Campos Anidados")}</p><p class="lede">${phrase("The Seven Fields are increasingly inclusive ways of participating in reality. Every wider Field carries forward the mature gifts of those before it.", "Los Siete Campos son formas cada vez más inclusivas de participar en la realidad. Cada Campo más amplio conserva los dones maduros de los anteriores.")}</p><button class="secondary-button" type="button" data-view="nestedFields">${phrase("Open the Principle of Nested Fields", "Abrir el principio de los Campos Anidados")}</button></section>
     </main>`;
+}
+
+function renderNestedFields() {
+  const catalog = catalogFor(state.lang);
+  const principle = contentByID(catalog.principles, "principle-31");
+  const companions = catalog.libraryEntries.filter(entry => principle.libraryEntryIDs?.includes(entry.id));
+  return `${renderTopbar(phrase("Nested Fields", "Campos Anidados"), phrase("Every wider Field carries the gifts before it", "Cada Campo más amplio conserva los dones anteriores"))}
+    <main class="page nested-fields-page">
+      <header class="section-intro"><p class="eyebrow">${phrase("The Principle of Nested Fields", "El principio de los Campos Anidados")}</p><h1 class="page-title">${phrase("Growth includes what came before.", "Crecer incluye lo que vino antes.")}</h1><p class="lede">${phrase("The Seven Fields are not levels that replace one another. They are increasingly inclusive ways of participating in reality. Every wider Field carries forward the mature gifts of those before it.", "Los Siete Campos no son niveles que se reemplazan entre sí. Son formas cada vez más inclusivas de participar en la realidad. Cada Campo más amplio conserva los dones maduros de los anteriores.")}</p></header>
+      <section class="nested-spectrum" aria-label="${phrase("Seven nested Fields", "Siete Campos Anidados")}">${catalog.fields.map((field, index) => `<button type="button" data-field="${field.id}" style="--nested-color:${fieldColors[index]};--nested-index:${index}"><span>${field.dimension}D</span><strong>${escapeHTML(field.title)}</strong><small>${escapeHTML(field.carriesForward)}</small></button>`).join("")}</section>
+      <article class="prose"><section><h2>${phrase("The Principle of Inclusion", "El principio de inclusión")}</h2><p>${escapeHTML(principle.meaning)}</p><blockquote>${escapeHTML(principle.contemplativeQuestion)}</blockquote></section></article>
+      <div class="practice-actions"><button class="primary-button" type="button" data-principle="${principle.id}">${phrase("Read the Principle of Inclusion", "Leer el principio de inclusión")}</button></div>
+      ${companions.length ? `<section><p class="eyebrow">${phrase("Companion teachings", "Enseñanzas relacionadas")}</p><div class="list">${companions.map(entry => `<button class="list-row" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</div></section>` : ""}
+    </main>`;
+}
+
+function primaryMovementForField(field) {
+  const capacity = field.linkedPractices?.find(item => item.kind === "capacity");
+  return movements.some(item => item.id === capacity?.id) ? capacity.id : "notice";
 }
 
 function renderField() {
@@ -1331,8 +1895,97 @@ function renderField() {
         <section><h2>${phrase("Expand", "Expansión")}</h2><p>${escapeHTML(field.expansionPractice)}</p></section>
         <section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(field.goldenAgeExpression)}</p></section>
       </article>
-      <div class="practice-actions"><button class="primary-button" type="button" data-action="save-field-practice" data-field="${field.id}">${phrase("Carry this return practice", "Llevar esta práctica de regreso")}</button></div>
+      <div class="practice-actions"><button class="primary-button" type="button" data-action="open-field-return" data-field="${field.id}">${phrase("Experience the return", "Experimentar el regreso")}</button><button class="text-button" type="button" data-view="nestedFields">${phrase("The Principle of Nested Fields", "El principio de los Campos Anidados")}</button></div>
     </main>`;
+}
+
+function guidedExperienceDefinition() {
+  const catalog = catalogFor(state.lang);
+  const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
+  const field = contentByID(catalog.fields, state.selectedField);
+  if (state.guidedKind === "field-return") return {
+    navigationTitle: field.title,
+    eyebrow: phrase("Return practice", "Práctica de regreso"),
+    phases: [
+      [field.archetype, field.returnPractice, field.sovereignPhrase],
+      [phrase("Sovereign question", "Pregunta soberana"), field.sovereignQuestion, phrase("No answer is required. Notice what is true for you.", "No hace falta responder. Observa lo que sea verdadero para ti.")],
+      [phrase("Golden Age expression", "Expresión de la Edad Dorada"), field.goldenAgeExpression, phrase("Carry only what belongs in this moment.", "Lleva solo lo que corresponda a este momento.")]
+    ],
+    finalTitle: `${phrase("Continue with", "Continuar con")} ${escapeHTML(local(movementByID(primaryMovementForField(field))).name)}`
+  };
+  if (state.guidedKind === "entry-crossing") return {
+    navigationTitle: entry.title,
+    eyebrow: phrase("Sovereign question", "Pregunta soberana"),
+    phases: [["", entry.sovereignQuestion, phrase("Keep the question if it is useful. Its meaning remains yours.", "Guarda la pregunta si te resulta útil. Su significado sigue siendo tuyo.")]],
+    finalTitle: phrase("Enter a Sovereign Crossing", "Entrar en un cruce soberano")
+  };
+  if (state.guidedKind === "entry-act") return {
+    navigationTitle: entry.title,
+    eyebrow: phrase("Embodied act", "Acto encarnado"),
+    phases: [["", entry.embodiedAct, entry.goldenAgeExpression]],
+    finalTitle: phrase("Carry this act", "Llevar este acto")
+  };
+  if (state.guidedKind === "entry-deeper") {
+    const link = entry.appLinks?.[0];
+    return {
+      navigationTitle: entry.title,
+      eyebrow: phrase("Go deeper", "Profundizar"),
+      phases: [[link?.label || "", entry.coreTeaching, phrase("Continue only if this remains useful now.", "Continúa solo si esto sigue siendo útil ahora.")]],
+      finalTitle: `${phrase("Open", "Abrir")} ${escapeHTML(link?.label || local(movementByID(entry.tags.capacities[0])).name)}`
+    };
+  }
+  return {
+    navigationTitle: entry.title,
+    eyebrow: phrase("Two-minute practice", "Práctica de dos minutos"),
+    phases: entry.twoMinutePractice.map((instruction, index) => [
+      `${phrase("Step", "Paso")} ${index + 1} ${phrase("of", "de")} ${entry.twoMinutePractice.length}`,
+      instruction,
+      index === entry.twoMinutePractice.length - 1 ? phrase("Nothing more is required.", "No hace falta nada más.") : phrase("Take the time you need before continuing.", "Tómate el tiempo que necesites antes de continuar.")
+    ]),
+    finalTitle: phrase("Complete and return", "Completar y volver")
+  };
+}
+
+function renderGuidedExperience() {
+  const definition = guidedExperienceDefinition();
+  const index = Math.min(state.guidedPhase, definition.phases.length - 1);
+  const [title, prompt, support] = definition.phases[index];
+  const final = index === definition.phases.length - 1;
+  return `<header class="topbar"><button class="icon-button" type="button" data-action="guided-back" aria-label="${escapeHTML(index ? phrase("Previous step", "Paso anterior") : phrase("Leave this invitation", "Salir de esta invitación"))}">←</button><div class="topbar-title"><strong>${escapeHTML(definition.navigationTitle)}</strong></div><div class="topbar-actions"><button class="icon-button" type="button" data-action="home" aria-label="${tr("home")}">⌂</button></div></header>
+    <main class="page guided-experience-page"><section class="guided-phase"><p class="eyebrow">${escapeHTML(definition.eyebrow)}</p>${title ? `<h2>${escapeHTML(title)}</h2>` : ""}<h1 class="practice-title">${escapeHTML(prompt)}</h1>${support ? `<p class="lede">${escapeHTML(support)}</p>` : ""}</section><div class="practice-actions"><button class="primary-button" type="button" data-action="guided-next">${final ? definition.finalTitle : tr("continue")}</button><button class="text-button" type="button" data-action="guided-leave">${phrase("Leave it here", "Dejarlo aquí")}</button></div></main>`;
+}
+
+function completeGuidedExperience() {
+  const catalog = catalogFor(state.lang);
+  const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
+  const field = contentByID(catalog.fields, state.selectedField);
+  if (state.guidedKind === "field-return") {
+    startMovement(primaryMovementForField(field));
+    return;
+  }
+  if (state.guidedKind === "entry-crossing") {
+    startMovement("cross");
+    return;
+  }
+  if (state.guidedKind === "entry-act") {
+    addTrace({ type: "act", title: entry.title, detail: entry.embodiedAct });
+    navigate("history", { remember: false });
+    return;
+  }
+  if (state.guidedKind === "entry-deeper") {
+    const link = entry.appLinks?.[0];
+    if (link?.kind === "field" && catalog.fields.some(item => item.id === link.id)) {
+      navigate("field", { field: link.id, remember: false });
+      return;
+    }
+    if (movements.some(item => item.id === link?.id)) {
+      startMovement(link.id);
+      return;
+    }
+    startMovement(entry.tags.capacities.find(id => movements.some(item => item.id === id)) || "notice");
+    return;
+  }
+  goBack();
 }
 
 function libraryFilterOptions(values, selected) {
@@ -1356,17 +2009,29 @@ function renderLibrary() {
   const fields = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.fields));
   const domains = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.domains));
   const needs = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.needs));
-  const practiceContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><h2>${phrase("Choose the amount of support you need", "Elige el apoyo que necesitas")}</h2><p>${phrase("Use a two-minute practice for one clear movement, or enter a guided engine when you want a fuller sequence.", "Usa una práctica de dos minutos para un movimiento claro o entra en una secuencia guiada cuando quieras más apoyo.")}</p><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>
-    <section class="content-grid">${catalog.practiceEngines.slice(0, 4).map(engine => `<button class="content-card" type="button" data-engine="${engine.id}"><span class="eyebrow">${engine.recommendedDurations.join(" · ")} min</span><strong>${escapeHTML(engine.title)}</strong><small>${escapeHTML(engine.purpose)}</small><b>→</b></button>`).join("")}</section>`;
+  const featuredIDs = ["separate-event-from-interpretation", "body-before-cosmology", "emotion-is-information-not-command", "practise-one-golden-act"];
+  const featured = featuredIDs.map(id => catalog.libraryEntries.find(entry => entry.id === id)).filter(Boolean);
+  const practiceContent = `<section><p class="eyebrow">${phrase("Guided practice paths", "Caminos de práctica guiada")}</p><div class="list">${guidedLibraryPaths[state.lang].map(path => `<button class="list-row" type="button" data-library-path="${path.id}"><span><strong>${escapeHTML(path.title)}</strong><span>${escapeHTML(path.subtitle)}</span></span><b>→</b></button>`).join("")}</div></section>
+    <section><p class="eyebrow">${phrase("Two-minute practices", "Prácticas de dos minutos")}</p><div class="list">${featured.map(entry => `<button class="list-row" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>2 min</b></button>`).join("")}</div><button class="secondary-button" type="button" data-action="browse-two-minute">${phrase("Browse all two-minute practices", "Ver todas las prácticas de dos minutos")}</button></section>
+    ${state.showAllPractices ? `<section class="list">${catalog.libraryEntries.map(entry => `<button class="list-row" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section>` : ""}
+    <section class="start-here"><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>`;
   const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button></section>
     <section class="library-tools"><label class="search-field"><span>${phrase("Search teachings", "Buscar enseñanzas")}</span><input class="field-input" type="search" value="${escapeAttribute(state.libraryQuery)}" data-library-query placeholder="${phrase("A question, quality or situation", "Una pregunta, cualidad o situación")}"></label><div class="filter-grid"><label>${phrase("Field", "Campo")}<select data-library-filter="field"><option value="all">${phrase("All Fields", "Todos los Campos")}</option>${libraryFilterOptions(fields, state.libraryField)}</select></label><label>${phrase("Theme", "Tema")}<select data-library-filter="domain"><option value="all">${phrase("All themes", "Todos los temas")}</option>${libraryFilterOptions(domains, state.libraryDomain)}</select></label><label>${phrase("Need", "Necesidad")}<select data-library-filter="need"><option value="all">${phrase("All needs", "Todas las necesidades")}</option>${libraryFilterOptions(needs, state.libraryNeed)}</select></label></div><p class="result-count">${entries.length} ${phrase("teachings", "enseñanzas")}</p></section>
     <section class="list">${entries.map(entry => `<button class="list-row" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>`;
-  return `${renderTopbar(tr("library"), phrase("Practices and teachings, clearly separated", "Prácticas y enseñanzas, claramente separadas"))}
+  return `${renderTopbar(tr("library"), phrase("Back to the five doors", "Volver a las cinco puertas"))}
     <main class="page wide">
-      <header class="section-intro"><p class="eyebrow">${phrase("You do not need to read everything", "No necesitas leerlo todo")}</p><h1 class="page-title">${tr("library")}</h1><p class="lede measure">${phrase("Begin with what meets this moment. Practices help you do something now; teachings help you understand the wider pattern.", "Comienza con lo que acompaña este momento. Las prácticas te ayudan a hacer algo ahora; las enseñanzas ayudan a comprender el patrón más amplio.")}</p></header>
-      <nav class="segmented" aria-label="${tr("library")}"><button type="button" data-library-mode="practices" aria-pressed="${state.libraryMode === "practices"}">${phrase("Practices", "Prácticas")}</button><button type="button" data-library-mode="teachings" aria-pressed="${state.libraryMode === "teachings"}">${phrase("Teachings", "Enseñanzas")}</button></nav>
-      ${state.libraryMode === "practices" ? practiceContent : teachingContent}
+      <header class="section-intro"><p class="eyebrow">${tr("library")}</p><h1 class="page-title">${phrase("What would help now?", "¿Qué ayudaría ahora?")}</h1><p class="lede measure">${phrase("Choose something to practise, or explore the idea behind it.", "Elige algo para practicar o explora la idea que hay detrás.")}</p></header>
+      <section class="library-mode-choices"><p class="eyebrow">${state.libraryMode ? phrase("Switch at any time", "Cambia cuando quieras") : phrase("Choose a way in", "Elige una forma de entrar")}</p><button class="list-row" type="button" data-library-mode="practices" aria-pressed="${state.libraryMode === "practices"}"><span><strong>${phrase("Find a practice", "Encontrar una práctica")}</strong><span>${phrase("Begin a guided path or choose a two-minute practice.", "Comienza un camino guiado o elige una práctica de dos minutos.")}</span></span><b>${state.libraryMode === "practices" ? "✓" : "→"}</b></button><button class="list-row" type="button" data-library-mode="teachings" aria-pressed="${state.libraryMode === "teachings"}"><span><strong>${phrase("Explore a teaching", "Explorar una enseñanza")}</strong><span>${phrase("Start, continue, search, or browse the teachings.", "Comienza, continúa, busca o explora las enseñanzas.")}</span></span><b>${state.libraryMode === "teachings" ? "✓" : "→"}</b></button></section>
+      ${state.libraryMode === "practices" ? practiceContent : state.libraryMode === "teachings" ? teachingContent : ""}
     </main>`;
+}
+
+function renderLibraryPath() {
+  const catalog = catalogFor(state.lang);
+  const path = guidedLibraryPaths[state.lang].find(item => item.id === state.selectedPath) || guidedLibraryPaths[state.lang][0];
+  const entries = path.entryIDs.map(id => catalog.libraryEntries.find(entry => entry.id === id)).filter(Boolean);
+  const practice = contentByID(catalog.practiceEngines, path.practiceID);
+  return `${renderTopbar(phrase("Guided practice path", "Camino de práctica guiada"), phrase("Back to Practices & Teachings", "Volver a Prácticas y enseñanzas"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("One clear thread", "Un hilo claro")}</p><h1 class="page-title">${escapeHTML(path.title)}</h1><p class="lede">${escapeHTML(path.subtitle)}</p></header><p class="gentle-note">${phrase("Move in order, or enter only the teaching that is useful now.", "Avanza en orden o entra solo en la enseñanza que sea útil ahora.")}</p><section class="list path-steps">${entries.map((entry, index) => `<button class="list-row" type="button" data-entry="${entry.id}"><span><small>${index + 1} ${phrase("of", "de")} ${entries.length}</small><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section><div class="practice-actions"><button class="primary-button" type="button" data-engine="${practice.id}">${phrase("Begin", "Comenzar")} ${escapeHTML(practice.title)}</button></div><p class="gentle-note">${phrase("The practice offers a reflection. It does not decide what your choices mean.", "La práctica ofrece una reflexión. No decide qué significan tus elecciones.")}</p></main>`;
 }
 
 function renderTeaching() {
@@ -1421,7 +2086,7 @@ function renderLibraryEntry() {
   const catalog = catalogFor(state.lang);
   const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
   const field = catalog.fields.find(item => entry.tags.fields.includes(item.id));
-  return `${renderTopbar(entry.title, field ? `${field.dimension}D · ${field.title}` : phrase("Teaching", "Enseñanza"))}<main class="page"><header class="section-intro"><p class="eyebrow">${field ? `${field.dimension}D · ${escapeHTML(field.title)}` : phrase("Living teaching", "Enseñanza viva")}</p><h1 class="page-title">${escapeHTML(entry.title)}</h1><p class="lede">${escapeHTML(entry.summary)}</p></header><article class="prose"><section><h2>${phrase("Orientation", "Orientación")}</h2><p>${escapeHTML(entry.libraryCopy)}</p></section><section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(entry.sovereignQuestion)}</blockquote></section><section class="embodied-invitation"><h2>${phrase("Live this today", "Vívelo hoy")}</h2><p>${escapeHTML(entry.embodiedAct)}</p></section>${state.showFullTeaching ? `<section><h2>${phrase("Core teaching", "Enseñanza central")}</h2><p>${escapeHTML(entry.coreTeaching)}</p></section><section><h2>${phrase("When it loses balance", "Cuando pierde equilibrio")}</h2><p>${escapeHTML(entry.shadowForm)}</p></section><section><h2>${phrase("How to recognise it", "Cómo reconocerlo")}</h2><p>${escapeHTML(entry.recognition)}</p></section><section><h2>${phrase("Two-minute practice", "Práctica de dos minutos")}</h2><ol>${entry.twoMinutePractice.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol></section><section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(entry.goldenAgeExpression)}</p></section>` : ""}</article><div class="practice-actions"><button class="secondary-button" type="button" data-action="toggle-full-teaching">${state.showFullTeaching ? phrase("Return to the short view", "Volver a la vista breve") : phrase("Read the full teaching", "Leer la enseñanza completa")}</button><button class="primary-button" type="button" data-action="save-entry" data-entry="${entry.id}">${phrase("Keep this question", "Guardar esta pregunta")}</button>${field ? `<button class="text-button" type="button" data-field="${field.id}">${phrase("Explore this Field", "Explorar este Campo")}</button>` : ""}</div></main>`;
+  return `${renderTopbar(phrase("Practices & Teachings", "Prácticas y enseñanzas"), field ? `${field.dimension}D · ${field.title}` : phrase("Teaching", "Enseñanza"))}<main class="page"><header class="section-intro"><p class="eyebrow">${field ? `${field.dimension}D · ${escapeHTML(field.title)}` : phrase("Living teaching", "Enseñanza viva")}</p><h1 class="page-title">${escapeHTML(entry.title)}</h1><p class="lede">${escapeHTML(entry.summary)}</p></header><article class="prose"><section><h2>${phrase("Orientation", "Orientación")}</h2><p>${escapeHTML(entry.libraryCopy)}</p></section><section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(entry.sovereignQuestion)}</blockquote></section><section class="embodied-invitation"><h2>${phrase("Live this today", "Vívelo hoy")}</h2><p>${escapeHTML(entry.embodiedAct)}</p></section>${state.showFullTeaching ? `<section><h2>${phrase("Core teaching", "Enseñanza central")}</h2><p>${escapeHTML(entry.coreTeaching)}</p></section><section><h2>${phrase("Shadow form", "Forma de sombra")}</h2><p>${escapeHTML(entry.shadowForm)}</p></section><section><h2>${phrase("Recognition", "Reconocimiento")}</h2><p>${escapeHTML(entry.recognition)}</p></section><section><h2>${phrase("Two-minute practice", "Práctica de dos minutos")}</h2><ol>${entry.twoMinutePractice.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol></section><section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(entry.goldenAgeExpression)}</p></section>` : ""}</article><div class="practice-actions entry-actions"><button class="primary-button" type="button" data-entry-practice="${entry.id}">${phrase("Experience this", "Experimentar esto")}</button><button class="secondary-button" type="button" data-action="toggle-full-teaching">${state.showFullTeaching ? phrase("Show the summary", "Mostrar el resumen") : phrase("Read the full teaching", "Leer la enseñanza completa")}</button><button class="text-button" type="button" data-entry-crossing="${entry.id}">${phrase("Cross this pattern", "Cruzar este patrón")}</button><button class="text-button" type="button" data-entry-act="${entry.id}">${phrase("Live this today", "Vivir esto hoy")}</button><button class="text-button" type="button" data-entry-deeper="${entry.id}">${phrase("Go deeper", "Profundizar")}</button>${field ? `<button class="text-button" type="button" data-field="${field.id}">${phrase("Explore the Field", "Explorar el Campo")}</button>` : ""}</div></main>`;
 }
 
 function renderPracticeEngines() {
@@ -1498,7 +2163,7 @@ function renderThreshold() {
 }
 
 function renderHistory() {
-  return `${renderTopbar(tr("history"), phrase("Saved only when you choose", "Guardado solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Personal Sovereign Path", "Camino soberano personal")}</p><h1 class="page-title">${state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length ? phrase("Your saved choices are here.", "Tus elecciones guardadas están aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Practices, questions, principles and directions appear here only when you choose to save them. Tone Sovereign does not interpret them.", "Las prácticas, preguntas, principios y direcciones aparecen aquí solo cuando eliges guardarlos. Tone Sovereign no los interpreta.")}</p></header><section class="continuity-links"><button class="orientation-invitation" type="button" data-view="ruleOfLife"><span class="door-mark" aria-hidden="true">│</span><span><strong>${phrase("My Golden Age Rule of Life", "Mi regla de vida de la Edad Dorada")}</strong><small>${phrase("Keep chosen principles and commitments as a living orientation.", "Conserva principios y compromisos elegidos como orientación viva.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="missions"><span class="door-mark" aria-hidden="true">↗</span><span><strong>${phrase("Mission Path", "Camino de misión")}</strong><small>${phrase("Protect a direction, its next visible step and a sustainable rhythm.", "Protege una dirección, su próximo paso visible y un ritmo sostenible.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="foundations"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Foundations", "Fundamentos")}</strong><small>${phrase("Return to the Laws, Principles and scales of participation.", "Vuelve a las Leyes, los Principios y las escalas de participación.")}</small></span><b>→</b></button></section>${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}<p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
+  return `${renderTopbar(tr("history"), phrase("Saved only when you choose", "Guardado solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Personal Sovereign Path", "Camino soberano personal")}</p><h1 class="page-title">${state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length ? phrase("Your saved choices are here.", "Tus elecciones guardadas están aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Practices, responses, principles and directions appear here only when you choose to save them. Tone Sovereign does not interpret them.", "Las prácticas, respuestas, principios y direcciones aparecen aquí solo cuando eliges guardarlos. Tone Sovereign no los interpreta.")}</p></header><section class="continuity-links"><p class="eyebrow">${phrase("Continue from here", "Continuar desde aquí")}</p><button class="orientation-invitation" type="button" data-library-path="overwhelm-to-contribution"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Find where to contribute", "Descubre dónde contribuir")}</strong><small>${phrase("Meet inward aliveness with outward reality, without forcing a final purpose.", "Encuentra la vitalidad interior con la realidad exterior, sin forzar un propósito final.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="ruleOfLife"><span class="door-mark" aria-hidden="true">│</span><span><strong>${phrase("My Golden Age Rule of Life", "Mi regla de vida de la Edad Dorada")}</strong><small>${phrase("Keep chosen principles and commitments as a living orientation.", "Conserva principios y compromisos elegidos como orientación viva.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="missions"><span class="door-mark" aria-hidden="true">↗</span><span><strong>${phrase("Mission Path", "Camino de misión")}</strong><small>${phrase("Protect a direction, its next visible step and a sustainable rhythm.", "Protege una dirección, su próximo paso visible y un ritmo sostenible.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="foundations"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Foundations", "Fundamentos")}</strong><small>${phrase("Return to the Laws, Principles and scales of participation.", "Vuelve a las Leyes, los Principios y las escalas de participación.")}</small></span><b>→</b></button></section>${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}<p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
 }
 
 function renderSettings() {
@@ -1542,7 +2207,7 @@ function addTrace(trace) {
 }
 
 function exportData() {
-  const data = { app: "Tone Sovereign", version: 2, exportedAt: new Date().toISOString(), preferences: { lang: state.lang, sound: state.sound, voice: state.voice, reduceMotion: state.reduceMotion, quietWords: state.quietWords }, traces: state.traces, ruleOfLife: state.ruleOfLife, missions: state.missions };
+  const data = { app: "Tone Sovereign", version: 3, exportedAt: new Date().toISOString(), preferences: { lang: state.lang, sound: state.sound, voice: state.voice, reduceMotion: state.reduceMotion, quietWords: state.quietWords }, traces: state.traces, crossMarks: readJSON(STORAGE.crossMarks, []), ruleOfLife: state.ruleOfLife, missions: state.missions };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
@@ -1567,6 +2232,7 @@ function importData(file) {
         state.missions = data.missions;
         localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
       }
+      if (Array.isArray(data.crossMarks)) localStorage.setItem(STORAGE.crossMarks, JSON.stringify(data.crossMarks.slice(0, 30)));
       showToast(state.lang === "en" ? "Your local data was restored." : "Tus datos locales fueron restaurados.");
       render();
     } catch {
@@ -1585,6 +2251,7 @@ function eraseData() {
   localStorage.removeItem(STORAGE.ruleOfLife);
   localStorage.removeItem(STORAGE.engineDrafts);
   localStorage.removeItem(STORAGE.missions);
+  localStorage.removeItem(STORAGE.crossMarks);
   state.ruleOfLife = { principleIDs: [], commitmentIDs: [] };
   state.engineDrafts = {};
   state.missions = [];
@@ -1603,15 +2270,32 @@ function readAbout() {
 app.addEventListener("click", async event => {
   const button = event.target.closest("button");
   if (!button) return;
-  const { action, view, movement, steady, pull, relation, doorway, tone, field, teaching, law, principle, entry, engine, mission } = button.dataset;
+  const { action, view, steady, pull, relation, doorway, tone, field, teaching, law, principle, entry, engine, mission } = button.dataset;
 
+  if (view === "threshold") { startMovement("cross"); return; }
   if (view) { navigate(view); return; }
-  if (movement !== undefined) { stopPracticeTimers(); state.practice.index = Number(movement); render(); playMovementVoice(movements[state.practice.index].id); return; }
-  if (steady) { state.practice.steadyState = steady; render(); return; }
-  if (pull !== undefined) { state.practice.pull = pulls[state.lang][Number(pull)]; render(); return; }
+  if (button.dataset.libraryPath) { navigate("libraryPath", { path: button.dataset.libraryPath }); return; }
+  if (button.dataset.entryPractice) { state.selectedEntry = button.dataset.entryPractice; navigate("guided", { guidedKind: "entry-practice" }); return; }
+  if (button.dataset.entryCrossing) { state.selectedEntry = button.dataset.entryCrossing; navigate("guided", { guidedKind: "entry-crossing" }); return; }
+  if (button.dataset.entryAct) { state.selectedEntry = button.dataset.entryAct; navigate("guided", { guidedKind: "entry-act" }); return; }
+  if (button.dataset.entryDeeper) { state.selectedEntry = button.dataset.entryDeeper; navigate("guided", { guidedKind: "entry-deeper" }); return; }
+  if (button.dataset.openMovement) { startMovement(button.dataset.openMovement); return; }
+  if (button.dataset.capacityOption !== undefined) { state.practice.selectedOption = button.dataset.capacityOption; render(); return; }
+  if (button.dataset.noticeOutcome !== undefined) { state.practice.noticeOutcome = button.dataset.noticeOutcome; render(); return; }
+  if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.stage = "choose"; render(); return; }
+  if (button.dataset.breathPattern) { state.practice.breathPattern = button.dataset.breathPattern; state.practice.stage = "setup"; render(); return; }
+  if (steady) { state.practice.steadyState = steady; state.practice.breathPattern = ""; state.practice.stage = "setup"; render(); return; }
+  if (pull !== undefined) {
+    const pullIndex = Number(pull);
+    state.practice.pull = pulls[state.lang][pullIndex];
+    state.practice.customPull = "";
+    state.practice.stage = pullIndex === pulls[state.lang].length - 1 ? "custom" : "pause";
+    render();
+    return;
+  }
   if (relation) { state.practice.relation = relation; render(); return; }
   if (doorway) { state.practice.doorway = doorway; render(); return; }
-  if (tone) { const selected = tones.find(item => item.id === tone); state.practice.tone = tone; state.practice.frequency = selected.hz; if (state.practice.tonePlaying) sound.tone(selected.hz, state.practice.amplitude); render(); return; }
+  if (tone) { const selected = tones.find(item => item.id === tone); state.practice.tone = tone; state.practice.frequency = selected.hz; if (button.dataset.selectTone) state.practice.embodyStage = "tune"; if (state.practice.tonePlaying) sound.tone(selected.hz, state.practice.amplitude); render(); return; }
   if (!action && field) { navigate("field", { field }); return; }
   if (!action && teaching) { navigate("teaching", { teaching }); return; }
   if (!action && law) { state.teachingDepth = 1; navigate("law", { law }); return; }
@@ -1627,6 +2311,23 @@ app.addEventListener("click", async event => {
 
   if (action === "back") goBack();
   if (action === "home") goHome();
+  if (action === "guided-back") { if (state.guidedPhase > 0) { state.guidedPhase -= 1; render(); } else goBack(); }
+  if (action === "guided-leave") goBack();
+  if (action === "guided-next") {
+    const definition = guidedExperienceDefinition();
+    if (state.guidedPhase < definition.phases.length - 1) { state.guidedPhase += 1; render(); }
+    else completeGuidedExperience();
+  }
+  if (action === "open-field-return") { state.selectedField = button.dataset.field; navigate("guided", { guidedKind: "field-return" }); }
+  if (action === "browse-two-minute") { state.showAllPractices = true; render(); }
+  if (action === "movement-back") movementBack();
+  if (action === "start-full-practice") startFullPractice();
+  if (action === "return-movement-field") returnToMovementField();
+  if (action === "complete-movement") requestMovementCompletion();
+  if (action === "finish-movement-save") finishMovement(true);
+  if (action === "finish-movement-pass") finishMovement(false);
+  if (action === "continue-stabilise") startMovement("stabilise");
+  if (action === "continue-embody") startMovement("embody");
   if (action === "replay-ceremony") replayCeremony(true);
   if (action === "replay-from-home" || action === "replay-from-settings") { state.stack = []; state.view = "landing"; replayCeremony(true); }
   if (action === "toggle-sound-replay") { state.sound = !state.sound; persistPreferences(); replayCeremony(true); }
@@ -1636,15 +2337,89 @@ app.addEventListener("click", async event => {
   if (action === "toggle-motion") { state.reduceMotion = !state.reduceMotion; persistPreferences(); render(); }
   if (action === "toggle-words") { state.quietWords = !state.quietWords; persistPreferences(); render(); }
   if (action === "open-inclusion-principle") { state.teachingDepth = 1; navigate("principle", { principle: "principle-31" }); }
-  if (action === "previous-movement") previousMovement();
-  if (action === "next-movement") nextMovement();
   if (action === "start-notice") beginNoticePractice();
   if (action === "another-notice-cue") offerAnotherNoticeCue();
+  if (action === "end-notice") { stopPracticeTimers(); state.practice.noticeStarted = false; state.practice.stage = "close"; render(); sound.playVoice("ts_notice_close_v1", state.reduceMotion ? 0 : 0.22); }
   if (action === "notice-tap" && state.quietWords) showToast(state.lang === "en" ? "Noticed" : "Notado");
   if (action === "start-breath") await beginBreathPractice();
-  if (action === "stop-breath") { state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
-  if (action === "change-steady") { state.practice.steadyState = ""; state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
-  if (action === "reclaim-hold") { state.practice.reclaimHolding = !state.practice.reclaimHolding; if (state.practice.reclaimHolding) sound.playVoice("ts_reclaim_centre_remains_v1"); render(); }
+  if (action === "stop-breath") { state.practice.breathStartedAt = 0; stopPracticeTimers(); state.practice.stage = "complete"; render(); }
+  if (action === "more-steady") { state.practice.steadyExpanded = true; render(); }
+  if (action === "change-breath-pattern") { state.practice.stage = "patterns"; render(); }
+  if (action === "change-steady") { state.practice.steadyState = ""; state.practice.breathPattern = ""; state.practice.stage = "chooser"; state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
+  if (action === "capacity-continue") {
+    const flow = capacityFlows[state.practice.movement];
+    state.practice.capacityAnswers[state.practice.capacityStep] = state.practice.selectedOption;
+    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; render(); playCapacityStageVoice(state.practice.movement, state.practice.capacityStep); }
+    else requestMovementCompletion();
+  }
+  if (action === "reclaim-nothing-clear") { state.practice.pull = state.lang === "en" ? "Nothing clear" : "Nada claro"; state.practice.customPull = ""; state.practice.stage = "pause"; render(); }
+  if (action === "reclaim-custom-continue") { state.practice.pull = state.practice.customPull.trim(); state.practice.stage = "pause"; render(); }
+  if (action === "reclaim-to-relationship") { state.practice.stage = "relationship"; render(); }
+  if (action === "reclaim-complete") { state.practice.stage = "complete"; render(); }
+  if (action === "show-cross-focuses") { state.practice.stage = "focuses"; render(); }
+  if (action === "previous-cross-focus" || action === "next-cross-focus") {
+    const current = crossFocuses.findIndex(item => item.id === state.practice.crossFocus);
+    const offset = action === "previous-cross-focus" ? -1 : 1;
+    state.practice.crossFocus = crossFocuses[(current + offset + crossFocuses.length) % crossFocuses.length].id;
+    state.practice.crossQuestion = 0;
+    state.practice.crossSaved = false;
+    state.practice.crossCrossed = false;
+    render();
+  }
+  if (action === "open-cross-question") { chooseCrossQuestion(); state.practice.stage = "question"; sound.threshold().catch(() => {}); render(); }
+  if (action === "another-cross-question") {
+    chooseCrossQuestion({ avoidCurrent: true });
+    state.practice.stage = "question";
+    render();
+  }
+  if (action === "save-cross-question") {
+    const marks = readJSON(STORAGE.crossMarks, []);
+    const id = currentCrossQuestionKey();
+    const question = crossQuestions[currentCrossFocus().questionKey].en[state.practice.crossQuestion];
+    const existing = marks.findIndex(item => item.id === id || (!item.id && item.question === question));
+    const next = existing >= 0 ? marks.filter((_, index) => index !== existing) : [{ id, focus: state.practice.crossFocus, questionKey: currentCrossFocus().questionKey, questionIndex: state.practice.crossQuestion, question, savedAt: new Date().toISOString(), returnCount: 0, lastReturn: null, lastCrossing: null }, ...marks].slice(0, 30);
+    localStorage.setItem(STORAGE.crossMarks, JSON.stringify(next));
+    state.practice.crossSaved = existing < 0;
+    render();
+  }
+  if (action === "return-saved-cross") {
+    const saved = readJSON(STORAGE.crossMarks, [])[0];
+    if (saved) {
+      const marks = readJSON(STORAGE.crossMarks, []);
+      const returnedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE.crossMarks, JSON.stringify(marks.map((item, index) => index === 0 ? { ...item, returnCount: (item.returnCount || 0) + 1, lastReturn: returnedAt } : item)));
+      state.practice.crossFocus = saved.focus;
+      state.practice.crossQuestion = Number(saved.questionIndex) || 0;
+      state.practice.crossSaved = true;
+      state.practice.crossCrossed = false;
+      state.practice.stage = "question";
+      sound.threshold().catch(() => {});
+      render();
+    }
+  }
+  if (action === "cross-ready") {
+    if (state.practice.stage === "question") {
+      state.practice.stage = "crossed";
+      state.practice.crossCrossed = true;
+      sound.thresholdCrossing().catch(() => {});
+      if (state.practice.crossSaved) {
+        const id = currentCrossQuestionKey();
+        localStorage.setItem(STORAGE.crossMarks, JSON.stringify(readJSON(STORAGE.crossMarks, []).map(item => item.id === id ? { ...item, lastCrossing: new Date().toISOString() } : item)));
+      }
+      render();
+    }
+    else { stopPracticeTimers(); state.practice.stage = "close"; sound.playVoice("ts_cross_return_v1"); render(); }
+  }
+  if (action === "previous-tone" || action === "next-tone") {
+    const current = tones.findIndex(item => item.id === state.practice.tone);
+    const offset = action === "previous-tone" ? -1 : 1;
+    const selected = tones[(current + offset + tones.length) % tones.length];
+    state.practice.tone = selected.id; state.practice.frequency = selected.hz; render();
+  }
+  if (action === "show-all-tones") { state.practice.embodyStage = "all"; render(); }
+  if (action === "enter-tone") { state.practice.embodyStage = "tune"; sound.tone(state.practice.frequency, state.practice.amplitude); state.practice.tonePlaying = true; render(); }
+  if (action === "embody-hold") { state.practice.embodyStage = "hold"; sound.tone(state.practice.frequency, state.practice.amplitude); state.practice.tonePlaying = true; render(); }
+  if (action === "embody-complete") { sound.stop(); state.practice.tonePlaying = false; sound.playVoice("ts_embody_silence_v1", 0.72); requestMovementCompletion(); }
   if (action === "save-question") { state.practice.questionSaved = !state.practice.questionSaved; render(); }
   if (action === "toggle-tone") { state.practice.tonePlaying = !state.practice.tonePlaying; if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); else sound.stop(); render(); }
   if (action === "save-field-practice") { const item = contentByID(catalogFor(state.lang).fields, button.dataset.field); addTrace({ type: "field", title: `${item.dimension}D · ${item.title}`, detail: item.returnPractice }); showToast(tr("saved")); }
@@ -1666,7 +2441,7 @@ app.addEventListener("click", async event => {
   if (action === "import") document.querySelector("[data-import-file]")?.click();
   if (action === "erase") eraseData();
   if (action === "read-about") readAbout();
-  if (action === "previous-engine-step") { state.engineStep = Math.max(0, state.engineStep - 1); render(); }
+  if (action === "previous-engine-step") { state.engineStep = Math.max(0, state.engineStep - 1); render(); playEngineStageVoice(); }
   if (action === "next-engine-step") {
     const engineItem = contentByID(catalogFor(state.lang).practiceEngines, state.selectedEngine);
     if (state.engineStep < engineItem.steps.length - 1) state.engineStep += 1;
@@ -1677,6 +2452,7 @@ app.addEventListener("click", async event => {
       localStorage.setItem(STORAGE.engineDrafts, JSON.stringify(state.engineDrafts));
     }
     render();
+    if (!state.engineComplete) playEngineStageVoice();
   }
   if (action === "restart-engine") { state.engineStep = 0; state.engineComplete = false; state.engineResponses = {}; render(); }
   if (action === "finish-engine") { state.libraryMode = "practices"; navigate("practiceEngines", { remember: false }); }
@@ -1699,7 +2475,13 @@ app.addEventListener("click", async event => {
 let librarySearchTimer = 0;
 app.addEventListener("input", event => {
   const target = event.target;
-  if (target.dataset.input) state.practice[target.dataset.input] = target.value;
+  if (target.dataset.input) {
+    state.practice[target.dataset.input] = target.value;
+    if (target.dataset.input === "customPull") {
+      const continueButton = document.querySelector('[data-action="reclaim-custom-continue"]');
+      if (continueButton) continueButton.disabled = !target.value.trim();
+    }
+  }
   if (target.dataset.engineResponse) {
     state.engineResponses[target.dataset.engineResponse] = target.value;
     state.engineDrafts[state.selectedEngine] = { ...state.engineResponses };
@@ -1724,8 +2506,39 @@ app.addEventListener("input", event => {
   if (target.dataset.range === "amplitude") { state.practice.amplitude = Number(target.value); if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); target.nextElementSibling.textContent = target.value; }
 });
 
+app.addEventListener("pointerdown", event => {
+  const control = event.target.closest("[data-action='reclaim-hold']");
+  if (!control || state.practice.reclaimComplete) return;
+  event.preventDefault();
+  window.clearTimeout(reclaimHoldTimer);
+  state.practice.reclaimHolding = true;
+  control.classList.add("hold-active");
+  control.setPointerCapture?.(event.pointerId);
+  reclaimHoldTimer = window.setTimeout(() => {
+    reclaimHoldTimer = 0;
+    state.practice.reclaimHolding = false;
+    state.practice.reclaimComplete = true;
+    sound.playVoice("ts_reclaim_centre_remains_v1");
+    announce(state.lang === "en" ? "You can still choose." : "Todavía puedes elegir.");
+    render();
+  }, 3200);
+});
+
+function cancelReclaimHold(event) {
+  const control = event.target.closest?.("[data-action='reclaim-hold']") || document.querySelector("[data-action='reclaim-hold'].hold-active");
+  if (!control || !reclaimHoldTimer) return;
+  window.clearTimeout(reclaimHoldTimer);
+  reclaimHoldTimer = 0;
+  state.practice.reclaimHolding = false;
+  control.classList.remove("hold-active");
+}
+
+app.addEventListener("pointerup", cancelReclaimHold);
+app.addEventListener("pointercancel", cancelReclaimHold);
+
 app.addEventListener("change", event => {
   if (event.target.matches("[data-import-file]") && event.target.files[0]) importData(event.target.files[0]);
+  if (event.target.matches("[data-notice-duration]")) { state.practice.noticeDuration = Number(event.target.value); }
   const libraryFilter = event.target.dataset.libraryFilter;
   if (libraryFilter === "field") state.libraryField = event.target.value;
   if (libraryFilter === "domain") state.libraryDomain = event.target.value;
@@ -1769,7 +2582,7 @@ function drawAmbient(time = 0) {
   const width = innerWidth;
   const height = innerHeight;
   ctx.clearRect(0, 0, width, height);
-  if (!state.reduceMotion && state.view !== "landing") {
+  if (!state.reduceMotion && !matchMedia("(prefers-reduced-motion: reduce)").matches && state.view !== "landing") {
     const gradient = ctx.createRadialGradient(width * .5, height * .22, 0, width * .5, height * .22, Math.min(width, height) * .5);
     gradient.addColorStop(0, "rgba(216,180,90,.09)");
     gradient.addColorStop(1, "rgba(0,0,0,0)");
@@ -1788,15 +2601,18 @@ function drawAmbient(time = 0) {
 
 window.addEventListener("resize", resizeField);
 document.addEventListener("visibilitychange", () => {
-  const breathing = state.view === "practice" && movements[state.practice.index]?.id === "stabilise" && state.practice.breathStartedAt;
-  if (!breathing) return;
+  const breathing = state.view === "movement" && state.practice.movement === "stabilise" && state.practice.breathStartedAt;
+  const crossing = state.view === "movement" && state.practice.movement === "cross" && (state.practice.stage === "question" || state.practice.stage === "crossed");
+  if (!breathing && !crossing) return;
   if (document.hidden) {
     window.clearInterval(practiceTimer);
     practiceTimer = 0;
     breathLastPhaseKey = "";
     sound.stop();
-  } else {
+  } else if (breathing) {
     startBreathTimer(false);
+  } else if (crossing) {
+    sound.threshold().catch(() => {});
   }
 });
 window.addEventListener("beforeunload", () => { cancelAnimationFrame(fieldFrame); stopPracticeTimers(); });
