@@ -617,6 +617,94 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .breath-orb::before { content: ""; width: 40%; aspect-ratio: 1; border-radius: 50%; background: rgba(134,183,173,.48); box-shadow: 0 0 42px rgba(134,183,173,.45); }
 @keyframes breathOrb { 0%,100% { transform: scale(.82); } 40% { transform: scale(1); } 60% { transform: scale(1); } }
 
+.steady-setup-copy {
+  width: min(520px, 100%);
+  margin: 5vh auto 0;
+  padding: clamp(28px, 6vw, 52px) clamp(20px, 5vw, 42px);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: radial-gradient(circle at 50% 46%, rgba(134,183,173,.09), transparent 68%);
+}
+.steady-pattern-title {
+  margin: 18px 0 12px;
+  color: var(--ivory);
+  font-family: var(--serif);
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  font-weight: 400;
+}
+
+.steady-session {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  min-height: 100svh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(var(--steady-rgb), .065), transparent 55%),
+    #030302;
+}
+.steady-breath-instrument {
+  position: absolute;
+  inset: 0 0 148px;
+  width: 100%;
+  height: calc(100% - 148px);
+  border: 0;
+  background: #030302;
+  color-scheme: dark;
+  pointer-events: none;
+}
+.steady-session-header {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  left: 0;
+  min-height: calc(var(--safe-top) + 62px);
+  padding: var(--safe-top) clamp(18px, 5vw, 34px) 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(180deg, rgba(3,3,2,.88), transparent);
+}
+.steady-session-header .icon-button {
+  flex: 0 0 auto;
+  background: rgba(5,5,4,.48);
+  border-color: rgba(var(--steady-rgb), .2);
+}
+.steady-session-header strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+.steady-session-header span {
+  display: block;
+  margin-top: 3px;
+  color: rgba(var(--steady-rgb), .82);
+  font-size: .76rem;
+}
+.steady-session-footer {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 28px max(24px, env(safe-area-inset-left)) calc(var(--safe-bottom) + 12px);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  background: linear-gradient(180deg, transparent, rgba(3,3,2,.94) 28%, #030302 62%);
+}
+.steady-session-footer p {
+  max-width: 430px;
+  margin: 0;
+  color: rgba(247,223,155,.68);
+  font-size: .82rem;
+  line-height: 1.45;
+  text-align: center;
+}
+.steady-session-footer .primary-button { max-width: 430px; }
+
 .field-input,
 .field-textarea {
   width: 100%;

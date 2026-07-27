@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #030302;
+      color-scheme: dark;
+      color: #f0ddc7;
+      -webkit-font-smoothing: antialiased;
+    }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #phase {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #label {
+      max-width: min(82vw, 380px);
+      margin-bottom: 8px;
+      color: rgba(216,178,118,.72);
+      font: 400 clamp(15px,3.7vw,22px) -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: .16em;
+      line-height: 1.35;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    #count {
+      color: rgba(255,253,248,.76);
+      font: 200 clamp(72px,18vw,110px) -apple-system, BlinkMacSystemFont, sans-serif;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    #dots {
+      position: absolute;
+      right: 0;
+      bottom: 28px;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+    }
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 99px;
+      background: rgba(216,178,118,.22);
+      transition: transform .25s, background .25s;
+    }
+    .dot.active { transform: scale(1.6); background: rgba(216,178,118,.86); }
+    body.reduce-motion .dot { transition: none; }
+    body.reduce-motion .dot.active { transform: none; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="phase"><div id="label"></div><div id="count"></div></div>
+  <div id="dots"></div>
+  <script>
+    const C = document.getElementById("c");
+    const X = C.getContext("2d");
+    const label = document.getElementById("label");
+    const count = document.getElementById("count");
+    const dots = document.getElementById("dots");
+    const params = new URLSearchParams(location.search);
+    const language = params.get("lang") === "es" ? "es" : "en";
+    const labels = language === "es" ? {
+      inhale: "inhala",
+      "inhale again": "inhala otra vez",
+      exhale: "exhala",
+      hold: "pausa opcional",
+      pulse: "pulso",
+      release: "suelta",
+      "observe natural": "observa la respiraci\u00f3n natural",
+      "breath in": "nota c\u00f3mo entra la respiraci\u00f3n",
+      "breath out": "nota c\u00f3mo sale la respiraci\u00f3n",
+      "allow natural": "deja que la respiraci\u00f3n siga natural"
+    } : {
+      inhale: "inhale",
+      "inhale again": "inhale again",
+      exhale: "exhale",
+      hold: "optional hold",
+      pulse: "pulse",
+      release: "release",
+      "observe natural": "observe the natural breath",
+      "breath in": "notice the breath coming in",
+      "breath out": "notice the breath going out",
+      "allow natural": "let breath stay natural"
+    };
+
+    let W = 0;
+    let H = 0;
+    let D = 1;
+    function resize() {
+      D = devicePixelRatio || 1;
+      W = innerWidth;
+      H = innerHeight;
+      C.width = W * D;
+      C.height = H * D;
+      C.style.width = `${W}px`;
+      C.style.height = `${H}px`;
+      X.setTransform(1, 0, 0, 1, 0, 0);
+      X.scale(D, D);
+    }
+    addEventListener("resize", resize);
+    resize();
+
+    const PATTERNS = {
+      physiological: { style: "fluid", phases: [
+        { l: "inhale", d: 2, t: "in", s: .90 },
+        { l: "inhale again", d: 1.5, t: "in2", s: .98 },
+        { l: "exhale", d: 6, t: "out", s: .15 }
+      ] },
+      extended: { style: "fluid", phases: [
+        { l: "inhale", d: 4, t: "in", s: .90 },
+        { l: "exhale", d: 6, t: "out", s: .15 }
+      ] },
+      "478": { style: "fluid", phases: [
+        { l: "inhale", d: 4, t: "in", s: .86 },
+        { l: "hold", d: 7, t: "hold", s: .86 },
+        { l: "exhale", d: 8, t: "out", s: .16 }
+      ] },
+      coherent: { style: "coherent", phases: [
+        { l: "inhale", d: 5.5, t: "in", s: .86 },
+        { l: "exhale", d: 5.5, t: "out", s: .20 }
+      ] },
+      fire: { style: "fire", phases: [
+        { l: "pulse", d: .45, t: "in", s: .82 },
+        { l: "release", d: .45, t: "out", s: .30 }
+      ] },
+      twoone: { style: "fluid", phases: [
+        { l: "inhale", d: 2, t: "in", s: .78 },
+        { l: "hold", d: 1, t: "hold", s: .78 },
+        { l: "exhale", d: 4, t: "out", s: .18 },
+        { l: "hold", d: 1, t: "hold2", s: .18 }
+      ] },
+      box: { style: "box", phases: [
+        { l: "inhale", d: 4, t: "in", s: .78 },
+        { l: "hold", d: 4, t: "hold", s: .78 },
+        { l: "exhale", d: 4, t: "out", s: .18 },
+        { l: "hold", d: 4, t: "hold2", s: .18 }
+      ] },
+      anapana: { free: true, style: "anapana", phases: [
+        { l: "observe natural", d: 7, t: "observe", s: .48 },
+        { l: "breath in", d: 5.5, t: "observe", s: .56 },
+        { l: "breath out", d: 5.5, t: "observe", s: .44 },
+        { l: "allow natural", d: 6, t: "observe", s: .52 }
+      ] }
+    };
+
+    const key = PATTERNS[params.get("pattern")] ? params.get("pattern") : "extended";
+    const cur = PATTERNS[key];
+    const reduceMotion = params.get("reduce") === "1";
+    const rgb = /^\d{1,3},\d{1,3},\d{1,3}$/.test(params.get("rgb") || "")
+      ? params.get("rgb")
+      : "216,178,118";
+    const cream = "255,253,248";
+    const cycleDuration = cur.phases.reduce((sum, phase) => sum + phase.d, 0);
+    const initialElapsed = Math.max(0, Number(params.get("elapsed")) || 0) % cycleDuration;
+    let phaseIdx = 0;
+    let phaseStart = 0;
+    let phaseProgress = 0;
+    let phaseEntryR = .15;
+    let phaseFromR = .15;
+    let holdTarget = null;
+    let orbR = .15;
+    let orbTarget = .5;
+    let sineT = 0;
+    let lightAngle = 0;
+    let shockR = 0;
+    let shockA = 0;
+    let lastDraw = 0;
+    const mist = Array.from({ length: 82 }, () => ({
+      x: (Math.random() * 2 - 1) * .8,
+      y: (Math.random() * 2 - 1) * .8,
+      vx: (Math.random() - .5) * .007,
+      vy: (Math.random() - .5) * .007,
+      r: Math.random() * .4 + .08,
+      a: Math.random() * .5 + .14,
+      life: Math.random(),
+      ls: Math.random() * .003 + .001,
+      wisp: Math.random() < .18
+    }));
+
+    function drawDots() {
+      dots.innerHTML = "";
+      if (cur.free) { dots.style.display = "none"; return; }
+      cur.phases.forEach(() => {
+        const dot = document.createElement("div");
+        dot.className = "dot";
+        dots.appendChild(dot);
+      });
+    }
+
+    function alignElapsed(elapsed) {
+      const position = ((elapsed % cycleDuration) + cycleDuration) % cycleDuration;
+      let cursor = 0;
+      let previousScale = cur.phases[cur.phases.length - 1].s;
+      for (let index = 0; index < cur.phases.length; index += 1) {
+        const phase = cur.phases[index];
+        if (position < cursor + phase.d || index === cur.phases.length - 1) {
+          phaseIdx = index;
+          phaseProgress = Math.max(0, Math.min(1, (position - cursor) / phase.d));
+          phaseEntryR = previousScale;
+          phaseFromR = previousScale;
+          orbR = previousScale;
+          orbTarget = phase.s;
+          phaseStart = performance.now() - Math.max(0, position - cursor) * 1000;
+          return;
+        }
+        cursor += phase.d;
+        previousScale = phase.s;
+      }
+    }
+
+    function enterPhase(ts, entryR = orbR) {
+      phaseEntryR = entryR;
+      phaseFromR = entryR;
+      holdTarget = null;
+      const phase = cur.phases[phaseIdx];
+      if (key === "physiological" && phase.t === "in2") {
+        shockR = 0;
+        shockA = .75;
+      }
+    }
+
+    function updatePhase(ts) {
+      let phase = cur.phases[phaseIdx];
+      let elapsed = (ts - phaseStart) / 1000;
+      while (elapsed >= phase.d) {
+        const finishedTarget = phase.s;
+        phaseStart += phase.d * 1000;
+        phaseIdx = (phaseIdx + 1) % cur.phases.length;
+        orbR = finishedTarget;
+        enterPhase(ts, finishedTarget);
+        phase = cur.phases[phaseIdx];
+        elapsed = (ts - phaseStart) / 1000;
+      }
+      phaseProgress = Math.max(0, Math.min(1, elapsed / phase.d));
+      label.textContent = labels[phase.l] || phase.l;
+      if (cur.free) {
+        count.textContent = "";
+        orbTarget = phase.s + Math.sin(ts * .00045) * .09 + Math.sin(ts * .00027) * .04;
+      } else {
+        count.textContent = Math.max(1, Math.ceil(phase.d - elapsed));
+        if (phase.t.startsWith("hold")) {
+          if (holdTarget === null) holdTarget = phaseEntryR;
+          orbTarget = holdTarget;
+        } else {
+          orbTarget = phase.s;
+        }
+        [...dots.children].forEach((dot, index) => dot.classList.toggle("active", index === phaseIdx));
+      }
+    }
+
+    const ease = value => .5 - Math.cos(Math.max(0, Math.min(1, value)) * Math.PI) * .5;
+    function fillGlow(cx, cy, radius, alpha = .30) {
+      const glow = X.createRadialGradient(cx, cy, 0, cx, cy, radius);
+      glow.addColorStop(0, `rgba(${cream},${alpha})`);
+      glow.addColorStop(.35, `rgba(${rgb},${alpha * .7})`);
+      glow.addColorStop(1, `rgba(${rgb},0)`);
+      X.fillStyle = glow;
+      X.fillRect(0, 0, W, H);
+    }
+
+    function drawFluid(cx, cy, radius, holding = false) {
+      fillGlow(cx, cy, radius * 1.7, .28 * orbR + .08);
+      for (let index = 0; index < 4; index += 1) {
+        const drift = holding ? 0 : Math.sin(sineT * .6 + index * .7) * 4;
+        const ringRadius = radius * (1 + index * .22) + drift;
+        X.beginPath();
+        X.arc(cx, cy, ringRadius, 0, Math.PI * 2);
+        X.strokeStyle = `rgba(${rgb},${.52 - index * .11})`;
+        X.lineWidth = 2.5 - index * .55;
+        X.stroke();
+      }
+      const lightX = cx + Math.cos(lightAngle) * radius * .55;
+      const lightY = cy + Math.sin(lightAngle) * radius * .4;
+      const light = X.createRadialGradient(lightX, lightY, 0, cx, cy, radius * 1.2);
+      light.addColorStop(0, `rgba(${rgb},.09)`);
+      light.addColorStop(1, `rgba(${rgb},0)`);
+      X.fillStyle = light;
+      X.beginPath();
+      X.arc(cx, cy, radius * 1.2, 0, Math.PI * 2);
+      X.fill();
+    }
+
+    function drawCoherent(cx, cy, radius) {
+      const wave = Math.sin(sineT) * .07;
+      fillGlow(cx, cy, radius * (1 + wave) * 1.8, .30 * orbR + .08);
+      for (let index = 0; index < 5; index += 1) {
+        const ringRadius = radius * (1 + index * .20 + Math.sin(sineT - index * .45) * .065);
+        X.beginPath();
+        X.arc(cx, cy, ringRadius, 0, Math.PI * 2);
+        X.strokeStyle = `rgba(${rgb},${.55 - index * .10})`;
+        X.lineWidth = 2.5 - index * .45;
+        X.stroke();
+      }
+    }
+
+    function roundedSquare(cx, cy, size, stroke, width) {
+      const radius = size * .18;
+      X.beginPath();
+      X.moveTo(cx - size + radius, cy - size);
+      X.lineTo(cx + size - radius, cy - size);
+      X.arcTo(cx + size, cy - size, cx + size, cy - size + radius, radius);
+      X.lineTo(cx + size, cy + size - radius);
+      X.arcTo(cx + size, cy + size, cx + size - radius, cy + size, radius);
+      X.lineTo(cx - size + radius, cy + size);
+      X.arcTo(cx - size, cy + size, cx - size, cy + size - radius, radius);
+      X.lineTo(cx - size, cy - size + radius);
+      X.arcTo(cx - size, cy - size, cx - size + radius, cy - size, radius);
+      X.closePath();
+      X.strokeStyle = stroke;
+      X.lineWidth = width;
+      X.stroke();
+    }
+
+    function drawBox(cx, cy, radius, holding = false) {
+      const size = radius * 1.1;
+      fillGlow(cx, cy, size * 1.8, .30 * orbR + .08);
+      for (let index = 0; index < 4; index += 1) {
+        roundedSquare(cx, cy, size * (1 + index * .22), `rgba(${rgb},${.55 - index * .12})`, 2.5 - index * .55);
+      }
+      const corner = size * .18;
+      const active = phaseIdx % 4;
+      X.save();
+      X.lineWidth = holding ? 3 : 4;
+      X.strokeStyle = `rgba(${rgb},${holding ? .68 : .9})`;
+      X.lineCap = "round";
+      X.beginPath();
+      if (active === 0) { X.moveTo(cx - size + corner, cy - size); X.lineTo(cx + size - corner, cy - size); }
+      else if (active === 1) { X.moveTo(cx + size, cy - size + corner); X.lineTo(cx + size, cy + size - corner); }
+      else if (active === 2) { X.moveTo(cx + size - corner, cy + size); X.lineTo(cx - size + corner, cy + size); }
+      else { X.moveTo(cx - size, cy + size - corner); X.lineTo(cx - size, cy - size + corner); }
+      X.stroke();
+      X.restore();
+    }
+
+    function drawAnapana(cx, cy) {
+      const field = X.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .7);
+      field.addColorStop(0, `rgba(${rgb},${.10 * orbR})`);
+      field.addColorStop(.4, `rgba(${rgb},${.05 * orbR})`);
+      field.addColorStop(1, `rgba(${rgb},0)`);
+      X.fillStyle = field;
+      X.fillRect(0, 0, W, H);
+      mist.forEach(particle => {
+        if (!reduceMotion) {
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          particle.life += particle.ls;
+          if (particle.life > 1) {
+            particle.life = 0;
+            particle.x = (Math.random() * 2 - 1) * .65;
+            particle.y = (Math.random() * 2 - 1) * .65;
+          }
+        }
+        const fade = Math.sin(particle.life * Math.PI);
+        const x = cx + particle.x * W * .42;
+        const y = cy + particle.y * H * .42;
+        const radius = particle.r * Math.min(W, H) * .55 * orbR;
+        if (particle.wisp) {
+          const endX = x + (particle.x > 0 ? 1 : -1) * particle.life * W * .18;
+          const endY = y + (particle.y > 0 ? 1 : -1) * particle.life * H * .14;
+          const gradient = X.createLinearGradient(x, y, endX, endY);
+          gradient.addColorStop(0, `rgba(${rgb},${fade * particle.a * .45})`);
+          gradient.addColorStop(1, `rgba(${rgb},0)`);
+          X.beginPath();
+          X.moveTo(x, y);
+          X.lineTo(endX, endY);
+          X.strokeStyle = gradient;
+          X.lineWidth = radius * .35;
+          X.stroke();
+        } else {
+          const gradient = X.createRadialGradient(x, y, 0, x, y, radius);
+          gradient.addColorStop(0, `rgba(${rgb},${fade * particle.a * .65})`);
+          gradient.addColorStop(1, `rgba(${rgb},0)`);
+          X.beginPath();
+          X.arc(x, y, radius, 0, Math.PI * 2);
+          X.fillStyle = gradient;
+          X.fill();
+        }
+      });
+    }
+
+    function draw(ts) {
+      requestAnimationFrame(draw);
+      if (reduceMotion && ts - lastDraw < 250) return;
+      lastDraw = ts;
+      updatePhase(ts);
+      const phase = cur.phases[phaseIdx];
+      const holding = !cur.free && phase.t.startsWith("hold");
+      if (reduceMotion) {
+        sineT = 0;
+        lightAngle = 0;
+        orbR = cur.free ? .52 : .58;
+        shockA = 0;
+      } else if (cur.free) {
+        sineT += .018;
+        lightAngle += .002;
+        orbR += (orbTarget - orbR) * .025;
+      } else if (holding) {
+        orbR = orbTarget;
+        lightAngle += .001;
+      } else {
+        sineT += cur.style === "fire" ? .072 : .038;
+        lightAngle += .005;
+        orbR = phaseFromR + (orbTarget - phaseFromR) * ease(phaseProgress);
+      }
+      X.clearRect(0, 0, W, H);
+      const cx = W / 2;
+      const cy = H / 2;
+      const maxRadius = Math.min(W, H) * .44;
+      const radius = maxRadius * orbR;
+      if (cur.free) drawAnapana(cx, cy);
+      else if (cur.style === "box") drawBox(cx, cy, radius, holding);
+      else if (cur.style === "coherent") drawCoherent(cx, cy, radius);
+      else drawFluid(cx, cy, radius, holding);
+      if (key === "physiological" && !reduceMotion) {
+        shockR += 3;
+        shockA = Math.max(0, shockA - .022);
+        if (shockA > .02) {
+          X.beginPath();
+          X.arc(cx, cy, shockR, 0, Math.PI * 2);
+          X.strokeStyle = `rgba(${rgb},${shockA})`;
+          X.lineWidth = 4;
+          X.stroke();
+        }
+      }
+    }
+
+    document.body.classList.toggle("reduce-motion", reduceMotion);
+    drawDots();
+    alignElapsed(initialElapsed);
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>

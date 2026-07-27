@@ -177,14 +177,56 @@ const noticeVoiceCues = [
 ];
 
 const steadyStates = [
-  { id: "overwhelmed", en: ["Overwhelmed", "Too much input, everything at once."], es: ["Demasiado a la vez", "Llegan demasiadas cosas al mismo tiempo."], breath: "4 · 6" },
-  { id: "anxious", en: ["Anxious or scattered", "Racing, uneasy, hard to focus."], es: ["Ansiedad o dispersión", "Hay inquietud y cuesta concentrarse."], breath: "4 · 6" },
-  { id: "angry", en: ["Anger or heat", "Irritated, tense, close to reacting."], es: ["Enojo o calor", "Hay irritación, tensión o ganas de reaccionar."], breath: "4 · 7" },
-  { id: "stuck", en: ["Stuck or avoiding", "Hard to begin or choose."], es: ["Bloqueo o evitación", "Cuesta comenzar o elegir."], breath: "natural" },
-  { id: "looping", en: ["Looping or self-attack", "The same thought keeps returning."], es: ["Pensamientos en bucle", "El mismo pensamiento sigue volviendo con dureza."], breath: "4 · 6" },
-  { id: "fog", en: ["Fog or far away", "Numb, unreal, hard to locate."], es: ["Niebla o lejanía", "Hay desconexión o cuesta ubicarse."], breath: "natural" },
-  { id: "wired", en: ["Wired or restless", "Unable to settle or wind down."], es: ["Aceleración o inquietud", "Cuesta calmarse o bajar el ritmo."], breath: "4 · 7" }
+  { id: "overwhelmed", pattern: "physiological", en: ["Overwhelmed", "Too much input, everything at once."], es: ["Demasiado a la vez", "Llegan demasiadas cosas al mismo tiempo."] },
+  { id: "anxious", pattern: "coherent", en: ["Anxious or scattered", "Racing, uneasy, hard to focus."], es: ["Ansiedad o dispersión", "Hay inquietud y cuesta concentrarse."] },
+  { id: "angry", pattern: "extended", en: ["Anger or heat", "Irritated, tense, close to reacting."], es: ["Enojo o calor", "Hay irritación, tensión o ganas de reaccionar."] },
+  { id: "stuck", pattern: "anapana", en: ["Stuck or avoiding", "Hard to begin or choose."], es: ["Bloqueo o evitación", "Cuesta comenzar o elegir."] },
+  { id: "looping", pattern: "coherent", en: ["Looping or self-attack", "The same thought keeps returning."], es: ["Pensamientos en bucle", "El mismo pensamiento sigue volviendo con dureza."] },
+  { id: "fog", pattern: "anapana", en: ["Fog or far away", "Numb, unreal, hard to locate."], es: ["Niebla o lejanía", "Hay desconexión o cuesta ubicarse."] },
+  { id: "wired", pattern: "extended", en: ["Wired or restless", "Unable to settle or wind down."], es: ["Aceleración o inquietud", "Cuesta calmarse o bajar el ritmo."] }
 ];
+
+const BREATH_PATTERNS = Object.freeze({
+  physiological: {
+    rgb: "244,162,97",
+    en: { title: "Double inhale, long exhale", cue: "Small inhale. Inhale again. Slow exhale." },
+    es: { title: "Doble inhalación y exhalación larga", cue: "Inhala suavemente. Inhala otra vez. Exhala despacio." },
+    phases: [
+      { id: "inhale", duration: 2, voice: "ts_stabilise_inhale_v1", sound: "in" },
+      { id: "inhale-again", duration: 1.5, voice: "ts_stabilise_inhale_again_v1", sound: "in2" },
+      { id: "exhale", duration: 6, voice: "ts_stabilise_long_exhale_v1", sound: "out" }
+    ]
+  },
+  extended: {
+    rgb: "90,181,212",
+    en: { title: "Long exhale", cue: "Breathe in. Let the exhale be longer." },
+    es: { title: "Exhalación larga", cue: "Inhala. Deja que la exhalación dure más." },
+    phases: [
+      { id: "inhale", duration: 4, voice: "ts_stabilise_inhale_v1", sound: "in" },
+      { id: "exhale", duration: 6, voice: "ts_stabilise_long_exhale_v1", sound: "out" }
+    ]
+  },
+  coherent: {
+    rgb: "120,240,177",
+    en: { title: "Steady rhythm", cue: "Breathe in. Breathe out. No hold, no push." },
+    es: { title: "Ritmo estable", cue: "Inhala. Exhala. Sin pausa y sin forzar." },
+    phases: [
+      { id: "inhale", duration: 5.5, voice: "ts_stabilise_inhale_v1", sound: "in" },
+      { id: "exhale", duration: 5.5, voice: "ts_stabilise_exhale_v1", sound: "out" }
+    ]
+  },
+  anapana: {
+    rgb: "138,191,184",
+    en: { title: "Natural breath", cue: "Observe the natural breath without changing it." },
+    es: { title: "Respiración natural", cue: "Observa la respiración natural sin cambiarla." },
+    phases: [
+      { id: "observe", duration: 7, voice: "ts_stabilise_natural_breath_v1", sound: "observe" },
+      { id: "breath-in", duration: 5.5, voice: "", sound: "observe" },
+      { id: "breath-out", duration: 5.5, voice: "", sound: "observe" },
+      { id: "natural", duration: 6, voice: "", sound: "observe" }
+    ]
+  }
+});
 
 const pulls = {
   en: ["Fear", "Pressure", "Self-doubt", "Regret", "Old story", "Another person's demand", "Comparison", "Something else"],
@@ -445,6 +487,7 @@ let ceremonyTimer = 0;
 let practiceTimer = 0;
 let toastTimer = 0;
 let fieldFrame = 0;
+let breathLastPhaseKey = "";
 
 const tr = key => copy[state.lang][key] || key;
 const local = item => item[state.lang];
@@ -458,6 +501,8 @@ class SoundEngine {
     this.voiceSource = null;
     this.voiceToken = 0;
     this.firstLightSources = [];
+    this.breathDrone = null;
+    this.breathDroneGain = null;
   }
 
   async ready() {
@@ -480,6 +525,8 @@ class SoundEngine {
   stopTones() {
     this.nodes.forEach(node => { try { node.stop(); } catch {} });
     this.nodes.clear();
+    this.breathDrone = null;
+    this.breathDroneGain = null;
   }
 
   stopVoice() {
@@ -624,12 +671,49 @@ class SoundEngine {
     }
   }
 
-  async breath() {
+  async startBreathPattern(patternKey) {
     if (!state.sound) return;
     await this.ready();
     this.stopTones();
+    const droneSettings = {
+      anapana: { frequency: 110, gain: .045 },
+      coherent: { frequency: 120, gain: .05 },
+      extended: { frequency: 98, gain: .04 },
+      physiological: { frequency: 130, gain: .04 }
+    }[patternKey];
+    if (!droneSettings) return;
     const now = this.context.currentTime;
-    [220, 277.18].forEach(f => this.note(f, now, 30, .018));
+    const oscillator = this.context.createOscillator();
+    const filter = this.context.createBiquadFilter();
+    const gain = this.context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(droneSettings.frequency, now);
+    filter.type = "lowpass";
+    filter.frequency.value = 800;
+    gain.gain.setValueAtTime(.0001, now);
+    gain.gain.exponentialRampToValueAtTime(droneSettings.gain, now + 1.5);
+    oscillator.connect(filter).connect(gain).connect(this.master);
+    oscillator.start(now);
+    this.nodes.add(oscillator);
+    this.breathDrone = oscillator;
+    this.breathDroneGain = gain;
+    oscillator.addEventListener("ended", () => this.nodes.delete(oscillator));
+  }
+
+  async breathPhase(patternKey, phaseType) {
+    if (!state.sound || phaseType === "observe") return;
+    await this.ready();
+    const now = this.context.currentTime;
+    if (patternKey === "coherent" && this.breathDrone) {
+      const target = phaseType === "in" ? 140 : 100;
+      this.breathDrone.frequency.cancelScheduledValues(now);
+      this.breathDrone.frequency.setValueAtTime(this.breathDrone.frequency.value, now);
+      this.breathDrone.frequency.linearRampToValueAtTime(target, now + 5.5);
+      return;
+    }
+    const frequency = { in: 330, out: 220, hold: 275, hold2: 275, in2: 392 }[phaseType] || 280;
+    this.note(frequency, now, .6, .07, "sine");
+    this.note(frequency * 2, now, .4, .025, "sine");
   }
 
   async tone(frequency, amplitude) {
@@ -881,6 +965,7 @@ function movementCopy() { return local(movements[state.practice.index]); }
 function renderPractice() {
   const movement = movements[state.practice.index];
   const movementCopy = local(movement);
+  if (movement.id === "stabilise" && state.practice.breathStartedAt) return renderStabiliseSession();
   return `${renderTopbar(movementCopy.name, movementCopy.line)}
     <main class="page practice-page">
       <nav class="movement-strip" aria-label="${state.lang === "en" ? "Practice movements" : "Movimientos de la práctica"}">
@@ -904,6 +989,53 @@ function renderPractice() {
     </main>`;
 }
 
+function selectedBreathPattern() {
+  const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
+  return BREATH_PATTERNS[selectedState?.pattern] || BREATH_PATTERNS.extended;
+}
+
+function selectedBreathPatternKey() {
+  const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
+  return BREATH_PATTERNS[selectedState?.pattern] ? selectedState.pattern : "extended";
+}
+
+function breathInstrumentURL() {
+  const patternKey = selectedBreathPatternKey();
+  const pattern = selectedBreathPattern();
+  const elapsed = Math.max(0, (Date.now() - state.practice.breathStartedAt) / 1000);
+  const reduced = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const query = new URLSearchParams({
+    pattern: patternKey,
+    rgb: pattern.rgb,
+    lang: state.lang,
+    reduce: reduced ? "1" : "0",
+    elapsed: elapsed.toFixed(3)
+  });
+  return `${ROOT}breath-instrument.html?${query}`;
+}
+
+function renderStabiliseSession() {
+  const lang = state.lang;
+  const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
+  const pattern = selectedBreathPattern();
+  const patternCopy = pattern[lang];
+  const consent = lang === "en"
+    ? "Stop at any time. Let the breath return to its natural rhythm."
+    : "Detente cuando quieras. Deja que la respiración vuelva a su ritmo natural.";
+  return `<main class="steady-session" style="--steady-rgb:${pattern.rgb}">
+    <iframe class="steady-breath-instrument" src="${breathInstrumentURL()}" title="${lang === "en" ? "Breathing guide" : "Guía de respiración"}" tabindex="-1"></iframe>
+    <header class="steady-session-header">
+      <button class="icon-button" type="button" data-action="stop-breath" aria-label="${lang === "en" ? "Leave breathing practice" : "Salir de la práctica de respiración"}">‹</button>
+      <div><strong>${lang === "en" ? "Stabilise" : "Estabilizar"}</strong><span>${escapeHTML(selectedState?.[lang]?.[0] || patternCopy.title)}</span></div>
+    </header>
+    <footer class="steady-session-footer">
+      <p>${consent}</p>
+      <button class="primary-button" type="button" data-action="stop-breath">${lang === "en" ? "Enough" : "Suficiente"}</button>
+    </footer>
+    <span class="sr-only" data-breath-status aria-live="polite"></span>
+  </main>`;
+}
+
 function renderMovement(id) {
   const lang = state.lang;
   const p = state.practice;
@@ -921,14 +1053,13 @@ function renderMovement(id) {
       return `<div class="choice-grid">${steadyStates.map(item => `<button class="choice" type="button" data-steady="${item.id}"><strong>${item[lang][0]}</strong><br><small>${item[lang][1]}</small></button>`).join("")}</div>`;
     }
     const chosen = steadyStates.find(item => item.id === p.steadyState);
-    const natural = chosen.breath === "natural";
-    return `<div class="instrument-region breath-orb" aria-hidden="true"></div>
-      <div class="practice-copy">
+    const pattern = BREATH_PATTERNS[chosen.pattern];
+    return `<div class="practice-copy steady-setup-copy">
         <p class="eyebrow">${chosen[lang][0]}</p>
-        <p class="lede">${natural ? (lang === "en" ? "Let the breath come and go by itself." : "Deja que la respiración entre y salga por sí sola.") : (lang === "en" ? "Breathe in gently. Let the exhale last a little longer." : "Inhala suavemente. Deja que la exhalación dure un poco más.")}</p>
-        <p class="timer" data-breath-timer>${p.breathStartedAt ? "0:30" : chosen.breath}</p>
+        <h2 class="steady-pattern-title">${escapeHTML(pattern[lang].title)}</h2>
+        <p class="lede">${escapeHTML(pattern[lang].cue)}</p>
       </div>
-      <button class="primary-button" type="button" data-action="${p.breathStartedAt ? "stop-breath" : "start-breath"}">${p.breathStartedAt ? (lang === "en" ? "End breathing" : "Terminar respiración") : (lang === "en" ? "Begin breathing" : "Comenzar respiración")}</button>
+      <button class="primary-button" type="button" data-action="start-breath">${lang === "en" ? "Begin breathing" : "Comenzar respiración"}</button>
       <button class="text-button" type="button" data-action="change-steady">${lang === "en" ? "Choose another state" : "Elegir otro estado"}</button>`;
   }
   if (id === "discern") {
@@ -1026,6 +1157,7 @@ function resumePracticeView() {
 function stopPracticeTimers() {
   window.clearInterval(practiceTimer);
   practiceTimer = 0;
+  breathLastPhaseKey = "";
   sound.stop();
   state.practice.tonePlaying = false;
 }
@@ -1098,19 +1230,72 @@ function offerAnotherNoticeCue() {
   announce(noticeCues[state.lang][cue]);
 }
 
-function startBreathTimer(reset = true) {
-  if (reset) state.practice.breathStartedAt = Date.now();
-  sound.breath().catch(() => {});
+function breathFrameAt(pattern, elapsed) {
+  const cycleDuration = pattern.phases.reduce((sum, phase) => sum + phase.duration, 0);
+  const cycleIndex = Math.floor(elapsed / cycleDuration);
+  const cycleElapsed = elapsed % cycleDuration;
+  let cursor = 0;
+  for (let index = 0; index < pattern.phases.length; index += 1) {
+    const phase = pattern.phases[index];
+    if (cycleElapsed < cursor + phase.duration || index === pattern.phases.length - 1) {
+      return { phase, index, cycleIndex, key: `${cycleIndex}:${index}` };
+    }
+    cursor += phase.duration;
+  }
+  return { phase: pattern.phases[0], index: 0, cycleIndex, key: `${cycleIndex}:0` };
+}
+
+function breathVoiceCues(pattern) {
+  return [...new Set([
+    ...pattern.phases.map(phase => phase.voice).filter(Boolean),
+    ...(pattern === BREATH_PATTERNS.anapana ? ["ts_stabilise_return_attention_v1"] : [])
+  ])];
+}
+
+async function beginBreathPractice() {
+  const pattern = selectedBreathPattern();
+  try {
+    if (state.voice) await sound.prepareVoiceCues(breathVoiceCues(pattern));
+    else if (state.sound) await sound.ready();
+  } catch {
+    showToast(state.lang === "en" ? "Breathing audio could not start." : "No se pudo iniciar el audio de respiración.");
+  }
+  state.practice.breathStartedAt = Date.now();
+  breathLastPhaseKey = "";
+  render();
+}
+
+async function startBreathTimer(reset = true) {
+  if (reset) {
+    state.practice.breathStartedAt = Date.now();
+    breathLastPhaseKey = "";
+  }
+  const startedAt = state.practice.breathStartedAt;
+  const patternKey = selectedBreathPatternKey();
+  const pattern = selectedBreathPattern();
+  try { await sound.startBreathPattern(patternKey); } catch {}
+  if (!state.practice.breathStartedAt || state.practice.breathStartedAt !== startedAt) return;
   window.clearInterval(practiceTimer);
   const update = () => {
     const elapsed = (Date.now() - state.practice.breathStartedAt) / 1000;
-    const remaining = Math.max(0, 30 - Math.floor(elapsed));
-    const node = document.querySelector("[data-breath-timer]");
-    if (node) node.textContent = `0:${String(remaining).padStart(2, "0")}`;
-    if (remaining <= 0) { window.clearInterval(practiceTimer); practiceTimer = 0; state.practice.breathStartedAt = 0; sound.stop(); announce(state.lang === "en" ? "Breathing complete" : "Respiración completa"); }
+    const frame = breathFrameAt(pattern, elapsed);
+    if (frame.key !== breathLastPhaseKey) {
+      breathLastPhaseKey = frame.key;
+      sound.breathPhase(patternKey, frame.phase.sound).catch(() => {});
+      let voiceCue = frame.phase.voice;
+      if (patternKey === "anapana" && frame.index === 0 && frame.cycleIndex > 0) voiceCue = "ts_stabilise_return_attention_v1";
+      if (voiceCue) sound.playVoice(voiceCue);
+      const phaseLabels = state.lang === "en"
+        ? { inhale: "Inhale", "inhale-again": "Inhale again", exhale: "Exhale", observe: "Observe the natural breath", "breath-in": "Notice the breath coming in", "breath-out": "Notice the breath going out", natural: "Let breath stay natural" }
+        : { inhale: "Inhala", "inhale-again": "Inhala otra vez", exhale: "Exhala", observe: "Observa la respiración natural", "breath-in": "Nota cómo entra la respiración", "breath-out": "Nota cómo sale la respiración", natural: "Deja que la respiración siga natural" };
+      const status = phaseLabels[frame.phase.id] || pattern[state.lang].cue;
+      const statusNode = document.querySelector("[data-breath-status]");
+      if (statusNode) statusNode.textContent = status;
+      announce(status);
+    }
   };
   update();
-  practiceTimer = window.setInterval(update, 250);
+  practiceTimer = window.setInterval(update, 100);
 }
 
 const fieldColors = ["#d8c49a", "#b9c989", "#d8b45a", "#9ebdd2", "#86b7ad", "#b8a5cc", "#f0dca2"];
@@ -1415,7 +1600,7 @@ function readAbout() {
   sound.playVoice("ts_about_introduction_v1");
 }
 
-app.addEventListener("click", event => {
+app.addEventListener("click", async event => {
   const button = event.target.closest("button");
   if (!button) return;
   const { action, view, movement, steady, pull, relation, doorway, tone, field, teaching, law, principle, entry, engine, mission } = button.dataset;
@@ -1456,7 +1641,7 @@ app.addEventListener("click", event => {
   if (action === "start-notice") beginNoticePractice();
   if (action === "another-notice-cue") offerAnotherNoticeCue();
   if (action === "notice-tap" && state.quietWords) showToast(state.lang === "en" ? "Noticed" : "Notado");
-  if (action === "start-breath") { state.practice.breathStartedAt = Date.now(); sound.playVoice("ts_stabilise_inhale_v1"); render(); startBreathTimer(false); }
+  if (action === "start-breath") await beginBreathPractice();
   if (action === "stop-breath") { state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
   if (action === "change-steady") { state.practice.steadyState = ""; state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
   if (action === "reclaim-hold") { state.practice.reclaimHolding = !state.practice.reclaimHolding; if (state.practice.reclaimHolding) sound.playVoice("ts_reclaim_centre_remains_v1"); render(); }
@@ -1602,6 +1787,18 @@ function drawAmbient(time = 0) {
 }
 
 window.addEventListener("resize", resizeField);
+document.addEventListener("visibilitychange", () => {
+  const breathing = state.view === "practice" && movements[state.practice.index]?.id === "stabilise" && state.practice.breathStartedAt;
+  if (!breathing) return;
+  if (document.hidden) {
+    window.clearInterval(practiceTimer);
+    practiceTimer = 0;
+    breathLastPhaseKey = "";
+    sound.stop();
+  } else {
+    startBreathTimer(false);
+  }
+});
 window.addEventListener("beforeunload", () => { cancelAnimationFrame(fieldFrame); stopPracticeTimers(); });
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
