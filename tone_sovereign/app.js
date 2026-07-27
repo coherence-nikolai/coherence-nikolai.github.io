@@ -856,7 +856,7 @@ function renderHome() {
       </header>
       <button class="orientation-invitation" type="button" data-view="about">
         <span class="door-mark" aria-hidden="true">✦</span>
-        <span><strong>${phrase("Meet Tone Sovereign", "Conoce Tone Sovereign")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
+        <span><strong>${phrase("Begin Here", "Comienza aquí")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
         <b aria-hidden="true">→</b>
       </button>
       <section class="door-stack" aria-label="${tr("fiveDoors")}">
