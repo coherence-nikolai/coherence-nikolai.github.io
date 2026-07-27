@@ -12,7 +12,10 @@ const NOTICE = Object.freeze({
 const STORAGE = {
   preferences: "tone-sovereign.preferences.v1",
   traces: "tone-sovereign.traces.v1",
-  carriedAct: "tone-sovereign.carried-act.v1"
+  carriedAct: "tone-sovereign.carried-act.v1",
+  ruleOfLife: "tone-sovereign.rule-of-life.v1",
+  engineDrafts: "tone-sovereign.practice-engine-drafts.v1",
+  missions: "tone-sovereign.missions.v1"
 };
 
 const copy = {
@@ -31,7 +34,7 @@ const copy = {
     home: "Home",
     back: "Back",
     settings: "Settings",
-    history: "What remains",
+    history: "What You Chose to Keep",
     fiveDoors: "Five doors",
     beginQuestion: "Where would you like to begin?",
     beginSupport: "Choose the doorway that meets this moment. Each stands on its own.",
@@ -73,7 +76,7 @@ const copy = {
     home: "Inicio",
     back: "Atrás",
     settings: "Ajustes",
-    history: "Lo que permanece",
+    history: "Lo que elegiste conservar",
     fiveDoors: "Cinco puertas",
     beginQuestion: "¿Dónde te gustaría comenzar?",
     beginSupport: "Elige la puerta que acompaña este momento. Cada una funciona por sí sola.",
@@ -335,6 +338,31 @@ const symbolText = {
   }
 };
 
+const canonicalCatalogs = window.TONE_SOVEREIGN_CATALOGS;
+if (!canonicalCatalogs?.en || !canonicalCatalogs?.es) {
+  throw new Error("Tone Sovereign catalog did not load.");
+}
+
+const catalogFor = language => canonicalCatalogs[language === "es" ? "es" : "en"];
+const phrase = (english, spanish) => state.lang === "es" ? spanish : english;
+const readableTag = value => String(value || "")
+  .replaceAll("-", " ")
+  .replace(/\b\w/g, letter => letter.toUpperCase());
+const spanishTagLabels = {
+  "1d-presence": "1D · Presencia", "2d-vitality": "2D · Vitalidad", "3d-sovereignty": "3D · Soberanía", "4d-discernment": "4D · Discernimiento", "5d-participation": "5D · Participación", "6d-integration": "6D · Integración", "7d-unity": "7D · Unidad",
+  attention: "Atención", congruence: "Congruencia", "conscious-intake": "Recepción consciente", "cultural-sovereignty": "Soberanía cultural", dreams: "Sueños", "embodied-expression": "Expresión encarnada", embodiment: "Encarnación", "emergent-pathways": "Caminos emergentes", emotion: "Emoción", "field-stewardship": "Cuidado del campo", "full-arrival": "Llegada plena", "golden-age": "Edad Dorada", identity: "Identidad", meditation: "Meditación", perception: "Percepción", relationships: "Relaciones", shadow: "Sombra", "sustainable-service": "Servicio sostenible",
+  alignment: "Alineación", "body-care": "Cuidado del cuerpo", "cultural-discernment": "Discernimiento cultural", "field-regulation": "Regulación del campo", focus: "Enfoque", "independent-thought": "Pensamiento independiente", "information-boundary": "Límite de información", "next-step": "Próximo paso", presence: "Presencia", rest: "Descanso",
+  alone: "A solas", "creative-project": "Proyecto creativo", group: "Grupo", online: "En línea", relationship: "Relación", "sleep-threshold": "Antes de dormir", work: "Trabajo",
+  beauty: "Belleza", cooperation: "Cooperación", courage: "Valentía", creativity: "Creatividad", dignity: "Dignidad", kindness: "Amabilidad", repair: "Reparación", restraint: "Moderación", service: "Servicio", truth: "Verdad",
+  body: "Cuerpo", "chosen-connection": "Conexión elegida", "daily-task": "Tarea cotidiana", "digital-life": "Vida digital", "immediate-space": "Espacio cercano", "inner-attention": "Atención interior", "shared-world": "Mundo compartido",
+  small: "Pequeño", spacious: "Espacioso", steady: "Constante", notice: "Notar", stabilise: "Estabilizar", discern: "Discernir", reclaim: "Recuperar", cross: "Cruzar", embody: "Encarnar", integrate: "Integrar"
+};
+const tagLabel = value => state.lang === "es" ? (spanishTagLabels[value] || readableTag(value)) : readableTag(value);
+
+function contentByID(collection, id) {
+  return collection.find(item => item.id === id) || collection[0];
+}
+
 function readJSON(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
 }
@@ -350,9 +378,33 @@ const state = {
   quietWords: savedPreferences.quietWords !== false,
   ceremonyKey: 1,
   ceremonySettled: false,
-  selectedField: 1,
+  selectedField: "1d-presence",
   selectedTeaching: "golden-age",
-  actIndex: Number(localStorage.getItem(STORAGE.carriedAct) || 0) % acts.length,
+  selectedLaw: "law-01",
+  selectedPrinciple: "principle-01",
+  selectedEntry: "separate-event-from-interpretation",
+  selectedEngine: "congruence-compass",
+  selectedMission: "",
+  foundationMode: "laws",
+  libraryMode: "practices",
+  libraryQuery: "",
+  libraryField: "all",
+  libraryDomain: "all",
+  libraryNeed: "all",
+  teachingDepth: 1,
+  showFullTeaching: false,
+  engineStep: 0,
+  engineDuration: 2,
+  engineResponses: {},
+  engineComplete: false,
+  actIndex: Number(localStorage.getItem(STORAGE.carriedAct) || 0) % canonicalCatalogs.en.sovereignActs.length,
+  actQuality: "all",
+  actContext: "all",
+  actEffort: "all",
+  ruleOfLife: readJSON(STORAGE.ruleOfLife, { principleIDs: [], commitmentIDs: [] }),
+  engineDrafts: readJSON(STORAGE.engineDrafts, {}),
+  missions: readJSON(STORAGE.missions, []),
+  missionDraft: { title: "", direction: "", nextVisibleStep: "", sustainabilityNote: "", principleID: "" },
   traces: readJSON(STORAGE.traces, []),
   toast: "",
   practice: newPractice()
@@ -626,12 +678,31 @@ function showToast(message) {
 
 function navigate(view, options = {}) {
   stopPracticeTimers();
+  window.scrollTo({ top: 0, behavior: "auto" });
   if (state.view !== view && options.remember !== false) state.stack.push(state.view);
   state.view = view;
   if (options.field) state.selectedField = options.field;
   if (options.teaching) state.selectedTeaching = options.teaching;
+  if (options.law) state.selectedLaw = options.law;
+  if (options.principle) state.selectedPrinciple = options.principle;
+  if (options.entry) state.selectedEntry = options.entry;
+  if (options.engine) {
+    state.selectedEngine = options.engine;
+    state.engineStep = 0;
+    state.engineResponses = { ...(state.engineDrafts[options.engine] || {}) };
+    state.engineComplete = false;
+  }
+  if (options.mission !== undefined) {
+    state.selectedMission = options.mission;
+    const mission = state.missions.find(item => item.id === options.mission);
+    state.missionDraft = mission ? { title: mission.title, direction: mission.direction, nextVisibleStep: mission.nextVisibleStep || "", sustainabilityNote: mission.sustainabilityNote || "", principleID: mission.principleID || "" } : { title: "", direction: "", nextVisibleStep: "", sustainabilityNote: "", principleID: "" };
+  }
+  if (options.mode) {
+    if (view === "foundations") state.foundationMode = options.mode;
+    if (view === "library") state.libraryMode = options.mode;
+  }
   render();
-  window.scrollTo({ top: 0, behavior: state.reduceMotion ? "auto" : "smooth" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function goBack() {
@@ -659,6 +730,16 @@ function render() {
     field: renderField,
     library: renderLibrary,
     teaching: renderTeaching,
+    foundations: renderFoundations,
+    law: renderLaw,
+    principle: renderPrinciple,
+    entry: renderLibraryEntry,
+    practiceEngines: renderPracticeEngines,
+    practiceEngine: renderPracticeEngine,
+    ruleOfLife: renderRuleOfLife,
+    missions: renderMissions,
+    mission: renderMission,
+    scales: renderScales,
     acts: renderActs,
     threshold: renderThreshold,
     history: renderHistory,
@@ -773,6 +854,11 @@ function renderHome() {
         <h1 class="display">${tr("beginQuestion")}</h1>
         <p class="lede hero-copy">${tr("beginSupport")}</p>
       </header>
+      <button class="orientation-invitation" type="button" data-view="about">
+        <span class="door-mark" aria-hidden="true">✦</span>
+        <span><strong>${phrase("Meet Tone Sovereign", "Conoce Tone Sovereign")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
+        <b aria-hidden="true">→</b>
+      </button>
       <section class="door-stack" aria-label="${tr("fiveDoors")}">
         ${doors.map(door => `<button class="door ${door.primary ? "primary-door" : ""}" type="button" data-view="${door.id}">
           <span class="door-mark" aria-hidden="true">${door.mark}</span>
@@ -781,7 +867,8 @@ function renderHome() {
         </button>`).join("")}
       </section>
       <footer class="home-footer">
-        <button class="text-button" type="button" data-view="about">${tr("about")}</button>
+        <button class="text-button" type="button" data-view="foundations">${phrase("Foundations", "Fundamentos")}</button>
+        <button class="text-button" type="button" data-view="ruleOfLife">${phrase("My compass", "Mi brújula")}</button>
         <button class="text-button" type="button" data-view="history">${tr("history")}</button>
         <button class="text-button" type="button" data-view="settings">${tr("settings")}</button>
         <button class="text-button" type="button" data-action="replay-from-home">${tr("replay")}</button>
@@ -1026,56 +1113,197 @@ function startBreathTimer(reset = true) {
   practiceTimer = window.setInterval(update, 250);
 }
 
+const fieldColors = ["#d8c49a", "#b9c989", "#d8b45a", "#9ebdd2", "#86b7ad", "#b8a5cc", "#f0dca2"];
+
 function renderFields() {
-  const intro = state.lang === "en"
-    ? ["The Seven Nested Fields", "Every Field contributes an essential capacity. Growth carries each mature gift into a wider, more responsible way of participating."]
-    : ["Los Siete Campos Anidados", "Cada Campo aporta una capacidad esencial. Crecer lleva cada don maduro hacia una manera más amplia y responsable de participar."];
-  return `${renderTopbar(tr("fields"), state.lang === "en" ? "A spectrum of increasing inclusion" : "Un espectro de inclusión creciente")}
+  const catalog = catalogFor(state.lang);
+  return `${renderTopbar(tr("fields"), phrase("A spectrum of increasing inclusion", "Un espectro de inclusión creciente"))}
     <main class="page wide">
-      <header class="section-intro"><p class="eyebrow">${state.lang === "en" ? "Nested, not ranked" : "Anidados, no jerárquicos"}</p><h1 class="page-title">${intro[0]}</h1><p class="lede measure">${intro[1]}</p></header>
-      <section class="nested-map" aria-label="${intro[0]}">
-        ${fields.map((field, index) => `<span class="field-ring" style="--size:${18 + index * 11}%;--ring-color:${field.color}" aria-hidden="true"></span>`).join("")}
-        <div class="field-nodes">${fields.map(field => `<button class="field-node" type="button" data-field="${field.n}" style="--field-color:${field.color}"><span class="field-number">${field.n}D</span><span><strong>${field[state.lang][0]}</strong><small>${field[state.lang][1]}</small></span></button>`).join("")}</div>
+      <header class="section-intro"><p class="eyebrow">${phrase("Nested, not ranked", "Anidados, no jerárquicos")}</p><h1 class="page-title">${phrase("The Seven Nested Fields", "Los Siete Campos Anidados")}</h1><p class="lede measure">${phrase("Every Field contributes an essential capacity. Growth carries each mature gift into a wider, more responsible way of participating.", "Cada Campo aporta una capacidad esencial. Crecer lleva cada don maduro hacia una manera más amplia y responsable de participar.")}</p></header>
+      <section class="nested-map" aria-label="${phrase("The Seven Nested Fields", "Los Siete Campos Anidados")}">
+        ${catalog.fields.map((field, index) => `<span class="field-ring" style="--size:${18 + index * 11}%;--ring-color:${fieldColors[index]}" aria-hidden="true"></span>`).join("")}
+        <div class="field-nodes">${catalog.fields.map((field, index) => `<button class="field-node" type="button" data-field="${field.id}" style="--field-color:${fieldColors[index]}"><span class="field-number">${field.dimension}D</span><span><strong>${escapeHTML(field.title)}</strong><small>${escapeHTML(field.archetype)} · ${escapeHTML(field.gift)}</small></span></button>`).join("")}</div>
       </section>
-      <section class="start-here"><p class="eyebrow">${state.lang === "en" ? "The Principle of Inclusion" : "El principio de inclusión"}</p><p class="lede">${state.lang === "en" ? "Every wider consciousness includes and reorganises the healthy expression of what came before. Expansion without inclusion becomes fragmentation." : "Cada forma más amplia de conciencia incluye y reorganiza la expresión sana de lo anterior. La expansión sin inclusión se vuelve fragmentación."}</p></section>
+      <section class="start-here"><p class="eyebrow">${phrase("The Principle of Nested Fields", "El principio de los Campos Anidados")}</p><p class="lede">${phrase("The Seven Fields are increasingly inclusive ways of participating in reality. Every wider Field carries forward the mature gifts of those before it.", "Los Siete Campos son formas cada vez más inclusivas de participar en la realidad. Cada Campo más amplio conserva los dones maduros de los anteriores.")}</p><button class="text-button" type="button" data-action="open-inclusion-principle">${phrase("Read the Principle of Inclusion", "Leer el principio de inclusión")}</button></section>
     </main>`;
 }
 
 function renderField() {
-  const field = fields.find(item => item.n === state.selectedField) || fields[0];
-  const text = field[state.lang];
-  return `${renderTopbar(`${field.n}D · ${text[0]}`, text[1])}
+  const catalog = catalogFor(state.lang);
+  const field = contentByID(catalog.fields, state.selectedField);
+  const index = Math.max(0, catalog.fields.findIndex(item => item.id === field.id));
+  const color = fieldColors[index];
+  return `${renderTopbar(`${field.dimension}D · ${escapeHTML(field.title)}`, field.archetype)}
     <main class="page">
-      <header class="section-intro"><p class="eyebrow">${state.lang === "en" ? "A needed gift" : "Un don necesario"}</p><h1 class="page-title" style="color:${field.color}">${text[0]}</h1><p class="lede">${text[1]}</p></header>
-      <div class="instrument-region" style="border-color:${field.color};color:${field.color}" aria-hidden="true"><span class="field-number" style="--field-color:${field.color};font-size:1.5rem">${field.n}D</span></div>
-      <section class="carry-forward"><p class="eyebrow">${state.lang === "en" ? "What this Field carries forward" : "Lo que este Campo lleva consigo"}</p><p><strong>${state.lang === "en" ? "Carries forward:" : "Lleva consigo:"}</strong> ${text[2]}.</p><p><strong>${state.lang === "en" ? "Adds:" : "Añade:"}</strong> ${text[3]}.</p></section>
-      <section><p class="eyebrow">${state.lang === "en" ? "Try the gift now" : "Prueba el don ahora"}</p><p class="lede">${text[4]}</p><button class="primary-button" type="button" data-action="save-field-practice" data-field="${field.n}">${state.lang === "en" ? "Carry this practice" : "Llevar esta práctica"}</button></section>
+      <header class="section-intro"><p class="eyebrow">${escapeHTML(field.archetype)}</p><h1 class="page-title" style="color:${color}">${escapeHTML(field.title)}</h1><p class="lede">${escapeHTML(field.coreTeaching)}</p></header>
+      <div class="instrument-region field-emblem" style="border-color:${color};color:${color}" aria-hidden="true"><span class="field-number" style="--field-color:${color};font-size:1.5rem">${field.dimension}D</span><small>${escapeHTML(field.sovereignPhrase)}</small></div>
+      <section class="carry-forward"><p class="eyebrow">${phrase("What this Field carries forward", "Lo que este Campo lleva consigo")}</p><p><strong>${phrase("Carries forward:", "Lleva consigo:")}</strong> ${escapeHTML(field.carriesForward)}</p><p><strong>${phrase("Adds:", "Añade:")}</strong> ${escapeHTML(field.adds)}</p></section>
+      <article class="prose field-teaching">
+        <section><h2>${phrase("Gift", "Don")}</h2><p>${escapeHTML(field.gift)}</p></section>
+        <section><h2>${phrase("When the gift loses balance", "Cuando el don pierde equilibrio")}</h2><p>${escapeHTML(field.shadow)}</p></section>
+        <section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(field.sovereignQuestion)}</blockquote></section>
+        <section><h2>${phrase("Return", "Regreso")}</h2><p>${escapeHTML(field.returnPractice)}</p></section>
+        <section><h2>${phrase("Expand", "Expansión")}</h2><p>${escapeHTML(field.expansionPractice)}</p></section>
+        <section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(field.goldenAgeExpression)}</p></section>
+      </article>
+      <div class="practice-actions"><button class="primary-button" type="button" data-action="save-field-practice" data-field="${field.id}">${phrase("Carry this return practice", "Llevar esta práctica de regreso")}</button></div>
     </main>`;
 }
 
+function libraryFilterOptions(values, selected) {
+  return [...values].sort().map(value => `<option value="${escapeAttribute(value)}" ${value === selected ? "selected" : ""}>${escapeHTML(tagLabel(value))}</option>`).join("");
+}
+
+function filteredLibraryEntries(catalog) {
+  const query = state.libraryQuery.trim().toLocaleLowerCase(state.lang === "es" ? "es" : "en");
+  return catalog.libraryEntries.filter(entry => {
+    const searchable = [entry.title, entry.summary, entry.sovereignQuestion, entry.libraryCopy].join(" ").toLocaleLowerCase(state.lang === "es" ? "es" : "en");
+    return (!query || searchable.includes(query))
+      && (state.libraryField === "all" || entry.tags.fields.includes(state.libraryField))
+      && (state.libraryDomain === "all" || entry.tags.domains.includes(state.libraryDomain))
+      && (state.libraryNeed === "all" || entry.tags.needs.includes(state.libraryNeed));
+  });
+}
+
 function renderLibrary() {
-  return `${renderTopbar(tr("library"), state.lang === "en" ? "Short paths into deeper practice" : "Caminos breves hacia una práctica más profunda")}
-    <main class="page">
-      <header class="section-intro"><p class="eyebrow">${state.lang === "en" ? "A clear place to begin" : "Un lugar claro para comenzar"}</p><h1 class="page-title">${tr("library")}</h1><p class="lede">${state.lang === "en" ? "Start with the Golden Age, then follow the question that feels alive. You do not need to read everything." : "Comienza con la Edad Dorada y luego sigue la pregunta que se sienta viva. No necesitas leerlo todo."}</p></header>
-      <section class="start-here"><p class="eyebrow">${state.lang === "en" ? "Start here" : "Comienza aquí"}</p><button class="list-row" type="button" data-teaching="golden-age"><span><strong>${teachings[0][state.lang].title}</strong><span>${teachings[0][state.lang].line}</span></span><b>→</b></button></section>
-      <section class="list">${teachings.slice(1).map(item => `<button class="list-row" type="button" data-teaching="${item.id}"><span><strong>${item[state.lang].title}</strong><span>${item[state.lang].line}</span></span><b>${item.icon}</b></button>`).join("")}</section>
+  const catalog = catalogFor(state.lang);
+  const entries = filteredLibraryEntries(catalog);
+  const fields = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.fields));
+  const domains = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.domains));
+  const needs = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.needs));
+  const practiceContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><h2>${phrase("Choose the amount of support you need", "Elige el apoyo que necesitas")}</h2><p>${phrase("Use a two-minute practice for one clear movement, or enter a guided engine when you want a fuller sequence.", "Usa una práctica de dos minutos para un movimiento claro o entra en una secuencia guiada cuando quieras más apoyo.")}</p><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>
+    <section class="content-grid">${catalog.practiceEngines.slice(0, 4).map(engine => `<button class="content-card" type="button" data-engine="${engine.id}"><span class="eyebrow">${engine.recommendedDurations.join(" · ")} min</span><strong>${escapeHTML(engine.title)}</strong><small>${escapeHTML(engine.purpose)}</small><b>→</b></button>`).join("")}</section>`;
+  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button></section>
+    <section class="library-tools"><label class="search-field"><span>${phrase("Search teachings", "Buscar enseñanzas")}</span><input class="field-input" type="search" value="${escapeAttribute(state.libraryQuery)}" data-library-query placeholder="${phrase("A question, quality or situation", "Una pregunta, cualidad o situación")}"></label><div class="filter-grid"><label>${phrase("Field", "Campo")}<select data-library-filter="field"><option value="all">${phrase("All Fields", "Todos los Campos")}</option>${libraryFilterOptions(fields, state.libraryField)}</select></label><label>${phrase("Theme", "Tema")}<select data-library-filter="domain"><option value="all">${phrase("All themes", "Todos los temas")}</option>${libraryFilterOptions(domains, state.libraryDomain)}</select></label><label>${phrase("Need", "Necesidad")}<select data-library-filter="need"><option value="all">${phrase("All needs", "Todas las necesidades")}</option>${libraryFilterOptions(needs, state.libraryNeed)}</select></label></div><p class="result-count">${entries.length} ${phrase("teachings", "enseñanzas")}</p></section>
+    <section class="list">${entries.map(entry => `<button class="list-row" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>`;
+  return `${renderTopbar(tr("library"), phrase("Practices and teachings, clearly separated", "Prácticas y enseñanzas, claramente separadas"))}
+    <main class="page wide">
+      <header class="section-intro"><p class="eyebrow">${phrase("You do not need to read everything", "No necesitas leerlo todo")}</p><h1 class="page-title">${tr("library")}</h1><p class="lede measure">${phrase("Begin with what meets this moment. Practices help you do something now; teachings help you understand the wider pattern.", "Comienza con lo que acompaña este momento. Las prácticas te ayudan a hacer algo ahora; las enseñanzas ayudan a comprender el patrón más amplio.")}</p></header>
+      <nav class="segmented" aria-label="${tr("library")}"><button type="button" data-library-mode="practices" aria-pressed="${state.libraryMode === "practices"}">${phrase("Practices", "Prácticas")}</button><button type="button" data-library-mode="teachings" aria-pressed="${state.libraryMode === "teachings"}">${phrase("Teachings", "Enseñanzas")}</button></nav>
+      ${state.libraryMode === "practices" ? practiceContent : teachingContent}
     </main>`;
 }
 
 function renderTeaching() {
   const item = teachings.find(entry => entry.id === state.selectedTeaching) || teachings[0];
   const text = item[state.lang];
-  return `${renderTopbar(text.title, text.line)}<main class="page"><header class="section-intro"><p class="eyebrow">${item.icon} · ${state.lang === "en" ? "Teaching" : "Enseñanza"}</p><h1 class="page-title">${text.title}</h1><p class="lede">${text.line}</p></header><article class="prose">${text.sections.map(section => `<section><h2>${section[0]}</h2><p>${section[1]}</p></section>`).join("")}</article><div class="practice-actions"><button class="primary-button" type="button" data-action="save-teaching" data-teaching="${item.id}">${state.lang === "en" ? "Carry one question from this" : "Llevar una pregunta de esto"}</button></div></main>`;
+  return `${renderTopbar(text.title, text.line)}<main class="page"><header class="section-intro"><p class="eyebrow">${item.icon} · ${phrase("Orientation", "Orientación")}</p><h1 class="page-title">${text.title}</h1><p class="lede">${text.line}</p></header><article class="prose">${text.sections.map(section => `<section><h2>${section[0]}</h2><p>${section[1]}</p></section>`).join("")}</article><div class="practice-actions"><button class="primary-button" type="button" data-action="save-teaching" data-teaching="${item.id}">${phrase("Carry one question from this", "Llevar una pregunta de esto")}</button></div></main>`;
 }
 
-function currentAct() { return acts[((state.actIndex % acts.length) + acts.length) % acts.length]; }
+function renderFoundations() {
+  const catalog = catalogFor(state.lang);
+  const items = state.foundationMode === "laws" ? catalog.laws : catalog.principles;
+  return `${renderTopbar(phrase("Foundations", "Fundamentos"), phrase("Laws and principles for conscious participation", "Leyes y principios para la participación consciente"))}
+    <main class="page wide"><header class="section-intro"><p class="eyebrow">${phrase("A compass, not a command", "Una brújula, no una orden")}</p><h1 class="page-title">${phrase("Foundations", "Fundamentos")}</h1><p class="lede measure">${phrase("These teachings offer ways to see and act more clearly. Test them in life. Your discernment remains the authority.", "Estas enseñanzas ofrecen maneras de ver y actuar con más claridad. Pruébalas en la vida. Tu discernimiento sigue siendo la autoridad.")}</p></header>
+      <nav class="segmented"><button type="button" data-foundation-mode="laws" aria-pressed="${state.foundationMode === "laws"}">${phrase("21 Laws", "21 Leyes")}</button><button type="button" data-foundation-mode="principles" aria-pressed="${state.foundationMode === "principles"}">${phrase("32 Principles", "32 Principios")}</button></nav>
+      <button class="orientation-invitation" type="button" data-view="scales"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Four scales of participation", "Cuatro escalas de participación")}</strong><small>${phrase("Inner coherence, personal sovereignty, conscious relationship and field stewardship.", "Coherencia interior, soberanía personal, relación consciente y cuidado del campo.")}</small></span><b>→</b></button>
+      <section class="list foundation-list">${items.map(item => `<button class="list-row" type="button" data-${state.foundationMode === "laws" ? "law" : "principle"}="${item.id}"><span><small>${String(item.order).padStart(2, "0")}</small><strong>${escapeHTML(item.title)}</strong><span>${escapeHTML(state.foundationMode === "laws" ? item.coreQuestion : item.contemplativeQuestion)}</span></span><b>→</b></button>`).join("")}</section>
+    </main>`;
+}
+
+function depthSelector() {
+  return `<nav class="depth-selector" aria-label="${phrase("Depth", "Profundidad")}">${[1, 2, 3].map(level => `<button type="button" data-depth="${level}" aria-pressed="${state.teachingDepth === level}">${level}</button>`).join("")}</nav>`;
+}
+
+function renderLaw() {
+  const catalog = catalogFor(state.lang);
+  const law = contentByID(catalog.laws, state.selectedLaw);
+  const teaching = catalog.lawTeachings[law.id];
+  const relatedEngine = catalog.practiceEngines.find(engine => law.practiceIDs.includes(engine.id));
+  const sections = state.teachingDepth === 1
+    ? [[phrase("In plain language", "En palabras sencillas"), teaching.plainLanguage], [phrase("In ordinary life", "En la vida diaria"), teaching.ordinaryExample]]
+    : state.teachingDepth === 2
+      ? [[phrase("How it works", "Cómo funciona"), teaching.operatingPattern], [phrase("What this does not mean", "Lo que esto no significa"), teaching.notMeaning]]
+      : [[phrase("Why this matters for a Golden Age", "Por qué importa para una Edad Dorada"), teaching.goldenAgeRelevance], [phrase("Try it in life", "Pruébalo en la vida"), teaching.embodiedExperiment]];
+  return `${renderTopbar(`${phrase("Law", "Ley")} ${law.order}`, law.title)}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Law of conscious participation", "Ley de participación consciente")}</p><h1 class="page-title">${escapeHTML(law.title)}</h1><p class="lede">${escapeHTML(law.meaning)}</p><blockquote>${escapeHTML(law.coreQuestion)}</blockquote></header>${depthSelector()}<article class="prose depth-content">${sections.map(([title, body]) => `<section><h2>${escapeHTML(title)}</h2><p>${escapeHTML(body)}</p></section>`).join("")}</article><aside class="gentle-note">${phrase("This is a lens for reflection, not a diagnosis or a claim that circumstances do not matter.", "Esta es una perspectiva para reflexionar, no un diagnóstico ni una afirmación de que las circunstancias no importan.")}</aside><div class="practice-actions">${relatedEngine ? `<button class="primary-button" type="button" data-engine="${relatedEngine.id}">${phrase("Practise this law", "Practicar esta ley")}</button>` : ""}</div></main>`;
+}
+
+function renderPrinciple() {
+  const catalog = catalogFor(state.lang);
+  const principle = contentByID(catalog.principles, state.selectedPrinciple);
+  const teaching = catalog.principleTeachings[principle.id];
+  const kept = state.ruleOfLife.principleIDs.includes(principle.id);
+  const relatedEngine = catalog.practiceEngines.find(engine => principle.practiceIDs.includes(engine.id));
+  const sections = state.teachingDepth === 1
+    ? [[phrase("Why it exists", "Por qué existe"), teaching.purpose], [phrase("In ordinary life", "En la vida diaria"), teaching.ordinaryExample]]
+    : state.teachingDepth === 2
+      ? [[phrase("What it protects", "Lo que protege"), teaching.protects], [phrase("What it balances", "Lo que equilibra"), teaching.balance], [phrase("It is not this", "No es esto"), teaching.notThis]]
+      : [[phrase("Within myself", "Dentro de mí"), teaching.innerExpression], [phrase("Between people", "Entre personas"), teaching.relationshipExpression], [phrase("Within society", "En la sociedad"), teaching.societyExpression], [phrase("A question to hold", "Una pregunta para sostener"), teaching.tensionQuestion]];
+  return `${renderTopbar(`${phrase("Principle", "Principio")} ${principle.order}`, principle.title)}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Golden Age principle", "Principio de la Edad Dorada")}</p><h1 class="page-title">${escapeHTML(principle.title)}</h1><p class="lede">${escapeHTML(principle.meaning)}</p><blockquote>${escapeHTML(principle.contemplativeQuestion)}</blockquote></header>${depthSelector()}<article class="prose depth-content">${sections.map(([title, body]) => `<section><h2>${escapeHTML(title)}</h2><p>${escapeHTML(body)}</p></section>`).join("")}</article><section class="embodied-invitation"><p class="eyebrow">${phrase("Sovereign act", "Acto soberano")}</p><p>${escapeHTML(principle.sovereignAct)}</p></section><aside class="gentle-note">${phrase("A principle is an invitation to practise, not a measure of your worth.", "Un principio es una invitación a practicar, no una medida de tu valor.")}</aside><div class="practice-actions"><button class="${kept ? "secondary-button" : "primary-button"}" type="button" data-action="toggle-principle" data-principle="${principle.id}">${kept ? phrase("Remove from my compass", "Quitar de mi brújula") : phrase("Keep in my compass", "Guardar en mi brújula")}</button>${relatedEngine ? `<button class="secondary-button" type="button" data-engine="${relatedEngine.id}">${phrase("Practise this principle", "Practicar este principio")}</button>` : ""}</div></main>`;
+}
+
+function renderLibraryEntry() {
+  const catalog = catalogFor(state.lang);
+  const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
+  const field = catalog.fields.find(item => entry.tags.fields.includes(item.id));
+  return `${renderTopbar(entry.title, field ? `${field.dimension}D · ${field.title}` : phrase("Teaching", "Enseñanza"))}<main class="page"><header class="section-intro"><p class="eyebrow">${field ? `${field.dimension}D · ${escapeHTML(field.title)}` : phrase("Living teaching", "Enseñanza viva")}</p><h1 class="page-title">${escapeHTML(entry.title)}</h1><p class="lede">${escapeHTML(entry.summary)}</p></header><article class="prose"><section><h2>${phrase("Orientation", "Orientación")}</h2><p>${escapeHTML(entry.libraryCopy)}</p></section><section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(entry.sovereignQuestion)}</blockquote></section><section class="embodied-invitation"><h2>${phrase("Live this today", "Vívelo hoy")}</h2><p>${escapeHTML(entry.embodiedAct)}</p></section>${state.showFullTeaching ? `<section><h2>${phrase("Core teaching", "Enseñanza central")}</h2><p>${escapeHTML(entry.coreTeaching)}</p></section><section><h2>${phrase("When it loses balance", "Cuando pierde equilibrio")}</h2><p>${escapeHTML(entry.shadowForm)}</p></section><section><h2>${phrase("How to recognise it", "Cómo reconocerlo")}</h2><p>${escapeHTML(entry.recognition)}</p></section><section><h2>${phrase("Two-minute practice", "Práctica de dos minutos")}</h2><ol>${entry.twoMinutePractice.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol></section><section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(entry.goldenAgeExpression)}</p></section>` : ""}</article><div class="practice-actions"><button class="secondary-button" type="button" data-action="toggle-full-teaching">${state.showFullTeaching ? phrase("Return to the short view", "Volver a la vista breve") : phrase("Read the full teaching", "Leer la enseñanza completa")}</button><button class="primary-button" type="button" data-action="save-entry" data-entry="${entry.id}">${phrase("Keep this question", "Guardar esta pregunta")}</button>${field ? `<button class="text-button" type="button" data-field="${field.id}">${phrase("Explore this Field", "Explorar este Campo")}</button>` : ""}</div></main>`;
+}
+
+function renderPracticeEngines() {
+  const catalog = catalogFor(state.lang);
+  return `${renderTopbar(phrase("Guided Practices", "Prácticas guiadas"), phrase("Twelve ways to meet a real moment", "Doce maneras de acompañar un momento real"))}<main class="page wide"><header class="section-intro"><p class="eyebrow">${phrase("Choose by need, not achievement", "Elige según tu necesidad, no como logro")}</p><h1 class="page-title">${phrase("Guided Practices", "Prácticas guiadas")}</h1><p class="lede measure">${phrase("Each practice stands on its own. Choose two, five or ten minutes. You can leave at any point.", "Cada práctica funciona por sí sola. Elige dos, cinco o diez minutos. Puedes salir en cualquier momento.")}</p></header><section class="content-grid engine-grid">${catalog.practiceEngines.map(engine => `<button class="content-card" type="button" data-engine="${engine.id}"><span class="eyebrow">${engine.recommendedDurations.join(" · ")} min</span><strong>${escapeHTML(engine.title)}</strong><small>${escapeHTML(engine.purpose)}</small><span class="tag-line">${engine.capacitySequence.map(tagLabel).join(" → ")}</span><b>→</b></button>`).join("")}</section></main>`;
+}
+
+function renderPracticeEngine() {
+  const catalog = catalogFor(state.lang);
+  const engine = contentByID(catalog.practiceEngines, state.selectedEngine);
+  if (state.engineComplete) {
+    return `${renderTopbar(engine.title, phrase("Practice complete", "Práctica completada"))}<main class="page"><section class="engine-completion"><div class="completion-seal"><div class="seal-orb" aria-hidden="true"></div><p class="eyebrow">${phrase("Return", "Regreso")}</p><h1 class="page-title">${phrase("Take only what feels useful.", "Lleva solo lo que te resulte útil.")}</h1><p class="lede">${phrase("The practice can end here. Its meaning remains yours.", "La práctica puede terminar aquí. Su significado sigue siendo tuyo.")}</p></div><div class="practice-actions"><button class="primary-button" type="button" data-action="finish-engine">${phrase("Return to practices", "Volver a las prácticas")}</button><button class="secondary-button" type="button" data-action="restart-engine">${phrase("Begin again", "Comenzar de nuevo")}</button></div></section></main>`;
+  }
+  const step = engine.steps[state.engineStep];
+  const response = state.engineResponses[step.id] || "";
+  const isLast = state.engineStep === engine.steps.length - 1;
+  const responseControl = step.responseKind === "pause"
+    ? `<div class="pause-field" aria-hidden="true"><span></span></div>`
+    : `<label class="field-label"><span>${step.responseKind === "action" ? phrase("One action, if useful", "Una acción, si es útil") : phrase("A few words, if useful", "Unas palabras, si son útiles")}</span><textarea class="field-textarea" data-engine-response="${step.id}">${escapeHTML(response)}</textarea></label>`;
+  return `${renderTopbar(engine.title, `${state.engineDuration} min · ${state.engineStep + 1} ${phrase("of", "de")} ${engine.steps.length}`)}<main class="page practice-engine-page"><nav class="movement-strip" aria-label="${phrase("Practice steps", "Pasos de la práctica")}">${engine.steps.map((item, index) => `<span class="movement-dot ${index < state.engineStep ? "done" : ""} ${index === state.engineStep ? "active" : ""}"></span>`).join("")}</nav><header class="section-intro"><p class="eyebrow">${escapeHTML(engine.title)}</p><h1 class="practice-title">${escapeHTML(step.prompt)}</h1>${step.optionalSupport ? `<p class="lede">${escapeHTML(step.optionalSupport)}</p>` : ""}</header>${responseControl}<div class="duration-row" aria-label="${phrase("Practice length", "Duración de la práctica")}">${engine.recommendedDurations.map(duration => `<button class="chip" type="button" data-engine-duration="${duration}" aria-pressed="${state.engineDuration === duration}">${duration} min</button>`).join("")}</div><footer class="practice-actions"><div class="button-row"><button class="secondary-button" type="button" data-action="previous-engine-step" ${state.engineStep === 0 ? "disabled" : ""}>${tr("back")}</button><button class="primary-button" type="button" data-action="next-engine-step">${isLast ? phrase("Complete practice", "Completar la práctica") : tr("continue")}</button></div><button class="text-button" type="button" data-view="practiceEngines">${phrase("Choose another practice", "Elegir otra práctica")}</button></footer></main>`;
+}
+
+function currentActPool() {
+  const acts = catalogFor(state.lang).sovereignActs.filter(act => (state.actQuality === "all" || act.primaryQuality === state.actQuality) && (state.actContext === "all" || act.context === state.actContext) && (state.actEffort === "all" || act.effort === state.actEffort));
+  return acts.length ? acts : catalogFor(state.lang).sovereignActs;
+}
+
+function currentAct() {
+  const pool = currentActPool();
+  return pool[((state.actIndex % pool.length) + pool.length) % pool.length];
+}
 
 function renderActs() {
+  const catalog = catalogFor(state.lang);
   const act = currentAct();
-  const title = state.lang === "en" ? act[0] : act[2];
-  const body = state.lang === "en" ? act[1] : act[3];
-  return `${renderTopbar(tr("acts"), state.lang === "en" ? "One quality entering the day" : "Una cualidad entrando en el día")}
-    <main class="page"><section class="act-stage"><div class="act-path" aria-hidden="true"></div><div class="act-copy"><p class="eyebrow">${state.lang === "en" ? "Today's invitation" : "La invitación de hoy"}</p><h1 class="page-title">${title}</h1><p>${body}</p></div><div class="button-row"><button class="primary-button" type="button" data-action="carry-act">${state.lang === "en" ? "Carry this act" : "Llevar este acto"}</button><button class="secondary-button" type="button" data-action="another-act">${tr("another")}</button></div><button class="text-button" type="button" data-action="attune-act">${state.lang === "en" ? "Attune before choosing" : "Afinar antes de elegir"}</button></section></main>`;
+  const qualities = new Set(catalog.sovereignActs.map(item => item.primaryQuality));
+  const contexts = new Set(catalog.sovereignActs.map(item => item.context));
+  const efforts = new Set(catalog.sovereignActs.map(item => item.effort));
+  return `${renderTopbar(tr("acts"), phrase("One quality entering the day", "Una cualidad entrando en el día"))}<main class="page"><section class="act-stage"><div class="act-path" aria-hidden="true"></div><div class="act-copy"><p class="eyebrow">${escapeHTML(tagLabel(act.primaryQuality))} · ${escapeHTML(tagLabel(act.effort))}</p><h1 class="page-title">${escapeHTML(act.title)}</h1><p>${escapeHTML(act.invitation)}</p></div><details class="act-filters"><summary>${phrase("Choose the kind of act", "Elegir el tipo de acto")}</summary><div class="filter-grid"><label>${phrase("Quality", "Cualidad")}<select data-act-filter="quality"><option value="all">${phrase("Any quality", "Cualquier cualidad")}</option>${libraryFilterOptions(qualities, state.actQuality)}</select></label><label>${phrase("Context", "Contexto")}<select data-act-filter="context"><option value="all">${phrase("Any context", "Cualquier contexto")}</option>${libraryFilterOptions(contexts, state.actContext)}</select></label><label>${phrase("Effort", "Esfuerzo")}<select data-act-filter="effort"><option value="all">${phrase("Any size", "Cualquier tamaño")}</option>${libraryFilterOptions(efforts, state.actEffort)}</select></label></div></details><div class="button-row"><button class="primary-button" type="button" data-action="carry-act">${phrase("Carry this act", "Llevar este acto")}</button><button class="secondary-button" type="button" data-action="another-act">${tr("another")}</button></div><button class="text-button" type="button" data-action="attune-act">${phrase("Attune before choosing", "Afinar antes de elegir")}</button></section></main>`;
+}
+
+function renderRuleOfLife() {
+  const catalog = catalogFor(state.lang);
+  const keptPrinciples = catalog.principles.filter(item => state.ruleOfLife.principleIDs.includes(item.id));
+  const prompt = catalog.weeklyReviewPrompts[new Date().getDay() % catalog.weeklyReviewPrompts.length];
+  return `${renderTopbar(phrase("My Compass", "Mi brújula"), phrase("Chosen locally, editable at any time", "Elegida localmente, editable en cualquier momento"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("A living rule of life", "Una regla de vida viva")}</p><h1 class="page-title">${phrase("My Compass", "Mi brújula")}</h1><p class="lede">${phrase("Keep only the principles and commitments you want to remember. This is not a score, identity or promise to be perfect.", "Guarda solo los principios y compromisos que quieras recordar. Esto no es una puntuación, identidad ni promesa de perfección.")}</p></header><section class="start-here"><p class="eyebrow">${phrase("This week's question", "La pregunta de esta semana")}</p><blockquote>${escapeHTML(prompt.prompt)}</blockquote></section><section><h2>${phrase("Principles I chose", "Principios que elegí")}</h2>${keptPrinciples.length ? `<div class="list">${keptPrinciples.map(item => `<button class="list-row" type="button" data-principle="${item.id}"><span><strong>${escapeHTML(item.title)}</strong><span>${escapeHTML(item.sovereignAct)}</span></span><b>→</b></button>`).join("")}</div>` : `<p class="empty-state">${phrase("No principles kept yet. Explore Foundations and keep only what feels worth practising.", "Todavía no guardaste principios. Explora Fundamentos y conserva solo lo que valga la pena practicar.")}</p>`}</section><section><h2>${phrase("Commitments", "Compromisos")}</h2><div class="commitment-list">${catalog.ruleCommitments.map(item => `<label class="commitment-row"><input type="checkbox" data-commitment="${item.id}" ${state.ruleOfLife.commitmentIDs.includes(item.id) ? "checked" : ""}><span><strong>${escapeHTML(item.domain)}</strong>${escapeHTML(item.text)}</span></label>`).join("")}</div></section></main>`;
+}
+
+function renderMissions() {
+  return `${renderTopbar(phrase("Mission Path", "Camino de misión"), phrase("Optional project orientation", "Orientación opcional para un proyecto"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Direction before explanation", "Dirección antes que explicación")}</p><h1 class="page-title">${phrase("Protect a direction.", "Protege una dirección.")}</h1><p class="lede">${phrase("This is not a task manager. It holds direction, the next visible step and the rhythm that preserves the person serving it.", "Esto no es un gestor de tareas. Sostiene la dirección, el próximo paso visible y el ritmo que cuida a la persona que la sirve.")}</p></header>${state.missions.length ? `<section class="list">${state.missions.map(mission => `<button class="list-row" type="button" data-mission="${mission.id}"><span><strong>${escapeHTML(mission.title)}</strong><span>${escapeHTML(mission.direction)}</span></span><b>→</b></button>`).join("")}</section>` : `<p class="empty-state">${phrase("No direction has been saved yet.", "Todavía no se ha guardado ninguna dirección.")}</p>`}<div class="practice-actions"><button class="primary-button" type="button" data-action="new-mission">${phrase("Begin a Mission Path", "Comenzar un camino de misión")}</button></div></main>`;
+}
+
+function renderMission() {
+  const catalog = catalogFor(state.lang);
+  const existing = state.missions.find(item => item.id === state.selectedMission);
+  const draft = state.missionDraft;
+  return `${renderTopbar(existing ? phrase("Mission Path", "Camino de misión") : phrase("New Mission Path", "Nuevo camino de misión"), phrase("Let movement reveal the route", "Deja que el movimiento revele la ruta"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Direction before explanation", "Dirección antes que explicación")}</p><h1 class="page-title">${phrase("Let movement reveal the route.", "Deja que el movimiento revele la ruta.")}</h1><p class="lede">${phrase("Choose a direction that can preserve the body, attention and relationships through which it will be served.", "Elige una dirección que pueda cuidar el cuerpo, la atención y las relaciones mediante las que será servida.")}</p></header><section class="mission-form"><label class="field-label"><span>${phrase("Name this path", "Nombra este camino")}</span><input class="field-input" data-mission-input="title" value="${escapeAttribute(draft.title)}"></label><label class="field-label"><span>${phrase("Protected direction", "Dirección protegida")}</span><textarea class="field-textarea" data-mission-input="direction">${escapeHTML(draft.direction)}</textarea></label><label class="field-label"><span>${phrase("Next visible step", "Próximo paso visible")}</span><input class="field-input" data-mission-input="nextVisibleStep" value="${escapeAttribute(draft.nextVisibleStep)}"></label><label class="field-label"><span>${phrase("What rhythm could sustain this?", "¿Qué ritmo podría sostener esto?")}</span><textarea class="field-textarea" data-mission-input="sustainabilityNote">${escapeHTML(draft.sustainabilityNote)}</textarea></label><label class="field-label"><span>${phrase("Guiding principle", "Principio guía")}</span><select data-mission-principle><option value="">${phrase("No principle selected", "Ningún principio seleccionado")}</option>${catalog.principles.map(item => `<option value="${item.id}" ${draft.principleID === item.id ? "selected" : ""}>${escapeHTML(item.title)}</option>`).join("")}</select></label></section><div class="practice-actions"><button class="primary-button" type="button" data-action="save-mission" ${draft.title.trim() && draft.direction.trim() ? "" : "disabled"}>${phrase("Save this direction", "Guardar esta dirección")}</button>${existing ? `<button class="text-button danger" type="button" data-action="delete-mission">${phrase("Release this Mission Path", "Soltar este camino de misión")}</button>` : ""}</div></main>`;
+}
+
+function renderScales() {
+  const scales = [
+    [phrase("Inner coherence", "Coherencia interior"), phrase("Bring thoughts, feelings, values and actions into honest relationship.", "Pon pensamientos, emociones, valores y acciones en una relación honesta.")],
+    [phrase("Personal sovereignty", "Soberanía personal"), phrase("Choose with agency, boundaries and responsibility.", "Elige con autonomía, límites y responsabilidad.")],
+    [phrase("Conscious relationship", "Relación consciente"), phrase("Meet difference without control, disappearance or forced agreement.", "Encuentra la diferencia sin control, desaparición ni acuerdo forzado.")],
+    [phrase("Field stewardship", "Cuidado del campo"), phrase("Consider how choices shape communities, systems and the living world.", "Considera cómo las elecciones dan forma a comunidades, sistemas y al mundo vivo.")]
+  ];
+  return `${renderTopbar(phrase("Four Scales", "Cuatro escalas"), phrase("From inner life to the wider field", "Desde la vida interior hasta el campo más amplio"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("One choice, several scales", "Una elección, varias escalas")}</p><h1 class="page-title">${phrase("Four Scales of Participation", "Cuatro escalas de participación")}</h1><p class="lede">${phrase("A choice can be kind to one part of us and harmful to a relationship or system. The four scales help widen attention without erasing the particular person in front of us.", "Una elección puede ser amable con una parte de nosotros y dañina para una relación o sistema. Las cuatro escalas amplían la atención sin borrar a la persona concreta frente a nosotros.")}</p></header><section class="scale-rings">${scales.map(([title, body], index) => `<article style="--scale-size:${100 - index * 13}%;--scale-index:${index}"><span>${index + 1}</span><div><h2>${title}</h2><p>${body}</p></div></article>`).join("")}</section></main>`;
 }
 
 function renderThreshold() {
@@ -1085,8 +1313,7 @@ function renderThreshold() {
 }
 
 function renderHistory() {
-  return `${renderTopbar(tr("history"), state.lang === "en" ? "The app remembers the form, never the meaning" : "La app recuerda la forma, nunca el significado")}
-    <main class="page"><header class="section-intro"><p class="eyebrow">${state.lang === "en" ? "Local continuity" : "Continuidad local"}</p><h1 class="page-title">${tr("history")}</h1><p class="lede">${state.lang === "en" ? "These are quiet traces of what you chose to practise. They stay on this device unless you export them. Only you decide what they mean." : "Estas son huellas tranquilas de lo que elegiste practicar. Permanecen en este dispositivo salvo que las exportes. Solo tú decides lo que significan."}</p></header>${state.traces.length ? `<section class="trace-list">${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${state.lang === "en" ? "No saved traces yet. Nothing is missing." : "Todavía no hay huellas guardadas. No falta nada."}</p>`}</main>`;
+  return `${renderTopbar(tr("history"), phrase("Saved only when you choose", "Guardado solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Personal Sovereign Path", "Camino soberano personal")}</p><h1 class="page-title">${state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length ? phrase("Your saved choices are here.", "Tus elecciones guardadas están aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Practices, questions, principles and directions appear here only when you choose to save them. Tone Sovereign does not interpret them.", "Las prácticas, preguntas, principios y direcciones aparecen aquí solo cuando eliges guardarlos. Tone Sovereign no los interpreta.")}</p></header><section class="continuity-links"><button class="orientation-invitation" type="button" data-view="ruleOfLife"><span class="door-mark" aria-hidden="true">│</span><span><strong>${phrase("My Golden Age Rule of Life", "Mi regla de vida de la Edad Dorada")}</strong><small>${phrase("Keep chosen principles and commitments as a living orientation.", "Conserva principios y compromisos elegidos como orientación viva.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="missions"><span class="door-mark" aria-hidden="true">↗</span><span><strong>${phrase("Mission Path", "Camino de misión")}</strong><small>${phrase("Protect a direction, its next visible step and a sustainable rhythm.", "Protege una dirección, su próximo paso visible y un ritmo sostenible.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="foundations"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Foundations", "Fundamentos")}</strong><small>${phrase("Return to the Laws, Principles and scales of participation.", "Vuelve a las Leyes, los Principios y las escalas de participación.")}</small></span><b>→</b></button></section>${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}<p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
 }
 
 function renderSettings() {
@@ -1130,7 +1357,7 @@ function addTrace(trace) {
 }
 
 function exportData() {
-  const data = { app: "Tone Sovereign", version: 1, exportedAt: new Date().toISOString(), preferences: { lang: state.lang, sound: state.sound, voice: state.voice, reduceMotion: state.reduceMotion, quietWords: state.quietWords }, traces: state.traces };
+  const data = { app: "Tone Sovereign", version: 2, exportedAt: new Date().toISOString(), preferences: { lang: state.lang, sound: state.sound, voice: state.voice, reduceMotion: state.reduceMotion, quietWords: state.quietWords }, traces: state.traces, ruleOfLife: state.ruleOfLife, missions: state.missions };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
@@ -1147,6 +1374,14 @@ function importData(file) {
       if (data.app !== "Tone Sovereign" || !Array.isArray(data.traces)) throw new Error("Invalid export");
       state.traces = data.traces.slice(0, 100);
       localStorage.setItem(STORAGE.traces, JSON.stringify(state.traces));
+      if (data.ruleOfLife && Array.isArray(data.ruleOfLife.principleIDs) && Array.isArray(data.ruleOfLife.commitmentIDs)) {
+        state.ruleOfLife = data.ruleOfLife;
+        localStorage.setItem(STORAGE.ruleOfLife, JSON.stringify(state.ruleOfLife));
+      }
+      if (Array.isArray(data.missions)) {
+        state.missions = data.missions;
+        localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
+      }
       showToast(state.lang === "en" ? "Your local data was restored." : "Tus datos locales fueron restaurados.");
       render();
     } catch {
@@ -1162,6 +1397,12 @@ function eraseData() {
   state.traces = [];
   localStorage.removeItem(STORAGE.traces);
   localStorage.removeItem(STORAGE.carriedAct);
+  localStorage.removeItem(STORAGE.ruleOfLife);
+  localStorage.removeItem(STORAGE.engineDrafts);
+  localStorage.removeItem(STORAGE.missions);
+  state.ruleOfLife = { principleIDs: [], commitmentIDs: [] };
+  state.engineDrafts = {};
+  state.missions = [];
   showToast(state.lang === "en" ? "Local traces erased." : "Huellas locales borradas.");
   render();
 }
@@ -1177,7 +1418,7 @@ function readAbout() {
 app.addEventListener("click", event => {
   const button = event.target.closest("button");
   if (!button) return;
-  const { action, view, movement, steady, pull, relation, doorway, tone, field, teaching } = button.dataset;
+  const { action, view, movement, steady, pull, relation, doorway, tone, field, teaching, law, principle, entry, engine, mission } = button.dataset;
 
   if (view) { navigate(view); return; }
   if (movement !== undefined) { stopPracticeTimers(); state.practice.index = Number(movement); render(); playMovementVoice(movements[state.practice.index].id); return; }
@@ -1186,8 +1427,18 @@ app.addEventListener("click", event => {
   if (relation) { state.practice.relation = relation; render(); return; }
   if (doorway) { state.practice.doorway = doorway; render(); return; }
   if (tone) { const selected = tones.find(item => item.id === tone); state.practice.tone = tone; state.practice.frequency = selected.hz; if (state.practice.tonePlaying) sound.tone(selected.hz, state.practice.amplitude); render(); return; }
-  if (field) { navigate("field", { field: Number(field) }); return; }
-  if (teaching) { navigate("teaching", { teaching }); return; }
+  if (!action && field) { navigate("field", { field }); return; }
+  if (!action && teaching) { navigate("teaching", { teaching }); return; }
+  if (!action && law) { state.teachingDepth = 1; navigate("law", { law }); return; }
+  if (!action && principle) { state.teachingDepth = 1; navigate("principle", { principle }); return; }
+  if (!action && entry) { state.showFullTeaching = false; navigate("entry", { entry }); return; }
+  if (!action && engine) { navigate("practiceEngine", { engine }); return; }
+  if (!action && mission) { navigate("mission", { mission }); return; }
+
+  if (button.dataset.libraryMode) { state.libraryMode = button.dataset.libraryMode; render(); return; }
+  if (button.dataset.foundationMode) { state.foundationMode = button.dataset.foundationMode; render(); return; }
+  if (button.dataset.depth) { state.teachingDepth = Number(button.dataset.depth); render(); return; }
+  if (button.dataset.engineDuration) { state.engineDuration = Number(button.dataset.engineDuration); render(); return; }
 
   if (action === "back") goBack();
   if (action === "home") goHome();
@@ -1199,6 +1450,7 @@ app.addEventListener("click", event => {
   if (action === "toggle-voice") { state.voice = !state.voice; if (!state.voice) sound.stopVoice(); persistPreferences(); render(); }
   if (action === "toggle-motion") { state.reduceMotion = !state.reduceMotion; persistPreferences(); render(); }
   if (action === "toggle-words") { state.quietWords = !state.quietWords; persistPreferences(); render(); }
+  if (action === "open-inclusion-principle") { state.teachingDepth = 1; navigate("principle", { principle: "principle-31" }); }
   if (action === "previous-movement") previousMovement();
   if (action === "next-movement") nextMovement();
   if (action === "start-notice") beginNoticePractice();
@@ -1210,10 +1462,18 @@ app.addEventListener("click", event => {
   if (action === "reclaim-hold") { state.practice.reclaimHolding = !state.practice.reclaimHolding; if (state.practice.reclaimHolding) sound.playVoice("ts_reclaim_centre_remains_v1"); render(); }
   if (action === "save-question") { state.practice.questionSaved = !state.practice.questionSaved; render(); }
   if (action === "toggle-tone") { state.practice.tonePlaying = !state.practice.tonePlaying; if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); else sound.stop(); render(); }
-  if (action === "save-field-practice") { const item = fields.find(entry => entry.n === Number(button.dataset.field)); addTrace({ type: "field", title: `${item.n}D · ${item[state.lang][0]}`, detail: item[state.lang][4] }); showToast(tr("saved")); }
+  if (action === "save-field-practice") { const item = contentByID(catalogFor(state.lang).fields, button.dataset.field); addTrace({ type: "field", title: `${item.dimension}D · ${item.title}`, detail: item.returnPractice }); showToast(tr("saved")); }
   if (action === "save-teaching") { const item = teachings.find(entry => entry.id === button.dataset.teaching); addTrace({ type: "teaching", title: item[state.lang].title, detail: item[state.lang].line }); showToast(tr("saved")); }
-  if (action === "another-act") { state.actIndex = (state.actIndex + 1 + Math.floor(Math.random() * (acts.length - 1))) % acts.length; render(); }
-  if (action === "carry-act") { const act = currentAct(); localStorage.setItem(STORAGE.carriedAct, String(state.actIndex)); addTrace({ type: "act", title: state.lang === "en" ? act[0] : act[2], detail: state.lang === "en" ? act[1] : act[3] }); showToast(tr("saved")); }
+  if (action === "save-entry") { const item = contentByID(catalogFor(state.lang).libraryEntries, button.dataset.entry); addTrace({ type: "teaching", title: item.title, detail: item.sovereignQuestion }); showToast(tr("saved")); }
+  if (action === "toggle-full-teaching") { state.showFullTeaching = !state.showFullTeaching; render(); }
+  if (action === "toggle-principle") {
+    const id = button.dataset.principle;
+    state.ruleOfLife.principleIDs = state.ruleOfLife.principleIDs.includes(id) ? state.ruleOfLife.principleIDs.filter(item => item !== id) : [...state.ruleOfLife.principleIDs, id];
+    localStorage.setItem(STORAGE.ruleOfLife, JSON.stringify(state.ruleOfLife));
+    render();
+  }
+  if (action === "another-act") { const pool = currentActPool(); state.actIndex = (state.actIndex + 1 + Math.floor(Math.random() * Math.max(1, pool.length - 1))) % pool.length; render(); }
+  if (action === "carry-act") { const act = currentAct(); localStorage.setItem(STORAGE.carriedAct, String(state.actIndex)); addTrace({ type: "act", title: act.title, detail: act.invitation }); showToast(tr("saved")); }
   if (action === "attune-act") { state.practice = newPractice(); state.practice.index = 0; navigate("practice"); }
   if (action === "keep-threshold") { const doorwayItem = doorways.find(item => item.id === state.practice.doorway); addTrace({ type: "threshold", title: doorwayItem[state.lang][0], detail: doorwayItem[state.lang][2] }); showToast(tr("saved")); }
   if (action === "leave-threshold") goHome();
@@ -1221,17 +1481,82 @@ app.addEventListener("click", event => {
   if (action === "import") document.querySelector("[data-import-file]")?.click();
   if (action === "erase") eraseData();
   if (action === "read-about") readAbout();
+  if (action === "previous-engine-step") { state.engineStep = Math.max(0, state.engineStep - 1); render(); }
+  if (action === "next-engine-step") {
+    const engineItem = contentByID(catalogFor(state.lang).practiceEngines, state.selectedEngine);
+    if (state.engineStep < engineItem.steps.length - 1) state.engineStep += 1;
+    else {
+      state.engineComplete = true;
+      addTrace({ type: "practice", title: engineItem.title, detail: phrase("Completed as a private practice.", "Completada como práctica privada.") });
+      delete state.engineDrafts[engineItem.id];
+      localStorage.setItem(STORAGE.engineDrafts, JSON.stringify(state.engineDrafts));
+    }
+    render();
+  }
+  if (action === "restart-engine") { state.engineStep = 0; state.engineComplete = false; state.engineResponses = {}; render(); }
+  if (action === "finish-engine") { state.libraryMode = "practices"; navigate("practiceEngines", { remember: false }); }
+  if (action === "new-mission") { navigate("mission", { mission: "" }); }
+  if (action === "save-mission") {
+    const existingIndex = state.missions.findIndex(item => item.id === state.selectedMission);
+    const value = { id: state.selectedMission || crypto.randomUUID?.() || String(Date.now()), ...state.missionDraft, updatedAt: new Date().toISOString() };
+    state.missions = existingIndex >= 0 ? state.missions.map((item, index) => index === existingIndex ? value : item) : [value, ...state.missions];
+    localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
+    showToast(tr("saved"));
+    navigate("missions", { remember: false });
+  }
+  if (action === "delete-mission") {
+    state.missions = state.missions.filter(item => item.id !== state.selectedMission);
+    localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
+    navigate("missions", { remember: false });
+  }
 });
 
+let librarySearchTimer = 0;
 app.addEventListener("input", event => {
   const target = event.target;
   if (target.dataset.input) state.practice[target.dataset.input] = target.value;
+  if (target.dataset.engineResponse) {
+    state.engineResponses[target.dataset.engineResponse] = target.value;
+    state.engineDrafts[state.selectedEngine] = { ...state.engineResponses };
+    localStorage.setItem(STORAGE.engineDrafts, JSON.stringify(state.engineDrafts));
+  }
+  if (target.dataset.missionInput) {
+    state.missionDraft[target.dataset.missionInput] = target.value;
+    const saveButton = document.querySelector('[data-action="save-mission"]');
+    if (saveButton) saveButton.disabled = !(state.missionDraft.title.trim() && state.missionDraft.direction.trim());
+  }
+  if (target.dataset.libraryQuery !== undefined) {
+    state.libraryQuery = target.value;
+    window.clearTimeout(librarySearchTimer);
+    librarySearchTimer = window.setTimeout(() => {
+      render();
+      const input = document.querySelector("[data-library-query]");
+      input?.focus();
+      input?.setSelectionRange(input.value.length, input.value.length);
+    }, 180);
+  }
   if (target.dataset.range === "frequency") { state.practice.frequency = Number(target.value); if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); target.nextElementSibling.textContent = `${target.value} Hz`; }
   if (target.dataset.range === "amplitude") { state.practice.amplitude = Number(target.value); if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); target.nextElementSibling.textContent = target.value; }
 });
 
 app.addEventListener("change", event => {
   if (event.target.matches("[data-import-file]") && event.target.files[0]) importData(event.target.files[0]);
+  const libraryFilter = event.target.dataset.libraryFilter;
+  if (libraryFilter === "field") state.libraryField = event.target.value;
+  if (libraryFilter === "domain") state.libraryDomain = event.target.value;
+  if (libraryFilter === "need") state.libraryNeed = event.target.value;
+  if (libraryFilter) render();
+  const actFilter = event.target.dataset.actFilter;
+  if (actFilter === "quality") state.actQuality = event.target.value;
+  if (actFilter === "context") state.actContext = event.target.value;
+  if (actFilter === "effort") state.actEffort = event.target.value;
+  if (actFilter) { state.actIndex = 0; render(); }
+  if (event.target.dataset.commitment) {
+    const id = event.target.dataset.commitment;
+    state.ruleOfLife.commitmentIDs = event.target.checked ? [...new Set([...state.ruleOfLife.commitmentIDs, id])] : state.ruleOfLife.commitmentIDs.filter(item => item !== id);
+    localStorage.setItem(STORAGE.ruleOfLife, JSON.stringify(state.ruleOfLife));
+  }
+  if (event.target.matches("[data-mission-principle]")) state.missionDraft.principleID = event.target.value;
 });
 
 app.addEventListener("keydown", event => {

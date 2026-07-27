@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v13";
+const CACHE = "tone-sovereign-v14";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_cross_open_question_v1",
@@ -18,6 +18,7 @@ const CORE = [
   "./",
   "./index.html",
   "./styles.css",
+  "./catalog.js",
   "./app.js",
   "./manifest.webmanifest",
   "./sword-mark.png",
