@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "voiceID": "JqBjSCR45bFOddN5ioed",
+  "durationsSeconds": [900, 1800, 2700, 3600],
+  "guidanceModes": ["regular", "light", "off"],
+  "practices": [
+    {
+      "id": "breath-at-the-threshold",
+      "symbol": "wind",
+      "accent": "#D9B45A",
+      "en": {
+        "intention": "Settle",
+        "title": "Breath at the Threshold",
+        "purpose": "Rest attention on the natural breath without changing it.",
+        "lineage": "Inspired by traditional breath awareness. The breath stays natural and the user remains in charge.",
+        "safety": "Sit, recline, or keep your eyes open. If following the breath feels uncomfortable, feel your feet or listen to the room instead.",
+        "cues": [
+          "Find a position that asks for as little effort as possible.",
+          "Feel one breath where it is easiest to notice.",
+          "Let the breath stay natural. There is no right depth or rhythm.",
+          "Know when the breath comes in. Know when the breath goes out.",
+          "If attention wandered, gently meet the next breath.",
+          "Notice the beginning, middle, and end of one breath.",
+          "Let the body breathe by itself for a while.",
+          "Nothing needs to be achieved. This breath is enough.",
+          "Let attention widen while the breath remains nearby.",
+          "Feel the room around you. Return in your own time."
+        ]
+      },
+      "es": {
+        "intention": "Asentarte",
+        "title": "Respirar en el umbral",
+        "purpose": "Descansa la atención en la respiración natural sin cambiarla.",
+        "lineage": "Inspirada en la atención tradicional a la respiración. La respiración sigue natural y tú sigues a cargo.",
+        "safety": "Puedes sentarte, recostarte o mantener los ojos abiertos. Si atender la respiración resulta incómodo, siente los pies o escucha la habitación.",
+        "cues": [
+          "Encuentra una postura que requiera el menor esfuerzo posible.",
+          "Siente una respiración donde sea más fácil notarla.",
+          "Deja que la respiración siga natural. No hay una profundidad ni un ritmo correctos.",
+          "Reconoce cuando el aire entra. Reconoce cuando el aire sale.",
+          "Si la atención se fue, encuentra con suavidad la siguiente respiración.",
+          "Nota el comienzo, el medio y el final de una respiración.",
+          "Deja que el cuerpo respire por sí solo durante un momento.",
+          "No hay nada que lograr. Esta respiración es suficiente.",
+          "Deja que la atención se amplíe mientras la respiración permanece cerca.",
+          "Siente la habitación a tu alrededor. Regresa a tu propio ritmo."
+        ]
+      }
+    },
+    {
+      "id": "simple-noting",
+      "symbol": "circle.dotted",
+      "accent": "#E7C872",
+      "en": {
+        "intention": "Notice",
+        "title": "Simple Noting",
+        "purpose": "Give what stands out one quiet name, then let it change.",
+        "lineage": "Inspired by Mahasi-style noting. Labels are light reminders, not judgments or a test of speed.",
+        "safety": "Use ordinary words. If naming becomes tiring, stop naming and feel one point of contact instead.",
+        "cues": [
+          "Let the body arrive before trying to name anything.",
+          "When something stands out, give it one quiet name.",
+          "You might note hearing, warmth, pressure, seeing, or thinking.",
+          "One simple word is enough. Then notice what comes next.",
+          "If a thought carries you away, quietly note thinking.",
+          "If something feels difficult, name the sensation without arguing with it.",
+          "When the experience is clear, let the label fall away.",
+          "Return to whatever is most obvious now.",
+          "Now notice without needing to name every experience.",
+          "Feel one point of contact and return to the room."
+        ]
+      },
+      "es": {
+        "intention": "Notar",
+        "title": "Notar con sencillez",
+        "purpose": "Da un nombre tranquilo a lo que destaque y deja que cambie.",
+        "lineage": "Inspirada en el método de anotación de Mahasi. Las palabras son recordatorios ligeros, no juicios ni una prueba de rapidez.",
+        "safety": "Usa palabras comunes. Si nombrar te cansa, deja de hacerlo y siente un punto de contacto.",
+        "cues": [
+          "Deja que el cuerpo llegue antes de intentar nombrar algo.",
+          "Cuando algo destaque, dale un nombre tranquilo.",
+          "Podrías notar sonido, calor, presión, visión o pensamiento.",
+          "Una palabra sencilla es suficiente. Después nota lo que sigue.",
+          "Si un pensamiento te lleva, di en silencio: pensando.",
+          "Si algo se siente difícil, nombra la sensación sin discutir con ella.",
+          "Cuando la experiencia esté clara, deja caer la palabra.",
+          "Vuelve a lo que sea más evidente ahora.",
+          "Ahora nota sin tener que nombrar cada experiencia.",
+          "Siente un punto de contacto y regresa a la habitación."
+        ]
+      }
+    },
+    {
+      "id": "the-living-body",
+      "symbol": "figure.mind.and.body",
+      "accent": "#B8C58C",
+      "en": {
+        "intention": "Feel",
+        "title": "The Living Body",
+        "purpose": "Meet the body through contact, temperature, movement, and space.",
+        "lineage": "A gentle body-sensing practice. It invites direct experience without asking the body to relax or perform.",
+        "safety": "Choose a neutral area if any part of the body feels too intense. You may open your eyes or stop at any time.",
+        "cues": [
+          "Feel the support beneath your body.",
+          "Notice the hands as they are, without needing to change them.",
+          "Feel the face, jaw, and the space around the eyes.",
+          "Notice the chest and belly moving in their own way.",
+          "Feel warmth, coolness, pressure, tingling, or nothing clear.",
+          "Let one tense place have a little more room around it.",
+          "Feel the body as many sensations, not one fixed object.",
+          "Include the space just beyond the skin.",
+          "Sense the whole body at once, however faintly.",
+          "Feel your hands and feet. Return when you are ready."
+        ]
+      },
+      "es": {
+        "intention": "Sentir",
+        "title": "El cuerpo vivo",
+        "purpose": "Encuentra el cuerpo mediante el contacto, la temperatura, el movimiento y el espacio.",
+        "lineage": "Una práctica suave de percepción corporal. Invita a la experiencia directa sin pedir que el cuerpo se relaje ni rinda.",
+        "safety": "Elige una zona neutral si alguna parte del cuerpo se siente demasiado intensa. Puedes abrir los ojos o detenerte cuando quieras.",
+        "cues": [
+          "Siente el apoyo debajo de tu cuerpo.",
+          "Nota las manos tal como están, sin necesidad de cambiarlas.",
+          "Siente el rostro, la mandíbula y el espacio alrededor de los ojos.",
+          "Nota el pecho y el vientre moviéndose a su manera.",
+          "Siente calor, frescor, presión, cosquilleo o nada claro.",
+          "Deja que una zona tensa tenga un poco más de espacio a su alrededor.",
+          "Siente el cuerpo como muchas sensaciones, no como un objeto fijo.",
+          "Incluye el espacio que está justo más allá de la piel.",
+          "Siente todo el cuerpo a la vez, aunque sea de forma tenue.",
+          "Siente las manos y los pies. Regresa cuando estés listo."
+        ]
+      }
+    },
+    {
+      "id": "open-field",
+      "symbol": "circle",
+      "accent": "#9DBDCC",
+      "en": {
+        "intention": "Open",
+        "title": "Open Field",
+        "purpose": "Let sounds, sensations, and thoughts appear within a wider awareness.",
+        "lineage": "An open-awareness practice. Nothing needs to be held away, and no single experience needs to become the centre.",
+        "safety": "Keep your eyes open if spacious attention feels unsteady. Return to your feet, hands, or the room whenever useful.",
+        "cues": [
+          "Begin with one clear point of contact.",
+          "Let sounds arrive without searching for them.",
+          "Include sensations in the body.",
+          "Include thoughts and images as events that appear.",
+          "Notice that awareness can hold more than one thing.",
+          "Nothing needs to become the centre for long.",
+          "Let the field be wide and the body remain grounded.",
+          "If you become lost, return to one sound or one touch.",
+          "Rest with the whole changing field.",
+          "See the room and carry this wider attention with you."
+        ]
+      },
+      "es": {
+        "intention": "Abrirte",
+        "title": "Campo abierto",
+        "purpose": "Deja que sonidos, sensaciones y pensamientos aparezcan dentro de una atención más amplia.",
+        "lineage": "Una práctica de atención abierta. No hace falta apartar nada ni convertir una sola experiencia en el centro.",
+        "safety": "Mantén los ojos abiertos si la atención espaciosa se siente inestable. Vuelve a los pies, las manos o la habitación cuando te ayude.",
+        "cues": [
+          "Comienza con un punto claro de contacto.",
+          "Deja que los sonidos lleguen sin buscarlos.",
+          "Incluye las sensaciones del cuerpo.",
+          "Incluye pensamientos e imágenes como sucesos que aparecen.",
+          "Nota que la atención puede contener más de una cosa.",
+          "Nada necesita ser el centro durante mucho tiempo.",
+          "Deja que el campo sea amplio y que el cuerpo siga conectado al suelo.",
+          "Si te pierdes, vuelve a un sonido o a un contacto.",
+          "Descansa con todo el campo cambiante.",
+          "Mira la habitación y lleva contigo esta atención más amplia."
+        ]
+      }
+    },
+    {
+      "id": "golden-age-goodwill",
+      "symbol": "heart",
+      "accent": "#D79BA5",
+      "en": {
+        "intention": "Offer goodwill",
+        "title": "Golden Age Goodwill",
+        "purpose": "Practise a wish for wellbeing without forcing a feeling.",
+        "lineage": "Inspired by loving-kindness practice. The words are invitations; warmth does not have to appear.",
+        "safety": "Begin with someone easy or with a living being you care about. Skip anyone who makes the practice feel unsafe.",
+        "cues": [
+          "Feel the body supported before offering any words.",
+          "Bring to mind someone whose wellbeing is easy to wish for.",
+          "May you be safe. May you have room to breathe.",
+          "Let the words be enough. No special feeling is required.",
+          "Offer the same wish to yourself, if that feels possible.",
+          "May I meet this life with care and courage.",
+          "Include someone you do not know well.",
+          "Let goodwill widen without asking you to ignore harm or boundaries.",
+          "May our choices help life flourish.",
+          "Release the words and return to the room."
+        ]
+      },
+      "es": {
+        "intention": "Ofrecer buena voluntad",
+        "title": "Buena voluntad para una Edad Dorada",
+        "purpose": "Practica un deseo de bienestar sin forzar ningún sentimiento.",
+        "lineage": "Inspirada en la práctica de bondad amorosa. Las palabras son invitaciones; no es necesario que aparezca calidez.",
+        "safety": "Comienza con alguien fácil o con un ser vivo que quieras. Omite a cualquier persona que haga que la práctica se sienta insegura.",
+        "cues": [
+          "Siente el cuerpo apoyado antes de ofrecer palabras.",
+          "Piensa en alguien cuyo bienestar sea fácil de desear.",
+          "Que estés a salvo. Que tengas espacio para respirar.",
+          "Deja que las palabras sean suficientes. No hace falta sentir algo especial.",
+          "Ofrécete el mismo deseo, si te resulta posible.",
+          "Que pueda encontrar esta vida con cuidado y valentía.",
+          "Incluye a alguien que no conozcas bien.",
+          "Deja que la buena voluntad se amplíe sin ignorar el daño ni los límites.",
+          "Que nuestras decisiones ayuden a la vida a florecer.",
+          "Suelta las palabras y regresa a la habitación."
+        ]
+      }
+    },
+    {
+      "id": "sound-and-silence",
+      "symbol": "waveform",
+      "accent": "#A8B7CE",
+      "en": {
+        "intention": "Listen",
+        "title": "Sound and Silence",
+        "purpose": "Receive nearby sounds, distant sounds, and the quiet between them.",
+        "lineage": "A listening practice. No background music is added, so the environment remains available to awareness.",
+        "safety": "Lower your device volume before beginning. If a sound feels too sharp, attend to a neutral sound or feel contact with the ground.",
+        "cues": [
+          "Let the body settle enough to listen.",
+          "Receive the nearest sound without naming its source.",
+          "Now include a sound farther away.",
+          "Notice that sounds arrive and end by themselves.",
+          "Hear the texture, rhythm, and space of one sound.",
+          "Notice any quiet between sounds.",
+          "Include pleasant, unpleasant, and ordinary sounds equally.",
+          "If thought takes over, listen again without blame.",
+          "Rest as listening itself for a while.",
+          "Feel your body in the room and return."
+        ]
+      },
+      "es": {
+        "intention": "Escuchar",
+        "title": "Sonido y silencio",
+        "purpose": "Recibe sonidos cercanos, sonidos lejanos y la quietud entre ellos.",
+        "lineage": "Una práctica de escucha. No se añade música de fondo para que el entorno siga disponible a la atención.",
+        "safety": "Baja el volumen del dispositivo antes de comenzar. Si un sonido resulta demasiado fuerte, atiende a un sonido neutral o siente el contacto con el suelo.",
+        "cues": [
+          "Deja que el cuerpo se asiente lo suficiente para escuchar.",
+          "Recibe el sonido más cercano sin nombrar su origen.",
+          "Ahora incluye un sonido más lejano.",
+          "Nota que los sonidos llegan y terminan por sí solos.",
+          "Escucha la textura, el ritmo y el espacio de un sonido.",
+          "Nota cualquier quietud entre los sonidos.",
+          "Incluye por igual los sonidos agradables, desagradables y comunes.",
+          "Si el pensamiento toma el control, vuelve a escuchar sin culpa.",
+          "Descansa durante un momento como la escucha misma.",
+          "Siente tu cuerpo en la habitación y regresa."
+        ]
+      }
+    },
+    {
+      "id": "holding-opposites",
+      "symbol": "circle.lefthalf.filled",
+      "accent": "#B7A5C8",
+      "en": {
+        "intention": "Include",
+        "title": "Holding Opposites",
+        "purpose": "Let two different feelings or needs remain in conscious relationship.",
+        "lineage": "An integration practice. Wholeness does not require one part to defeat another.",
+        "safety": "Choose a small, workable tension rather than your most painful experience. Return to grounding or stop if the practice becomes too intense.",
+        "cues": [
+          "Begin with the support beneath you.",
+          "Notice one feeling, need, or point of view that is present.",
+          "Notice a different feeling, need, or point of view nearby.",
+          "Let each have a simple name without deciding which is right.",
+          "Feel where each one appears in the body, if anywhere.",
+          "Neither part needs to disappear for this moment to be held.",
+          "Ask what each part is trying to protect or preserve.",
+          "Let a larger awareness include both without forcing agreement.",
+          "Notice whether one honest next step can respect more of the whole.",
+          "Return to contact, breath, and the room."
+        ]
+      },
+      "es": {
+        "intention": "Incluir",
+        "title": "Sostener los opuestos",
+        "purpose": "Deja que dos sentimientos o necesidades diferentes permanezcan en relación consciente.",
+        "lineage": "Una práctica de integración. La totalidad no requiere que una parte derrote a otra.",
+        "safety": "Elige una tensión pequeña y manejable, no tu experiencia más dolorosa. Vuelve al contacto con el suelo o detente si se vuelve demasiado intenso.",
+        "cues": [
+          "Comienza con el apoyo que hay debajo de ti.",
+          "Nota un sentimiento, una necesidad o un punto de vista presente.",
+          "Nota otro sentimiento, necesidad o punto de vista cercano.",
+          "Dale a cada uno un nombre sencillo sin decidir cuál tiene razón.",
+          "Siente dónde aparece cada uno en el cuerpo, si aparece en algún lugar.",
+          "Ninguna parte necesita desaparecer para sostener este momento.",
+          "Pregunta qué intenta proteger o conservar cada parte.",
+          "Deja que una atención más amplia incluya ambas sin forzar un acuerdo.",
+          "Nota si un próximo paso honesto puede respetar mejor el conjunto.",
+          "Vuelve al contacto, a la respiración y a la habitación."
+        ]
+      }
+    },
+    {
+      "id": "sovereign-rest",
+      "symbol": "moon.stars",
+      "accent": "#C8B791",
+      "en": {
+        "intention": "Rest",
+        "title": "Sovereign Rest",
+        "purpose": "Practise being here without turning rest into another demand.",
+        "lineage": "A low-demand restorative sit. Rest is treated as a living capacity, not a reward for productivity.",
+        "safety": "Recline if useful. Falling asleep is not a mistake. Keep your eyes open if closing them does not feel supportive.",
+        "cues": [
+          "Let the surface beneath you carry some of your weight.",
+          "For now, there is nowhere else you need to get to.",
+          "Allow one muscle to stop helping quite so much.",
+          "The breath can be ordinary.",
+          "If plans appear, let them wait beside you.",
+          "Rest does not need to look peaceful to be real.",
+          "Feel any place that already knows how to soften.",
+          "Let silence do some of the work.",
+          "Receive this moment without needing to improve it.",
+          "Move slowly. Take only the rest that is actually here."
+        ]
+      },
+      "es": {
+        "intention": "Descansar",
+        "title": "Descanso soberano",
+        "purpose": "Practica estar aquí sin convertir el descanso en otra exigencia.",
+        "lineage": "Una práctica restauradora de baja exigencia. El descanso es una capacidad viva, no una recompensa por producir.",
+        "safety": "Recuéstate si te ayuda. Dormirte no es un error. Mantén los ojos abiertos si cerrarlos no te sostiene.",
+        "cues": [
+          "Deja que la superficie debajo de ti cargue parte de tu peso.",
+          "Por ahora, no hay ningún otro lugar al que necesites llegar.",
+          "Permite que un músculo deje de ayudar tanto.",
+          "La respiración puede ser común.",
+          "Si aparecen planes, deja que esperen a tu lado.",
+          "El descanso no necesita parecer tranquilo para ser real.",
+          "Siente algún lugar que ya sepa suavizarse.",
+          "Deja que el silencio haga parte del trabajo.",
+          "Recibe este momento sin necesidad de mejorarlo.",
+          "Muévete despacio. Toma solo el descanso que realmente está aquí."
+        ]
+      }
+    }
+  ]
+}

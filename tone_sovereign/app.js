@@ -9,6 +9,12 @@ const NOTICE = Object.freeze({
   cueDuration: 10,
   manualCueDuration: 4
 });
+const guidedSitsManifest = await fetch(`${ROOT}guided-sits.json`, { cache: "no-cache" })
+  .then(response => {
+    if (!response.ok) throw new Error(`Guided Sits manifest request failed: ${response.status}`);
+    return response.json();
+  })
+  .catch(() => ({ durationsSeconds: [900, 1800, 2700, 3600], practices: [] }));
 const STORAGE = {
   preferences: "tone-sovereign.preferences.v1",
   traces: "tone-sovereign.traces.v1",
@@ -593,6 +599,7 @@ const state = {
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
+  guidedSit: newGuidedSit(),
   guidedKind: "",
   guidedPhase: 0,
   engineStep: 0,
@@ -657,12 +664,31 @@ function newPractice() {
   };
 }
 
+function newGuidedSit() {
+  const allowedDurations = guidedSitsManifest.durationsSeconds || [900, 1800, 2700, 3600];
+  const savedDuration = Number(savedPreferences.guidedSitDuration);
+  const savedGuidance = ["regular", "light", "off"].includes(savedPreferences.guidedSitGuidance)
+    ? savedPreferences.guidedSitGuidance
+    : "regular";
+  return {
+    selectedID: "",
+    phase: "catalog",
+    duration: allowedDurations.includes(savedDuration) ? savedDuration : allowedDurations[0],
+    guidance: savedGuidance,
+    elapsed: 0,
+    paused: false,
+    lastCueIndex: -1,
+    lastTickAt: 0
+  };
+}
+
 const app = document.querySelector("#app");
 const liveRegion = document.querySelector("#live-region");
 const canvas = document.querySelector("#ambient-field");
 const ctx = canvas.getContext("2d", { alpha: true });
 let ceremonyTimer = 0;
 let practiceTimer = 0;
+let guidedSitTimer = 0;
 let toastTimer = 0;
 let fieldFrame = 0;
 let breathLastPhaseKey = "";
@@ -921,6 +947,18 @@ class SoundEngine {
     this.note(392, now + .16, 2.1, .045, "sine", 523.25);
     this.note(784, now + .42, 1.25, .018);
   }
+
+  async guidedSitBell(closing = false) {
+    if (!state.sound) return;
+    await this.ready();
+    const now = this.context.currentTime;
+    const root = closing ? 293.66 : 392;
+    const duration = closing ? 2.8 : 2.2;
+    const ratios = closing ? [1, 1.5, 2, 3] : [1, 2, 3, 4];
+    ratios.forEach((ratio, index) => {
+      this.note(root * ratio, now + index * .025, duration * (1 - index * .08), .045 / (index + 1), "sine");
+    });
+  }
 }
 
 const sound = new SoundEngine();
@@ -931,7 +969,9 @@ function persistPreferences() {
     sound: state.sound,
     voice: state.voice,
     reduceMotion: state.reduceMotion,
-    quietWords: state.quietWords
+    quietWords: state.quietWords,
+    guidedSitDuration: state.guidedSit.duration,
+    guidedSitGuidance: state.guidedSit.guidance
   }));
   document.documentElement.lang = state.lang;
   document.documentElement.classList.toggle("user-reduced-motion", state.reduceMotion);
@@ -950,6 +990,7 @@ function showToast(message) {
 
 function navigate(view, options = {}) {
   stopPracticeTimers();
+  if (state.view === "guidedSits" && view !== "guidedSits") resetGuidedSitSession();
   window.scrollTo({ top: 0, behavior: "auto" });
   if (state.view !== view && options.remember !== false) state.stack.push(state.view);
   state.view = view;
@@ -985,6 +1026,7 @@ function navigate(view, options = {}) {
 
 function goBack() {
   stopPracticeTimers();
+  if (state.view === "guidedSits") resetGuidedSitSession();
   state.view = state.stack.pop() || "home";
   render();
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -992,6 +1034,7 @@ function goBack() {
 
 function goHome() {
   stopPracticeTimers();
+  if (state.view === "guidedSits") resetGuidedSitSession();
   state.stack = [];
   state.view = "home";
   render();
@@ -1004,6 +1047,7 @@ function render() {
     landing: renderLanding,
     home: renderHome,
     practice: renderPractice,
+    guidedSits: renderGuidedSits,
     movement: renderMovementSession,
     fields: renderFields,
     nestedFields: renderNestedFields,
@@ -1033,6 +1077,7 @@ function render() {
   if (state.view === "symbol") observeSymbolSections();
   if (state.view === "landing" && !state.ceremonySettled) settleCeremonyLater();
   if (state.view === "movement") resumePracticeView();
+  if (state.view === "guidedSits" && state.guidedSit.phase === "session" && !state.guidedSit.paused) startGuidedSitTimer();
   if (state.view === "threshold") sound.threshold().catch(() => {});
 }
 
@@ -1168,6 +1213,7 @@ function renderPractice() {
         <p class="lede">${lang === "en" ? "Follow all seven steps, or choose one step below." : "Sigue los siete pasos o elige un paso a continuación."}</p>
       </header>
       <button class="full-practice-entry" type="button" data-action="start-full-practice"><span aria-hidden="true">✦</span><span><strong>${lang === "en" ? "Begin the full seven-step practice" : "Comenzar la práctica completa de siete pasos"}</strong><small>${lang === "en" ? "Notice → Stabilise → Discern → Reclaim → Cross → Embody → Integrate" : "Notar → Estabilizar → Discernir → Recuperar → Cruzar → Encarnar → Integrar"}</small></span><b>→</b></button>
+      <button class="guided-practice-entry" type="button" data-view="guidedSits"><span aria-hidden="true">◷</span><span><strong>${lang === "en" ? "Guided Sits" : "Meditaciones guiadas"}</strong><small>${lang === "en" ? "15, 30, 45, or 60 minutes with optional voice guidance" : "15, 30, 45 o 60 minutos con guía de voz opcional"}</small></span><b>›</b></button>
       <button class="guided-practice-entry" type="button" data-view="practiceEngines"><span aria-hidden="true">◌</span><span><strong>${lang === "en" ? "Short guided practices" : "Prácticas guiadas breves"}</strong><small>${lang === "en" ? "One-minute check-in, or choose a reusable practice" : "Una revisión de un minuto o una práctica para repetir"}</small></span><b>›</b></button>
       <p class="movement-or-label">${lang === "en" ? "OR CHOOSE ONE STEP" : "O ELIGE UN PASO"}</p>
       <section class="movement-field-grid" aria-label="${lang === "en" ? "Independent practices" : "Prácticas independientes"}">
@@ -1182,6 +1228,242 @@ function renderPractice() {
       </section>
       <p class="movement-field-note">${lang === "en" ? "Begin anywhere. Finishing one practice never requires starting another." : "Comienza donde quieras. Terminar una práctica nunca exige comenzar otra."}</p>
     </main>`;
+}
+
+const guidedSitMarks = Object.freeze({
+  wind: "∿",
+  "circle.dotted": "···",
+  "figure.mind.and.body": "◇",
+  circle: "○",
+  heart: "♡",
+  waveform: "≈",
+  "arrow.left.and.right": "⇌",
+  moon: "•"
+});
+
+function guidedSitPractice() {
+  return guidedSitsManifest.practices.find(item => item.id === state.guidedSit.selectedID) || guidedSitsManifest.practices[0];
+}
+
+function guidedSitContent(practice = guidedSitPractice()) {
+  return practice?.[state.lang] || practice?.en;
+}
+
+function guidedSitAssetID(practice, cueIndex) {
+  return `ts_sit_${practice.id.replaceAll("-", "_")}_${String(cueIndex + 1).padStart(2, "0")}_v1`;
+}
+
+function guidedSitSchedule(duration = state.guidedSit.duration, mode = state.guidedSit.guidance) {
+  const safeDuration = Math.max(Number(duration) || 180, 180);
+  const interval = mode === "regular" ? 120 : 300;
+  const secondCue = mode === "regular" ? 75 : 150;
+  const cueByTime = new Map([[0, 0], [Math.min(secondCue, safeDuration - 120), 1]]);
+  let cueIndex = 2;
+  for (let time = secondCue + interval; time <= safeDuration - 180; time += interval) {
+    cueByTime.set(time, Math.min(cueIndex, 7));
+    cueIndex = cueIndex === 7 ? 2 : cueIndex + 1;
+  }
+  cueByTime.set(Math.max(0, safeDuration - 120), 8);
+  cueByTime.set(Math.max(0, safeDuration - 32), 9);
+  return [...cueByTime.entries()]
+    .map(([elapsed, cue]) => ({ elapsed, cue }))
+    .sort((a, b) => a.elapsed - b.elapsed);
+}
+
+function currentGuidedSitEvent() {
+  return guidedSitSchedule().filter(item => item.elapsed <= state.guidedSit.elapsed).at(-1) || { elapsed: 0, cue: 0 };
+}
+
+function guidedSitModeCopy(mode) {
+  const definitions = {
+    regular: {
+      en: ["Regular", "An invitation about every two minutes."],
+      es: ["Regular", "Una invitación aproximadamente cada dos minutos."]
+    },
+    light: {
+      en: ["Light", "An invitation about every five minutes."],
+      es: ["Ligera", "Una invitación aproximadamente cada cinco minutos."]
+    },
+    off: {
+      en: ["Voice off", "Bells and the visual field, without spoken guidance."],
+      es: ["Sin voz", "Campanas y campo visual, sin guía hablada."]
+    }
+  };
+  return definitions[mode][state.lang];
+}
+
+function guidedSitInstrument(practice, progress, active = false) {
+  const circumference = 603.19;
+  const clamped = Math.max(0, Math.min(progress, 1));
+  const mark = guidedSitMarks[practice.symbol] || "•";
+  return `<div class="guided-sit-instrument ${active ? "is-active" : ""}" style="--guided-accent:${escapeAttribute(practice.accent || "#D9B45A")}" role="img" aria-label="${phrase("Guided sit field", "Campo de meditación guiada")}" aria-valuenow="${Math.round(clamped * 100)}">
+    <svg viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="guided-sit-glow" cx="110" cy="110" r="100"></circle>
+      <circle class="guided-sit-track" cx="110" cy="110" r="96"></circle>
+      <circle class="guided-sit-progress" data-guided-progress-ring cx="110" cy="110" r="96" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference * (1 - clamped)}"></circle>
+      <circle class="guided-sit-inner-ring" cx="110" cy="110" r="58"></circle>
+    </svg>
+    <span class="guided-sit-mark" aria-hidden="true">${mark}</span>
+    <span class="guided-sit-star" aria-hidden="true"></span>
+  </div>`;
+}
+
+function renderGuidedSits() {
+  const sit = state.guidedSit;
+  const practices = guidedSitsManifest.practices || [];
+  if (sit.phase === "catalog") {
+    return `${renderTopbar(phrase("Guided Sits", "Meditaciones guiadas"), phrase("Back to practice", "Volver a las prácticas"))}
+      <main class="page guided-sits-page"><header class="section-intro"><p class="eyebrow">${phrase("Stillness", "Quietud")}</p><h1 class="page-title">${phrase("How would you like to sit?", "¿Cómo te gustaría meditar?")}</h1><p class="lede">${phrase("Choose one simple way to meet the next few minutes. You may stop or change your focus at any time.", "Elige una forma sencilla de encontrar los próximos minutos. Puedes detenerte o cambiar el foco en cualquier momento.")}</p></header>
+      <section class="list guided-sit-catalog">${practices.map(practice => { const content = guidedSitContent(practice); return `<button class="list-row guided-sit-row" type="button" data-guided-practice="${practice.id}"><span class="guided-sit-row-mark" style="--guided-accent:${escapeAttribute(practice.accent)}" aria-hidden="true">${guidedSitMarks[practice.symbol] || "•"}</span><span><strong>${escapeHTML(content.title)}</strong><span>${escapeHTML(content.purpose)}</span></span><b>→</b></button>`; }).join("")}</section>
+      ${practices.length ? "" : `<p class="empty-state">${phrase("Guided sits are unavailable in this build.", "Las meditaciones guiadas no están disponibles en esta versión.")}</p>`}</main>`;
+  }
+
+  const practice = guidedSitPractice();
+  if (!practice) {
+    state.guidedSit.phase = "catalog";
+    return renderGuidedSits();
+  }
+  const content = guidedSitContent(practice);
+
+  if (sit.phase === "setup") {
+    return `${renderTopbar(content.title, phrase("Back to guided sits", "Volver a meditaciones"))}
+      <main class="page guided-sits-page guided-sit-setup">
+        ${guidedSitInstrument(practice, 0)}
+        <header class="section-intro"><p class="eyebrow">${escapeHTML(content.intention)}</p><h1 class="page-title">${escapeHTML(content.title)}</h1><p class="lede">${escapeHTML(content.purpose)}</p></header>
+        <section class="guided-sit-orientation"><p>${escapeHTML(content.lineage)}</p><p>${escapeHTML(content.safety)}</p></section>
+        <section class="guided-sit-options"><p class="eyebrow">${phrase("Length", "Duración")}</p><div class="guided-sit-segments">${guidedSitsManifest.durationsSeconds.map(duration => `<button type="button" data-guided-duration="${duration}" aria-pressed="${sit.duration === duration}">${duration / 60} min</button>`).join("")}</div></section>
+        <section class="guided-sit-options"><p class="eyebrow">${phrase("Guidance", "Guía")}</p><div class="guided-sit-segments guidance-modes">${["regular", "light", "off"].map(mode => `<button type="button" data-guided-mode="${mode}" aria-pressed="${sit.guidance === mode}">${guidedSitModeCopy(mode)[0]}</button>`).join("")}</div><p class="guided-sit-option-detail">${guidedSitModeCopy(sit.guidance)[1]}</p></section>
+        <button class="primary-button" type="button" data-action="begin-guided-sit">${phrase("Begin this sit", "Comenzar esta meditación")}</button>
+      </main>`;
+  }
+
+  if (sit.phase === "complete") {
+    return `${renderTopbar(phrase("Guided Sits", "Meditaciones guiadas"), phrase("Return", "Volver"))}
+      <main class="page guided-sits-page guided-sit-completion">${guidedSitInstrument(practice, 1)}<header class="section-intro"><p class="eyebrow">${escapeHTML(content.intention)}</p><h1 class="page-title">${phrase("The sit is complete.", "La meditación ha terminado.")}</h1><p class="lede">${phrase("Notice what is here now. Nothing needs to be measured or saved.", "Nota lo que está presente ahora. No hace falta medir ni guardar nada.")}</p></header><button class="primary-button" type="button" data-action="guided-sit-return">${phrase("Return to guided sits", "Volver a meditaciones")}</button></main>`;
+  }
+
+  const cueEvent = currentGuidedSitEvent();
+  const cue = content.cues[cueEvent.cue] || content.purpose;
+  const progress = sit.elapsed / Math.max(sit.duration, 1);
+  const remaining = Math.max(sit.duration - sit.elapsed, 0);
+  return `${renderTopbar(content.title, phrase("Leave this sit", "Salir de esta meditación"))}
+    <main class="page guided-sits-page guided-sit-session">
+      <p class="eyebrow">${escapeHTML(content.intention)}</p>
+      ${guidedSitInstrument(practice, progress, !sit.paused)}
+      <section class="guided-sit-cue" role="status" aria-live="polite"><h1 data-guided-cue>${escapeHTML(cue)}</h1><time data-guided-timer datetime="PT${remaining}S" aria-label="${phrase("Time remaining", "Tiempo restante")}">${formatClock(remaining)}</time></section>
+      <div class="button-row guided-sit-controls"><button class="secondary-button" type="button" data-action="pause-guided-sit">${sit.paused ? phrase("Resume", "Continuar") : phrase("Pause", "Pausar")}</button>${sit.guidance === "off" ? "" : `<button class="secondary-button" type="button" data-action="replay-guided-sit-cue">${phrase("Replay", "Repetir")}</button>`}</div>
+      <button class="text-button" type="button" data-action="end-guided-sit">${phrase("End sit", "Terminar meditación")}</button>
+    </main>`;
+}
+
+function formatClock(seconds) {
+  const safe = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(safe / 60)}:${String(safe % 60).padStart(2, "0")}`;
+}
+
+function selectGuidedSit(practiceID) {
+  state.guidedSit.selectedID = practiceID;
+  state.guidedSit.phase = "setup";
+  state.guidedSit.elapsed = 0;
+  state.guidedSit.paused = false;
+  state.guidedSit.lastCueIndex = -1;
+  render();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+async function beginGuidedSit() {
+  const practice = guidedSitPractice();
+  if (!practice) return;
+  state.guidedSit.phase = "session";
+  state.guidedSit.elapsed = 0;
+  state.guidedSit.paused = false;
+  state.guidedSit.lastCueIndex = 0;
+  state.guidedSit.lastTickAt = Date.now();
+  render();
+  sound.guidedSitBell(false).catch(() => {});
+  if (state.guidedSit.guidance !== "off") {
+    sound.playVoice(guidedSitAssetID(practice, 0), 1.25).catch(() => {
+      showToast(phrase("Voice guidance is unavailable. The silent sit will continue.", "La guía de voz no está disponible. La meditación continuará en silencio."));
+    });
+  }
+  announce(guidedSitContent(practice).cues[0]);
+}
+
+function updateGuidedSitTimer() {
+  const sit = state.guidedSit;
+  if (state.view !== "guidedSits" || sit.phase !== "session" || sit.paused || document.hidden) return;
+  const now = Date.now();
+  const delta = Math.floor((now - sit.lastTickAt) / 1000);
+  if (delta <= 0) return;
+  const previousElapsed = sit.elapsed;
+  sit.elapsed = Math.min(sit.duration, sit.elapsed + delta);
+  sit.lastTickAt += delta * 1000;
+
+  const crossed = guidedSitSchedule().filter(item => item.elapsed > previousElapsed && item.elapsed <= sit.elapsed).at(-1);
+  if (crossed) {
+    sit.lastCueIndex = crossed.cue;
+    const practice = guidedSitPractice();
+    if (sit.guidance !== "off") sound.playVoice(guidedSitAssetID(practice, crossed.cue)).catch(() => {});
+    announce(guidedSitContent(practice).cues[crossed.cue]);
+    render();
+  } else {
+    const remaining = Math.max(sit.duration - sit.elapsed, 0);
+    const timer = document.querySelector("[data-guided-timer]");
+    const ring = document.querySelector("[data-guided-progress-ring]");
+    const instrument = document.querySelector(".guided-sit-instrument");
+    if (timer) { timer.textContent = formatClock(remaining); timer.dateTime = `PT${remaining}S`; }
+    if (ring) ring.style.strokeDashoffset = String(603.19 * (1 - sit.elapsed / Math.max(sit.duration, 1)));
+    if (instrument) instrument.setAttribute("aria-valuenow", String(Math.round(sit.elapsed / Math.max(sit.duration, 1) * 100)));
+  }
+
+  if (sit.elapsed >= sit.duration) completeGuidedSit();
+}
+
+function startGuidedSitTimer() {
+  const sit = state.guidedSit;
+  if (guidedSitTimer || state.view !== "guidedSits" || sit.phase !== "session" || sit.paused || document.hidden) return;
+  sit.lastTickAt = Date.now();
+  guidedSitTimer = window.setInterval(updateGuidedSitTimer, 250);
+}
+
+function pauseGuidedSit() {
+  updateGuidedSitTimer();
+  state.guidedSit.paused = !state.guidedSit.paused;
+  sound.stopVoice();
+  window.clearInterval(guidedSitTimer);
+  guidedSitTimer = 0;
+  render();
+}
+
+function replayGuidedSitCue() {
+  if (state.guidedSit.guidance === "off") return;
+  const practice = guidedSitPractice();
+  const cue = currentGuidedSitEvent().cue;
+  sound.playVoice(guidedSitAssetID(practice, cue)).catch(() => {
+    showToast(phrase("Voice guidance is unavailable.", "La guía de voz no está disponible."));
+  });
+}
+
+function completeGuidedSit() {
+  if (state.guidedSit.phase !== "session") return;
+  window.clearInterval(guidedSitTimer);
+  guidedSitTimer = 0;
+  sound.stopVoice();
+  sound.guidedSitBell(true).catch(() => {});
+  state.guidedSit.phase = "complete";
+  state.guidedSit.paused = false;
+  state.guidedSit.elapsed = state.guidedSit.duration;
+  render();
+  announce(phrase("The sit is complete.", "La meditación ha terminado."));
+}
+
+function resetGuidedSitSession() {
+  window.clearInterval(guidedSitTimer);
+  guidedSitTimer = 0;
+  sound.stopVoice();
+  const duration = state.guidedSit.duration;
+  const guidance = state.guidedSit.guidance;
+  state.guidedSit = { ...newGuidedSit(), duration, guidance };
 }
 
 function movementByID(id = state.practice.movement) {
@@ -1688,8 +1970,10 @@ function resumePracticeView() {
 
 function stopPracticeTimers() {
   window.clearInterval(practiceTimer);
+  window.clearInterval(guidedSitTimer);
   window.clearTimeout(reclaimHoldTimer);
   practiceTimer = 0;
+  guidedSitTimer = 0;
   reclaimHoldTimer = 0;
   breathLastPhaseKey = "";
   sound.stop();
@@ -2011,7 +2295,8 @@ function renderLibrary() {
   const needs = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.needs));
   const featuredIDs = ["separate-event-from-interpretation", "body-before-cosmology", "emotion-is-information-not-command", "practise-one-golden-act"];
   const featured = featuredIDs.map(id => catalog.libraryEntries.find(entry => entry.id === id)).filter(Boolean);
-  const practiceContent = `<section><p class="eyebrow">${phrase("Guided practice paths", "Caminos de práctica guiada")}</p><div class="list">${guidedLibraryPaths[state.lang].map(path => `<button class="list-row" type="button" data-library-path="${path.id}"><span><strong>${escapeHTML(path.title)}</strong><span>${escapeHTML(path.subtitle)}</span></span><b>→</b></button>`).join("")}</div></section>
+  const practiceContent = `<section><p class="eyebrow">${phrase("Longer guided practice", "Práctica guiada más larga")}</p><div class="list"><button class="list-row" type="button" data-view="guidedSits"><span><strong>${phrase("Guided Sits", "Meditaciones guiadas")}</strong><span>${phrase("Eight practices with 15, 30, 45, or 60 minute options and optional voice guidance.", "Ocho prácticas de 15, 30, 45 o 60 minutos con guía de voz opcional.")}</span></span><b>→</b></button></div></section>
+    <section><p class="eyebrow">${phrase("Guided practice paths", "Caminos de práctica guiada")}</p><div class="list">${guidedLibraryPaths[state.lang].map(path => `<button class="list-row" type="button" data-library-path="${path.id}"><span><strong>${escapeHTML(path.title)}</strong><span>${escapeHTML(path.subtitle)}</span></span><b>→</b></button>`).join("")}</div></section>
     <section><p class="eyebrow">${phrase("Two-minute practices", "Prácticas de dos minutos")}</p><div class="list">${featured.map(entry => `<button class="list-row" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>2 min</b></button>`).join("")}</div><button class="secondary-button" type="button" data-action="browse-two-minute">${phrase("Browse all two-minute practices", "Ver todas las prácticas de dos minutos")}</button></section>
     ${state.showAllPractices ? `<section class="list">${catalog.libraryEntries.map(entry => `<button class="list-row" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section>` : ""}
     <section class="start-here"><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>`;
@@ -2280,6 +2565,9 @@ app.addEventListener("click", async event => {
   if (button.dataset.entryAct) { state.selectedEntry = button.dataset.entryAct; navigate("guided", { guidedKind: "entry-act" }); return; }
   if (button.dataset.entryDeeper) { state.selectedEntry = button.dataset.entryDeeper; navigate("guided", { guidedKind: "entry-deeper" }); return; }
   if (button.dataset.openMovement) { startMovement(button.dataset.openMovement); return; }
+  if (button.dataset.guidedPractice) { selectGuidedSit(button.dataset.guidedPractice); return; }
+  if (button.dataset.guidedDuration) { state.guidedSit.duration = Number(button.dataset.guidedDuration); persistPreferences(); render(); return; }
+  if (button.dataset.guidedMode) { state.guidedSit.guidance = button.dataset.guidedMode; persistPreferences(); render(); return; }
   if (button.dataset.capacityOption !== undefined) { state.practice.selectedOption = button.dataset.capacityOption; render(); return; }
   if (button.dataset.noticeOutcome !== undefined) { state.practice.noticeOutcome = button.dataset.noticeOutcome; render(); return; }
   if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.stage = "choose"; render(); return; }
@@ -2309,8 +2597,18 @@ app.addEventListener("click", async event => {
   if (button.dataset.depth) { state.teachingDepth = Number(button.dataset.depth); render(); return; }
   if (button.dataset.engineDuration) { state.engineDuration = Number(button.dataset.engineDuration); render(); return; }
 
+  if (action === "back" && state.view === "guidedSits" && state.guidedSit.phase !== "catalog") {
+    resetGuidedSitSession();
+    render();
+    return;
+  }
   if (action === "back") goBack();
   if (action === "home") goHome();
+  if (action === "begin-guided-sit") await beginGuidedSit();
+  if (action === "pause-guided-sit") pauseGuidedSit();
+  if (action === "replay-guided-sit-cue") replayGuidedSitCue();
+  if (action === "end-guided-sit") completeGuidedSit();
+  if (action === "guided-sit-return") { resetGuidedSitSession(); render(); window.scrollTo({ top: 0, behavior: "auto" }); }
   if (action === "guided-back") { if (state.guidedPhase > 0) { state.guidedPhase -= 1; render(); } else goBack(); }
   if (action === "guided-leave") goBack();
   if (action === "guided-next") {
@@ -2603,12 +2901,17 @@ window.addEventListener("resize", resizeField);
 document.addEventListener("visibilitychange", () => {
   const breathing = state.view === "movement" && state.practice.movement === "stabilise" && state.practice.breathStartedAt;
   const crossing = state.view === "movement" && state.practice.movement === "cross" && (state.practice.stage === "question" || state.practice.stage === "crossed");
-  if (!breathing && !crossing) return;
+  const guidedSitting = state.view === "guidedSits" && state.guidedSit.phase === "session";
+  if (!breathing && !crossing && !guidedSitting) return;
   if (document.hidden) {
     window.clearInterval(practiceTimer);
+    window.clearInterval(guidedSitTimer);
     practiceTimer = 0;
+    guidedSitTimer = 0;
     breathLastPhaseKey = "";
     sound.stop();
+  } else if (guidedSitting && !state.guidedSit.paused) {
+    startGuidedSitTimer();
   } else if (breathing) {
     startBreathTimer(false);
   } else if (crossing) {

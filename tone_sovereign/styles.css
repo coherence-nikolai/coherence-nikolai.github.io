@@ -1098,6 +1098,106 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .guided-phase .practice-title { max-width: 18ch; margin: 0; }
 .guided-phase .lede { max-width: 44ch; }
 
+/* Guided Sits */
+.guided-sits-page { max-width: 680px; }
+.guided-sit-catalog { margin-top: 28px; }
+.guided-sit-row { grid-template-columns: 58px minmax(0, 1fr) 24px; }
+.guided-sit-row-mark {
+  width: 52px;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--guided-accent), transparent 48%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--guided-accent);
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  box-shadow: inset 0 0 20px color-mix(in srgb, var(--guided-accent), transparent 88%);
+}
+.guided-sit-setup { display: grid; align-content: start; gap: 26px; }
+.guided-sit-setup .section-intro { margin: 0; }
+.guided-sit-orientation {
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--ivory-soft);
+  line-height: 1.65;
+}
+.guided-sit-orientation p { margin: 0; }
+.guided-sit-orientation p + p { margin-top: 12px; color: var(--gold-light); }
+.guided-sit-options { display: grid; gap: 10px; }
+.guided-sit-options .eyebrow { margin: 0; }
+.guided-sit-segments {
+  padding: 3px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .34);
+}
+.guided-sit-segments.guidance-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.guided-sit-segments button {
+  min-width: 0;
+  min-height: 48px;
+  padding: 7px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ivory-soft);
+  cursor: pointer;
+}
+.guided-sit-segments button[aria-pressed="true"] {
+  color: #140d00;
+  background: var(--gold-light);
+  box-shadow: 0 0 18px rgba(216, 180, 90, .22);
+}
+.guided-sit-option-detail { min-height: 2.8em; margin: 0; color: var(--gold); line-height: 1.45; }
+.guided-sit-instrument {
+  position: relative;
+  width: min(236px, 68vw);
+  aspect-ratio: 1;
+  margin: 8px auto;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.guided-sit-instrument svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transform: rotate(-90deg); }
+.guided-sit-glow { fill: rgba(0, 0, 0, .94); filter: drop-shadow(0 0 24px color-mix(in srgb, var(--guided-accent), transparent 72%)); }
+.guided-sit-track { fill: none; stroke: color-mix(in srgb, var(--guided-accent), transparent 78%); stroke-width: .8; }
+.guided-sit-progress { fill: none; stroke: var(--guided-accent); stroke-width: 1.4; stroke-linecap: round; transition: stroke-dashoffset 480ms linear; filter: drop-shadow(0 0 5px color-mix(in srgb, var(--guided-accent), transparent 40%)); }
+.guided-sit-inner-ring { fill: color-mix(in srgb, var(--guided-accent), transparent 91%); stroke: color-mix(in srgb, var(--guided-accent), transparent 58%); stroke-width: .9; transform-origin: 110px 110px; }
+.guided-sit-mark { position: relative; z-index: 2; color: var(--ivory); font-family: var(--serif); font-size: 3.1rem; text-shadow: 0 0 20px color-mix(in srgb, var(--guided-accent), transparent 38%); }
+.guided-sit-star { position: absolute; z-index: 3; top: 2.5%; left: 50%; width: 8px; aspect-ratio: 1; border-radius: 50%; background: var(--guided-accent); transform: translateX(-50%); box-shadow: 0 0 12px var(--guided-accent); }
+.guided-sit-instrument.is-active .guided-sit-inner-ring { animation: guided-sit-breathe 4.8s ease-in-out infinite alternate; }
+.guided-sit-instrument.is-active .guided-sit-star { animation: guided-sit-star 3.6s ease-in-out infinite; }
+@keyframes guided-sit-breathe { from { transform: scale(.96); opacity: .72; } to { transform: scale(1.05); opacity: 1; } }
+@keyframes guided-sit-star { 0%, 100% { opacity: .65; box-shadow: 0 0 8px var(--guided-accent); } 50% { opacity: 1; box-shadow: 0 0 18px var(--guided-accent); } }
+.guided-sit-session {
+  min-height: calc(100svh - 82px);
+  padding-top: clamp(18px, 4vh, 42px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 3.5vh, 30px);
+  text-align: center;
+}
+.guided-sit-session > .eyebrow { margin: 0; }
+.guided-sit-cue { width: min(100%, 600px); display: grid; justify-items: center; gap: 12px; }
+.guided-sit-cue h1 { max-width: 21ch; margin: 0; font-family: var(--serif); font-size: clamp(1.8rem, 5.8vw, 2.65rem); font-weight: 400; line-height: 1.16; }
+.guided-sit-cue time { color: var(--gold-light); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.guided-sit-controls { width: min(100%, 520px); }
+.guided-sit-session > .text-button { margin-top: auto; }
+.guided-sit-completion {
+  min-height: calc(100svh - 82px);
+  display: grid;
+  align-content: center;
+  justify-items: stretch;
+  gap: 30px;
+  text-align: center;
+}
+.guided-sit-completion .section-intro { margin: 0 auto; }
+
 .toast { position: fixed; z-index: 50; left: 50%; top: calc(var(--safe-top) + 62px); transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 18px; border: 1px solid var(--line-strong); border-radius: 6px; background: rgba(8,8,5,.96); color: var(--ivory); box-shadow: 0 12px 40px rgba(0,0,0,.5); }
 .noscript { padding: 60px 24px; max-width: 700px; margin: auto; }
 
@@ -1135,6 +1235,8 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
   .content-card { min-height: 158px; }
   .practice-engine-page .section-intro { padding-top: 4vh; }
   .orientation-invitation { grid-template-columns: 52px minmax(0, 1fr) 18px; gap: 12px; }
+  .guided-sit-row { grid-template-columns: 54px minmax(0, 1fr) 18px; }
+  .guided-sit-session { padding-inline: 18px; }
   .nested-spectrum { aspect-ratio: auto; display: flex; flex-direction: column; gap: 0; }
   .nested-spectrum button { position: static; width: 100%; aspect-ratio: auto; min-height: 88px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 14px 4px; align-content: center; }
   .nested-spectrum small { max-width: 90%; }
@@ -1143,6 +1245,8 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 @media (max-width: 360px) {
   .topbar-title span { display: none; }
   .topbar-title strong { font-size: 1.15rem; }
+  .guided-sit-segments button { font-size: .78rem; }
+  .guided-sit-instrument { width: min(192px, 62vw); }
 }
 
 @media (max-height: 760px) and (max-width: 620px) {

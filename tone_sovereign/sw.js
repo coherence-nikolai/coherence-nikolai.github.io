@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v17";
+const CACHE = "tone-sovereign-v18";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_attunement_capacity_v1",
@@ -40,6 +40,7 @@ const CORE = [
   "./index.html",
   "./styles.css",
   "./catalog.js",
+  "./guided-sits.json",
   "./app.js",
   "./breath-instrument.html",
   "./manifest.webmanifest",
@@ -74,6 +75,10 @@ self.addEventListener("fetch", event => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
+      .catch(() => caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        if (event.request.mode === "navigate") return caches.match("./index.html");
+        return Response.error();
+      }))
   );
 });
