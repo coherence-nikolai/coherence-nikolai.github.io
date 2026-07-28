@@ -9,6 +9,21 @@ const NOTICE = Object.freeze({
   cueDuration: 10,
   manualCueDuration: 4
 });
+const SPECTRUM = Object.freeze({
+  orientation: "#e3b84f",
+  practice: "#d8be82",
+  fields: "#8f9fd1",
+  teachings: "#7fafcb",
+  acts: "#8fc58b",
+  threshold: "#a58dcb",
+  notice: "#7db7d8",
+  stabilise: "#78b89f",
+  discern: "#a8c6d8",
+  reclaim: "#e1b45e",
+  cross: "#a58dcb",
+  embody: "#d79baa",
+  integrate: "#7fb5b0"
+});
 const guidedSitsManifest = await fetch(`${ROOT}guided-sits.json`, { cache: "no-cache" })
   .then(response => {
     if (!response.ok) throw new Error(`Guided Sits manifest request failed: ${response.status}`);
@@ -113,11 +128,11 @@ const copy = {
 };
 
 const doors = [
-  { id: "practice", mark: "⌁", key: "practice", support: "practiceSupport", primary: true },
-  { id: "fields", mark: "≋", key: "fields", support: "fieldsSupport" },
-  { id: "library", mark: "▱", key: "library", support: "librarySupport" },
-  { id: "acts", mark: "↗", key: "acts", support: "actsSupport" },
-  { id: "threshold", mark: "∩", key: "threshold", support: "thresholdSupport" }
+  { id: "practice", mark: "⌁", key: "practice", support: "practiceSupport", spectrum: "practice", primary: true },
+  { id: "fields", mark: "≋", key: "fields", support: "fieldsSupport", spectrum: "fields" },
+  { id: "library", mark: "▱", key: "library", support: "librarySupport", spectrum: "teachings" },
+  { id: "acts", mark: "↗", key: "acts", support: "actsSupport", spectrum: "acts" },
+  { id: "threshold", mark: "∩", key: "threshold", support: "thresholdSupport", spectrum: "threshold" }
 ];
 
 const guidedLibraryPaths = {
@@ -157,37 +172,37 @@ const guidedLibraryPaths = {
 
 const movements = [
   {
-    id: "notice", mark: "·", color: "#e9cb78",
+    id: "notice", mark: "·", color: SPECTRUM.notice,
     en: { name: "Notice", line: "See clearly", title: "Notice what is here.", body: "Four simple invitations, then open noticing." },
     es: { name: "Notar", line: "Ver con claridad", title: "Nota lo que está aquí.", body: "Cuatro invitaciones sencillas y luego atención abierta." }
   },
   {
-    id: "stabilise", mark: "│", color: "#86b7ad",
+    id: "stabilise", mark: "│", color: SPECTRUM.stabilise,
     en: { name: "Stabilise", line: "Find stability", title: "What feels difficult now?", body: "Choose the closest state. We will choose a gentle breath." },
     es: { name: "Estabilizar", line: "Encontrar estabilidad", title: "¿Qué se siente difícil ahora?", body: "Elige el estado más cercano. Elegiremos una respiración suave." }
   },
   {
-    id: "discern", mark: "◇", color: "#9eb3c7",
+    id: "discern", mark: "◇", color: SPECTRUM.discern,
     en: { name: "Discern", line: "Separate fact from story", title: "What do you know for sure?", body: "Make room between what happened and what your mind added." },
     es: { name: "Discernir", line: "Separar hecho de relato", title: "¿Qué sabes con certeza?", body: "Abre espacio entre lo que ocurrió y lo que tu mente añadió." }
   },
   {
-    id: "reclaim", mark: "◌", color: "#d9b45a",
+    id: "reclaim", mark: "◌", color: SPECTRUM.reclaim,
     en: { name: "Reclaim", line: "Choose your relationship", title: "What is pulling at your attention?", body: "Name it, pause, then choose how you will relate to it." },
     es: { name: "Recuperar", line: "Volver a elegir", title: "¿Qué atrae tu atención?", body: "Ponle un nombre, haz una pausa y elige cómo relacionarte con eso." }
   },
   {
-    id: "cross", mark: "∩", color: "#d6a77d",
+    id: "cross", mark: "∩", color: SPECTRUM.cross,
     en: { name: "Cross", line: "Meet a threshold", title: "Choose a doorway.", body: "Let one useful question meet you before the next step." },
     es: { name: "Cruzar", line: "Encontrar un umbral", title: "Elige una puerta.", body: "Deja que una pregunta útil te encuentre antes del siguiente paso." }
   },
   {
-    id: "embody", mark: "∿", color: "#d39aa4",
+    id: "embody", mark: "∿", color: SPECTRUM.embody,
     en: { name: "Embody", line: "Embody a quality", title: "Choose the tone you want to carry.", body: "Let sound, breath and attention give the quality a felt form." },
     es: { name: "Encarnar", line: "Encarnar una cualidad", title: "Elige el tono que quieres llevar.", body: "Deja que el sonido, la respiración y la atención den forma a la cualidad." }
   },
   {
-    id: "integrate", mark: "∴", color: "#b8a5cc",
+    id: "integrate", mark: "∴", color: SPECTRUM.integrate,
     en: { name: "Integrate", line: "Carry it into life", title: "What small act gives this tone a body?", body: "Choose one action you can genuinely take." },
     es: { name: "Integrar", line: "Llevarlo a la vida", title: "¿Qué pequeño acto da cuerpo a este tono?", body: "Elige una acción que realmente puedas realizar." }
   }
@@ -1041,6 +1056,29 @@ function goHome() {
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
+function currentSpectrum() {
+  if (state.view === "movement") {
+    const movement = movementByID();
+    return { name: "movement", color: movement.color };
+  }
+  if (["practice", "guidedSits", "guided", "practiceEngines", "practiceEngine"].includes(state.view)) {
+    return { name: "practice", color: SPECTRUM.practice };
+  }
+  if (["fields", "nestedFields", "field"].includes(state.view)) {
+    return { name: "fields", color: SPECTRUM.fields };
+  }
+  if (["library", "libraryPath", "teaching", "foundations", "law", "principle", "entry", "scales"].includes(state.view)) {
+    return { name: "teachings", color: SPECTRUM.teachings };
+  }
+  if (["acts", "ruleOfLife", "missions", "mission", "history"].includes(state.view)) {
+    return { name: "acts", color: SPECTRUM.acts };
+  }
+  if (state.view === "threshold") {
+    return { name: "threshold", color: SPECTRUM.threshold };
+  }
+  return { name: "orientation", color: SPECTRUM.orientation };
+}
+
 function render() {
   persistPreferences();
   const renderers = {
@@ -1073,7 +1111,8 @@ function render() {
     symbol: renderSymbol,
     about: renderAbout
   };
-  app.innerHTML = `<div class="app-shell">${(renderers[state.view] || renderHome)()}</div>`;
+  const spectrum = currentSpectrum();
+  app.innerHTML = `<div class="app-shell spectrum-${spectrum.name}" style="--section-color:${spectrum.color}">${(renderers[state.view] || renderHome)()}</div>`;
   if (state.view === "symbol") observeSymbolSections();
   if (state.view === "landing" && !state.ceremonySettled) settleCeremonyLater();
   if (state.view === "movement") resumePracticeView();
@@ -1181,13 +1220,13 @@ function renderHome() {
         <h1 class="display">${tr("beginQuestion")}</h1>
         <p class="lede hero-copy">${tr("beginSupport")}</p>
       </header>
-      <button class="orientation-invitation" type="button" data-view="about">
+      <button class="orientation-invitation spectrum-row" style="--item-color:${SPECTRUM.orientation}" type="button" data-view="about">
         <span class="door-mark" aria-hidden="true">✦</span>
         <span><strong>${phrase("Begin Here", "Comienza aquí")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
         <b aria-hidden="true">→</b>
       </button>
       <section class="door-stack" aria-label="${tr("fiveDoors")}">
-        ${doors.map(door => `<button class="door ${door.primary ? "primary-door" : ""}" type="button" data-view="${door.id}">
+        ${doors.map(door => `<button class="door spectrum-row ${door.primary ? "primary-door" : ""}" style="--item-color:${SPECTRUM[door.spectrum]}" type="button" data-view="${door.id}">
           <span class="door-mark" aria-hidden="true">${door.mark}</span>
           <span class="door-copy"><strong>${tr(door.key)}</strong><span>${tr(door.support)}</span></span>
           <span class="door-arrow" aria-hidden="true">→</span>
@@ -2287,6 +2326,12 @@ function filteredLibraryEntries(catalog) {
   });
 }
 
+function entrySpectrumColor(entry, catalog) {
+  const fieldID = entry?.tags?.fields?.[0];
+  const index = catalog.fields.findIndex(field => field.id === fieldID);
+  return index >= 0 ? fieldColors[index] : SPECTRUM.teachings;
+}
+
 function renderLibrary() {
   const catalog = catalogFor(state.lang);
   const entries = filteredLibraryEntries(catalog);
@@ -2295,18 +2340,18 @@ function renderLibrary() {
   const needs = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.needs));
   const featuredIDs = ["separate-event-from-interpretation", "body-before-cosmology", "emotion-is-information-not-command", "practise-one-golden-act"];
   const featured = featuredIDs.map(id => catalog.libraryEntries.find(entry => entry.id === id)).filter(Boolean);
-  const practiceContent = `<section><p class="eyebrow">${phrase("Longer guided practice", "Práctica guiada más larga")}</p><div class="list"><button class="list-row" type="button" data-view="guidedSits"><span><strong>${phrase("Guided Sits", "Meditaciones guiadas")}</strong><span>${phrase("Eight practices with 15, 30, 45, or 60 minute options and optional voice guidance.", "Ocho prácticas de 15, 30, 45 o 60 minutos con guía de voz opcional.")}</span></span><b>→</b></button></div></section>
-    <section><p class="eyebrow">${phrase("Guided practice paths", "Caminos de práctica guiada")}</p><div class="list">${guidedLibraryPaths[state.lang].map(path => `<button class="list-row" type="button" data-library-path="${path.id}"><span><strong>${escapeHTML(path.title)}</strong><span>${escapeHTML(path.subtitle)}</span></span><b>→</b></button>`).join("")}</div></section>
-    <section><p class="eyebrow">${phrase("Two-minute practices", "Prácticas de dos minutos")}</p><div class="list">${featured.map(entry => `<button class="list-row" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>2 min</b></button>`).join("")}</div><button class="secondary-button" type="button" data-action="browse-two-minute">${phrase("Browse all two-minute practices", "Ver todas las prácticas de dos minutos")}</button></section>
-    ${state.showAllPractices ? `<section class="list">${catalog.libraryEntries.map(entry => `<button class="list-row" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section>` : ""}
+  const practiceContent = `<section><p class="eyebrow">${phrase("Longer guided practice", "Práctica guiada más larga")}</p><div class="list"><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.stabilise}" type="button" data-view="guidedSits"><span><strong>${phrase("Guided Sits", "Meditaciones guiadas")}</strong><span>${phrase("Eight practices with 15, 30, 45, or 60 minute options and optional voice guidance.", "Ocho prácticas de 15, 30, 45 o 60 minutos con guía de voz opcional.")}</span></span><b>→</b></button></div></section>
+    <section><p class="eyebrow">${phrase("Guided practice paths", "Caminos de práctica guiada")}</p><div class="list">${guidedLibraryPaths[state.lang].map(path => `<button class="list-row spectrum-row" style="--item-color:${SPECTRUM.threshold}" type="button" data-library-path="${path.id}"><span><strong>${escapeHTML(path.title)}</strong><span>${escapeHTML(path.subtitle)}</span></span><b>→</b></button>`).join("")}</div></section>
+    <section><p class="eyebrow">${phrase("Two-minute practices", "Prácticas de dos minutos")}</p><div class="list">${featured.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>2 min</b></button>`).join("")}</div><button class="secondary-button" type="button" data-action="browse-two-minute">${phrase("Browse all two-minute practices", "Ver todas las prácticas de dos minutos")}</button></section>
+    ${state.showAllPractices ? `<section class="list">${catalog.libraryEntries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section>` : ""}
     <section class="start-here"><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>`;
-  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button></section>
+  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button></section>
     <section class="library-tools"><label class="search-field"><span>${phrase("Search teachings", "Buscar enseñanzas")}</span><input class="field-input" type="search" value="${escapeAttribute(state.libraryQuery)}" data-library-query placeholder="${phrase("A question, quality or situation", "Una pregunta, cualidad o situación")}"></label><div class="filter-grid"><label>${phrase("Field", "Campo")}<select data-library-filter="field"><option value="all">${phrase("All Fields", "Todos los Campos")}</option>${libraryFilterOptions(fields, state.libraryField)}</select></label><label>${phrase("Theme", "Tema")}<select data-library-filter="domain"><option value="all">${phrase("All themes", "Todos los temas")}</option>${libraryFilterOptions(domains, state.libraryDomain)}</select></label><label>${phrase("Need", "Necesidad")}<select data-library-filter="need"><option value="all">${phrase("All needs", "Todas las necesidades")}</option>${libraryFilterOptions(needs, state.libraryNeed)}</select></label></div><p class="result-count">${entries.length} ${phrase("teachings", "enseñanzas")}</p></section>
-    <section class="list">${entries.map(entry => `<button class="list-row" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>`;
+    <section class="list">${entries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>`;
   return `${renderTopbar(tr("library"), phrase("Back to the five doors", "Volver a las cinco puertas"))}
     <main class="page wide">
       <header class="section-intro"><p class="eyebrow">${tr("library")}</p><h1 class="page-title">${phrase("What would help now?", "¿Qué ayudaría ahora?")}</h1><p class="lede measure">${phrase("Choose something to practise, or explore the idea behind it.", "Elige algo para practicar o explora la idea que hay detrás.")}</p></header>
-      <section class="library-mode-choices"><p class="eyebrow">${state.libraryMode ? phrase("Switch at any time", "Cambia cuando quieras") : phrase("Choose a way in", "Elige una forma de entrar")}</p><button class="list-row" type="button" data-library-mode="practices" aria-pressed="${state.libraryMode === "practices"}"><span><strong>${phrase("Find a practice", "Encontrar una práctica")}</strong><span>${phrase("Begin a guided path or choose a two-minute practice.", "Comienza un camino guiado o elige una práctica de dos minutos.")}</span></span><b>${state.libraryMode === "practices" ? "✓" : "→"}</b></button><button class="list-row" type="button" data-library-mode="teachings" aria-pressed="${state.libraryMode === "teachings"}"><span><strong>${phrase("Explore a teaching", "Explorar una enseñanza")}</strong><span>${phrase("Start, continue, search, or browse the teachings.", "Comienza, continúa, busca o explora las enseñanzas.")}</span></span><b>${state.libraryMode === "teachings" ? "✓" : "→"}</b></button></section>
+      <section class="library-mode-choices"><p class="eyebrow">${state.libraryMode ? phrase("Switch at any time", "Cambia cuando quieras") : phrase("Choose a way in", "Elige una forma de entrar")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.practice}" type="button" data-library-mode="practices" aria-pressed="${state.libraryMode === "practices"}"><span><strong>${phrase("Find a practice", "Encontrar una práctica")}</strong><span>${phrase("Begin a guided path or choose a two-minute practice.", "Comienza un camino guiado o elige una práctica de dos minutos.")}</span></span><b>${state.libraryMode === "practices" ? "✓" : "→"}</b></button><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-library-mode="teachings" aria-pressed="${state.libraryMode === "teachings"}"><span><strong>${phrase("Explore a teaching", "Explorar una enseñanza")}</strong><span>${phrase("Start, continue, search, or browse the teachings.", "Comienza, continúa, busca o explora las enseñanzas.")}</span></span><b>${state.libraryMode === "teachings" ? "✓" : "→"}</b></button></section>
       ${state.libraryMode === "practices" ? practiceContent : state.libraryMode === "teachings" ? teachingContent : ""}
     </main>`;
 }

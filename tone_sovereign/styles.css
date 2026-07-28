@@ -11,6 +11,14 @@
   --teal: #86b7ad;
   --rose: #d39aa4;
   --blue: #8da9c8;
+  --spectrum-notice: #7db7d8;
+  --spectrum-stabilise: #78b89f;
+  --spectrum-discern: #a8c6d8;
+  --spectrum-reclaim: #e1b45e;
+  --spectrum-cross: #a58dcb;
+  --spectrum-embody: #d79baa;
+  --spectrum-integrate: #7fb5b0;
+  --section-color: var(--gold);
   --line: rgba(216, 180, 90, 0.22);
   --line-strong: rgba(247, 223, 155, 0.5);
   --panel: rgba(8, 8, 5, 0.86);
@@ -61,8 +69,27 @@ img { display: block; max-width: 100%; }
 .app-shell {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 50% 8%, rgba(216, 180, 90, 0.1), transparent 31rem),
+    radial-gradient(circle at 50% 8%, color-mix(in srgb, var(--section-color) 11%, transparent), transparent 31rem),
     linear-gradient(180deg, rgba(8, 8, 5, 0.76), rgba(3, 3, 2, 0.95));
+}
+
+.app-shell:not(.spectrum-orientation) .topbar-title span,
+.app-shell:not(.spectrum-orientation) .section-intro > .eyebrow {
+  color: color-mix(in srgb, var(--section-color) 84%, var(--gold-light));
+}
+
+.app-shell:not(.spectrum-orientation) .section-intro {
+  position: relative;
+  padding-left: 18px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--section-color) 7%, transparent), transparent 68%);
+}
+
+.app-shell:not(.spectrum-orientation) .section-intro::before {
+  content: "";
+  position: absolute;
+  inset: 3px auto 3px 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--section-color) 76%, transparent), transparent);
 }
 
 .page {
@@ -161,6 +188,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
   border-color: rgba(247, 223, 155, 0.58);
   background: linear-gradient(100deg, rgba(110, 77, 15, 0.54), rgba(216, 180, 90, 0.25), rgba(46, 34, 9, 0.6));
   box-shadow: inset 0 1px rgba(255, 245, 214, 0.08), 0 10px 34px rgba(0, 0, 0, 0.2);
+}
+.app-shell:not(.spectrum-orientation) .primary-button {
+  border-color: color-mix(in srgb, var(--section-color) 58%, transparent);
+  background: linear-gradient(100deg, color-mix(in srgb, var(--section-color) 24%, #090806), color-mix(in srgb, var(--section-color) 13%, #17130a), rgba(8, 8, 5, .82));
 }
 .secondary-button { background: rgba(7, 7, 5, 0.68); color: var(--ivory-soft); }
 .button-row { display: flex; gap: 10px; align-items: center; }
@@ -538,6 +569,26 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   border-bottom: 1px solid var(--line);
   background: transparent;
 }
+.spectrum-row {
+  --item-color: var(--section-color);
+  position: relative;
+  border-left: 2px solid color-mix(in srgb, var(--item-color) 64%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--item-color) 11%, transparent), color-mix(in srgb, var(--item-color) 3%, transparent) 56%, transparent);
+}
+.spectrum-row:hover {
+  border-left-color: var(--item-color);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--item-color) 17%, transparent), color-mix(in srgb, var(--item-color) 4%, transparent) 62%, transparent);
+}
+.spectrum-row .door-mark,
+.spectrum-row .door-arrow,
+.spectrum-row > b,
+.spectrum-row > span > b { color: var(--item-color); }
+.spectrum-row .door-mark {
+  border-color: color-mix(in srgb, var(--item-color) 58%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--item-color) 11%, transparent), transparent 72%);
+  box-shadow: inset 0 0 22px color-mix(in srgb, var(--item-color) 8%, transparent), 0 0 24px color-mix(in srgb, var(--item-color) 7%, transparent);
+}
+.spectrum-row .door-copy span { color: color-mix(in srgb, var(--item-color) 78%, var(--ivory-soft)); }
 .door.primary-door { min-height: 148px; }
 .door-mark,
 .movement-mark {
@@ -579,6 +630,10 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .orientation-invitation strong { display: block; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
 .orientation-invitation small { display: block; margin-top: 5px; color: var(--ivory-soft); line-height: 1.45; }
 .orientation-invitation b { color: var(--gold-light); font-weight: 400; }
+.orientation-invitation.spectrum-row {
+  padding-inline: 12px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--item-color) 10%, transparent), transparent 70%);
+}
 
 /* Practice */
 .practice-page { min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; }
@@ -660,10 +715,18 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   box-shadow: inset 0 0 28px color-mix(in srgb, var(--movement-color) 8%, transparent), 0 0 28px color-mix(in srgb, var(--movement-color) 7%, transparent);
 }
 .movement-field-choice strong { display: block; font-family: var(--serif); font-size: 1.45rem; font-weight: 400; }
-.movement-field-choice small { display: block; margin-top: 5px; color: var(--gold); line-height: 1.35; }
+.movement-field-choice small { display: block; margin-top: 5px; color: color-mix(in srgb, var(--movement-color) 76%, var(--ivory-soft)); line-height: 1.35; }
 .movement-field-choice b { color: var(--movement-color); font-weight: 400; }
 .movement-field-note { margin: 28px auto 0; max-width: 540px; color: var(--ivory-soft); text-align: center; line-height: 1.55; }
 .movement-session-page { min-height: calc(100svh - 82px); display: grid; }
+.movement-session-page .eyebrow,
+.movement-session-page .practice-settings-row,
+.movement-session-page .timer { color: var(--movement-color); }
+.movement-session-page .choice.selected {
+  border-color: color-mix(in srgb, var(--movement-color) 72%, transparent);
+  background: color-mix(in srgb, var(--movement-color) 14%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--movement-color) 8%, transparent);
+}
 .movement-session-page .practice-stage { animation: movementStageIn 240ms ease both; }
 @keyframes movementStageIn { from { opacity: 0; } to { opacity: 1; } }
 .focused-stage { width: min(620px, 100%); margin-inline: auto; justify-items: center; text-align: center; }
@@ -898,7 +961,7 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .nested-map { position: relative; min-height: 620px; display: grid; place-items: center; margin: 24px 0 34px; overflow: hidden; }
 .field-ring { position: absolute; border: 1px solid var(--ring-color, var(--line)); border-radius: 50%; width: var(--size); aspect-ratio: 1; opacity: .75; pointer-events: none; }
 .field-nodes { position: relative; width: min(600px, 100%); display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; z-index: 2; }
-.field-node { min-height: 72px; padding: 12px; text-align: left; display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; backdrop-filter: blur(14px); }
+.field-node { min-height: 72px; padding: 12px; text-align: left; display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; border-color: color-mix(in srgb, var(--field-color) 38%, transparent); background: linear-gradient(90deg, color-mix(in srgb, var(--field-color) 10%, transparent), rgba(5,5,4,.7)); backdrop-filter: blur(14px); }
 .field-number { width: 44px; height: 44px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; color: var(--field-color); }
 .field-node strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.15rem; }
 .field-node small { color: var(--ivory-soft); }
@@ -922,7 +985,10 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .start-here h2 { margin: 0 0 8px; font-family: var(--serif); font-size: 1.65rem; font-weight: 400; }
 .start-here > p:not(.eyebrow) { color: var(--ivory-soft); line-height: 1.65; }
 .list { margin-top: 20px; border-top: 1px solid var(--line); }
-.list-row { width: 100%; min-height: 82px; padding: 16px 6px; border: 0; border-bottom: 1px solid var(--line); background: transparent; display: grid; grid-template-columns: minmax(0,1fr) 24px; gap: 16px; align-items: center; text-align: left; }
+.list-row { width: 100%; min-height: 82px; padding: 16px 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; display: grid; grid-template-columns: minmax(0,1fr) 24px; gap: 16px; align-items: center; text-align: left; }
+.list-row.spectrum-row { border-left-width: 2px; }
+.list-row.spectrum-row > b { color: var(--item-color); font-weight: 500; }
+.list-row.spectrum-row > span > span { color: color-mix(in srgb, var(--item-color) 42%, var(--ivory-soft)); }
 .list-row strong { display: block; font-family: var(--serif); font-size: 1.3rem; font-weight: 400; }
 .list-row span { display: block; margin-top: 4px; color: var(--ivory-soft); line-height: 1.4; }
 .prose { font-size: 1.03rem; line-height: 1.75; color: var(--ivory-soft); }
@@ -1078,7 +1144,10 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 
 /* Golden Age route parity */
 .library-mode-choices { margin: 26px 0 34px; border-top: 1px solid var(--line); }
-.library-mode-choices .list-row[aria-pressed="true"] { background: rgba(216,180,90,.075); }
+.library-mode-choices .list-row[aria-pressed="true"] {
+  border-left-color: var(--item-color);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--item-color) 20%, transparent), color-mix(in srgb, var(--item-color) 5%, transparent) 68%, transparent);
+}
 .path-steps { counter-reset: path-step; }
 .path-steps .list-row { min-height: 104px; }
 .entry-actions { align-items: stretch; }
