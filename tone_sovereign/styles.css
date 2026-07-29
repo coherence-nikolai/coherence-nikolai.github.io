@@ -68,10 +68,47 @@ img { display: block; max-width: 100%; }
 
 .app-shell {
   min-height: 100vh;
+  position: relative;
+  isolation: isolate;
   background:
     radial-gradient(circle at 50% 8%, color-mix(in srgb, var(--section-color) 11%, transparent), transparent 31rem),
     linear-gradient(180deg, rgba(8, 8, 5, 0.76), rgba(3, 3, 2, 0.95));
 }
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  opacity: .9;
+}
+
+.interface-navigation::before {
+  background:
+    radial-gradient(circle at 50% 9%, color-mix(in srgb, var(--section-color) 14%, transparent), transparent 36rem),
+    radial-gradient(circle at 8% 58%, color-mix(in srgb, var(--section-color) 5%, transparent), transparent 32rem);
+}
+
+.interface-practice::before {
+  background: radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--section-color) 15%, transparent), transparent 32rem);
+}
+
+.interface-teaching::before {
+  background:
+    radial-gradient(circle at 12% 14%, color-mix(in srgb, var(--section-color) 12%, transparent), transparent 30rem),
+    linear-gradient(90deg, color-mix(in srgb, var(--section-color) 5%, transparent), transparent 62%);
+}
+
+.interface-threshold::before {
+  background:
+    radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--section-color) 19%, transparent), transparent 30rem),
+    linear-gradient(180deg, transparent 58%, color-mix(in srgb, var(--section-color) 7%, transparent) 62%, transparent 64%);
+}
+
+.interface-teaching .page { width: min(820px, 100%); }
+.interface-teaching .prose { max-width: 44rem; }
+.interface-practice .page:not(.wide) { width: min(700px, 100%); }
 
 .app-shell:not(.spectrum-orientation) .topbar-title span,
 .app-shell:not(.spectrum-orientation) .section-intro > .eyebrow {
@@ -91,6 +128,15 @@ img { display: block; max-width: 100%; }
   width: 2px;
   background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--section-color) 76%, transparent), transparent);
 }
+
+.interface-teaching .section-intro::before { width: 3px; }
+.interface-practice .section-intro {
+  padding-inline: 0;
+  text-align: center;
+  background: none;
+}
+.interface-practice .section-intro::before { display: none; }
+.interface-practice .section-intro .lede { margin-inline: auto; }
 
 .page {
   width: min(760px, 100%);
@@ -119,7 +165,7 @@ img { display: block; max-width: 100%; }
 
 .topbar-title { min-width: 0; }
 .topbar-title strong { display: block; font-family: var(--serif); font-size: 1.25rem; font-weight: 400; }
-.topbar-title span { display: block; color: var(--gold); font-size: 0.72rem; margin-top: 2px; }
+.topbar-title span { display: block; color: var(--gold); font-size: 0.78rem; line-height: 1.35; margin-top: 2px; }
 .topbar-actions { display: flex; gap: 6px; align-items: center; }
 
 .icon-button,
@@ -174,7 +220,7 @@ textarea:focus-visible {
 
 button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
-.text-button { min-height: 42px; padding: 0 14px; color: var(--ivory-soft); }
+.text-button { min-width: 44px; min-height: 44px; padding: 0 14px; color: var(--ivory-soft); }
 .primary-button,
 .secondary-button {
   width: 100%;
@@ -202,7 +248,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
   color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: 0.73rem;
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
@@ -519,7 +565,7 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 }
 .landing-copy p { margin: 0; color: var(--ivory-soft); font-size: clamp(1.05rem, 4vw, 1.35rem); }
 .landing-copy strong { display: block; margin-top: 4px; font-family: var(--serif); font-size: clamp(2.1rem, 8vw, 3.6rem); font-weight: 400; color: var(--gold-light); }
-.symbol-link { margin-top: 12px; border: 0; background: transparent; color: rgba(216, 180, 90, 0.72); cursor: pointer; }
+.symbol-link { min-height: 44px; margin-top: 4px; padding: 0 12px; border: 0; background: transparent; color: rgba(216, 180, 90, 0.78); cursor: pointer; }
 
 .landing-actions {
   width: min(360px, 100%);
@@ -791,7 +837,7 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .seal-orb { display: grid; place-items: center; color: var(--gold-light); font-size: 2.2rem; }
 .practice-settings-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 18px; color: var(--gold); }
 .practice-settings-row label { display: flex; align-items: center; gap: 8px; }
-.practice-settings-row select { min-height: 40px; border: 1px solid var(--line); border-radius: 6px; background: #070705; color: var(--ivory); padding: 0 12px; }
+.practice-settings-row select { min-height: 44px; border: 1px solid var(--line); border-radius: 6px; background: #070705; color: var(--ivory); padding: 0 12px; }
 .notice-instrument.still .aperture-ring { animation: none; }
 .notice-live-stage .button-row { width: 100%; justify-content: center; }
 .state-list { width: min(620px, 100%); margin-inline: auto; display: grid; gap: 9px; }
@@ -1067,7 +1113,7 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 }
 .segmented button,
 .depth-selector button {
-  min-height: 40px;
+  min-height: 44px;
   border: 0;
   border-radius: 4px;
   background: transparent;
@@ -1092,10 +1138,24 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
   text-align: left;
   cursor: pointer;
 }
+.content-card.spectrum-card {
+  border-color: color-mix(in srgb, var(--item-color) 34%, transparent);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--item-color) 13%, transparent), rgba(7,7,5,.76) 58%);
+  box-shadow: inset 3px 0 color-mix(in srgb, var(--item-color) 62%, transparent);
+}
+.content-card.spectrum-card .eyebrow,
+.content-card.spectrum-card .tag-line,
+.content-card.spectrum-card b { color: color-mix(in srgb, var(--item-color) 82%, var(--gold-light)); }
+.content-card.spectrum-card:hover {
+  border-color: color-mix(in srgb, var(--item-color) 62%, transparent);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--item-color) 19%, transparent), rgba(7,7,5,.74) 62%);
+}
 .content-card strong { font-family: var(--serif); font-size: 1.45rem; font-weight: 400; }
 .content-card small { color: var(--ivory-soft); font-size: .92rem; line-height: 1.5; }
 .content-card b { position: absolute; right: 18px; bottom: 16px; color: var(--gold-light); font-weight: 400; }
-.content-card .tag-line { margin-top: 7px; color: var(--gold); font-size: .7rem; line-height: 1.4; }
+.content-card .tag-line { margin-top: 7px; color: var(--gold); font-size: .76rem; line-height: 1.45; }
+
+.progressive-disclosure { width: min(520px, 100%); margin: 18px auto 36px; display: block; }
 
 .library-tools { margin: 26px 0 12px; }
 .search-field { display: grid; gap: 8px; color: var(--gold); }
@@ -1180,9 +1240,10 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .setting-row { min-height: 68px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 20px; align-items: center; border-bottom: 1px solid var(--line); }
 .setting-row strong { display: block; font-weight: 500; }
 .setting-row span { color: var(--ivory-soft); font-size: .85rem; }
-.switch { width: 52px; height: 30px; padding: 3px; border: 1px solid var(--line-strong); border-radius: 999px; background: #0b0b08; cursor: pointer; }
-.switch::after { content: ""; display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--ivory-soft); transition: transform 180ms ease, background 180ms ease; }
-.switch[aria-checked="true"]::after { transform: translateX(20px); background: var(--gold-light); box-shadow: 0 0 12px var(--gold); }
+.switch { position: relative; width: 52px; height: 44px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.switch::before { content: ""; position: absolute; inset: 7px 0; border: 1px solid var(--line-strong); border-radius: 999px; background: #0b0b08; }
+.switch::after { content: ""; position: absolute; top: 11px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--ivory-soft); transition: transform 180ms ease, background 180ms ease; }
+.switch[aria-checked="true"]::after { transform: translateX(22px); background: var(--gold-light); box-shadow: 0 0 12px var(--gold); }
 .danger { color: #e6a792; border-color: rgba(230,167,146,.36); }
 .file-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 

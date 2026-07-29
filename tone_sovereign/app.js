@@ -606,11 +606,13 @@ const state = {
   selectedEngine: "congruence-compass",
   selectedMission: "",
   foundationMode: "laws",
+  foundationVisibleCount: 10,
   libraryMode: "",
   libraryQuery: "",
   libraryField: "all",
   libraryDomain: "all",
   libraryNeed: "all",
+  libraryVisibleCount: 8,
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
@@ -977,6 +979,7 @@ class SoundEngine {
 }
 
 const sound = new SoundEngine();
+const HISTORY_MARKER = "tone-sovereign";
 
 function persistPreferences() {
   localStorage.setItem(STORAGE.preferences, JSON.stringify({
@@ -1007,7 +1010,9 @@ function navigate(view, options = {}) {
   stopPracticeTimers();
   if (state.view === "guidedSits" && view !== "guidedSits") resetGuidedSitSession();
   window.scrollTo({ top: 0, behavior: "auto" });
-  if (state.view !== view && options.remember !== false) state.stack.push(state.view);
+  const changedView = state.view !== view;
+  const remembersView = changedView && options.remember !== false;
+  if (remembersView) state.stack.push(state.view);
   state.view = view;
   if (options.field) state.selectedField = options.field;
   if (options.teaching) state.selectedTeaching = options.teaching;
@@ -1035,11 +1040,16 @@ function navigate(view, options = {}) {
     if (view === "library") state.libraryMode = options.mode;
   }
   render();
+  if (changedView) {
+    const historyState = { app: HISTORY_MARKER, view };
+    if (remembersView) window.history.pushState(historyState, "", window.location.href);
+    else window.history.replaceState(historyState, "", window.location.href);
+  }
   if (view === "practiceEngine") playEngineStageVoice();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
-function goBack() {
+function restorePreviousView() {
   stopPracticeTimers();
   if (state.view === "guidedSits") resetGuidedSitSession();
   state.view = state.stack.pop() || "home";
@@ -1047,11 +1057,20 @@ function goBack() {
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
+function goBack() {
+  if (state.stack.length && window.history.state?.app === HISTORY_MARKER) {
+    window.history.back();
+    return;
+  }
+  restorePreviousView();
+}
+
 function goHome() {
   stopPracticeTimers();
   if (state.view === "guidedSits") resetGuidedSitSession();
   state.stack = [];
   state.view = "home";
+  window.history.replaceState({ app: HISTORY_MARKER, view: "home" }, "", window.location.href);
   render();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
@@ -1077,6 +1096,20 @@ function currentSpectrum() {
     return { name: "threshold", color: SPECTRUM.threshold };
   }
   return { name: "orientation", color: SPECTRUM.orientation };
+}
+
+function currentInterfaceMode() {
+  if (state.view === "guidedSits") {
+    return state.guidedSit.phase === "catalog" ? "navigation" : "practice";
+  }
+  if (["movement", "guided", "practiceEngine", "acts", "mission"].includes(state.view)) {
+    return "practice";
+  }
+  if (["nestedFields", "field", "libraryPath", "teaching", "law", "principle", "entry", "scales", "symbol", "about", "ruleOfLife"].includes(state.view)) {
+    return "teaching";
+  }
+  if (state.view === "threshold") return "threshold";
+  return "navigation";
 }
 
 function render() {
@@ -1112,7 +1145,8 @@ function render() {
     about: renderAbout
   };
   const spectrum = currentSpectrum();
-  app.innerHTML = `<div class="app-shell spectrum-${spectrum.name}" style="--section-color:${spectrum.color}">${(renderers[state.view] || renderHome)()}</div>`;
+  const interfaceMode = currentInterfaceMode();
+  app.innerHTML = `<div class="app-shell spectrum-${spectrum.name} interface-${interfaceMode}" style="--section-color:${spectrum.color}">${(renderers[state.view] || renderHome)()}</div>`;
   if (state.view === "symbol") observeSymbolSections();
   if (state.view === "landing" && !state.ceremonySettled) settleCeremonyLater();
   if (state.view === "movement") resumePracticeView();
@@ -2333,9 +2367,21 @@ function entrySpectrumColor(entry, catalog) {
   return index >= 0 ? fieldColors[index] : SPECTRUM.teachings;
 }
 
+function fieldLinkedSpectrumColor(item, catalog) {
+  const fieldID = item?.fieldIDs?.[0];
+  const index = catalog.fields.findIndex(field => field.id === fieldID);
+  return index >= 0 ? fieldColors[index] : SPECTRUM.teachings;
+}
+
+function practiceEngineSpectrumColor(engine) {
+  const capacity = engine?.capacitySequence?.find(id => SPECTRUM[id]);
+  return capacity ? SPECTRUM[capacity] : SPECTRUM.practice;
+}
+
 function renderLibrary() {
   const catalog = catalogFor(state.lang);
   const entries = filteredLibraryEntries(catalog);
+  const visibleEntries = entries.slice(0, state.libraryVisibleCount);
   const fields = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.fields));
   const domains = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.domains));
   const needs = new Set(catalog.libraryEntries.flatMap(entry => entry.tags.needs));
@@ -2348,7 +2394,8 @@ function renderLibrary() {
     <section class="start-here"><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>`;
   const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button></section>
     <section class="library-tools"><label class="search-field"><span>${phrase("Search teachings", "Buscar enseñanzas")}</span><input class="field-input" type="search" value="${escapeAttribute(state.libraryQuery)}" data-library-query placeholder="${phrase("A question, quality or situation", "Una pregunta, cualidad o situación")}"></label><div class="filter-grid"><label>${phrase("Field", "Campo")}<select data-library-filter="field"><option value="all">${phrase("All Fields", "Todos los Campos")}</option>${libraryFilterOptions(fields, state.libraryField)}</select></label><label>${phrase("Theme", "Tema")}<select data-library-filter="domain"><option value="all">${phrase("All themes", "Todos los temas")}</option>${libraryFilterOptions(domains, state.libraryDomain)}</select></label><label>${phrase("Need", "Necesidad")}<select data-library-filter="need"><option value="all">${phrase("All needs", "Todas las necesidades")}</option>${libraryFilterOptions(needs, state.libraryNeed)}</select></label></div><p class="result-count">${entries.length} ${phrase("teachings", "enseñanzas")}</p></section>
-    <section class="list">${entries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>`;
+    <section class="list">${visibleEntries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>
+    ${visibleEntries.length < entries.length ? `<button class="secondary-button progressive-disclosure" type="button" data-action="show-more-teachings">${phrase("Show 8 more", "Mostrar 8 más")} · ${entries.length - visibleEntries.length} ${phrase("remaining", "restantes")}</button>` : ""}`;
   return `${renderTopbar(tr("library"), phrase("Back to the five doors", "Volver a las cinco puertas"))}
     <main class="page wide">
       <header class="section-intro"><p class="eyebrow">${tr("library")}</p><h1 class="page-title">${phrase("What would help now?", "¿Qué ayudaría ahora?")}</h1><p class="lede measure">${phrase("Choose something to practise, or explore the idea behind it.", "Elige algo para practicar o explora la idea que hay detrás.")}</p></header>
@@ -2374,11 +2421,13 @@ function renderTeaching() {
 function renderFoundations() {
   const catalog = catalogFor(state.lang);
   const items = state.foundationMode === "laws" ? catalog.laws : catalog.principles;
+  const visibleItems = items.slice(0, state.foundationVisibleCount);
   return `${renderTopbar(phrase("Foundations", "Fundamentos"), phrase("Laws and principles for conscious participation", "Leyes y principios para la participación consciente"))}
     <main class="page wide"><header class="section-intro"><p class="eyebrow">${phrase("A compass, not a command", "Una brújula, no una orden")}</p><h1 class="page-title">${phrase("Foundations", "Fundamentos")}</h1><p class="lede measure">${phrase("These teachings offer ways to see and act more clearly. Test them in life. Your discernment remains the authority.", "Estas enseñanzas ofrecen maneras de ver y actuar con más claridad. Pruébalas en la vida. Tu discernimiento sigue siendo la autoridad.")}</p></header>
       <nav class="segmented"><button type="button" data-foundation-mode="laws" aria-pressed="${state.foundationMode === "laws"}">${phrase("21 Laws", "21 Leyes")}</button><button type="button" data-foundation-mode="principles" aria-pressed="${state.foundationMode === "principles"}">${phrase("32 Principles", "32 Principios")}</button></nav>
       <button class="orientation-invitation" type="button" data-view="scales"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Four scales of participation", "Cuatro escalas de participación")}</strong><small>${phrase("Inner coherence, personal sovereignty, conscious relationship and field stewardship.", "Coherencia interior, soberanía personal, relación consciente y cuidado del campo.")}</small></span><b>→</b></button>
-      <section class="list foundation-list">${items.map(item => `<button class="list-row" type="button" data-${state.foundationMode === "laws" ? "law" : "principle"}="${item.id}"><span><small>${String(item.order).padStart(2, "0")}</small><strong>${escapeHTML(item.title)}</strong><span>${escapeHTML(state.foundationMode === "laws" ? item.coreQuestion : item.contemplativeQuestion)}</span></span><b>→</b></button>`).join("")}</section>
+      <section class="list foundation-list">${visibleItems.map(item => `<button class="list-row spectrum-row" style="--item-color:${fieldLinkedSpectrumColor(item, catalog)}" type="button" data-${state.foundationMode === "laws" ? "law" : "principle"}="${item.id}"><span><small>${String(item.order).padStart(2, "0")}</small><strong>${escapeHTML(item.title)}</strong><span>${escapeHTML(state.foundationMode === "laws" ? item.coreQuestion : item.contemplativeQuestion)}</span></span><b>→</b></button>`).join("")}</section>
+      ${visibleItems.length < items.length ? `<button class="secondary-button progressive-disclosure" type="button" data-action="show-more-foundations">${phrase("Show 10 more", "Mostrar 10 más")} · ${items.length - visibleItems.length} ${phrase("remaining", "restantes")}</button>` : ""}
     </main>`;
 }
 
@@ -2422,7 +2471,7 @@ function renderLibraryEntry() {
 
 function renderPracticeEngines() {
   const catalog = catalogFor(state.lang);
-  return `${renderTopbar(phrase("Guided Practices", "Prácticas guiadas"), phrase("Twelve ways to meet a real moment", "Doce maneras de acompañar un momento real"))}<main class="page wide"><header class="section-intro"><p class="eyebrow">${phrase("Choose by need, not achievement", "Elige según tu necesidad, no como logro")}</p><h1 class="page-title">${phrase("Guided Practices", "Prácticas guiadas")}</h1><p class="lede measure">${phrase("Each practice stands on its own. Choose two, five or ten minutes. You can leave at any point.", "Cada práctica funciona por sí sola. Elige dos, cinco o diez minutos. Puedes salir en cualquier momento.")}</p></header><section class="content-grid engine-grid">${catalog.practiceEngines.map(engine => `<button class="content-card" type="button" data-engine="${engine.id}"><span class="eyebrow">${engine.recommendedDurations.join(" · ")} min</span><strong>${escapeHTML(engine.title)}</strong><small>${escapeHTML(engine.purpose)}</small><span class="tag-line">${engine.capacitySequence.map(tagLabel).join(" → ")}</span><b>→</b></button>`).join("")}</section></main>`;
+  return `${renderTopbar(phrase("Guided Practices", "Prácticas guiadas"), phrase("Twelve ways to meet a real moment", "Doce maneras de acompañar un momento real"))}<main class="page wide"><header class="section-intro"><p class="eyebrow">${phrase("Choose by need, not achievement", "Elige según tu necesidad, no como logro")}</p><h1 class="page-title">${phrase("Guided Practices", "Prácticas guiadas")}</h1><p class="lede measure">${phrase("Each practice stands on its own. Choose two, five or ten minutes. You can leave at any point.", "Cada práctica funciona por sí sola. Elige dos, cinco o diez minutos. Puedes salir en cualquier momento.")}</p></header><section class="content-grid engine-grid">${catalog.practiceEngines.map(engine => `<button class="content-card spectrum-card" style="--item-color:${practiceEngineSpectrumColor(engine)}" type="button" data-engine="${engine.id}"><span class="eyebrow">${engine.recommendedDurations.join(" · ")} min</span><strong>${escapeHTML(engine.title)}</strong><small>${escapeHTML(engine.purpose)}</small><span class="tag-line">${engine.capacitySequence.map(tagLabel).join(" → ")}</span><b>→</b></button>`).join("")}</section></main>`;
 }
 
 function renderPracticeEngine() {
@@ -2638,8 +2687,8 @@ app.addEventListener("click", async event => {
   if (!action && engine) { navigate("practiceEngine", { engine }); return; }
   if (!action && mission) { navigate("mission", { mission }); return; }
 
-  if (button.dataset.libraryMode) { state.libraryMode = button.dataset.libraryMode; render(); return; }
-  if (button.dataset.foundationMode) { state.foundationMode = button.dataset.foundationMode; render(); return; }
+  if (button.dataset.libraryMode) { state.libraryMode = button.dataset.libraryMode; state.libraryVisibleCount = 8; render(); return; }
+  if (button.dataset.foundationMode) { state.foundationMode = button.dataset.foundationMode; state.foundationVisibleCount = 10; render(); return; }
   if (button.dataset.depth) { state.teachingDepth = Number(button.dataset.depth); render(); return; }
   if (button.dataset.engineDuration) { state.engineDuration = Number(button.dataset.engineDuration); render(); return; }
 
@@ -2664,6 +2713,8 @@ app.addEventListener("click", async event => {
   }
   if (action === "open-field-return") { state.selectedField = button.dataset.field; navigate("guided", { guidedKind: "field-return" }); }
   if (action === "browse-two-minute") { state.showAllPractices = true; render(); }
+  if (action === "show-more-teachings") { state.libraryVisibleCount += 8; render(); }
+  if (action === "show-more-foundations") { state.foundationVisibleCount += 10; render(); }
   if (action === "movement-back") movementBack();
   if (action === "start-full-practice") startFullPractice();
   if (action === "return-movement-field") returnToMovementField();
@@ -2838,6 +2889,7 @@ app.addEventListener("input", event => {
   }
   if (target.dataset.libraryQuery !== undefined) {
     state.libraryQuery = target.value;
+    state.libraryVisibleCount = 8;
     window.clearTimeout(librarySearchTimer);
     librarySearchTimer = window.setTimeout(() => {
       render();
@@ -2887,7 +2939,7 @@ app.addEventListener("change", event => {
   if (libraryFilter === "field") state.libraryField = event.target.value;
   if (libraryFilter === "domain") state.libraryDomain = event.target.value;
   if (libraryFilter === "need") state.libraryNeed = event.target.value;
-  if (libraryFilter) render();
+  if (libraryFilter) { state.libraryVisibleCount = 8; render(); }
   const actFilter = event.target.dataset.actFilter;
   if (actFilter === "quality") state.actQuality = event.target.value;
   if (actFilter === "context") state.actContext = event.target.value;
@@ -2944,6 +2996,9 @@ function drawAmbient(time = 0) {
 }
 
 window.addEventListener("resize", resizeField);
+window.addEventListener("popstate", event => {
+  if (event.state?.app === HISTORY_MARKER) restorePreviousView();
+});
 document.addEventListener("visibilitychange", () => {
   const breathing = state.view === "movement" && state.practice.movement === "stabilise" && state.practice.breathStartedAt;
   const crossing = state.view === "movement" && state.practice.movement === "cross" && (state.practice.stage === "question" || state.practice.stage === "crossed");
@@ -2970,5 +3025,6 @@ if ("serviceWorker" in navigator) window.addEventListener("load", () => navigato
 
 persistPreferences();
 resizeField();
+window.history.replaceState({ app: HISTORY_MARKER, view: state.view }, "", window.location.href);
 render();
 fieldFrame = requestAnimationFrame(drawAmbient);
