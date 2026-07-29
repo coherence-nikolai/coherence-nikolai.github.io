@@ -1166,6 +1166,7 @@ function renderLanding() {
         <img class="sword-construction-mark sword-triskelion-mark" src="${ROOT}sword-mark.png" alt="">
         <img class="sword-mark" src="${ROOT}sword-mark.png" alt="">
         <div class="ring-trace"></div>
+        <div class="ring-leading-star-orbit"><span class="ring-leading-star"></span></div>
         <div class="blade-current"></div>
         <div class="travelling-star"></div>
         ${renderLivingApexStar()}
