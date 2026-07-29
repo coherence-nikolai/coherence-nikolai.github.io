@@ -48,6 +48,7 @@ const copy = {
     enter: "Enter",
     symbol: "The Symbol",
     replay: "Replay First Light",
+    replayWithSound: "Replay with sound",
     soundOn: "Sound on",
     soundOff: "Sound off",
     voiceOn: "Voice guidance on",
@@ -90,6 +91,7 @@ const copy = {
     enter: "Entrar",
     symbol: "El símbolo",
     replay: "Repetir Primera Luz",
+    replayWithSound: "Repetir con sonido",
     soundOn: "Sonido activado",
     soundOff: "Sonido desactivado",
     voiceOn: "Guía de voz activada",
@@ -976,6 +978,14 @@ class SoundEngine {
       this.note(root * ratio, now + index * .025, duration * (1 - index * .08), .045 / (index + 1), "sine");
     });
   }
+
+  async confirmSound() {
+    if (!state.sound) return;
+    await this.ready();
+    const now = this.context.currentTime;
+    this.note(392, now, .9, .045);
+    this.note(587.33, now + .08, 1.1, .025);
+  }
 }
 
 const sound = new SoundEngine();
@@ -1160,9 +1170,13 @@ function renderTopbar(title, subtitle = "") {
     <div class="topbar-title"><strong>${escapeHTML(title)}</strong>${subtitle ? `<span>${escapeHTML(subtitle)}</span>` : ""}</div>
     <div class="topbar-actions">
       <button class="icon-button" type="button" data-action="home" aria-label="${escapeHTML(tr("home"))}" title="${escapeHTML(tr("home"))}">⌂</button>
-      <button class="icon-button" type="button" data-action="toggle-sound" aria-label="${state.sound ? tr("soundOn") : tr("soundOff")}" title="${state.sound ? tr("soundOn") : tr("soundOff")}">${state.sound ? "◖" : "○"}</button>
+      <button class="icon-button" type="button" data-action="toggle-sound" aria-label="${state.sound ? tr("soundOn") : tr("soundOff")}" title="${state.sound ? tr("soundOn") : tr("soundOff")}">${renderSoundIcon(state.sound)}</button>
     </div>
   </header>`;
+}
+
+function renderSoundIcon(enabled = true) {
+  return `<span class="sound-glyph ${enabled ? "is-on" : "is-off"}" aria-hidden="true"><span class="sound-speaker"></span><span class="sound-wave sound-wave-one"></span><span class="sound-wave sound-wave-two"></span><span class="sound-slash"></span></span>`;
 }
 
 function renderLivingApexStar() {
@@ -1184,8 +1198,7 @@ function renderLanding() {
     <div class="gold-wash" aria-hidden="true"></div>
     <div class="landing-inner">
       <div class="landing-tools" ${state.ceremonySettled ? "" : "inert"}>
-        <button class="icon-button delayed-control" type="button" data-action="replay-ceremony" aria-label="${tr("replay")}" title="${tr("replay")}">↻</button>
-        <button class="icon-button landing-sound-button" type="button" data-action="toggle-sound-replay" aria-label="${state.sound ? tr("soundOn") : tr("soundOff")}" title="${state.sound ? tr("soundOn") : tr("soundOff")}">${state.sound ? "◖" : "○"}</button>
+        <button class="landing-replay-button delayed-control" type="button" data-action="replay-ceremony" aria-label="${tr("replayWithSound")}" title="${tr("replayWithSound")}">${renderSoundIcon(true)}<span>${tr("replayWithSound")}</span></button>
         <button class="text-button delayed-control" type="button" data-action="toggle-language">${tr("language")}</button>
       </div>
       <section class="landing-title" aria-label="Tone Sovereign">
@@ -2723,10 +2736,27 @@ app.addEventListener("click", async event => {
   if (action === "finish-movement-pass") finishMovement(false);
   if (action === "continue-stabilise") startMovement("stabilise");
   if (action === "continue-embody") startMovement("embody");
-  if (action === "replay-ceremony") replayCeremony(true);
+  if (action === "replay-ceremony") {
+    state.sound = true;
+    persistPreferences();
+    await replayCeremony(true);
+  }
   if (action === "replay-from-home" || action === "replay-from-settings") { state.stack = []; state.view = "landing"; replayCeremony(true); }
-  if (action === "toggle-sound-replay") { state.sound = !state.sound; persistPreferences(); replayCeremony(true); }
-  if (action === "toggle-sound") { state.sound = !state.sound; if (!state.sound) sound.stop(); persistPreferences(); render(); }
+  if (action === "toggle-sound") {
+    state.sound = !state.sound;
+    persistPreferences();
+    if (state.sound) {
+      await sound.confirmSound().catch(() => {
+        showToast(state.lang === "en" ? "Sound could not start. Try once more." : "No se pudo iniciar el sonido. Inténtalo otra vez.");
+      });
+      showToast(state.lang === "en" ? "Sound effects are on. Voice guidance is set separately in Settings." : "Los efectos de sonido están activados. La guía de voz se configura por separado en Ajustes.");
+    } else {
+      sound.stopTones();
+      sound.stopFirstLight();
+      showToast(state.lang === "en" ? "Sound effects are off. Voice guidance remains separate." : "Los efectos de sonido están desactivados. La guía de voz sigue siendo independiente.");
+    }
+    render();
+  }
   if (action === "toggle-language") { sound.stop(); state.lang = state.lang === "en" ? "es" : "en"; persistPreferences(); render(); }
   if (action === "toggle-voice") { state.voice = !state.voice; if (!state.voice) sound.stopVoice(); persistPreferences(); render(); }
   if (action === "toggle-motion") { state.reduceMotion = !state.reduceMotion; persistPreferences(); render(); }
