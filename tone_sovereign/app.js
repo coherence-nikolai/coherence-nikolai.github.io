@@ -689,11 +689,13 @@ function newGuidedSit() {
   const savedGuidance = ["regular", "light", "off"].includes(savedPreferences.guidedSitGuidance)
     ? savedPreferences.guidedSitGuidance
     : "regular";
+  const savedBackgroundTone = savedPreferences.guidedSitBackgroundTone === true;
   return {
     selectedID: "",
     phase: "catalog",
     duration: allowedDurations.includes(savedDuration) ? savedDuration : allowedDurations[0],
     guidance: savedGuidance,
+    backgroundTone: savedBackgroundTone,
     elapsed: 0,
     paused: false,
     lastCueIndex: -1,
@@ -727,6 +729,8 @@ class SoundEngine {
     this.firstLightSources = [];
     this.breathDrone = null;
     this.breathDroneGain = null;
+    this.guidedSitAmbient = null;
+    this.guidedSitAmbientGeneration = 0;
   }
 
   async ready() {
@@ -747,14 +751,17 @@ class SoundEngine {
   }
 
   stopTones() {
+    this.guidedSitAmbientGeneration += 1;
     this.nodes.forEach(node => { try { node.stop(); } catch {} });
     this.nodes.clear();
     this.breathDrone = null;
     this.breathDroneGain = null;
+    this.guidedSitAmbient = null;
   }
 
   stopVoice() {
     this.voiceToken += 1;
+    this.setGuidedSitAmbientDucked(false);
     if (!this.voiceSource) return;
     try { this.voiceSource.stop(); } catch {}
     this.voiceSource = null;
@@ -826,16 +833,22 @@ class SoundEngine {
 
   async playVoice(cue, delay = 0) {
     if (!state.voice) return false;
+    const requestedAt = Date.now();
     this.stopVoice();
     const token = this.voiceToken;
     const language = state.lang;
     const context = await this.ready();
     const buffer = await this.loadBuffer(this.voiceURL(cue, language), context);
     if (!state.voice || token !== this.voiceToken || language !== state.lang) return false;
-    const { source } = this.scheduleBuffer(buffer, context.currentTime + Math.max(0, delay), 0.86);
+    this.setGuidedSitAmbientDucked(true);
+    const remainingDelay = Math.max(0, delay - ((Date.now() - requestedAt) / 1000));
+    const { source } = this.scheduleBuffer(buffer, context.currentTime + remainingDelay, 0.86);
     this.voiceSource = source;
     source.addEventListener("ended", () => {
-      if (this.voiceSource === source) this.voiceSource = null;
+      if (this.voiceSource === source) {
+        this.voiceSource = null;
+        this.setGuidedSitAmbientDucked(false);
+      }
     });
     return true;
   }
@@ -979,6 +992,101 @@ class SoundEngine {
     });
   }
 
+  guidedSitAmbientProfile(practiceID) {
+    return {
+      "breath-at-the-threshold": { root: 110.00, gain: .014 },
+      "simple-noting": { root: 146.83, gain: .011 },
+      "the-living-body": { root: 98.00, gain: .014 },
+      "open-field": { root: 130.81, gain: .010 },
+      "golden-age-goodwill": { root: 174.61, gain: .010 },
+      "holding-opposites": { root: 123.47, gain: .011 },
+      "sovereign-rest": { root: 87.31, gain: .013 }
+    }[practiceID] || null;
+  }
+
+  async startGuidedSitAmbient(practiceID) {
+    const profile = this.guidedSitAmbientProfile(practiceID);
+    if (!state.sound || !state.guidedSit.backgroundTone || !profile) return;
+    if (this.guidedSitAmbient?.practiceID === practiceID) return;
+    this.stopGuidedSitAmbient(true);
+    const generation = this.guidedSitAmbientGeneration;
+    const context = await this.ready();
+    if (!state.sound || !state.guidedSit.backgroundTone
+      || generation !== this.guidedSitAmbientGeneration
+      || state.view !== "guidedSits"
+      || state.guidedSit.phase !== "session"
+      || state.guidedSit.selectedID !== practiceID
+      || !this.guidedSitAmbientProfile(practiceID)) return;
+    const now = context.currentTime;
+    const output = context.createGain();
+    const filter = context.createBiquadFilter();
+    const fundamental = context.createOscillator();
+    const fifth = context.createOscillator();
+    const fundamentalGain = context.createGain();
+    const fifthGain = context.createGain();
+    const pulse = context.createOscillator();
+    const pulseDepth = context.createGain();
+
+    fundamental.type = "sine";
+    fifth.type = "sine";
+    fundamental.frequency.setValueAtTime(profile.root, now);
+    fifth.frequency.setValueAtTime(profile.root * 1.5, now);
+    fundamentalGain.gain.value = 0.78;
+    fifthGain.gain.value = 0.22;
+    filter.type = "lowpass";
+    filter.frequency.value = 620;
+    filter.Q.value = 0.35;
+    output.gain.setValueAtTime(.0001, now);
+    output.gain.exponentialRampToValueAtTime(profile.gain, now + 1.4);
+    pulse.frequency.value = 1 / 12;
+    pulseDepth.gain.value = profile.gain * .12;
+
+    fundamental.connect(fundamentalGain).connect(filter);
+    fifth.connect(fifthGain).connect(filter);
+    filter.connect(output).connect(this.master);
+    pulse.connect(pulseDepth).connect(output.gain);
+    [fundamental, fifth, pulse].forEach(source => {
+      source.start(now);
+      this.nodes.add(source);
+      source.addEventListener("ended", () => this.nodes.delete(source));
+    });
+    this.guidedSitAmbient = {
+      practiceID,
+      sources: [fundamental, fifth, pulse],
+      gain: output,
+      target: profile.gain
+    };
+  }
+
+  stopGuidedSitAmbient(immediate = false) {
+    this.guidedSitAmbientGeneration += 1;
+    const ambient = this.guidedSitAmbient;
+    if (!ambient) return;
+    this.guidedSitAmbient = null;
+    const now = this.context?.currentTime || 0;
+    if (!immediate && this.context) {
+      ambient.gain.gain.cancelScheduledValues(now);
+      ambient.gain.gain.setValueAtTime(Math.max(ambient.gain.gain.value, .0001), now);
+      ambient.gain.gain.exponentialRampToValueAtTime(.0001, now + .35);
+    }
+    window.setTimeout(() => {
+      ambient.sources.forEach(source => {
+        try { source.stop(); } catch {}
+        this.nodes.delete(source);
+      });
+    }, immediate ? 0 : 390);
+  }
+
+  setGuidedSitAmbientDucked(ducked) {
+    const ambient = this.guidedSitAmbient;
+    if (!ambient || !this.context) return;
+    const now = this.context.currentTime;
+    const target = Math.max(.0001, ambient.target * (ducked ? .22 : 1));
+    ambient.gain.gain.cancelScheduledValues(now);
+    ambient.gain.gain.setValueAtTime(Math.max(ambient.gain.gain.value, .0001), now);
+    ambient.gain.gain.exponentialRampToValueAtTime(target, now + (ducked ? .28 : .85));
+  }
+
   async confirmSound() {
     if (!state.sound) return;
     await this.ready();
@@ -999,7 +1107,8 @@ function persistPreferences() {
     reduceMotion: state.reduceMotion,
     quietWords: state.quietWords,
     guidedSitDuration: state.guidedSit.duration,
-    guidedSitGuidance: state.guidedSit.guidance
+    guidedSitGuidance: state.guidedSit.guidance,
+    guidedSitBackgroundTone: state.guidedSit.backgroundTone
   }));
   document.documentElement.lang = state.lang;
   document.documentElement.classList.toggle("user-reduced-motion", state.reduceMotion);
@@ -1343,12 +1452,16 @@ function guidedSitAssetID(practice, cueIndex) {
 function guidedSitSchedule(duration = state.guidedSit.duration, mode = state.guidedSit.guidance) {
   const safeDuration = Math.max(Number(duration) || 180, 180);
   const interval = mode === "regular" ? 120 : 300;
-  const secondCue = mode === "regular" ? 75 : 150;
-  const cueByTime = new Map([[0, 0], [Math.min(secondCue, safeDuration - 120), 1]]);
-  let cueIndex = 2;
-  for (let time = secondCue + interval; time <= safeDuration - 180; time += interval) {
+  const cueByTime = new Map([
+    [0, 0],
+    [Math.min(20, safeDuration - 120), 1],
+    [Math.min(42, safeDuration - 120), 2],
+    [Math.min(66, safeDuration - 120), 3]
+  ]);
+  let cueIndex = 4;
+  for (let time = 66 + interval; time <= safeDuration - 180; time += interval) {
     cueByTime.set(time, Math.min(cueIndex, 7));
-    cueIndex = cueIndex === 7 ? 2 : cueIndex + 1;
+    cueIndex = cueIndex === 7 ? 4 : cueIndex + 1;
   }
   cueByTime.set(Math.max(0, safeDuration - 120), 8);
   cueByTime.set(Math.max(0, safeDuration - 32), 9);
@@ -1364,12 +1477,12 @@ function currentGuidedSitEvent() {
 function guidedSitModeCopy(mode) {
   const definitions = {
     regular: {
-      en: ["Regular", "An invitation about every two minutes."],
-      es: ["Regular", "Una invitación aproximadamente cada dos minutos."]
+      en: ["Regular", "More support through the opening minute, then an invitation about every two minutes."],
+      es: ["Regular", "Más apoyo durante el primer minuto; después, una invitación aproximadamente cada dos minutos."]
     },
     light: {
-      en: ["Light", "An invitation about every five minutes."],
-      es: ["Ligera", "Una invitación aproximadamente cada cinco minutos."]
+      en: ["Light", "More support through the opening minute, then an invitation about every five minutes."],
+      es: ["Ligera", "Más apoyo durante el primer minuto; después, una invitación aproximadamente cada cinco minutos."]
     },
     off: {
       en: ["Voice off", "Bells and the visual field, without spoken guidance."],
@@ -1395,12 +1508,29 @@ function guidedSitInstrument(practice, progress, active = false) {
   </div>`;
 }
 
+function guidedSitSupportsBackgroundTone(practice = guidedSitPractice()) {
+  return practice?.id !== "sound-and-silence";
+}
+
+function guidedSitBackgroundToneDetail(practice = guidedSitPractice()) {
+  if (!guidedSitSupportsBackgroundTone(practice)) {
+    return phrase(
+      "This practice leaves the background silent so you can hear the sounds around you.",
+      "Esta práctica deja el fondo en silencio para que puedas oír los sonidos a tu alrededor."
+    );
+  }
+  return phrase(
+    "A very quiet tone can sit beneath the voice. It is optional and carries no hidden meaning.",
+    "Un tono muy suave puede acompañar la voz. Es opcional y no tiene ningún significado oculto."
+  );
+}
+
 function renderGuidedSits() {
   const sit = state.guidedSit;
   const practices = guidedSitsManifest.practices || [];
   if (sit.phase === "catalog") {
     return `${renderTopbar(phrase("Guided Sits", "Meditaciones guiadas"), phrase("Back to practice", "Volver a las prácticas"))}
-      <main class="page guided-sits-page"><header class="section-intro"><p class="eyebrow">${phrase("Stillness", "Quietud")}</p><h1 class="page-title">${phrase("How would you like to sit?", "¿Cómo te gustaría meditar?")}</h1><p class="lede">${phrase("Choose one simple way to meet the next few minutes. You may stop or change your focus at any time.", "Elige una forma sencilla de encontrar los próximos minutos. Puedes detenerte o cambiar el foco en cualquier momento.")}</p></header>
+      <main class="page guided-sits-page"><header class="section-intro"><p class="eyebrow">${phrase("Stillness", "Quietud")}</p><h1 class="page-title">${phrase("How would you like to sit?", "¿Cómo te gustaría meditar?")}</h1><p class="lede">${phrase("Choose one simple way to meet the next few minutes. You may stop or change your focus at any time.", "Elige una forma sencilla de acompañar los próximos minutos. Puedes detenerte o cambiar el foco en cualquier momento.")}</p></header>
       <section class="list guided-sit-catalog">${practices.map(practice => { const content = guidedSitContent(practice); return `<button class="list-row guided-sit-row" type="button" data-guided-practice="${practice.id}"><span class="guided-sit-row-mark" style="--guided-accent:${escapeAttribute(practice.accent)}" aria-hidden="true">${guidedSitMarks[practice.symbol] || "•"}</span><span><strong>${escapeHTML(content.title)}</strong><span>${escapeHTML(content.purpose)}</span></span><b>→</b></button>`; }).join("")}</section>
       ${practices.length ? "" : `<p class="empty-state">${phrase("Guided sits are unavailable in this build.", "Las meditaciones guiadas no están disponibles en esta versión.")}</p>`}</main>`;
   }
@@ -1420,6 +1550,7 @@ function renderGuidedSits() {
         <section class="guided-sit-orientation"><p>${escapeHTML(content.lineage)}</p><p>${escapeHTML(content.safety)}</p></section>
         <section class="guided-sit-options"><p class="eyebrow">${phrase("Length", "Duración")}</p><div class="guided-sit-segments">${guidedSitsManifest.durationsSeconds.map(duration => `<button type="button" data-guided-duration="${duration}" aria-pressed="${sit.duration === duration}">${duration / 60} min</button>`).join("")}</div></section>
         <section class="guided-sit-options"><p class="eyebrow">${phrase("Guidance", "Guía")}</p><div class="guided-sit-segments guidance-modes">${["regular", "light", "off"].map(mode => `<button type="button" data-guided-mode="${mode}" aria-pressed="${sit.guidance === mode}">${guidedSitModeCopy(mode)[0]}</button>`).join("")}</div><p class="guided-sit-option-detail">${guidedSitModeCopy(sit.guidance)[1]}</p></section>
+        <section class="guided-sit-options"><p class="eyebrow">${phrase("Background tone", "Tono de fondo")}</p>${guidedSitSupportsBackgroundTone(practice) ? `<div class="guided-sit-segments tone-modes"><button type="button" data-guided-tone="on" aria-pressed="${sit.backgroundTone}">${phrase("Subtle", "Suave")}</button><button type="button" data-guided-tone="off" aria-pressed="${!sit.backgroundTone}">${phrase("Off", "Apagado")}</button></div>` : ""}<p class="guided-sit-option-detail">${escapeHTML(guidedSitBackgroundToneDetail(practice))}</p></section>
         <button class="primary-button" type="button" data-action="begin-guided-sit">${phrase("Begin this sit", "Comenzar esta meditación")}</button>
       </main>`;
   }
@@ -1439,6 +1570,7 @@ function renderGuidedSits() {
       ${guidedSitInstrument(practice, progress, !sit.paused)}
       <section class="guided-sit-cue" role="status" aria-live="polite"><h1 data-guided-cue>${escapeHTML(cue)}</h1><time data-guided-timer datetime="PT${remaining}S" aria-label="${phrase("Time remaining", "Tiempo restante")}">${formatClock(remaining)}</time></section>
       <div class="button-row guided-sit-controls"><button class="secondary-button" type="button" data-action="pause-guided-sit">${sit.paused ? phrase("Resume", "Continuar") : phrase("Pause", "Pausar")}</button>${sit.guidance === "off" ? "" : `<button class="secondary-button" type="button" data-action="replay-guided-sit-cue">${phrase("Replay", "Repetir")}</button>`}</div>
+      ${guidedSitSupportsBackgroundTone(practice) ? `<button class="text-button guided-sit-tone-toggle" type="button" data-action="toggle-guided-sit-tone">${sit.backgroundTone ? phrase("◌ Background tone on", "◌ Tono de fondo activado") : phrase("◌ Background tone off", "◌ Tono de fondo desactivado")}</button>` : ""}
       <button class="text-button" type="button" data-action="end-guided-sit">${phrase("End sit", "Terminar meditación")}</button>
     </main>`;
 }
@@ -1455,6 +1587,10 @@ function selectGuidedSit(practiceID) {
   state.guidedSit.paused = false;
   state.guidedSit.lastCueIndex = -1;
   render();
+  const practice = guidedSitPractice();
+  if (state.voice && practice) {
+    sound.prepareVoiceCues([0, 1, 2, 3].map(index => guidedSitAssetID(practice, index))).catch(() => {});
+  }
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -1468,6 +1604,7 @@ async function beginGuidedSit() {
   state.guidedSit.lastTickAt = Date.now();
   render();
   sound.guidedSitBell(false).catch(() => {});
+  sound.startGuidedSitAmbient(practice.id).catch(() => {});
   if (state.guidedSit.guidance !== "off") {
     sound.playVoice(guidedSitAssetID(practice, 0), 1.25).catch(() => {
       showToast(phrase("Voice guidance is unavailable. The silent sit will continue.", "La guía de voz no está disponible. La meditación continuará en silencio."));
@@ -1517,6 +1654,12 @@ function pauseGuidedSit() {
   updateGuidedSitTimer();
   state.guidedSit.paused = !state.guidedSit.paused;
   sound.stopVoice();
+  if (state.guidedSit.paused) {
+    sound.stopGuidedSitAmbient();
+  } else {
+    sound.startGuidedSitAmbient(guidedSitPractice().id).catch(() => {});
+    replayGuidedSitCue();
+  }
   window.clearInterval(guidedSitTimer);
   guidedSitTimer = 0;
   render();
@@ -1536,6 +1679,7 @@ function completeGuidedSit() {
   window.clearInterval(guidedSitTimer);
   guidedSitTimer = 0;
   sound.stopVoice();
+  sound.stopGuidedSitAmbient();
   sound.guidedSitBell(true).catch(() => {});
   state.guidedSit.phase = "complete";
   state.guidedSit.paused = false;
@@ -1548,9 +1692,24 @@ function resetGuidedSitSession() {
   window.clearInterval(guidedSitTimer);
   guidedSitTimer = 0;
   sound.stopVoice();
+  sound.stopGuidedSitAmbient(true);
   const duration = state.guidedSit.duration;
   const guidance = state.guidedSit.guidance;
-  state.guidedSit = { ...newGuidedSit(), duration, guidance };
+  const backgroundTone = state.guidedSit.backgroundTone;
+  state.guidedSit = { ...newGuidedSit(), duration, guidance, backgroundTone };
+}
+
+function returnGuidedSitToSetup() {
+  window.clearInterval(guidedSitTimer);
+  guidedSitTimer = 0;
+  sound.stopVoice();
+  sound.stopGuidedSitAmbient(true);
+  state.guidedSit.phase = "setup";
+  state.guidedSit.elapsed = 0;
+  state.guidedSit.paused = false;
+  state.guidedSit.lastCueIndex = -1;
+  render();
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function movementByID(id = state.practice.movement) {
@@ -2676,6 +2835,13 @@ app.addEventListener("click", async event => {
   if (button.dataset.guidedPractice) { selectGuidedSit(button.dataset.guidedPractice); return; }
   if (button.dataset.guidedDuration) { state.guidedSit.duration = Number(button.dataset.guidedDuration); persistPreferences(); render(); return; }
   if (button.dataset.guidedMode) { state.guidedSit.guidance = button.dataset.guidedMode; persistPreferences(); render(); return; }
+  if (button.dataset.guidedTone) {
+    state.guidedSit.backgroundTone = button.dataset.guidedTone === "on";
+    persistPreferences();
+    if (!state.guidedSit.backgroundTone) sound.stopGuidedSitAmbient();
+    render();
+    return;
+  }
   if (button.dataset.capacityOption !== undefined) { state.practice.selectedOption = button.dataset.capacityOption; render(); return; }
   if (button.dataset.noticeOutcome !== undefined) { state.practice.noticeOutcome = button.dataset.noticeOutcome; render(); return; }
   if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.stage = "choose"; render(); return; }
@@ -2705,6 +2871,10 @@ app.addEventListener("click", async event => {
   if (button.dataset.depth) { state.teachingDepth = Number(button.dataset.depth); render(); return; }
   if (button.dataset.engineDuration) { state.engineDuration = Number(button.dataset.engineDuration); render(); return; }
 
+  if (action === "back" && state.view === "guidedSits" && state.guidedSit.phase === "session") {
+    returnGuidedSitToSetup();
+    return;
+  }
   if (action === "back" && state.view === "guidedSits" && state.guidedSit.phase !== "catalog") {
     resetGuidedSitSession();
     render();
@@ -2715,6 +2885,13 @@ app.addEventListener("click", async event => {
   if (action === "begin-guided-sit") await beginGuidedSit();
   if (action === "pause-guided-sit") pauseGuidedSit();
   if (action === "replay-guided-sit-cue") replayGuidedSitCue();
+  if (action === "toggle-guided-sit-tone") {
+    state.guidedSit.backgroundTone = !state.guidedSit.backgroundTone;
+    persistPreferences();
+    if (state.guidedSit.backgroundTone) sound.startGuidedSitAmbient(guidedSitPractice().id).catch(() => {});
+    else sound.stopGuidedSitAmbient();
+    render();
+  }
   if (action === "end-guided-sit") completeGuidedSit();
   if (action === "guided-sit-return") { resetGuidedSitSession(); render(); window.scrollTo({ top: 0, behavior: "auto" }); }
   if (action === "guided-back") { if (state.guidedPhase > 0) { state.guidedPhase -= 1; render(); } else goBack(); }
@@ -2750,6 +2927,9 @@ app.addEventListener("click", async event => {
         showToast(state.lang === "en" ? "Sound could not start. Try once more." : "No se pudo iniciar el sonido. Inténtalo otra vez.");
       });
       showToast(state.lang === "en" ? "Sound effects are on. Voice guidance is set separately in Settings." : "Los efectos de sonido están activados. La guía de voz se configura por separado en Ajustes.");
+      if (state.view === "guidedSits" && state.guidedSit.phase === "session" && !state.guidedSit.paused) {
+        sound.startGuidedSitAmbient(guidedSitPractice().id).catch(() => {});
+      }
     } else {
       sound.stopTones();
       sound.stopFirstLight();
@@ -3043,6 +3223,8 @@ document.addEventListener("visibilitychange", () => {
     sound.stop();
   } else if (guidedSitting && !state.guidedSit.paused) {
     startGuidedSitTimer();
+    sound.startGuidedSitAmbient(guidedSitPractice().id).catch(() => {});
+    replayGuidedSitCue();
   } else if (breathing) {
     startBreathTimer(false);
   } else if (crossing) {

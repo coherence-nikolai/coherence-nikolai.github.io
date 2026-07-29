@@ -1393,6 +1393,7 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
   background: rgba(0, 0, 0, .34);
 }
 .guided-sit-segments.guidance-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.guided-sit-segments.tone-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .guided-sit-segments button {
   min-width: 0;
   min-height: 48px;
@@ -1443,7 +1444,8 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .guided-sit-cue h1 { max-width: 21ch; margin: 0; font-family: var(--serif); font-size: clamp(1.8rem, 5.8vw, 2.65rem); font-weight: 400; line-height: 1.16; }
 .guided-sit-cue time { color: var(--gold-light); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
 .guided-sit-controls { width: min(100%, 520px); }
-.guided-sit-session > .text-button { margin-top: auto; }
+.guided-sit-tone-toggle { min-height: 44px; margin-top: -8px; color: var(--gold); }
+.guided-sit-session > .text-button:last-child { margin-top: auto; }
 .guided-sit-completion {
   min-height: calc(100svh - 82px);
   display: grid;

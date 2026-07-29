@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v19";
+const CACHE = "tone-sovereign-v21";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_attunement_capacity_v1",
@@ -35,6 +35,19 @@ const VOICE_CUES = [
   "ts_stabilise_optional_hold_v1",
   "ts_stabilise_return_attention_v1"
 ];
+const GUIDED_SIT_VOICE_CUES = [
+  "breath_at_the_threshold",
+  "simple_noting",
+  "the_living_body",
+  "open_field",
+  "golden_age_goodwill",
+  "sound_and_silence",
+  "holding_opposites",
+  "sovereign_rest"
+].flatMap(practice => Array.from(
+  { length: 10 },
+  (_, index) => `ts_sit_${practice}_${String(index + 1).padStart(2, "0")}_v1`
+));
 const CORE = [
   "./",
   "./index.html",
@@ -48,7 +61,7 @@ const CORE = [
   "./tone-sovereign-logo.png",
   "./assets/sound/ts_first_light_arrival_full.wav",
   "./assets/sound/ts_first_light_living_ambience.wav",
-  ...["en", "es"].flatMap(language => VOICE_CUES.map(cue => `./assets/voice/${language}/${cue}.mp3`))
+  ...["en", "es"].flatMap(language => [...VOICE_CUES, ...GUIDED_SIT_VOICE_CUES].map(cue => `./assets/voice/${language}/${cue}.mp3`))
 ];
 
 self.addEventListener("install", event => {
