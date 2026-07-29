@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v21";
+const CACHE = "tone-sovereign-v22";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_attunement_capacity_v1",
