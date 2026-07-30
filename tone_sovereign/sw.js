@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v22";
+const CACHE = "tone-sovereign-v23";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_attunement_capacity_v1",
@@ -47,7 +47,7 @@ const GUIDED_SIT_VOICE_CUES = [
 ].flatMap(practice => Array.from(
   { length: 10 },
   (_, index) => `ts_sit_${practice}_${String(index + 1).padStart(2, "0")}_v1`
-));
+).concat(`ts_sit_${practice}_intro_v1`));
 const CORE = [
   "./",
   "./index.html",

@@ -1410,6 +1410,20 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
   box-shadow: 0 0 18px rgba(216, 180, 90, .22);
 }
 .guided-sit-option-detail { min-height: 2.8em; margin: 0; color: var(--gold); line-height: 1.45; }
+.guided-sit-introduction-option {
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.guided-sit-introduction-option .guided-sit-segments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.guided-sit-intro-listen { width: fit-content; min-height: 44px; color: var(--gold-light); }
+.guided-sit-transcript {
+  width: 100%;
+  color: var(--ivory-soft);
+  line-height: 1.65;
+}
+.guided-sit-transcript summary { min-height: 44px; display: flex; align-items: center; color: var(--ivory); cursor: pointer; }
+.guided-sit-transcript p { margin: 8px 0 0; }
 .guided-sit-instrument {
   position: relative;
   width: min(236px, 68vw);
@@ -1446,6 +1460,15 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .guided-sit-controls { width: min(100%, 520px); }
 .guided-sit-tone-toggle { min-height: 44px; margin-top: -8px; color: var(--gold); }
 .guided-sit-session > .text-button:last-child { margin-top: auto; }
+.guided-sit-introduction {
+  min-height: calc(100svh - 82px);
+  display: grid;
+  align-content: center;
+  justify-items: stretch;
+  gap: 24px;
+}
+.guided-sit-introduction .section-intro { margin: 0 auto; text-align: center; }
+.guided-sit-intro-status { margin: 0; color: var(--gold-light); text-align: center; }
 .guided-sit-completion {
   min-height: calc(100svh - 82px);
   display: grid;
