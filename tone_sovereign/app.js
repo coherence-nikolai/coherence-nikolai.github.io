@@ -698,6 +698,7 @@ function newGuidedSit() {
     guidance: savedGuidance,
     backgroundTone: savedBackgroundTone,
     introduction: savedIntroduction,
+    introductionPlaying: false,
     elapsed: 0,
     paused: false,
     lastCueIndex: -1,
@@ -1565,13 +1566,16 @@ function renderGuidedSits() {
   }
 
   if (sit.phase === "introduction") {
+    const introductionStatus = sit.introductionPlaying
+      ? phrase("Introduction playing", "Reproduciendo la introducción")
+      : phrase("Introduction paused", "Introducción en pausa");
     return `${renderTopbar(content.title, phrase("Back to setup", "Volver a la preparación"))}
       <main class="page guided-sits-page guided-sit-introduction">
         ${guidedSitInstrument(practice, 0, true)}
         <header class="section-intro"><p class="eyebrow">${phrase("About this meditation", "Acerca de esta meditación")}</p><h1 class="page-title">${escapeHTML(content.title)}</h1><p class="lede">${escapeHTML(content.purpose)}</p></header>
-        <p class="guided-sit-intro-status" role="status">◉ ${phrase("A short orientation before the timer begins", "Una breve orientación antes de que comience el tiempo")}</p>
+        <p class="guided-sit-intro-status" role="status">◉ ${introductionStatus}</p>
         <details class="guided-sit-transcript"><summary>${phrase("Read the introduction", "Leer la introducción")}</summary><p>${escapeHTML(content.introduction)}</p></details>
-        <button class="secondary-button" type="button" data-action="replay-guided-sit-introduction">${phrase("Play introduction", "Reproducir introducción")}</button>
+        <button class="secondary-button" type="button" data-action="${sit.introductionPlaying ? "pause-guided-sit-introduction" : "replay-guided-sit-introduction"}">${sit.introductionPlaying ? phrase("Pause introduction", "Pausar introducción") : phrase("Play introduction", "Reproducir introducción")}</button>
         <button class="primary-button" type="button" data-action="skip-guided-sit-introduction">${phrase("Begin the meditation now", "Comenzar la meditación ahora")}</button>
       </main>`;
   }
@@ -1624,14 +1628,21 @@ async function beginGuidedSit() {
   sound.stopVoice();
   if (state.guidedSit.introduction && state.voice) {
     state.guidedSit.phase = "introduction";
+    state.guidedSit.introductionPlaying = true;
     render();
     announce(phrase("Introduction playing.", "Reproduciendo la introducción."));
     const started = await sound.playVoice(guidedSitIntroductionAssetID(practice), 0, () => {
-      if (state.view === "guidedSits" && state.guidedSit.phase === "introduction") {
+      if (state.view === "guidedSits" && state.guidedSit.phase === "introduction" && state.guidedSit.selectedID === practice.id) {
         startGuidedSitSession();
       }
     }).catch(() => false);
     if (started) return;
+    if (state.view === "guidedSits" && state.guidedSit.phase === "introduction" && state.guidedSit.selectedID === practice.id) {
+      state.guidedSit.introductionPlaying = false;
+      render();
+      if (!document.hidden) showToast(phrase("The introduction is unavailable. You can read it or begin now.", "La introducción no está disponible. Puedes leerla o comenzar ahora."));
+    }
+    return;
   }
   startGuidedSitSession();
 }
@@ -1641,6 +1652,7 @@ function startGuidedSitSession() {
   if (!practice) return;
   sound.stopVoice();
   state.guidedSit.phase = "session";
+  state.guidedSit.introductionPlaying = false;
   state.guidedSit.elapsed = 0;
   state.guidedSit.paused = false;
   state.guidedSit.lastCueIndex = 0;
@@ -1656,17 +1668,24 @@ function startGuidedSitSession() {
   announce(guidedSitContent(practice).cues[0]);
 }
 
-function replayGuidedSitIntroduction() {
+async function replayGuidedSitIntroduction() {
   const practice = guidedSitPractice();
   if (!practice || !state.voice) {
     showToast(phrase("Turn voice on in Settings to hear the introduction.", "Activa la voz en Ajustes para escuchar la introducción."));
     return;
   }
-  sound.playVoice(guidedSitIntroductionAssetID(practice), 0, () => {
-    if (state.view === "guidedSits" && state.guidedSit.phase === "introduction") {
+  state.guidedSit.introductionPlaying = true;
+  render();
+  const started = await sound.playVoice(guidedSitIntroductionAssetID(practice), 0, () => {
+    if (state.view === "guidedSits" && state.guidedSit.phase === "introduction" && state.guidedSit.selectedID === practice.id) {
       startGuidedSitSession();
     }
-  }).catch(() => showToast(phrase("The introduction is unavailable.", "La introducción no está disponible.")));
+  }).catch(() => false);
+  if (!started && state.view === "guidedSits" && state.guidedSit.phase === "introduction" && state.guidedSit.selectedID === practice.id) {
+    state.guidedSit.introductionPlaying = false;
+    render();
+    if (!document.hidden) showToast(phrase("The introduction is unavailable.", "La introducción no está disponible."));
+  }
 }
 
 function previewGuidedSitIntroduction() {
@@ -2965,6 +2984,7 @@ app.addEventListener("click", async event => {
   if (action === "begin-guided-sit") await beginGuidedSit();
   if (action === "preview-guided-sit-introduction") previewGuidedSitIntroduction();
   if (action === "replay-guided-sit-introduction") replayGuidedSitIntroduction();
+  if (action === "pause-guided-sit-introduction") { sound.stopVoice(); state.guidedSit.introductionPlaying = false; render(); }
   if (action === "skip-guided-sit-introduction") startGuidedSitSession();
   if (action === "pause-guided-sit") pauseGuidedSit();
   if (action === "replay-guided-sit-cue") replayGuidedSitCue();
@@ -3301,6 +3321,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     if (guidedIntroduction) {
       sound.stopVoice();
+      state.guidedSit.introductionPlaying = false;
       return;
     }
     window.clearInterval(practiceTimer);
@@ -3309,6 +3330,9 @@ document.addEventListener("visibilitychange", () => {
     guidedSitTimer = 0;
     breathLastPhaseKey = "";
     sound.stop();
+  } else if (guidedIntroduction) {
+    render();
+    announce(phrase("Introduction paused.", "Introducción en pausa."));
   } else if (guidedSitting && !state.guidedSit.paused) {
     startGuidedSitTimer();
     sound.startGuidedSitAmbient(guidedSitPractice().id).catch(() => {});
