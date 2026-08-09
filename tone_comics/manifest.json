@@ -1,0 +1,1801 @@
+{
+  "updated": "2026-08-09T03:39:18.879Z",
+  "totalPages": 292,
+  "collections": [
+    {
+      "id": "tone-sovereign",
+      "label": "Tone Sovereign",
+      "deck": "Main issue pages",
+      "comics": [
+        {
+          "id": "tone-sovereign-issue-01",
+          "type": "image-set",
+          "title": "Issue 01",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-01.jpg",
+              "alt": "Issue 01 page 1",
+              "label": "issue-01-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-02.jpg",
+              "alt": "Issue 01 page 2",
+              "label": "issue-01-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-03.jpg",
+              "alt": "Issue 01 page 3",
+              "label": "issue-01-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-04.jpg",
+              "alt": "Issue 01 page 4",
+              "label": "issue-01-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-05.jpg",
+              "alt": "Issue 01 page 5",
+              "label": "issue-01-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-06.jpg",
+              "alt": "Issue 01 page 6",
+              "label": "issue-01-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-07.jpg",
+              "alt": "Issue 01 page 7",
+              "label": "issue-01-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-08.jpg",
+              "alt": "Issue 01 page 8",
+              "label": "issue-01-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-09.jpg",
+              "alt": "Issue 01 page 9",
+              "label": "issue-01-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-10.jpg",
+              "alt": "Issue 01 page 10",
+              "label": "issue-01-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-11.jpg",
+              "alt": "Issue 01 page 11",
+              "label": "issue-01-en-page-11"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-01/issue-01-en-page-12.jpg",
+              "alt": "Issue 01 page 12",
+              "label": "issue-01-en-page-12"
+            }
+          ]
+        },
+        {
+          "id": "tone-sovereign-issue-02",
+          "type": "image-set",
+          "title": "Issue 02",
+          "pageCount": 10,
+          "cover": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-01.jpg",
+              "alt": "Issue 02 page 1",
+              "label": "issue-02-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-02.jpg",
+              "alt": "Issue 02 page 2",
+              "label": "issue-02-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-03.jpg",
+              "alt": "Issue 02 page 3",
+              "label": "issue-02-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-04.jpg",
+              "alt": "Issue 02 page 4",
+              "label": "issue-02-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-05.jpg",
+              "alt": "Issue 02 page 5",
+              "label": "issue-02-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-06.jpg",
+              "alt": "Issue 02 page 6",
+              "label": "issue-02-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-07.jpg",
+              "alt": "Issue 02 page 7",
+              "label": "issue-02-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-08.jpg",
+              "alt": "Issue 02 page 8",
+              "label": "issue-02-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-09.jpg",
+              "alt": "Issue 02 page 9",
+              "label": "issue-02-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-02/issue-02-en-page-10.jpg",
+              "alt": "Issue 02 page 10",
+              "label": "issue-02-en-page-10"
+            }
+          ]
+        },
+        {
+          "id": "tone-sovereign-issue-03",
+          "type": "image-set",
+          "title": "Issue 03",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-01.jpg",
+              "alt": "Issue 03 page 1",
+              "label": "issue-03-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-02.jpg",
+              "alt": "Issue 03 page 2",
+              "label": "issue-03-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-03.jpg",
+              "alt": "Issue 03 page 3",
+              "label": "issue-03-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-04.jpg",
+              "alt": "Issue 03 page 4",
+              "label": "issue-03-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-05.jpg",
+              "alt": "Issue 03 page 5",
+              "label": "issue-03-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-06.jpg",
+              "alt": "Issue 03 page 6",
+              "label": "issue-03-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-07.jpg",
+              "alt": "Issue 03 page 7",
+              "label": "issue-03-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-08.jpg",
+              "alt": "Issue 03 page 8",
+              "label": "issue-03-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-09.jpg",
+              "alt": "Issue 03 page 9",
+              "label": "issue-03-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-10.jpg",
+              "alt": "Issue 03 page 10",
+              "label": "issue-03-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-11.jpg",
+              "alt": "Issue 03 page 11",
+              "label": "issue-03-en-page-11"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-03/issue-03-en-page-12.jpg",
+              "alt": "Issue 03 page 12",
+              "label": "issue-03-en-page-12"
+            }
+          ]
+        },
+        {
+          "id": "tone-sovereign-issue-04",
+          "type": "image-set",
+          "title": "Issue 04",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-01.jpg",
+              "alt": "Issue 04 page 1",
+              "label": "issue-04-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-02.jpg",
+              "alt": "Issue 04 page 2",
+              "label": "issue-04-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-03.jpg",
+              "alt": "Issue 04 page 3",
+              "label": "issue-04-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-04.jpg",
+              "alt": "Issue 04 page 4",
+              "label": "issue-04-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-05.jpg",
+              "alt": "Issue 04 page 5",
+              "label": "issue-04-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-06.jpg",
+              "alt": "Issue 04 page 6",
+              "label": "issue-04-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-07.jpg",
+              "alt": "Issue 04 page 7",
+              "label": "issue-04-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-08.jpg",
+              "alt": "Issue 04 page 8",
+              "label": "issue-04-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-09.jpg",
+              "alt": "Issue 04 page 9",
+              "label": "issue-04-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-10.jpg",
+              "alt": "Issue 04 page 10",
+              "label": "issue-04-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-11.jpg",
+              "alt": "Issue 04 page 11",
+              "label": "issue-04-en-page-11"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-04/issue-04-en-page-12-epilogue.jpg",
+              "alt": "Issue 04 page 12",
+              "label": "issue-04-en-page-12-Epilogue"
+            }
+          ]
+        },
+        {
+          "id": "tone-sovereign-issue-05",
+          "type": "image-set",
+          "title": "Issue 05",
+          "pageCount": 10,
+          "cover": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-01.jpg",
+              "alt": "Issue 05 page 1",
+              "label": "issue-05-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-02.jpg",
+              "alt": "Issue 05 page 2",
+              "label": "issue-05-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-03.jpg",
+              "alt": "Issue 05 page 3",
+              "label": "issue-05-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-04.jpg",
+              "alt": "Issue 05 page 4",
+              "label": "issue-05-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-05.jpg",
+              "alt": "Issue 05 page 5",
+              "label": "issue-05-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-06.jpg",
+              "alt": "Issue 05 page 6",
+              "label": "issue-05-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-07.jpg",
+              "alt": "Issue 05 page 7",
+              "label": "issue-05-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-08.jpg",
+              "alt": "Issue 05 page 8",
+              "label": "issue-05-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-09.jpg",
+              "alt": "Issue 05 page 9",
+              "label": "issue-05-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-05/issue-05-en-page-10-epilogue.jpg",
+              "alt": "Issue 05 page 10",
+              "label": "issue-05-en-page-10-Epilogue"
+            }
+          ]
+        },
+        {
+          "id": "tone-sovereign-issue-06",
+          "type": "image-set",
+          "title": "Issue 06",
+          "pageCount": 11,
+          "cover": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-00.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-00.jpg",
+              "alt": "Issue 06 page 1",
+              "label": "issue-06-en-page-00"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-01.jpg",
+              "alt": "Issue 06 page 2",
+              "label": "issue-06-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-02.jpg",
+              "alt": "Issue 06 page 3",
+              "label": "issue-06-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-03.jpg",
+              "alt": "Issue 06 page 4",
+              "label": "issue-06-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-04.jpg",
+              "alt": "Issue 06 page 5",
+              "label": "issue-06-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-05.jpg",
+              "alt": "Issue 06 page 6",
+              "label": "issue-06-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-06.jpg",
+              "alt": "Issue 06 page 7",
+              "label": "issue-06-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-07.jpg",
+              "alt": "Issue 06 page 8",
+              "label": "issue-06-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-08.jpg",
+              "alt": "Issue 06 page 9",
+              "label": "issue-06-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-09.jpg",
+              "alt": "Issue 06 page 10",
+              "label": "issue-06-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/tone-sovereign/issue-06/issue-06-en-page-10.jpg",
+              "alt": "Issue 06 page 11",
+              "label": "issue-06-en-page-10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "villain-arc",
+      "label": "Villain Arc",
+      "deck": "The Hall of Inner Adversaries",
+      "comics": [
+        {
+          "id": "villain-arc-issue-01",
+          "type": "image-set",
+          "title": "Issue 01",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-01/thehallofinneradverseries-issue-01-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-01/thehallofinneradverseries-issue-01-en-page-01.jpg",
+              "alt": "Issue 01 page 1",
+              "label": "TheHallofInnerAdverseries-issue-01-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-01/thehallofinneradverseries-issue-01-en-page-02.jpg",
+              "alt": "Issue 01 page 2",
+              "label": "TheHallofInnerAdverseries-issue-01-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-01/thehallofinneradverseries-issue-01-en-page-03.jpg",
+              "alt": "Issue 01 page 3",
+              "label": "TheHallofInnerAdverseries-issue-01-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-01/thehallofinneradverseries-issue-01-en-page-04.jpg",
+              "alt": "Issue 01 page 4",
+              "label": "TheHallofInnerAdverseries-issue-01-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-02",
+          "type": "image-set",
+          "title": "Issue 02",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-02/thehallofinneradverseries-issue-02-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-02/thehallofinneradverseries-issue-02-en-page-01.jpg",
+              "alt": "Issue 02 page 1",
+              "label": "TheHallofInnerAdverseries-issue-02-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-02/thehallofinneradverseries-issue-02-en-page-02.jpg",
+              "alt": "Issue 02 page 2",
+              "label": "TheHallofInnerAdverseries-issue-02-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-02/thehallofinneradverseries-issue-02-en-page-03.jpg",
+              "alt": "Issue 02 page 3",
+              "label": "TheHallofInnerAdverseries-issue-02-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-02/thehallofinneradverseries-issue-02-en-page-04.jpg",
+              "alt": "Issue 02 page 4",
+              "label": "TheHallofInnerAdverseries-issue-02-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-03",
+          "type": "image-set",
+          "title": "Issue 03",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-03/thehallofinneradverseries-issue-03-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-03/thehallofinneradverseries-issue-03-en-page-01.jpg",
+              "alt": "Issue 03 page 1",
+              "label": "TheHallofInnerAdverseries-issue-03-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-03/thehallofinneradverseries-issue-03-en-page-03.jpg",
+              "alt": "Issue 03 page 2",
+              "label": "TheHallofInnerAdverseries-issue-03-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-03/thehallofinneradverseries-issue-03-en-page-032.jpg",
+              "alt": "Issue 03 page 3",
+              "label": "TheHallofInnerAdverseries-issue-03-en-page-032"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-03/thehallofinneradverseries-issue-03-en-page-04.jpg",
+              "alt": "Issue 03 page 4",
+              "label": "TheHallofInnerAdverseries-issue-03-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-04",
+          "type": "image-set",
+          "title": "Issue 04",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-04/thehallofinneradverseries-issue-04-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-04/thehallofinneradverseries-issue-04-en-page-01.jpg",
+              "alt": "Issue 04 page 1",
+              "label": "TheHallofInnerAdverseries-issue-04-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-04/thehallofinneradverseries-issue-04-en-page-02.jpg",
+              "alt": "Issue 04 page 2",
+              "label": "TheHallofInnerAdverseries-issue-04-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-04/thehallofinneradverseries-issue-04-en-page-03.jpg",
+              "alt": "Issue 04 page 3",
+              "label": "TheHallofInnerAdverseries-issue-04-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-04/thehallofinneradverseries-issue-04-en-page-04.jpg",
+              "alt": "Issue 04 page 4",
+              "label": "TheHallofInnerAdverseries-issue-04-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-05",
+          "type": "image-set",
+          "title": "Issue 05",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-05/thehallofinneradverseries-issue-05-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-05/thehallofinneradverseries-issue-05-en-page-01.jpg",
+              "alt": "Issue 05 page 1",
+              "label": "TheHallofInnerAdverseries-issue-05-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-05/thehallofinneradverseries-issue-05-en-page-02.jpg",
+              "alt": "Issue 05 page 2",
+              "label": "TheHallofInnerAdverseries-issue-05-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-05/thehallofinneradverseries-issue-05-en-page-03.jpg",
+              "alt": "Issue 05 page 3",
+              "label": "TheHallofInnerAdverseries-issue-05-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-05/thehallofinneradverseries-issue-05-en-page-04.jpg",
+              "alt": "Issue 05 page 4",
+              "label": "TheHallofInnerAdverseries-issue-05-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-06",
+          "type": "image-set",
+          "title": "Issue 06",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-06/thehallofinneradverseries-issue-06-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-06/thehallofinneradverseries-issue-06-en-page-01.jpg",
+              "alt": "Issue 06 page 1",
+              "label": "TheHallofInnerAdverseries-issue-06-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-06/thehallofinneradverseries-issue-06-en-page-02.jpg",
+              "alt": "Issue 06 page 2",
+              "label": "TheHallofInnerAdverseries-issue-06-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-06/thehallofinneradverseries-issue-06-en-page-03.jpg",
+              "alt": "Issue 06 page 3",
+              "label": "TheHallofInnerAdverseries-issue-06-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-06/thehallofinneradverseries-issue-06-en-page-04.jpg",
+              "alt": "Issue 06 page 4",
+              "label": "TheHallofInnerAdverseries-issue-06-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-07",
+          "type": "image-set",
+          "title": "Issue 07",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-07/thehallofinneradverseries-issue-07-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-07/thehallofinneradverseries-issue-07-en-page-01.jpg",
+              "alt": "Issue 07 page 1",
+              "label": "TheHallofInnerAdverseries-issue-07-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-07/thehallofinneradverseries-issue-07-en-page-02.jpg",
+              "alt": "Issue 07 page 2",
+              "label": "TheHallofInnerAdverseries-issue-07-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-07/thehallofinneradverseries-issue-07-en-page-03.jpg",
+              "alt": "Issue 07 page 3",
+              "label": "TheHallofInnerAdverseries-issue-07-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-07/thehallofinneradverseries-issue-07-en-page-04.jpg",
+              "alt": "Issue 07 page 4",
+              "label": "TheHallofInnerAdverseries-issue-07-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-08",
+          "type": "image-set",
+          "title": "Issue 08",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-08/thehallofinneradverseries-issue-08-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-08/thehallofinneradverseries-issue-08-en-page-01.jpg",
+              "alt": "Issue 08 page 1",
+              "label": "TheHallofInnerAdverseries-issue-08-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-08/thehallofinneradverseries-issue-08-en-page-02.jpg",
+              "alt": "Issue 08 page 2",
+              "label": "TheHallofInnerAdverseries-issue-08-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-08/thehallofinneradverseries-issue-08-en-page-03.jpg",
+              "alt": "Issue 08 page 3",
+              "label": "TheHallofInnerAdverseries-issue-08-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-08/thehallofinneradverseries-issue-08-en-page-04.jpg",
+              "alt": "Issue 08 page 4",
+              "label": "TheHallofInnerAdverseries-issue-08-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-09",
+          "type": "image-set",
+          "title": "Issue 09",
+          "pageCount": 4,
+          "cover": "/tone_comics/assets/villain-arc/issue-09/thehallofinneradverseries-issue-09-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-09/thehallofinneradverseries-issue-09-en-page-01.jpg",
+              "alt": "Issue 09 page 1",
+              "label": "TheHallofInnerAdverseries-issue-09-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-09/thehallofinneradverseries-issue-09-en-page-02.jpg",
+              "alt": "Issue 09 page 2",
+              "label": "TheHallofInnerAdverseries-issue-09-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-09/thehallofinneradverseries-issue-09-en-page-03.jpg",
+              "alt": "Issue 09 page 3",
+              "label": "TheHallofInnerAdverseries-issue-09-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-09/thehallofinneradverseries-issue-09-en-page-04.jpg",
+              "alt": "Issue 09 page 4",
+              "label": "TheHallofInnerAdverseries-issue-09-en-page-04"
+            }
+          ]
+        },
+        {
+          "id": "villain-arc-issue-10",
+          "type": "image-set",
+          "title": "Issue 10",
+          "pageCount": 9,
+          "cover": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-01.jpg",
+              "alt": "Issue 10 page 1",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-02.jpg",
+              "alt": "Issue 10 page 2",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-03.jpg",
+              "alt": "Issue 10 page 3",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-04.jpg",
+              "alt": "Issue 10 page 4",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-05.jpg",
+              "alt": "Issue 10 page 5",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-06.jpg",
+              "alt": "Issue 10 page 6",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-07.jpg",
+              "alt": "Issue 10 page 7",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-08.jpg",
+              "alt": "Issue 10 page 8",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/villain-arc/issue-10/thehallofinneradverseries-issue-10-en-page-09.jpg",
+              "alt": "Issue 10 page 9",
+              "label": "TheHallofInnerAdverseries-issue-10-en-page-09"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "practice-compendium",
+      "label": "Practice Compendium",
+      "deck": "Tone Sovereign books",
+      "comics": [
+        {
+          "id": "practice-compendium-compendium-cover",
+          "type": "image-set",
+          "title": "Compendium Cover",
+          "pageCount": 1,
+          "cover": "/tone_comics/assets/practice-compendium/front-cover/front-cover-en-tone-soveregn-a-graphic-practice-compendium.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/front-cover/front-cover-en-tone-soveregn-a-graphic-practice-compendium.jpg",
+              "alt": "Compendium Cover page 1",
+              "label": "Front-Cover-en-Tone-Soveregn -A-Graphic-Practice Compendium"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-01",
+          "type": "image-set",
+          "title": "Book 01",
+          "pageCount": 11,
+          "cover": "/tone_comics/assets/practice-compendium/book-01/book-01-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-cover-page.jpg",
+              "alt": "Book 01 page 1",
+              "label": "Book-01-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-01.jpg",
+              "alt": "Book 01 page 2",
+              "label": "Book-01-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-02.jpg",
+              "alt": "Book 01 page 3",
+              "label": "Book-01-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-03.jpg",
+              "alt": "Book 01 page 4",
+              "label": "Book-01-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-04.jpg",
+              "alt": "Book 01 page 5",
+              "label": "Book-01-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-05.jpg",
+              "alt": "Book 01 page 6",
+              "label": "Book-01-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-06.jpg",
+              "alt": "Book 01 page 7",
+              "label": "Book-01-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-07.jpg",
+              "alt": "Book 01 page 8",
+              "label": "Book-01-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-08.jpg",
+              "alt": "Book 01 page 9",
+              "label": "Book-01-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-09.jpg",
+              "alt": "Book 01 page 10",
+              "label": "Book-01-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-01/book-01-en-page-10.jpg",
+              "alt": "Book 01 page 11",
+              "label": "Book-01-en-page-10"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-02",
+          "type": "image-set",
+          "title": "Book 02",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/practice-compendium/book-02/book-02-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-cover-page.jpg",
+              "alt": "Book 02 page 1",
+              "label": "Book-02-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-01.jpg",
+              "alt": "Book 02 page 2",
+              "label": "Book-02-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-02.jpg",
+              "alt": "Book 02 page 3",
+              "label": "Book-02-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-03.jpg",
+              "alt": "Book 02 page 4",
+              "label": "Book-02-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-04.jpg",
+              "alt": "Book 02 page 5",
+              "label": "Book-02-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-05.jpg",
+              "alt": "Book 02 page 6",
+              "label": "Book-02-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-06.jpg",
+              "alt": "Book 02 page 7",
+              "label": "Book-02-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-07.jpg",
+              "alt": "Book 02 page 8",
+              "label": "Book-02-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-08.jpg",
+              "alt": "Book 02 page 9",
+              "label": "Book-02-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-09.jpg",
+              "alt": "Book 02 page 10",
+              "label": "Book-02-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-10.jpg",
+              "alt": "Book 02 page 11",
+              "label": "Book-02-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-02/book-02-en-page-11.jpg",
+              "alt": "Book 02 page 12",
+              "label": "Book-02-en-page-11"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-03",
+          "type": "image-set",
+          "title": "Book 03",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/practice-compendium/book-03/book-03-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-cover-page.jpg",
+              "alt": "Book 03 page 1",
+              "label": "Book-03-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-01.jpg",
+              "alt": "Book 03 page 2",
+              "label": "Book-03-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-02.jpg",
+              "alt": "Book 03 page 3",
+              "label": "Book-03-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-03.jpg",
+              "alt": "Book 03 page 4",
+              "label": "Book-03-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-04.jpg",
+              "alt": "Book 03 page 5",
+              "label": "Book-03-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-05.jpg",
+              "alt": "Book 03 page 6",
+              "label": "Book-03-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-06.jpg",
+              "alt": "Book 03 page 7",
+              "label": "Book-03-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-07.jpg",
+              "alt": "Book 03 page 8",
+              "label": "Book-03-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-08.jpg",
+              "alt": "Book 03 page 9",
+              "label": "Book-03-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-09.jpg",
+              "alt": "Book 03 page 10",
+              "label": "Book-03-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-10.jpg",
+              "alt": "Book 03 page 11",
+              "label": "Book-03-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-03/book-03-en-page-11.jpg",
+              "alt": "Book 03 page 12",
+              "label": "Book-03-en-page-11"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-04",
+          "type": "image-set",
+          "title": "Book 04",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/practice-compendium/book-04/book-04-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-cover-page.jpg",
+              "alt": "Book 04 page 1",
+              "label": "Book-04-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-01.jpg",
+              "alt": "Book 04 page 2",
+              "label": "Book-04-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-02.jpg",
+              "alt": "Book 04 page 3",
+              "label": "Book-04-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-03.jpg",
+              "alt": "Book 04 page 4",
+              "label": "Book-04-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-04.jpg",
+              "alt": "Book 04 page 5",
+              "label": "Book-04-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-05.jpg",
+              "alt": "Book 04 page 6",
+              "label": "Book-04-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-06.jpg",
+              "alt": "Book 04 page 7",
+              "label": "Book-04-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-07.jpg",
+              "alt": "Book 04 page 8",
+              "label": "Book-04-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-08.jpg",
+              "alt": "Book 04 page 9",
+              "label": "Book-04-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-09.jpg",
+              "alt": "Book 04 page 10",
+              "label": "Book-04-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-10.jpg",
+              "alt": "Book 04 page 11",
+              "label": "Book-04-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-04/book-04-en-page-11.jpg",
+              "alt": "Book 04 page 12",
+              "label": "Book-04-en-page-11"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-05",
+          "type": "image-set",
+          "title": "Book 05",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/practice-compendium/book-05/book-05-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-cover-page.jpg",
+              "alt": "Book 05 page 1",
+              "label": "Book-05-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-01.jpg",
+              "alt": "Book 05 page 2",
+              "label": "Book-05-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-02.jpg",
+              "alt": "Book 05 page 3",
+              "label": "Book-05-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-03.jpg",
+              "alt": "Book 05 page 4",
+              "label": "Book-05-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-04.jpg",
+              "alt": "Book 05 page 5",
+              "label": "Book-05-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-05.jpg",
+              "alt": "Book 05 page 6",
+              "label": "Book-05-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-06.jpg",
+              "alt": "Book 05 page 7",
+              "label": "Book-05-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-07.jpg",
+              "alt": "Book 05 page 8",
+              "label": "Book-05-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-08.jpg",
+              "alt": "Book 05 page 9",
+              "label": "Book-05-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-09.jpg",
+              "alt": "Book 05 page 10",
+              "label": "Book-05-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-10.jpg",
+              "alt": "Book 05 page 11",
+              "label": "Book-05-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-05/book-05-en-page-11.jpg",
+              "alt": "Book 05 page 12",
+              "label": "Book-05-en-page-11"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-06",
+          "type": "image-set",
+          "title": "Book 06",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/practice-compendium/book-06/book-06-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-cover-page.jpg",
+              "alt": "Book 06 page 1",
+              "label": "Book-06-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-01.jpg",
+              "alt": "Book 06 page 2",
+              "label": "Book-06-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-02.jpg",
+              "alt": "Book 06 page 3",
+              "label": "Book-06-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-03.jpg",
+              "alt": "Book 06 page 4",
+              "label": "Book-06-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-04.jpg",
+              "alt": "Book 06 page 5",
+              "label": "Book-06-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-05.jpg",
+              "alt": "Book 06 page 6",
+              "label": "Book-06-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-06.jpg",
+              "alt": "Book 06 page 7",
+              "label": "Book-06-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-07.jpg",
+              "alt": "Book 06 page 8",
+              "label": "Book-06-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-08.jpg",
+              "alt": "Book 06 page 9",
+              "label": "Book-06-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-09.jpg",
+              "alt": "Book 06 page 10",
+              "label": "Book-06-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-10.jpg",
+              "alt": "Book 06 page 11",
+              "label": "Book-06-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-06/book-06-en-page-11.jpg",
+              "alt": "Book 06 page 12",
+              "label": "Book-06-en-page-11"
+            }
+          ]
+        },
+        {
+          "id": "practice-compendium-book-07",
+          "type": "image-set",
+          "title": "Book 07",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/practice-compendium/book-07/book-07-en-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-cover-page.jpg",
+              "alt": "Book 07 page 1",
+              "label": "Book-07-en-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-01.jpg",
+              "alt": "Book 07 page 2",
+              "label": "Book-07-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-02.jpg",
+              "alt": "Book 07 page 3",
+              "label": "Book-07-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-03.jpg",
+              "alt": "Book 07 page 4",
+              "label": "Book-07-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-04.jpg",
+              "alt": "Book 07 page 5",
+              "label": "Book-07-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-05.jpg",
+              "alt": "Book 07 page 6",
+              "label": "Book-07-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-06.jpg",
+              "alt": "Book 07 page 7",
+              "label": "Book-07-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-07.jpg",
+              "alt": "Book 07 page 8",
+              "label": "Book-07-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-08.jpg",
+              "alt": "Book 07 page 9",
+              "label": "Book-07-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-09.jpg",
+              "alt": "Book 07 page 10",
+              "label": "Book-07-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-10.jpg",
+              "alt": "Book 07 page 11",
+              "label": "Book-07-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/practice-compendium/book-07/book-07-en-page-11.jpg",
+              "alt": "Book 07 page 12",
+              "label": "Book-07-en-page-11"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spanish-editions",
+      "label": "Spanish Editions",
+      "deck": "Spanish issue and book pages",
+      "comics": [
+        {
+          "id": "spanish-editions-book-1-observar",
+          "type": "image-set",
+          "title": "Book 1 - Observar",
+          "pageCount": 11,
+          "cover": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-cover-page.jpg",
+              "alt": "Book 1 - Observar page 1",
+              "label": "Book-01-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-01.jpg",
+              "alt": "Book 1 - Observar page 2",
+              "label": "Book-01-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-02.jpg",
+              "alt": "Book 1 - Observar page 3",
+              "label": "Book-01-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-03.jpg",
+              "alt": "Book 1 - Observar page 4",
+              "label": "Book-01-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-04.jpg",
+              "alt": "Book 1 - Observar page 5",
+              "label": "Book-01-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-05.jpg",
+              "alt": "Book 1 - Observar page 6",
+              "label": "Book-01-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-06.jpg",
+              "alt": "Book 1 - Observar page 7",
+              "label": "Book-01-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-07.jpg",
+              "alt": "Book 1 - Observar page 8",
+              "label": "Book-01-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-08.jpg",
+              "alt": "Book 1 - Observar page 9",
+              "label": "Book-01-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-09.jpg",
+              "alt": "Book 1 - Observar page 10",
+              "label": "Book-01-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-1-observar/book-01-es-page-10.jpg",
+              "alt": "Book 1 - Observar page 11",
+              "label": "Book-01-es-page-10"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-book-2-estabilizar",
+          "type": "image-set",
+          "title": "Book 2 - Estabilizar",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-cover-page.jpg",
+              "alt": "Book 2 - Estabilizar page 1",
+              "label": "Book-02-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-01.jpg",
+              "alt": "Book 2 - Estabilizar page 2",
+              "label": "Book-02-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-02.jpg",
+              "alt": "Book 2 - Estabilizar page 3",
+              "label": "Book-02-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-03.jpg",
+              "alt": "Book 2 - Estabilizar page 4",
+              "label": "Book-02-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-04.jpg",
+              "alt": "Book 2 - Estabilizar page 5",
+              "label": "Book-02-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-05.jpg",
+              "alt": "Book 2 - Estabilizar page 6",
+              "label": "Book-02-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-06.jpg",
+              "alt": "Book 2 - Estabilizar page 7",
+              "label": "Book-02-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-07.jpg",
+              "alt": "Book 2 - Estabilizar page 8",
+              "label": "Book-02-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-08.jpg",
+              "alt": "Book 2 - Estabilizar page 9",
+              "label": "Book-02-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-09.jpg",
+              "alt": "Book 2 - Estabilizar page 10",
+              "label": "Book-02-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-10.jpg",
+              "alt": "Book 2 - Estabilizar page 11",
+              "label": "Book-02-es-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-2-estabilizar/book-02-es-page-11.jpg",
+              "alt": "Book 2 - Estabilizar page 12",
+              "label": "Book-02-es-page-11"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-book-3-discernir",
+          "type": "image-set",
+          "title": "Book 3 - Discernir",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-cover-page.jpg",
+              "alt": "Book 3 - Discernir page 1",
+              "label": "Book-03-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-01.jpg",
+              "alt": "Book 3 - Discernir page 2",
+              "label": "Book-03-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-02.jpg",
+              "alt": "Book 3 - Discernir page 3",
+              "label": "Book-03-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-03.jpg",
+              "alt": "Book 3 - Discernir page 4",
+              "label": "Book-03-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-04.jpg",
+              "alt": "Book 3 - Discernir page 5",
+              "label": "Book-03-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-05.jpg",
+              "alt": "Book 3 - Discernir page 6",
+              "label": "Book-03-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-06.jpg",
+              "alt": "Book 3 - Discernir page 7",
+              "label": "Book-03-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-07.jpg",
+              "alt": "Book 3 - Discernir page 8",
+              "label": "Book-03-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-08.jpg",
+              "alt": "Book 3 - Discernir page 9",
+              "label": "Book-03-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-09.jpg",
+              "alt": "Book 3 - Discernir page 10",
+              "label": "Book-03-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-10.jpg",
+              "alt": "Book 3 - Discernir page 11",
+              "label": "Book-03-es-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-3-discernir/book-03-es-page-11.jpg",
+              "alt": "Book 3 - Discernir page 12",
+              "label": "Book-03-es-page-11"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-book-4-recuperar",
+          "type": "image-set",
+          "title": "Book 4 - Recuperar",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-cover-page.jpg",
+              "alt": "Book 4 - Recuperar page 1",
+              "label": "Book-04-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-01.jpg",
+              "alt": "Book 4 - Recuperar page 2",
+              "label": "Book-04-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-02.jpg",
+              "alt": "Book 4 - Recuperar page 3",
+              "label": "Book-04-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-03.jpg",
+              "alt": "Book 4 - Recuperar page 4",
+              "label": "Book-04-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-04.jpg",
+              "alt": "Book 4 - Recuperar page 5",
+              "label": "Book-04-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-05.jpg",
+              "alt": "Book 4 - Recuperar page 6",
+              "label": "Book-04-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-06.jpg",
+              "alt": "Book 4 - Recuperar page 7",
+              "label": "Book-04-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-07.jpg",
+              "alt": "Book 4 - Recuperar page 8",
+              "label": "Book-04-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-08.jpg",
+              "alt": "Book 4 - Recuperar page 9",
+              "label": "Book-04-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-09.jpg",
+              "alt": "Book 4 - Recuperar page 10",
+              "label": "Book-04-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-10.jpg",
+              "alt": "Book 4 - Recuperar page 11",
+              "label": "Book-04-es-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-4-recuperar/book-04-es-page-11.jpg",
+              "alt": "Book 4 - Recuperar page 12",
+              "label": "Book-04-es-page-11"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-book-5-cruzar",
+          "type": "image-set",
+          "title": "Book 5 - Cruzar",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-cover-page.jpg",
+              "alt": "Book 5 - Cruzar page 1",
+              "label": "Book-05-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-01.jpg",
+              "alt": "Book 5 - Cruzar page 2",
+              "label": "Book-05-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-02.jpg",
+              "alt": "Book 5 - Cruzar page 3",
+              "label": "Book-05-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-03.jpg",
+              "alt": "Book 5 - Cruzar page 4",
+              "label": "Book-05-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-04.jpg",
+              "alt": "Book 5 - Cruzar page 5",
+              "label": "Book-05-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-05.jpg",
+              "alt": "Book 5 - Cruzar page 6",
+              "label": "Book-05-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-06.jpg",
+              "alt": "Book 5 - Cruzar page 7",
+              "label": "Book-05-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-07.jpg",
+              "alt": "Book 5 - Cruzar page 8",
+              "label": "Book-05-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-08.jpg",
+              "alt": "Book 5 - Cruzar page 9",
+              "label": "Book-05-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-09.jpg",
+              "alt": "Book 5 - Cruzar page 10",
+              "label": "Book-05-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-10.jpg",
+              "alt": "Book 5 - Cruzar page 11",
+              "label": "Book-05-es-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-5-cruzar/book-05-es-page-11.jpg",
+              "alt": "Book 5 - Cruzar page 12",
+              "label": "Book-05-es-page-11"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-book-6-encarnar",
+          "type": "image-set",
+          "title": "Book 6 - Encarnar",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-cover-page.jpg",
+              "alt": "Book 6 - Encarnar page 1",
+              "label": "Book-06-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-01.jpg",
+              "alt": "Book 6 - Encarnar page 2",
+              "label": "Book-06-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-02.jpg",
+              "alt": "Book 6 - Encarnar page 3",
+              "label": "Book-06-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-03.jpg",
+              "alt": "Book 6 - Encarnar page 4",
+              "label": "Book-06-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-04.jpg",
+              "alt": "Book 6 - Encarnar page 5",
+              "label": "Book-06-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-05.jpg",
+              "alt": "Book 6 - Encarnar page 6",
+              "label": "Book-06-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-06.jpg",
+              "alt": "Book 6 - Encarnar page 7",
+              "label": "Book-06-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-07.jpg",
+              "alt": "Book 6 - Encarnar page 8",
+              "label": "Book-06-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-08.jpg",
+              "alt": "Book 6 - Encarnar page 9",
+              "label": "Book-06-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-09.jpg",
+              "alt": "Book 6 - Encarnar page 10",
+              "label": "Book-06-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-10.jpg",
+              "alt": "Book 6 - Encarnar page 11",
+              "label": "Book-06-es-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-6-encarnar/book-06-es-page-11.jpg",
+              "alt": "Book 6 - Encarnar page 12",
+              "label": "Book-06-es-page-11"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-book-7-integrar",
+          "type": "image-set",
+          "title": "Book 7 - Integrar",
+          "pageCount": 12,
+          "cover": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-cover-page.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-cover-page.jpg",
+              "alt": "Book 7 - Integrar page 1",
+              "label": "Book-07-es-cover-page"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-01.jpg",
+              "alt": "Book 7 - Integrar page 2",
+              "label": "Book-07-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-02.jpg",
+              "alt": "Book 7 - Integrar page 3",
+              "label": "Book-07-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-03.jpg",
+              "alt": "Book 7 - Integrar page 4",
+              "label": "Book-07-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-04.jpg",
+              "alt": "Book 7 - Integrar page 5",
+              "label": "Book-07-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-05.jpg",
+              "alt": "Book 7 - Integrar page 6",
+              "label": "Book-07-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-06.jpg",
+              "alt": "Book 7 - Integrar page 7",
+              "label": "Book-07-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-07.jpg",
+              "alt": "Book 7 - Integrar page 8",
+              "label": "Book-07-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-08.jpg",
+              "alt": "Book 7 - Integrar page 9",
+              "label": "Book-07-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-09.jpg",
+              "alt": "Book 7 - Integrar page 10",
+              "label": "Book-07-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-10.jpg",
+              "alt": "Book 7 - Integrar page 11",
+              "label": "Book-07-es-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/book-7-integrar/book-07-es-page-11.jpg",
+              "alt": "Book 7 - Integrar page 12",
+              "label": "Book-07-es-page-11"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-compendium-cover",
+          "type": "image-set",
+          "title": "Compendium Cover",
+          "pageCount": 1,
+          "cover": "/tone_comics/assets/spanish-editions/compendium-cover/front-cover-es-tone-sovereign-compendio-grafico-de-practicas.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/compendium-cover/front-cover-es-tone-sovereign-compendio-grafico-de-practicas.jpg",
+              "alt": "Compendium Cover page 1",
+              "label": "Front-Cover-es-Tone-Sovereign-Compendio-Grafico-de-Practicas"
+            }
+          ]
+        },
+        {
+          "id": "spanish-editions-issue-6-la-corona-hueca",
+          "type": "image-set",
+          "title": "Issue 6 - La Corona Hueca",
+          "pageCount": 11,
+          "cover": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-00.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-00.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 1",
+              "label": "issue-06-es-page-00"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-01.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 2",
+              "label": "issue-06-es-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-02.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 3",
+              "label": "issue-06-es-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-03.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 4",
+              "label": "issue-06-es-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-04.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 5",
+              "label": "issue-06-es-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-05.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 6",
+              "label": "issue-06-es-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-06.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 7",
+              "label": "issue-06-es-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-07.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 8",
+              "label": "issue-06-es-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-08.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 9",
+              "label": "issue-06-es-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-09.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 10",
+              "label": "issue-06-es-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/spanish-editions/issue-6-la-corona-hueca/issue-06-es-page-10.jpg",
+              "alt": "Issue 6 - La Corona Hueca page 11",
+              "label": "issue-06-es-page-10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "insight",
+      "label": "Insight",
+      "deck": "Separate comic PDF",
+      "comics": [
+        {
+          "id": "insight-pdf",
+          "type": "pdf",
+          "title": "Insight",
+          "subtitle": "A Somewhat True Story of Seeing Through the Self",
+          "pageCount": 1,
+          "href": "/tone_comics/assets/insight/insight-a-somewhat-true-story-of-seeing-through-the-self.pdf"
+        }
+      ]
+    }
+  ]
+}

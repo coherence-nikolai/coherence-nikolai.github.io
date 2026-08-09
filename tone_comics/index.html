@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tone Comics - Coherence Nikolai</title>
+  <meta name="description" content="Tone Comics by Nikolai. Read Tone Sovereign comics, Villain Arc, Spanish editions, and Insight.">
+  <meta name="theme-color" content="#0b0707">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone_comics/">
+  <meta property="og:title" content="Tone Comics">
+  <meta property="og:description" content="Comics by Nikolai.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://coherence-nikolai.app/tone_comics/">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/tone_comics/styles.css">
+</head>
+<body class="tone-comics-page">
+  <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
+      <span>coherence</span>
+      <span>nikolai</span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="/">Home</a>
+      <a href="/#tone-apps">Tone</a>
+      <a href="/#sota-family">Sota</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="comics-hero" aria-labelledby="tone-comics-title">
+      <p class="label">Tone Comics</p>
+      <h1 id="tone-comics-title">Tone Comics.</h1>
+      <p>Comics by Nikolai.</p>
+      <div class="comic-hero-actions">
+        <a class="button primary" href="#library">Open library</a>
+        <a class="button ghost" href="/">Back to apps</a>
+      </div>
+    </section>
+
+    <section class="comic-shell" id="library" aria-labelledby="library-heading">
+      <div class="library-head">
+        <div>
+          <p class="label">Library</p>
+          <h2 id="library-heading">Choose a series.</h2>
+        </div>
+        <p id="comic-stats">Loading comics...</p>
+      </div>
+
+      <div class="collection-tabs" id="collection-tabs" role="tablist" aria-label="Comic series"></div>
+      <div class="comic-grid" id="comic-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="reader" id="reader" aria-labelledby="reader-title" hidden>
+      <div class="reader-bar">
+        <button class="reader-back" id="reader-back" type="button">Library</button>
+        <div>
+          <p class="label" id="reader-series">Tone Comics</p>
+          <h2 id="reader-title">Comic</h2>
+          <p id="reader-count"></p>
+        </div>
+      </div>
+      <div class="reader-pages" id="reader-pages"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Coherence Nikolai. Private apps and creative work by Nikolai.</p>
+    <nav aria-label="Footer navigation">
+      <a href="/">Home</a>
+      <a href="/tone_comics/">Tone Comics</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/support/">Support</a>
+    </nav>
+  </footer>
+
+  <script src="/assets/site.js"></script>
+  <script src="/tone_comics/app.js"></script>
+</body>
+</html>
