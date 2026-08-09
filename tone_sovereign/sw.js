@@ -1,4 +1,5 @@
-const CACHE = "tone-sovereign-v24";
+const CACHE = "tone-sovereign-v25";
+const COMIC_CACHE = "tone-sovereign-comics-v1";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_attunement_capacity_v1",
@@ -71,13 +72,24 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+    caches.keys().then(keys => Promise.all(keys.filter(key => ![CACHE, COMIC_CACHE].includes(key)).map(key => caches.delete(key))))
   );
   self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  if (url.origin === self.location.origin && url.pathname.includes("/assets/comics/")) {
+    event.respondWith(
+      caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+        if (response.ok) cache.put(event.request, response.clone());
+        return response;
+      })))
+    );
+    return;
+  }
 
   event.respondWith(
     fetch(event.request)

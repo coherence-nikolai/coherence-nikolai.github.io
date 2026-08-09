@@ -172,6 +172,51 @@ const guidedLibraryPaths = {
   ]
 };
 
+const comicSeries = [
+  {
+    id: "mainline",
+    en: {
+      title: "Tone Comics",
+      subtitle: "The mainline story of sovereignty moving from inner practice into wider participation."
+    },
+    es: {
+      title: "Tone Comics",
+      subtitle: "La historia principal de la soberanía, desde la práctica interior hacia una participación más amplia."
+    },
+    issues: [
+      { number: 1, pages: 12, esReady: true, en: "The Birth of the Sovereign", es: "El nacimiento del Soberano" },
+      { number: 2, pages: 10, esReady: true, en: "The Sovereign and the Seven Living Fields", es: "El Soberano y los Siete Campos Vivos" },
+      { number: 3, pages: 12, esReady: true, en: "The Offered Future", es: "El Futuro Ofrecido" },
+      { number: 4, pages: 12, esReady: true, en: "The Sovereign and the Borrowed Mind", es: "El Soberano y la Mente Prestada" },
+      { number: 5, pages: 11, esReady: true, en: "The Beautiful City", es: "La Ciudad Hermosa" },
+      { number: 6, pages: 11, esReady: true, en: "The Hollow Crown", es: "La Corona Hueca" }
+    ]
+  },
+  {
+    id: "hall",
+    en: {
+      title: "The Hall of Inner Adversaries",
+      subtitle: "A separate ten-issue series about meeting protective inner patterns without giving any one of them command."
+    },
+    es: {
+      title: "El Salón de los Adversarios Interiores",
+      subtitle: "Una serie independiente de diez números sobre cómo encontrar patrones protectores internos sin ceder el mando a ninguno."
+    },
+    issues: [
+      { number: 1, pages: 4, esReady: true, en: "Inner Ache", es: "Dolor Interior" },
+      { number: 2, pages: 4, esReady: true, en: "The Doubter", es: "El Dubitativo" },
+      { number: 3, pages: 4, esReady: true, en: "The Pretender", es: "El Farsante" },
+      { number: 4, pages: 4, esReady: true, en: "The Tyrant", es: "El Tirano" },
+      { number: 5, pages: 4, esReady: true, en: "The Echo", es: "El Eco" },
+      { number: 6, pages: 4, esReady: true, en: "The Compulsion", es: "La Compulsión" },
+      { number: 7, pages: 4, esReady: true, en: "Shame", es: "La Vergüenza" },
+      { number: 8, pages: 4, esReady: true, en: "The Divider", es: "El Divisor" },
+      { number: 9, pages: 4, esReady: true, en: "The Architect", es: "El Arquitecto" },
+      { number: 10, pages: 9, esReady: true, philosophicalFiction: true, en: "The Self", es: "El Yo" }
+    ]
+  }
+];
+
 const movements = [
   {
     id: "notice", mark: "·", color: SPECTRUM.notice,
@@ -615,6 +660,10 @@ const state = {
   libraryDomain: "all",
   libraryNeed: "all",
   libraryVisibleCount: 8,
+  selectedComicSeries: "mainline",
+  selectedComicIssue: 1,
+  comicPage: 1,
+  comicIssue10Accepted: false,
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
@@ -717,6 +766,7 @@ let toastTimer = 0;
 let fieldFrame = 0;
 let breathLastPhaseKey = "";
 let reclaimHoldTimer = 0;
+let comicSwipeStart = null;
 
 const tr = key => copy[state.lang][key] || key;
 const local = item => item[state.lang];
@@ -1210,7 +1260,7 @@ function currentSpectrum() {
   if (["fields", "nestedFields", "field"].includes(state.view)) {
     return { name: "fields", color: SPECTRUM.fields };
   }
-  if (["library", "libraryPath", "teaching", "foundations", "law", "principle", "entry", "scales"].includes(state.view)) {
+  if (["library", "libraryPath", "teaching", "foundations", "law", "principle", "entry", "scales", "comics", "comicNotice", "comicReader"].includes(state.view)) {
     return { name: "teachings", color: SPECTRUM.teachings };
   }
   if (["acts", "ruleOfLife", "missions", "mission", "history"].includes(state.view)) {
@@ -1229,7 +1279,7 @@ function currentInterfaceMode() {
   if (["movement", "guided", "practiceEngine", "acts", "mission"].includes(state.view)) {
     return "practice";
   }
-  if (["nestedFields", "field", "libraryPath", "teaching", "law", "principle", "entry", "scales", "symbol", "about", "ruleOfLife"].includes(state.view)) {
+  if (["nestedFields", "field", "libraryPath", "teaching", "law", "principle", "entry", "scales", "comics", "comicNotice", "comicReader", "symbol", "about", "ruleOfLife"].includes(state.view)) {
     return "teaching";
   }
   if (state.view === "threshold") return "threshold";
@@ -1255,6 +1305,9 @@ function render() {
     law: renderLaw,
     principle: renderPrinciple,
     entry: renderLibraryEntry,
+    comics: renderComics,
+    comicNotice: renderComicNotice,
+    comicReader: renderComicReader,
     practiceEngines: renderPracticeEngines,
     practiceEngine: renderPracticeEngine,
     ruleOfLife: renderRuleOfLife,
@@ -1276,6 +1329,7 @@ function render() {
   if (state.view === "movement") resumePracticeView();
   if (state.view === "guidedSits" && state.guidedSit.phase === "session" && !state.guidedSit.paused) startGuidedSitTimer();
   if (state.view === "threshold") sound.threshold().catch(() => {});
+  if (state.view === "comics" || state.view === "comicReader") prepareComicImages();
 }
 
 function renderTopbar(title, subtitle = "") {
@@ -2651,7 +2705,7 @@ function renderLibrary() {
     <section><p class="eyebrow">${phrase("Two-minute practices", "Prácticas de dos minutos")}</p><div class="list">${featured.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>2 min</b></button>`).join("")}</div><button class="secondary-button" type="button" data-action="browse-two-minute">${phrase("Browse all two-minute practices", "Ver todas las prácticas de dos minutos")}</button></section>
     ${state.showAllPractices ? `<section class="list">${catalog.libraryEntries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section>` : ""}
     <section class="start-here"><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>`;
-  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button></section>
+  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.reclaim}" type="button" data-view="comics"><span><strong>${phrase("Comics", "Cómics")}</strong><span>${phrase("Explore the teachings through two distinct illustrated story series.", "Explora las enseñanzas mediante dos series narrativas ilustradas y distintas.")}</span></span><b>→</b></button></section>
     <section class="library-tools"><label class="search-field"><span>${phrase("Search teachings", "Buscar enseñanzas")}</span><input class="field-input" type="search" value="${escapeAttribute(state.libraryQuery)}" data-library-query placeholder="${phrase("A question, quality or situation", "Una pregunta, cualidad o situación")}"></label><div class="filter-grid"><label>${phrase("Field", "Campo")}<select data-library-filter="field"><option value="all">${phrase("All Fields", "Todos los Campos")}</option>${libraryFilterOptions(fields, state.libraryField)}</select></label><label>${phrase("Theme", "Tema")}<select data-library-filter="domain"><option value="all">${phrase("All themes", "Todos los temas")}</option>${libraryFilterOptions(domains, state.libraryDomain)}</select></label><label>${phrase("Need", "Necesidad")}<select data-library-filter="need"><option value="all">${phrase("All needs", "Todas las necesidades")}</option>${libraryFilterOptions(needs, state.libraryNeed)}</select></label></div><p class="result-count">${entries.length} ${phrase("teachings", "enseñanzas")}</p></section>
     <section class="list">${visibleEntries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>
     ${visibleEntries.length < entries.length ? `<button class="secondary-button progressive-disclosure" type="button" data-action="show-more-teachings">${phrase("Show 8 more", "Mostrar 8 más")} · ${entries.length - visibleEntries.length} ${phrase("remaining", "restantes")}</button>` : ""}`;
@@ -2661,6 +2715,131 @@ function renderLibrary() {
       <section class="library-mode-choices"><p class="eyebrow">${state.libraryMode ? phrase("Switch at any time", "Cambia cuando quieras") : phrase("Choose a way in", "Elige una forma de entrar")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.practice}" type="button" data-library-mode="practices" aria-pressed="${state.libraryMode === "practices"}"><span><strong>${phrase("Find a practice", "Encontrar una práctica")}</strong><span>${phrase("Begin a guided path or choose a two-minute practice.", "Comienza un camino guiado o elige una práctica de dos minutos.")}</span></span><b>${state.libraryMode === "practices" ? "✓" : "→"}</b></button><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-library-mode="teachings" aria-pressed="${state.libraryMode === "teachings"}"><span><strong>${phrase("Explore a teaching", "Explorar una enseñanza")}</strong><span>${phrase("Start, continue, search, or browse the teachings.", "Comienza, continúa, busca o explora las enseñanzas.")}</span></span><b>${state.libraryMode === "teachings" ? "✓" : "→"}</b></button></section>
       ${state.libraryMode === "practices" ? practiceContent : state.libraryMode === "teachings" ? teachingContent : ""}
     </main>`;
+}
+
+function comicContext() {
+  const series = comicSeries.find(item => item.id === state.selectedComicSeries) || comicSeries[0];
+  const issue = series.issues.find(item => item.number === state.selectedComicIssue) || series.issues[0];
+  return { series, issue };
+}
+
+function comicAssetPath(seriesID, issueNumber, pageNumber, language = state.lang) {
+  const issue = String(issueNumber).padStart(2, "0");
+  const page = String(pageNumber).padStart(2, "0");
+  return `${ROOT}assets/comics/${language}/${seriesID}/issue-${issue}/page-${page}.webp`;
+}
+
+function comicImageAlt(series, issue, page = 1) {
+  const seriesTitle = series[state.lang].title;
+  const issueTitle = issue[state.lang];
+  return phrase(
+    `${seriesTitle}, Issue ${issue.number}: ${issueTitle}, page ${page} of ${issue.pages}`,
+    `${seriesTitle}, número ${issue.number}: ${issueTitle}, página ${page} de ${issue.pages}`
+  );
+}
+
+function renderComicLanguageControl() {
+  return `<div class="comic-language-control" role="group" aria-label="${phrase("Comic language", "Idioma del cómic")}">
+    <button type="button" data-comic-language="en" aria-pressed="${state.lang === "en"}">EN</button>
+    <button type="button" data-comic-language="es" aria-pressed="${state.lang === "es"}">ES</button>
+  </div>`;
+}
+
+function renderComicIssueCard(series, issue) {
+  const spanishFallback = state.lang === "es" && !issue.esReady;
+  const artLanguage = spanishFallback ? "en" : state.lang;
+  const openLabel = phrase(`Open ${series.en.title}, Issue ${issue.number}: ${issue.en}`, `Abrir ${series.es.title}, número ${issue.number}: ${issue.es}`);
+  return `<button class="comic-issue-card" type="button" data-comic-series="${series.id}" data-comic-issue="${issue.number}" aria-label="${escapeAttribute(openLabel)}">
+    <span class="comic-cover-wrap"><img src="${comicAssetPath(series.id, issue.number, 1, artLanguage)}" data-comic-fallback="${comicAssetPath(series.id, issue.number, 1, "en")}" loading="lazy" decoding="async" alt=""></span>
+    <span class="comic-card-copy"><small>${phrase("Issue", "Número")} ${issue.number} · ${issue.pages} ${phrase("pages", "páginas")}</small><strong>${escapeHTML(issue[state.lang])}</strong>${spanishFallback ? `<span>${phrase("Spanish edition in preparation · English available", "Edición en español en preparación · disponible en inglés")}</span>` : ""}</span>
+  </button>`;
+}
+
+function renderComics() {
+  return `${renderTopbar(phrase("Comics", "Cómics"), phrase("Illustrated teachings", "Enseñanzas ilustradas"))}
+    <main class="page wide comics-library-page">
+      <header class="section-intro comics-intro"><div><p class="eyebrow">${phrase("Practices & Teachings", "Prácticas y enseñanzas")}</p><h1 class="page-title">${phrase("Stories for discernment.", "Historias para el discernimiento.")}</h1><p class="lede measure">${phrase("Read in any order. These stories offer images and questions; they do not diagnose you or decide what your experience means.", "Lee en cualquier orden. Estas historias ofrecen imágenes y preguntas; no te diagnostican ni deciden qué significa tu experiencia.")}</p></div>${renderComicLanguageControl()}</header>
+      ${comicSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
+      <p class="gentle-note">${phrase("Comic images load only as you open or approach them. Your reading position is not recorded.", "Las imágenes se cargan solo cuando las abres o te acercas a ellas. Tu posición de lectura no se registra.")}</p>
+    </main>`;
+}
+
+function renderComicNotice() {
+  const { series, issue } = comicContext();
+  return `${renderTopbar(series[state.lang].title, `${phrase("Issue", "Número")} ${issue.number} · ${issue[state.lang]}`)}
+    <main class="page comic-notice-page">
+      <article class="comic-philosophical-notice" role="note" aria-labelledby="comic-notice-title">
+        <p class="eyebrow">${phrase("Before Issue 10", "Antes del número 10")}</p>
+        <h1 id="comic-notice-title" class="page-title">${phrase("Philosophical fiction, not instruction.", "Ficción filosófica, no instrucción.")}</h1>
+        <p>${phrase("This finale explores not-self, identity, awareness and the Empty Throne. These ideas belong to the comic’s imaginative universe. They are not app guidance, a diagnosis, or a claim about who you are.", "Este final explora el no-yo, la identidad, la consciencia y el Trono Vacío. Estas ideas pertenecen al universo imaginativo del cómic. No son orientación de la app, un diagnóstico ni una afirmación sobre quién eres.")}</p>
+        <p>${phrase("You do not need to agree or continue. If the story feels disorienting, stop and return to something concrete: the room, your body, another person, or ordinary life.", "No necesitas estar de acuerdo ni continuar. Si la historia te desorienta, detente y vuelve a algo concreto: la habitación, tu cuerpo, otra persona o la vida cotidiana.")}</p>
+        <div class="practice-actions"><button class="primary-button" type="button" data-action="accept-comic-notice">${phrase("I understand · read Issue 10", "Entiendo · leer el número 10")}</button><button class="text-button" type="button" data-action="back">${phrase("Not now", "Ahora no")}</button></div>
+      </article>
+    </main>`;
+}
+
+function renderComicReader() {
+  const { series, issue } = comicContext();
+  const page = Math.min(Math.max(1, state.comicPage), issue.pages);
+  state.comicPage = page;
+  const spanishFallback = state.lang === "es" && !issue.esReady;
+  const artLanguage = spanishFallback ? "en" : state.lang;
+  const progress = `${page} / ${issue.pages}`;
+  return `${renderTopbar(series[state.lang].title, `${phrase("Issue", "Número")} ${issue.number} · ${issue[state.lang]}`)}
+    <main class="comic-reader-page">
+      <header class="comic-reader-heading"><div><p class="eyebrow">${phrase("Issue", "Número")} ${issue.number}</p><h1>${escapeHTML(issue[state.lang])}</h1></div>${renderComicLanguageControl()}</header>
+      <p id="comic-language-note" class="comic-language-note" ${spanishFallback ? "" : "hidden"}>${phrase("Spanish edition in preparation. Showing the English artwork.", "La edición en español está en preparación. Se muestra la versión gráfica en inglés.")}</p>
+      <figure class="comic-page-stage" data-comic-swipe tabindex="0" aria-label="${phrase("Comic page. Swipe or use the arrow keys to turn pages.", "Página del cómic. Desliza o usa las flechas para cambiar de página.")}">
+        <img class="comic-page-image" src="${comicAssetPath(series.id, issue.number, page, artLanguage)}" data-comic-fallback="${comicAssetPath(series.id, issue.number, page, "en")}" loading="lazy" decoding="async" alt="${escapeAttribute(comicImageAlt(series, issue, page))}">
+      </figure>
+      <nav class="comic-reader-controls" aria-label="${phrase("Comic page navigation", "Navegación de páginas del cómic")}">
+        <button class="secondary-button" type="button" data-action="previous-comic-page" ${page === 1 ? "disabled" : ""}>← <span>${phrase("Previous", "Anterior")}</span></button>
+        <output aria-live="polite" aria-atomic="true">${progress}</output>
+        <button class="secondary-button" type="button" data-action="next-comic-page" ${page === issue.pages ? "disabled" : ""}><span>${phrase("Next", "Siguiente")}</span> →</button>
+      </nav>
+      <p class="comic-reader-help">${phrase("Swipe left or right · Arrow keys turn pages", "Desliza a la izquierda o derecha · las flechas cambian de página")}</p>
+    </main>`;
+}
+
+function prepareComicImages() {
+  document.querySelectorAll("img[data-comic-fallback]").forEach(image => {
+    image.addEventListener("error", () => {
+      const fallback = image.dataset.comicFallback;
+      if (!fallback || image.dataset.fallbackApplied === "true") return;
+      image.dataset.fallbackApplied = "true";
+      image.src = fallback;
+      if (image.classList.contains("comic-page-image")) {
+        document.querySelector("#comic-language-note")?.removeAttribute("hidden");
+        announce(phrase("Spanish page unavailable. Showing English.", "Página en español no disponible. Se muestra en inglés."));
+      }
+    }, { once: true });
+  });
+  if (state.view !== "comicReader") return;
+  const { series, issue } = comicContext();
+  if (state.comicPage >= issue.pages) return;
+  const preload = new Image();
+  preload.src = comicAssetPath(series.id, issue.number, state.comicPage + 1, state.lang === "es" && !issue.esReady ? "en" : state.lang);
+}
+
+function openComicIssue(seriesID, issueNumber) {
+  const series = comicSeries.find(item => item.id === seriesID);
+  const issue = series?.issues.find(item => item.number === Number(issueNumber));
+  if (!series || !issue) return;
+  state.selectedComicSeries = series.id;
+  state.selectedComicIssue = issue.number;
+  state.comicPage = 1;
+  if (issue.philosophicalFiction && !state.comicIssue10Accepted) navigate("comicNotice");
+  else navigate("comicReader");
+}
+
+function turnComicPage(offset) {
+  if (state.view !== "comicReader") return;
+  const { issue } = comicContext();
+  const next = Math.min(issue.pages, Math.max(1, state.comicPage + offset));
+  if (next === state.comicPage) return;
+  state.comicPage = next;
+  render();
+  document.querySelector("[data-comic-swipe]")?.focus({ preventScroll: true });
 }
 
 function renderLibraryPath() {
@@ -2913,6 +3092,8 @@ app.addEventListener("click", async event => {
 
   if (view === "threshold") { startMovement("cross"); return; }
   if (view) { navigate(view); return; }
+  if (button.dataset.comicSeries && button.dataset.comicIssue) { openComicIssue(button.dataset.comicSeries, button.dataset.comicIssue); return; }
+  if (button.dataset.comicLanguage) { state.lang = button.dataset.comicLanguage; persistPreferences(); render(); return; }
   if (button.dataset.libraryPath) { navigate("libraryPath", { path: button.dataset.libraryPath }); return; }
   if (button.dataset.entryPractice) { state.selectedEntry = button.dataset.entryPractice; navigate("guided", { guidedKind: "entry-practice" }); return; }
   if (button.dataset.entryCrossing) { state.selectedEntry = button.dataset.entryCrossing; navigate("guided", { guidedKind: "entry-crossing" }); return; }
@@ -2981,6 +3162,9 @@ app.addEventListener("click", async event => {
   }
   if (action === "back") goBack();
   if (action === "home") goHome();
+  if (action === "previous-comic-page") turnComicPage(-1);
+  if (action === "next-comic-page") turnComicPage(1);
+  if (action === "accept-comic-notice") { state.comicIssue10Accepted = true; navigate("comicReader", { remember: false }); }
   if (action === "begin-guided-sit") await beginGuidedSit();
   if (action === "preview-guided-sit-introduction") previewGuidedSitIntroduction();
   if (action === "replay-guided-sit-introduction") replayGuidedSitIntroduction();
@@ -3233,6 +3417,13 @@ app.addEventListener("pointerdown", event => {
   }, 3200);
 });
 
+app.addEventListener("pointerdown", event => {
+  const stage = event.target.closest("[data-comic-swipe]");
+  if (!stage || state.view !== "comicReader") return;
+  comicSwipeStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+  stage.setPointerCapture?.(event.pointerId);
+});
+
 function cancelReclaimHold(event) {
   const control = event.target.closest?.("[data-action='reclaim-hold']") || document.querySelector("[data-action='reclaim-hold'].hold-active");
   if (!control || !reclaimHoldTimer) return;
@@ -3244,6 +3435,16 @@ function cancelReclaimHold(event) {
 
 app.addEventListener("pointerup", cancelReclaimHold);
 app.addEventListener("pointercancel", cancelReclaimHold);
+app.addEventListener("pointerup", event => {
+  const stage = event.target.closest?.("[data-comic-swipe]");
+  if (!stage || !comicSwipeStart || comicSwipeStart.pointerId !== event.pointerId) return;
+  const deltaX = event.clientX - comicSwipeStart.x;
+  const deltaY = event.clientY - comicSwipeStart.y;
+  comicSwipeStart = null;
+  if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
+  turnComicPage(deltaX < 0 ? 1 : -1);
+});
+app.addEventListener("pointercancel", () => { comicSwipeStart = null; });
 
 app.addEventListener("change", event => {
   if (event.target.matches("[data-import-file]") && event.target.files[0]) importData(event.target.files[0]);
@@ -3266,7 +3467,12 @@ app.addEventListener("change", event => {
   if (event.target.matches("[data-mission-principle]")) state.missionDraft.principleID = event.target.value;
 });
 
-app.addEventListener("keydown", event => {
+document.addEventListener("keydown", event => {
+  if (state.view === "comicReader" && !event.target.matches("input, textarea, select") && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+    event.preventDefault();
+    turnComicPage(event.key === "ArrowLeft" ? -1 : 1);
+    return;
+  }
   if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-action='notice-tap']")) {
     event.preventDefault();
     if (state.quietWords) showToast(state.lang === "en" ? "Noticed" : "Notado");

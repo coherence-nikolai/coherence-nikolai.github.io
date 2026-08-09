@@ -1,0 +1,3867 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-08-09",
+  "derivative": {
+    "format": "webp",
+    "quality": 88,
+    "method": 6,
+    "dimensionPolicy": "source-native",
+    "sourceMastersModified": false
+  },
+  "totals": {
+    "files": 226,
+    "bytes": 143330440,
+    "byLanguage": {
+      "en": 113,
+      "es": 113
+    },
+    "bySeries": {
+      "mainline": 136,
+      "hall": 90
+    }
+  },
+  "entries": [
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-01-en-page-01.PNG",
+        "sha256": "fb1cfc65c3aabad5ebcd3eca358789b899271c2c611be76d9e624a491db7e3cc"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-01/page-01.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 657448,
+        "sha256": "f28a7959ba1161b1248baaaa3e3cdec74e901425139fcc804b08bd067404ed7c"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-01-en-page-02.PNG",
+        "sha256": "d202caa2dd4319ee67131a8506deb8aed16b2edb93124a9b231089a295190e3e"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-01/page-02.webp",
+        "width": 1315,
+        "height": 1862,
+        "bytes": 679136,
+        "sha256": "6c3c0d69f64a65b3ee7f41f449fdfa761de1a088a907e5d6389b5291672b8c38"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-01-en-page-03.PNG",
+        "sha256": "0b7bf4e51f4cc305487060fc27542ec7460b0ead86bb747ed07c603ebd0d3a77"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-01/page-03.webp",
+        "width": 1055,
+        "height": 1491,
+        "bytes": 601266,
+        "sha256": "8af9a3d10c14b260b9802b5b44009ff0daec38abeb2b27a6b64136e132f3f296"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-01-en-page-04.PNG",
+        "sha256": "320972ddd5f1d623fad6cca5a1246c76c51f2e38031f8046e846ad61f1d3fc8b"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-01/page-04.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 592834,
+        "sha256": "46bacd3c2aa17b6a45030ff9d1892757dda06c7b36e65df62612efe192d73fe6"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-02-en-page-01.PNG",
+        "sha256": "bfd0b01d469c60be693939583f4d4d8b84abec5c1ac7f025e2f27893a604ab54"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-02/page-01.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 630038,
+        "sha256": "f6eb4f032c542202c922d0bf64307bae618f6a687e579e63e9021ab1a526bf6e"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-02-en-page-02.PNG",
+        "sha256": "f3292109e0a3bdd6a656a85683d9f306bc38e7aa6f13110fe05e8fb946f21499"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-02/page-02.webp",
+        "width": 1209,
+        "height": 1712,
+        "bytes": 632676,
+        "sha256": "6ee7ca845d565a52d4849f44d256d0884fbbe866a78bf94d42af27099801dadc"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-02-en-page-03.PNG",
+        "sha256": "5a51b82519a9b8d65aed42798600e05cf424c0e1d06c33079b8d81d2b822ebb9"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-02/page-03.webp",
+        "width": 1055,
+        "height": 1491,
+        "bytes": 567812,
+        "sha256": "93222d621eb3ec2ed939170ff8c30844b2b3c2592c92f807da88841c7a8cb5f2"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-02-en-page-04.PNG",
+        "sha256": "792bf0af17cdff8db78b16cd44702e35d9412eed7f446779aa230bd6b22780fc"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-02/page-04.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 571210,
+        "sha256": "56569a8473c0c22154c558cd120bcc164e0145a6406faa1472c55b673545542b"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-03-en-page-01.PNG",
+        "sha256": "3cd8961c82078d4222406ee1d422c36b19dcfa91d45e7946026677e332b0549d"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-03/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 665928,
+        "sha256": "39e81f0d4e982846754fbd6a8ac534b19594d40a4cc988bbed46b59a1387a013"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-03-en-page-032.PNG",
+        "sha256": "5f01022e8b77277b574ed27c7e974ed94ebee45dc94134799a9a5a0520cbf2cd"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-03/page-02.webp",
+        "width": 1384,
+        "height": 2079,
+        "bytes": 850448,
+        "sha256": "f06a17808c9113532fb5c0bb54e94d907f884a5e6add2c1eba511f2fd0dffa80"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-03-en-page-03.PNG",
+        "sha256": "05ccd4b96f19637abaabd81aa3e511e9cba0d64ca7e042ea326f0ac09e0abd09"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-03/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 669948,
+        "sha256": "5c86f9e26450e962393773ebd3b69398419eeb27cab18e0a69c9b2d2712b89f0"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-03-en-page-04.PNG",
+        "sha256": "a5d973dfcd63a51bd128a841fe777ed52ed047b088a8812f5a1220c37d6c8937"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-03/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 638990,
+        "sha256": "2987060cfae3f022ab7f02d3bf9af6bceef099d0e2cd7d112490fe40c4cd9da4"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-04-en-page-01.PNG",
+        "sha256": "aea1cc7ebf67aa435464a06ab7eb136c6325ce78cbadaa5586639940dc16b1b5"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-04/page-01.webp",
+        "width": 1495,
+        "height": 2243,
+        "bytes": 928278,
+        "sha256": "6b2e4e9a41a1b464380c35005d4dfbc6962312d655523dd824647993767807e9"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-04-en-page-02.PNG",
+        "sha256": "02197844e1a4a11a1a57cdbd628ccf3ae50d21814e3262a3d8b94c1969ed90ce"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-04/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 605274,
+        "sha256": "10341a0e30a4422a2f475fb0ee193537cfd0ccd5429efa88f223a3c8b14ffcdf"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-04-en-page-03.PNG",
+        "sha256": "60128c05699348cc3587dd04624d1483efacc7759d9e3356c5eb4df376b8f6f2"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-04/page-03.webp",
+        "width": 1414,
+        "height": 2122,
+        "bytes": 871538,
+        "sha256": "7eb2f2218ae1c4688536f06ac38601d2da50f84f4a202b1d0d02ee6d29e6cf12"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-04-en-page-04.PNG",
+        "sha256": "faea7e840bfe445d6d85d659720e5c196898b9053b698b48468a523835cd8fd2"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-04/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 601052,
+        "sha256": "8c3ea18148708e5daf62c9ce1bb6f6b668d14886e1cddf75a03e5f345591e9f3"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-05-en-page-01.PNG",
+        "sha256": "e253820126ba5139017add36de71b156b215ebee5e053dec20d20ac2aff38920"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-05/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 702950,
+        "sha256": "21b966732cb5ec9b1a6f39ccc6b3740e42c34695b897cd0595f2b8ed28decd40"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-05-en-page-02.PNG",
+        "sha256": "74cc69d4302dc26fca855c92ec656b35d0645a8c83a30a3b6cdf90d34141ca7f"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-05/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 632064,
+        "sha256": "df48486c509ae0cc0245a7e0dcf25647191ae21d2ef53a2f62e5475eaf3af30b"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-05-en-page-03.PNG",
+        "sha256": "138e0aafc686017375c8a0b67b96ac4c140180403d655ff42459f11ac04306f2"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-05/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 596362,
+        "sha256": "011c624c252e6405846c5cac86866e18f22448ae9623f371d2fb3cb0e6962a01"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-05-en-page-04.PNG",
+        "sha256": "819f27baf6795fe97ffa312d3193f282882de0f0554035266a6b1f3cddedd99c"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-05/page-04.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 678070,
+        "sha256": "08a57d0f456e6e7cdc9fd525d438cdeec0919a53ed5c5f22271893d339dc4a88"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-06-en-page-01.PNG",
+        "sha256": "6a3538d4561cc6f11f482d9c3b718efbfe04533f3af308547ee7415af47ece44"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-06/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 738662,
+        "sha256": "793d9eb9483f2c544dc0e1980904ef160f9c38310a3b9d94795093ca5db504c1"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-06-en-page-02.PNG",
+        "sha256": "fed1897629d523a51b278c6f503e25b3a914490193cea1d93d2ef36b0d9522a3"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-06/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 607502,
+        "sha256": "6d9ef6101a4feae979999fcea37a4cd1b215c163778d83fce2cdace9624fa754"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-06-en-page-03.PNG",
+        "sha256": "2b47197eb26795ef47a7e34968fc6214f0248654fc8b05b88dd23acbb2abaea3"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-06/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 694558,
+        "sha256": "f86ccf8f6d93e369743e8977e462686f6d7dcec8f81f0314e25ad1507ebef299"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-06-en-page-04.PNG",
+        "sha256": "f55a458b51577226259f0e9ceb9c5ccb2045ba3667d790c32f2f1a9eb3283170"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-06/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 619348,
+        "sha256": "1344cf275331988a5ab7550240b0b2d8596be78f4d8dd6d4d1781b947728106e"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-07-en-page-01.PNG",
+        "sha256": "f0ba503ce2d0f3fc9d4b032e66ee6d67f170b2dee214c69388a1c56df83032c5"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-07/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 495008,
+        "sha256": "07dd1299a95a6a45832350d5d244241cefe0991803143a7ba63cb6ad2dde90fe"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-07-en-page-02.PNG",
+        "sha256": "b89d7606d96187123639aeb1771b6054ff043e2ebdec4153a0ef624eaa1bea09"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-07/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 762492,
+        "sha256": "8439bbe9e849a063313d28cc240ccaf0de016a1c8b621d1fe44205adc23ba0a9"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-07-en-page-03.PNG",
+        "sha256": "6cfc11a7ac236b9dda2425dcc655d0dc71550df377b81cab257ea2a64b8affa7"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-07/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 663612,
+        "sha256": "bc036d22a5ab88473d7c9d69a32e63dbc955d8b263c3fc4d85765c40a6cbf927"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-07-en-page-04.PNG",
+        "sha256": "aa00c9e613b3732ed7dbd90e8f31049d84ae731c1b5f3c86f626756991f6c256"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-07/page-04.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 618990,
+        "sha256": "5eec948f6b384e5d7495fc6c001e5c243876823baad632f9a189df529e0dc8f9"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-08-en-page-01.PNG",
+        "sha256": "5dcb11b29878a4b27ba0e02e8aa025d3fbdd72d2091bb297f75d14ec25d682f8"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-08/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 590124,
+        "sha256": "a81717663b8fdd73bc7d5764c21c80b2acee014d72a1f5916cec59e8a0a82c61"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-08-en-page-02.PNG",
+        "sha256": "9e4b1bc1f1664ae0e9a8e9d5b1459355ac0b5921022213ee66768eea67356ac3"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-08/page-02.webp",
+        "width": 2737,
+        "height": 4105,
+        "bytes": 2286542,
+        "sha256": "27001a0e88d2e836a5562fdca89001db431b48cb0fcb2a630ee9414ad8627e20"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-08-en-page-03.PNG",
+        "sha256": "02f9f89cae91600b56d98129f5a7f64070a73ca205b7691765ce35b3baebfb65"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-08/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 671524,
+        "sha256": "f8f8b4905593db7cf1865e82d3df4212d582dd7c775c832d4469376b50ae3415"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-08-en-page-04.PNG",
+        "sha256": "b13eebc9c6c30398f7baa894a24df3890f80af09613627d6c2787eb83899807b"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-08/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 716248,
+        "sha256": "83ec574bc9e318730dc4c8838dcdda6db05fd282cebf08b2ec6ce7a647169333"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-09-en-page-01.PNG",
+        "sha256": "d50fe6b58de92af1f1e838de1f8437e64d06c8db30cd745918785522f7d829be"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-09/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 642490,
+        "sha256": "3f0eb28b5825e52f66bdb0a4518f4f0c5dff785fcf8e7e7ca5b22241fd0262bc"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-09-en-page-02.PNG",
+        "sha256": "8f0b25890d16c2180551f52c6e4aa18b956c39982b2a31b708fda46a62c1d999"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-09/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 706632,
+        "sha256": "e32e0932f9833d2484952b0ff0964c25fa36fe1ec44ef7db85c6e8e03d93e2ec"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-09-en-page-03.PNG",
+        "sha256": "46966edf8319169bb5b23ccd00bdb36e19378341c2e9923d584058d5f6ed383e"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-09/page-03.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 672554,
+        "sha256": "d2b39f0455bcff84ff5aec1b89bac36ab8dec59cddddca5cd48a00988b22b6de"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-09-en-page-04.PNG",
+        "sha256": "68c0e5737edf570440c7f4f8d44ef59f7fc835cc9c22fd8d0082d44a04bd41ad"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-09/page-04.webp",
+        "width": 4092,
+        "height": 6150,
+        "bytes": 2840736,
+        "sha256": "95a3ad7c48e1852ce842cdf3a88d6d9527756a943ffb364a6a0f16ebeb62d7d9"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-10-en-page-01.PNG",
+        "sha256": "10b7ea7415990a4663035266485cce6da142067bf32738860f99e73f07ef66cc"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 712388,
+        "sha256": "a5cf2e2fd6df05e8e65770283a7c3720d04457473583f318e116c4221128bfe4"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-10-en-page-02.PNG",
+        "sha256": "da219039e78974f1cbb7e1520ec6389bbc53e357b527e2d0ff3661cc68ce5c0e"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 688604,
+        "sha256": "504eec48a85fb51ac67377468e6a0480f6eb1d9b0f80e93bf97a239b4e8723a3"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-10-en-page-03.PNG",
+        "sha256": "bf0500c60eecd6d71e669faa54d6491db94cb0feb9d8a4edf26bfad8e63b84fc"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-03.webp",
+        "width": 1025,
+        "height": 1535,
+        "bytes": 712166,
+        "sha256": "8de74e3963f3dca11bb8647840319f4be0f0f45dd99b7cbd56d711fc358f8d0d"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-10-en-page-04.PNG",
+        "sha256": "f402eca32df7c6c3c905775f8b6c996fd05874ad02dc54563a0aa7a1302fdacf"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 671682,
+        "sha256": "707827be7a0d3795823d7d8e2e54992a24541fa06b132b57d57809facbbb5e23"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-10-en-page-05.PNG",
+        "sha256": "64106ce94554c1ca335a10eab00db6ae3611642bc61c0fa97cc186fdd7e2c44b"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-05.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 553126,
+        "sha256": "585b303aa7c7a0c1eacb04705454b05034a773f71715f0888a6fc14a7554da8e"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-10-en-page-06.PNG",
+        "sha256": "45aac2aee3f61a352792daa5ca7895ffe832dc1ec362ec7bcb56f9483318b551"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-06.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 645834,
+        "sha256": "3d9d40d60b42b71253d1ff178e3481547f7fb0c70877930b36b4912578c0139e"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-10-en-page-07.PNG",
+        "sha256": "59a621b1297f3d7af1f7a08d6ee632077b279a428a79a230dc439ced8a2c6109"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-07.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 681278,
+        "sha256": "202bba8d485337ac6c1f95ea75f04aa44efc65f5fc44f761e2c2765937a9dfe3"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/original/TheHallofInnerAdverseries-issue-10-en-page-08.PNG",
+        "sha256": "19d49c920c4bb1ae008c618bb8c5d707109f1a7f99cee6f88bb8583714e982ca"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-08.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 720156,
+        "sha256": "4adf71a34c294e4c16f9ef8b79dd726391670cbecda6280b8d8de83d8a477c3a"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/revised/release/TheHallofInnerAdverseries-issue-10-en-page-09.PNG",
+        "sha256": "0bc6723cdd820e276757aa9acf28937c2c32bf202200d2edb97c2e7a0ef299eb"
+      },
+      "output": {
+        "path": "assets/comics/en/hall/issue-10/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 703400,
+        "sha256": "dcf1209ce4171aa98c8fd15b8bdee73989a7df405143fb6d8eb9309b907a5b23"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-01-es-page-01.png",
+        "sha256": "910f70eea09699ae383debcbf217b0ada2fe61e9c5e5946b3e1b24cc69f9b2b5"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-01/page-01.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 608140,
+        "sha256": "35166ef8f689933c0eb2a72547b0b17fcd018d96e0c613094f348592e0bc5d59"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-01-es-page-02.png",
+        "sha256": "e2f125706b06174a6bef5a21a82a6fbee7a8864fa1e3ac7c93c83213baf71835"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-01/page-02.webp",
+        "width": 1315,
+        "height": 1862,
+        "bytes": 655210,
+        "sha256": "b9c7cfa4e203fe6e3b5cf961df9adf324f2c7f9cdd17c85775abb0dda530eb93"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-01-es-page-03.png",
+        "sha256": "d01c71e4fcefaff0ac77a784891dfcf8343f26cbc0d9a18da0db4992d7ed506b"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-01/page-03.webp",
+        "width": 1055,
+        "height": 1491,
+        "bytes": 570956,
+        "sha256": "fc4bd48d6cba7d0dfad766473907ad624176d07dde0e1c40191f09f74596ce2e"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 1,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-01-es-page-04.png",
+        "sha256": "766a50f71467d62bb829b889696490f47d356dbd0236ac87e4917027ab047db5"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-01/page-04.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 559352,
+        "sha256": "b75c0796a7b79f64fbba2426f6a8b221880f2af0c327c6f74859fe3cfc73e163"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-02-es-page-01.png",
+        "sha256": "f0912c744601117f0d2d7bc5bcc8a7da88f100d9e4faaac46feb4d48a1f94f0d"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-02/page-01.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 578608,
+        "sha256": "7136c8ebbbf2f51e46e9a910bef03bea1594e984bd86c00d4ae0571e81139114"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-02-es-page-02.png",
+        "sha256": "ded0688e9876b5e464fb7e7bdc618f47ae29defaa770a55b22a88632555a5c5c"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-02/page-02.webp",
+        "width": 1209,
+        "height": 1712,
+        "bytes": 562426,
+        "sha256": "7f7db96f810e0d0005f9bee45818c2169bdd102fa25c72dc09fba868f2789a6b"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-02-es-page-03.png",
+        "sha256": "ffe2aa71e0699e02cc994e0a45dd4c1185a20630df7955ee5557209fe3fcab92"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-02/page-03.webp",
+        "width": 1055,
+        "height": 1491,
+        "bytes": 501246,
+        "sha256": "7bc8d60bebd811bf22f87611461d491972b6856124e4f1c92115d1c0e1a6349b"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 2,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-02-es-page-04.png",
+        "sha256": "1ce46d3faf587e13d577102876e5c06f7fba1252333bfc7b038cb31a72615fea"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-02/page-04.webp",
+        "width": 1054,
+        "height": 1492,
+        "bytes": 538432,
+        "sha256": "1f58c6f433e380d5076fb860a6a531baba5b2acd0dd7217e1951a2aef077cd1b"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-03-es-page-01.png",
+        "sha256": "5b383112765d399e741a5ae0fa9aa611e738d2cb41947da421426d78d3450dd4"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-03/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 600596,
+        "sha256": "543e95df69b68633205811fad65208ec41ac58d39600eaaac7de3846739dc02a"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-03-es-page-02.png",
+        "sha256": "16634892be4edb058f1e35d168a12b774ca30688b950383e376476e496c21fac"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-03/page-02.webp",
+        "width": 1384,
+        "height": 2079,
+        "bytes": 794938,
+        "sha256": "5b7875d7c4cfd064c4e3e499280d0eda97b8ae96f0c6ea1b6b52a43b86990812"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-03-es-page-03.png",
+        "sha256": "2c6dac1a87d4ca30576a44ef573924aeeb41486d0667f92ece84c5c51e94813d"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-03/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 544430,
+        "sha256": "b5e792f41f60eec4a6a9c9eae69c2d327d8b9cb7d21f4128aa5df8625672a385"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 3,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-03-es-page-04.png",
+        "sha256": "8b7563e9098e17a24fc8dcb989df513301dbc3b7e9e6b0616b9c652514cf5eb8"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-03/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 523826,
+        "sha256": "f3935658648e03ba93a36fb121c27a205296dc04a2dced2aad028fee37222b9f"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-04-es-page-01.png",
+        "sha256": "b62287f4ed23e1abda416630581d1944fc9265530ddb9d578801382cceedc2cb"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-04/page-01.webp",
+        "width": 1495,
+        "height": 2243,
+        "bytes": 851226,
+        "sha256": "3f6a54fb15f4a630e238f86f9e55cd9fd59cc062205ee4027c4b3070e89f56b6"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-04-es-page-02.png",
+        "sha256": "6064a1823a5952d363f7932d7a55ab6657bb4abdef7f29f5126692fcf037352f"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-04/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 565624,
+        "sha256": "7891b27d8d5f5619096aab0b17766777cf9125f8f4771543563adcb75c488dc7"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-04-es-page-03.png",
+        "sha256": "1b5b46d2d40dc8f4bf6fc4e407228b95fd1d4aa9d3fa0e2a42b8772c0aabf26a"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-04/page-03.webp",
+        "width": 1414,
+        "height": 2122,
+        "bytes": 820622,
+        "sha256": "d36e0cb946649d0e38031763351448a43b25e224e4ba5459f1b51eaf6fed9f78"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 4,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-04-es-page-04.png",
+        "sha256": "804fa8e43fc6adb860b92708586858c0f7b55ee8ff7295201f419002dc2922fe"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-04/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 583932,
+        "sha256": "cee603478caa57d7cc18bc91bdd83d6c6e14e2394d4e3c830ba56d29e74b7294"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-05-es-page-01.png",
+        "sha256": "007a7fb624d98bd9a41a3a35d31a30695cf91313f53310a759d3f2d85fe773d5"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-05/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 669822,
+        "sha256": "e304e372f857bf35a2eef29a4bdbf56e9f84ceb436f4fc0b5d418bda87aa4e2f"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-05-es-page-02.png",
+        "sha256": "d13300090b8dbb86bc3dfae7c104ce1f432e81cad0e8b242d87795940e7eb5e2"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-05/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 608286,
+        "sha256": "4be583e0a16b61358e5a8ea6fa32c1692186c998a2f588c4f3e8995f28817681"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-05-es-page-03.png",
+        "sha256": "16c0ffc3d76093c588417cc20f5e195d7d2808d16db7fab9e67d58f67b974e9e"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-05/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 576822,
+        "sha256": "8a75984d802f7ede6d7c645f91093859b8226ce9c26fd93fa5242bb675b923e6"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 5,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-05-es-page-04.png",
+        "sha256": "ccfcaa31137350ed139baf746f42f10f58629e6d08512fd69684630df206446d"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-05/page-04.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 645792,
+        "sha256": "c13eae61df06418c13085e21071fa45c981441cbdec729e9903d1b3c83dd2d34"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-06-es-page-01.png",
+        "sha256": "ce5bdedaa8ac0a10721362c8de36ec1e87005c01370570f65ab8f0ea2d335342"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-06/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 692372,
+        "sha256": "616e380a2faae8a7697441894158d1b7b160e0724b5fab04404bc26c52eb7e38"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-06-es-page-02.png",
+        "sha256": "9f29f944ae8e18bf512b0e3e07d43fb634e155221a5ef4ee2e7eac34f88487e7"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-06/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 580276,
+        "sha256": "96149941520362f7ea031d1103888c75f56d10904749ca0ac0ef25b69e289f1c"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-06-es-page-03.png",
+        "sha256": "23078a0ed1debed5349aa20e039d697f80fcf3dac3829b4368c5a356f95534fa"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-06/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 663014,
+        "sha256": "673e4e1641b624e655207ab89d6ae92931fbcacd4198e7e20d3ab530b8058b5f"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 6,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-06-es-page-04.png",
+        "sha256": "7ded29a7687dafbf522146e852ac2c8a6ac9c6ec79791083b3954b39b1983a02"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-06/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 589598,
+        "sha256": "00756b891d2208ca65d2e43953cbd64d767dc25d96d2c233a2d2e1f28529d925"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-07-es-page-01.png",
+        "sha256": "7856de9b9165a29af4273b5646f9b7bc2843c3d033102eb3589fe4174869b784"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-07/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 474808,
+        "sha256": "fc40df48e82aa8caf705da8a1f245dfc6cc0483d0b372d56e95b72d8060cbcc2"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-07-es-page-02.png",
+        "sha256": "edcca9db572f52699276d9d247362389f942ee7a9b9ca9abf74f033e4d9684fc"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-07/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 721560,
+        "sha256": "54662f3cf1ad614d8b822d5033a5ad875e034100f0ac750932b3c1c1dad65f57"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-07-es-page-03.png",
+        "sha256": "72e6597b15f5a5c78833edc2b50b109cdd5f2b2757067d34e180eca98c7a90fb"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-07/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 618368,
+        "sha256": "7ffef27aee622198d6da855eaa973ad526160a615cc67f16ee1c7cc03b1b69ee"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 7,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-07-es-page-04.png",
+        "sha256": "cccbe0530e6c54d32af03c2d5a9f614a0dc99268a570e96f785cb19081849860"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-07/page-04.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 585378,
+        "sha256": "8f54e2342644971e9310c4c073cc73eee200ea97061211fba3be5dfdeaf6e2e7"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-08-es-page-01.png",
+        "sha256": "b1e4f5760c902ed4d345451e66075f9fdd6b300e41dc29f13cc6c93f3fe50104"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-08/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 570498,
+        "sha256": "de51acc71c8af14fd4634690057f3bf8e61a70b88595f3a57139fc94d9a5a3af"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-08-es-page-02.png",
+        "sha256": "a5830a023068797a904e8726f06ac6aeb9435e68ea2c5d7becc206351abd50a0"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-08/page-02.webp",
+        "width": 2737,
+        "height": 4105,
+        "bytes": 2124102,
+        "sha256": "73bc042ae53d87ffba4e6f8943f8159a2b93e51a4f684460327ad41386494f9a"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-08-es-page-03.png",
+        "sha256": "0e6ae1e293e5efd9ba294545bd5dfdc6fc5032e3f3d52b07abbf260c343c23d5"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-08/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 608392,
+        "sha256": "fb10eebc3930dec45e7b94af04341a59bc3f69cad1b3ccdd1846f91ce498e0c1"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 8,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-08-es-page-04.png",
+        "sha256": "a28432b38924d2558d442f33dad1b2207d9612bf70e60b3520840bae8f3ff412"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-08/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 701550,
+        "sha256": "78d3cbc2ebb981a58d8a5d155ccbdc63861fd5cd2fb34e4aa65434fc00fd5168"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-09-es-page-01.png",
+        "sha256": "56a9c7be6835e60fc92864d673a9909f21d6f3333da37b8bcb31aed4abd61241"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-09/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 614418,
+        "sha256": "faf8d529ea8bea52d96e52270e8377d2a473c1cc2241753ae91cfae73b9bf038"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-09-es-page-02.png",
+        "sha256": "c868428f91349f8cadfa9e51f516bc2778136036c1f07772ba4cde3156060bdc"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-09/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 697056,
+        "sha256": "86289f36634fc7a7e7998e67482d394f8261e2e629c6efbbde54f696263555e5"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-09-es-page-03.png",
+        "sha256": "fcd393c0b3028a214b157672a293886071a196658b032c636f0c95a7ec30f948"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-09/page-03.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 620514,
+        "sha256": "a7fc7d9ce7b42139bc442c56fc6ae3444860a042f50683f823c047791d517a60"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 9,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-09-es-page-04.png",
+        "sha256": "b195a53301ab897501c96236728493752ac1f9654a74cfb1100c4265ca6519f0"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-09/page-04.webp",
+        "width": 4092,
+        "height": 6150,
+        "bytes": 2747522,
+        "sha256": "98f9c32172a30a86903d048c408b27c80964fa3bbc4cefa9b899d4842fb7a49e"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-01.png",
+        "sha256": "8b67b5018c4aeff8003a2e5f8c4525efdcd5546d02186fbe0c90c08768a2b5af"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-01.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 674214,
+        "sha256": "b60bc4ddb542c9432b2a2fdbe650cd5c263d48636f6037ee6ea9e147569e6826"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-02.png",
+        "sha256": "764fa808b69b8ed4faac236071bb41778ff5fdc12a432b50507fb931dbc91c68"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-02.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 636662,
+        "sha256": "c4db48a414e27ca951eabfff10595fb2b7f9f96ff9989691e789461abcd068ce"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-03.png",
+        "sha256": "41649c34e8f343e7b11fa83b9a46c63cd0420aafdd7386a75928ffd3d121e7ab"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-03.webp",
+        "width": 1025,
+        "height": 1535,
+        "bytes": 680948,
+        "sha256": "dd3d6fd766d5a172effc4a9234db728d38e6cd04e334948c7f9aa36ccbc80867"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-04.png",
+        "sha256": "1b368fc6e29317204920fee757159072c6264452ef7bb419bc3d747b5a417611"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 647608,
+        "sha256": "5eb9212c3cc41ded7af32e8e61a6fdc36db050065507bf19adb7443230604635"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-05.png",
+        "sha256": "d2139365394278a96f058b78551243c40895993fc12da1a41ec449d51b6fa5a3"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-05.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 539448,
+        "sha256": "1359e004e42c146d70e83a67736b2ce9bc2af55d05876e8c304ea17509fd5e66"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-06.png",
+        "sha256": "206107bb9bbfab907b6ff1e1e42254e00a6993f096db536d687f024a5ae7611c"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-06.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 626246,
+        "sha256": "64afad089bc1b0d92bf2d9f0ce7935826dcf5a4f11a0f25a8f1c30446ddcb17b"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-07.png",
+        "sha256": "aa121ef5391169dbe884ba3e9ff285710cbf47dbd8d15c3b989649a48594ed3d"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-07.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 646988,
+        "sha256": "f80644583f62239982ec15a22d6fc503861a848bd3943233cb83629ee6f553b1"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-08.png",
+        "sha256": "6228570a151a037c8ad49bbe7b08b78609f37b0fbba28e641bb4d9e9fc4f9ae2"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-08.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 700996,
+        "sha256": "82683dfe1d82e7358c572d94c5cb6c94460804b3f0f25c7aae7365ba2ce93691"
+      }
+    },
+    {
+      "series": "hall",
+      "issue": 10,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/VillainArcs/spanish/release/hall-inner-adversaries-issue-10-es-page-09.png",
+        "sha256": "abc735b16b1c0e5919f7f9b94f58ca759124b430a61424e1a5f848f8f86075cc"
+      },
+      "output": {
+        "path": "assets/comics/es/hall/issue-10/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 683348,
+        "sha256": "55ba843b766671d1ff1b14b5f32dd1357b0c233ab011e7df32915cefe4ee9c41"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-01.png",
+        "sha256": "81e1404c7edc41ae19b07a35289ee56d8449dc26f812d6ce81fb3bf3fcbbc48d"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 632732,
+        "sha256": "31a9532d722dd65f6bfa1f78e5045ed3153d9fc45ef327b5e344ef4102d13f07"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-02.png",
+        "sha256": "2429bf2492d8ee2315517a92fe33d7a09bcd54321b891ae7aa9d3fce41afe85f"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 693372,
+        "sha256": "708402b1b0a16015ec29d5074b877a22f6e4dd2459e5f647095c2f882996a84a"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-03.png",
+        "sha256": "e73ec209084e937a47d08182cff777c5e73fddd96b3e281a0b9b4cfce27ea984"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 720506,
+        "sha256": "c0390ecb921c15698d0a92e0cb8dfb49428e863b3c7e2f2445ef91c0c57d16bb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-04.png",
+        "sha256": "b1bc019a0c0dbeb0bd43ee3fa696ffa521cc28456ad17792657504681186c957"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 709636,
+        "sha256": "04ff5be8435672e08c8ea2f1a51e5d3831f72974d3f8667bff9e71076e77a088"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-05.png",
+        "sha256": "60f38557328e6e75326a9be7abc86b9b1aabe21fb2f5f382aceefd77162de125"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 648768,
+        "sha256": "29388ea842a6cd5fda7c7c721de6d717ce051c2bc8db3819e72544883f4e4efb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-06.png",
+        "sha256": "4e1295f89bf48a219bcd877bf5b85e114db04c5ed5d9111cfc8b6275be64a913"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 656498,
+        "sha256": "5332cf5a29229b63415a923ce4ed064dcd8aa4ea5b5a89f4aab0756131cbe5bb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-07.png",
+        "sha256": "4359fafa9da125652f198188841572f8db3e0eb0a8d0d62ab3cdc8b40b08d2d8"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 664126,
+        "sha256": "bdd788b67897eb174795084d13d7eef212bf0cbd729605ec7ff36d085814dfef"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-08.png",
+        "sha256": "fbec3dabe6d2f8eb0fd92fcf971056f1457b271c7b8f39536d6e712faf85d606"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 628614,
+        "sha256": "dbd5ce65309841f907c62ce7cdb2797bf15bb0affa22161dba16b8d08c021ad3"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-09.png",
+        "sha256": "8375822bb9b91c96594b1afd39b1a829a8c9d33ce6d61fb3490d7a07a1ba9aa9"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 599814,
+        "sha256": "abc3916436d0978dffc5fb41a2bd27d6aea2dfef2428a304ea5fc33694074fc5"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 10,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-10-corrected.png",
+        "sha256": "399a73775196c59bbc008dc489e6dc1b9d494cd8f8c6cc57a88b1cb1694726ab"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 488744,
+        "sha256": "8a72aa0866e5a05a1cce75913f14a8df9537499dc4bcc58bcfc151e74f9c5f7d"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 11,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-11-corrected.png",
+        "sha256": "c10a4f5d49b36799e7d8289b4490d8fbc08f547ed6802f1dc5014e6fe779dcea"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 600848,
+        "sha256": "46ab7e414cf9d5307d1a8f64252139bf28bf4dfac91f6138e709ae367ce6114f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 12,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue01/issue-01-en-page-12-corrected.png",
+        "sha256": "9e6bfebffbc7a484ef0f76e6a15f6d3ff56b34a64679ea028aeeb6770dc7a0b9"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-01/page-12.webp",
+        "width": 1024,
+        "height": 1535,
+        "bytes": 628838,
+        "sha256": "0e332886a8866ad605c3002acd372b3fbf8181ab610dfae647cec73a489a2aed"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-01-corrected.png",
+        "sha256": "e29bde702825bfd00db2ad091e692e7566f653858a4899bb3a9e57922525b147"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 654760,
+        "sha256": "205eed9ac2ae467a7de10b0d45571bc41bce680d5a75dd9a31ad092f3416664e"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-02.png",
+        "sha256": "a20319d1c0ddf1d4b3afbb1a6426750b2a4ebe9aab73bbe8d6e5b644b08465fd"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 651468,
+        "sha256": "c7f8ace0aaeb85908422a9f3d245b0f938a00e742e3fae087cf329fce7d56b30"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-03.png",
+        "sha256": "f428d5fea846b8a83375fc8df709f9fc95605de74271fcb8ed3d1308327d0a62"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 654822,
+        "sha256": "795cc1ac10a073523638a34b1ce78790a81491be2dcdd036626b86bd68600e3f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-04.png",
+        "sha256": "2bdb6d5466050030e65b3bec243d40c04cf3ae937fc0395ae84ac750ae8f5332"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 680586,
+        "sha256": "231d315311ca6c7d5f0b9dfcca6d79b800b526b133fff89f0361b55f7921e1b0"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-05.png",
+        "sha256": "0c59cb219402f87c8b1a81c5f0988d2fdac6459ba64ca840e4968cfb119d9ae7"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 579314,
+        "sha256": "53e9c684d169819762d38f76e5abbd798a1079fc7741b49cc4e5fad12fbfd408"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-06.png",
+        "sha256": "b16aac495d1e5a56968249dff8a2d8df46c18153c9c9bb3bc0f58e3eac3de3da"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 612978,
+        "sha256": "bb09e5398dbe75208a902423bbd3fd6fe14105a57dc16bba54ebb44c4f37f79b"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-07.png",
+        "sha256": "9d219852ee6b7d6aa64f34676232ba62cbc6a7e053e3fea11fa7fa3f76569738"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 635208,
+        "sha256": "fe750ccb5be30bb25d9efbec4c20841f70bde90e3007044be29216769332a9f1"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-08.png",
+        "sha256": "84a70ec48adf310d9643ab32f298c8fa520b3a6712da664a1004c0cda9022904"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 630694,
+        "sha256": "ec9cf686d6284ce53f69a11d71fffa3b126ab9170331c43c709c263f7c79f439"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-09.png",
+        "sha256": "f731d7a6eb789c0e9633f3cd8e94a0815a57f4c2cc92cfa8a248e5ac72454bc0"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 652310,
+        "sha256": "425e2d92da54769d3cd70a52078236b0acf7301fd86799156db61d4f189b06db"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 10,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/Corrected/Issue02/issue-02-en-page-10-corrected.png",
+        "sha256": "87031cfed08a6b7046bd3b69ce7c0ca0cff13427111ad98ee28d992f7d21f363"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-02/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 590808,
+        "sha256": "13b140043c5369b39fe91b8d1770cf5a396c1bcc6ebe73db4ae9471f1c6f81f0"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-01.png",
+        "sha256": "cc5ca2267cacde896ef19ddc6222f8bfd2a3c1e6eb696ee1577a41f199549d1a"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 678646,
+        "sha256": "c503ad5a1c1799b45b8e50765e07fc52245bffa8d00ac77ea7cb4b91ad6f7300"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-02.png",
+        "sha256": "f40c51c7408cc67f0f4e0b71330be5c4cfd491dedae3b0b0c0230b4fd0afa073"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 683570,
+        "sha256": "74c11cea104a3f5cf983737d993a677aba117a09740ec657e7390728b1bd1240"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-03.png",
+        "sha256": "d903cc577ee4c55ea5a0886569648eea2d4c18377c8f3178cdb4e8779ac90f80"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 605226,
+        "sha256": "381af58d15535efa838860405c56fc5ec476f225ddc7509bbb7573c1708dd4cf"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-04.png",
+        "sha256": "1622b332be386d08ab37672288283b8614bf94230c42269d5eff5ec5fd1d28d0"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 652958,
+        "sha256": "6d25528dab5cdeed12adb982af79c5c9bf49dd24bad0be8fb0ca9cb209a60a8e"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-05.png",
+        "sha256": "98180c18258318c278d8b94091427a2dc2b88fcea3c74695ad0a868dced92af0"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 604314,
+        "sha256": "2f70c70ac59217f9e06556dcdec959a26dad59e14de1102d9d471f04c68a846f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-06.png",
+        "sha256": "2f5994c2fcf30735518fa7d920cd4ce465948de9f9ca9aa9f16420cfb1b9a4f3"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 583660,
+        "sha256": "5fec344847631b302467f66db6f1ea7dade548cf9df99b3803540be1a4051399"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-07.png",
+        "sha256": "bb3882dfea97d564ea894acd79d6e24e33f767b388fb2e66aee009eca88a81b6"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 603350,
+        "sha256": "7694f2c9fce41239c0f248b7cc56b0b1d801b99850e82960410f0aa9b3baa3a1"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-08.png",
+        "sha256": "6ee6bf4644aa11cea9567c8fa4e6366fb781f5b166b7af77271bb44f62828b73"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 621606,
+        "sha256": "ec37df4ca12cf97ee0b8e4e8bd8578460a60442cf10a87194b257148000abbb7"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-09.png",
+        "sha256": "cda1d7bfc35deb5ed10ee9bf90fbc60de73eba5e310e6bc66202c8d0b1b8c2c5"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 631030,
+        "sha256": "b23c9a46aa7fea122a7e472dc8a4c2d0a35607ed9332cf64cd71cbc063193fe2"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 10,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-10.png",
+        "sha256": "198afcd781b9320678d2273746fcd838803a3230efa2300fcfa53c56c930b7ac"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 605234,
+        "sha256": "878c7ec5df444a2f892b3c00c3dda4315bb3a703ee306bc1a1a0dfde200812ba"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 11,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-11.png",
+        "sha256": "6c242c8f82ac46e773b6e6b6ef7d68323ec4e5f1fccc67b8078b5c1b10f6d286"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 564422,
+        "sha256": "4920893d0ded34c616332888e96b48b9cb44dbd29c6556fe16fd452eba9dfefd"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 12,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/revised/issue-03-en-page-12.png",
+        "sha256": "8d1969bec0d4e9285cb428e888f34cd7da5b5c77234abf3e426dcb218b95a5d7"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-03/page-12.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 686904,
+        "sha256": "d328455d1d1c0085622b07a6f7b3c6780b6c400053aaae54e11e8e50519153c9"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-01.PNG",
+        "sha256": "25087eac3bf164b3a5f079d456ed90f3d9869a650ab43e63556d9eb8d73de40d"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 530072,
+        "sha256": "928a130deb4126c778ec9610b7be021fd202129a1870600942450ca71d1a7c24"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-02.PNG",
+        "sha256": "88c6ff13b9d6820ee7777706b200b2047764d7c28497f917b0db26d832f2e250"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 482538,
+        "sha256": "f24b4c2ba828f54aa68cb3a8c4c69470d22326688a6bd9d703a286994ab595fa"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-03.PNG",
+        "sha256": "fbd33486e8b8127c75e38655d64dd067559b939290d7b48874223721f73eff2b"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 543932,
+        "sha256": "0acd7fa0a502b0cf583dc7f85ac853ef5a4b25e3a478e9fd4232f4b208c9a872"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-04.PNG",
+        "sha256": "7acc2c8f921111e6e94a826037a6a227d657f02b9c532abb07f0ed0b9c78cca6"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 580498,
+        "sha256": "7d7e37c5602a96bdff528a9528515f24ca589d77ca7bf06b8ec212e84fb216fc"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-05.PNG",
+        "sha256": "6e97f89421de5895f581de8f3039feba50a047d35087781b0272eb53b56c0338"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 507992,
+        "sha256": "c2d48b8f64400696d10ea90a08b390f249967d46f7774c97c8a8f7787a9885a3"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-06.PNG",
+        "sha256": "972e0e69b553b53115a34dd5fcaf0c469a92bda014f2dd17f30263bfecc5268f"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 512034,
+        "sha256": "97a1bbb58474900439693166f3176169e9d739ebcaa361837190911b749e3894"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-07.PNG",
+        "sha256": "96a3dfeb992e0807483b7c040cb67b4deaefa24bcb0987a8f64c65ffa8f1b995"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 615290,
+        "sha256": "11f604c4b228549369521030e339e79b9cb08aa0f91eabbd9a62d017140dbbdb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-08.PNG",
+        "sha256": "a3bb186a6dcc71755b9115e821bd5f2553c1ce8d9e3f431c3a86b2eb2f2c00b2"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 569740,
+        "sha256": "bdc1c628eecf56dee0d2ffede141407952d0b252ab866521f7437e570e03fd83"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-09.PNG",
+        "sha256": "041b23171eb8c56ffa66efdce9988354135ec31040f26a1a9bad0ec4bc2518c3"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 626032,
+        "sha256": "29103ba45ad8329d6fd3d281be332223728f81c6ae8f5759cae211193af0c26b"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 10,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-10.PNG",
+        "sha256": "6417b024931df57c14af2918d5d4f7f60b33255cc5f4d0d9c34e6ea1ad84a4c4"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 569564,
+        "sha256": "381c83e9e7c12c78f3c5d3be85cd2775fa8ad0b9709d8f396c6f1a75c4c964ad"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 11,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-11.PNG",
+        "sha256": "b16c8223c7cbb20e7a958415fb69aa4d593f2335dd72ab7227a90da0650063ef"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 600156,
+        "sha256": "5d63ab6b9c292b42082380d92889379327fcb4ce7faaf2034263ee391842589b"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 12,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/revised/issue-04-en-page-12-Epilogue.PNG",
+        "sha256": "56baed90160b4b8db3f94bee16336f29981e008aabf6c36d1b8e95ab6ea58342"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-04/page-12.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 523162,
+        "sha256": "9743cfec7d8ef6940a438ac09304523db7987c285f131439fbd02820de7ac4d5"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-01.PNG",
+        "sha256": "a207b2153e21dfc7de455ce48d1a51491a8e20841197debd5d6ca80139e1d654"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 498282,
+        "sha256": "f03c8d572e020962ddd8a436142d7dd9add1a7b8fa435d5ac64429dfceed3bce"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-02.PNG",
+        "sha256": "682bc8059c22167f25fe1d9890b631b24b1fa50538d69e1610d88857d6f92b8d"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 529582,
+        "sha256": "01395aed85c43b40a00557684e728738853c199284b89ba368faea65d77cf360"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-03.PNG",
+        "sha256": "0904e77039f0876bdd0f897f4298bc2e1f56e59987a1bbdd2598a1440b5641fc"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 543488,
+        "sha256": "e995cf4894ac395601e100b147de403d79e982cfcb0f000fbad504ef050dc155"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-04.PNG",
+        "sha256": "32a16172532a14dbf4c9b1aedefe9a14b183342854512da98b366eb04a817ba8"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 471154,
+        "sha256": "8ce9bbc9bcc6f525dde64a77b81721dbd87407ab810de9e868555dc2276f1145"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-05.PNG",
+        "sha256": "005e689d4727777a91351fbf9b7eb56baf27ab7fa4406c095dcc6489f1ab0762"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 412526,
+        "sha256": "246cbe88b67400db60ab0f94eea821d37742e5dc6925d59e20875146fe1e3169"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-06.PNG",
+        "sha256": "b44db4ebdd9140760115c26010d77d6f9a76cd8e0411a24f4fed47255f6b6274"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 503730,
+        "sha256": "0abc0a18df3ef6ab4a60750c38386a66f8bb506ba384e61d636721ec1757688e"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-07.PNG",
+        "sha256": "b1d100ee9678cb4f0e13338942a7b032daf367fba5fd7694af3e0da268b66850"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 527420,
+        "sha256": "a02283b10114d3c69c436211afc1ebe2ee2c1ab4d61c758fcf8698f115552532"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-08.PNG",
+        "sha256": "616167d64ca77180d47c0137f0dd8abd4a7e3cf9e43f9f7d99df636056003358"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 594730,
+        "sha256": "bd4b22ded3676c0a1669eadd36f16f10c732dfebf9eba366a1c11271c4a77513"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-09.PNG",
+        "sha256": "1b0118dc8b9f0351dd1ee6d54cf80edef5c8997030c5bd1fdb4c28f8135e6b61"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 515300,
+        "sha256": "0496040b2878fa4e828c7e8c864e15f87f24dd457c2932dd976a231844706cec"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 10,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-10.PNG",
+        "sha256": "6b0440bb1cea11b797933b68e61c913e01683c30ccc7feffb6b1dc8090ac39d5"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 489124,
+        "sha256": "16d94d57afc3945756626cca81180c524f708bfd8b41b504e16b96997a8a0552"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 11,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/revised/issue-05-en-page-11-Epilogue.PNG",
+        "sha256": "a5f64f2d36c271108d1de776cb92f8fad9331cd7745ec6cd3176feae604ef8a1"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-05/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 588998,
+        "sha256": "f1f2ba41e3998a2eeeee66bc8c7c34b6068d99635bf6af77c489a1c4e84d8f77"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 1,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-00.PNG",
+        "sha256": "54567da7aef99506371a93ab489b6a05750e01a7ba1b07f271d77c88e28eb082"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 523186,
+        "sha256": "7d96484ce3717ba1b26313764ee0c7c3bf3df7883592d6ee321b33ffa03c9a0b"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 2,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-01.PNG",
+        "sha256": "7e258b604b106c3e42967014025c90efcfdb3251508b28a8d4afa953fd1ac43c"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 577790,
+        "sha256": "ca33d921d718e5d864a0d82b59bfde80f0565bb45beb3cd502cb06857ea8518e"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 3,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-02.PNG",
+        "sha256": "3129bb2e9c113fd049b2af9ee2ce9ba817cf998c7585a367cf07a2700862d22e"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 580620,
+        "sha256": "a76cc7d5a845a9be27ce76ac6cfaec0081252ef847a04de26766fbb2b40d8227"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 4,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-03.PNG",
+        "sha256": "052a389c54bd7dbfd3f3419edadb6fc07bcd49367f2bd1560d6b91855547e107"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 578438,
+        "sha256": "e3732b8cd30e9ce28096f9db451c530423755bebe3be5d364b5c9999b2fc55b2"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 5,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-04.PNG",
+        "sha256": "eae4ef5e0afdda9ffad394cf414a143f653bf0991caa85d6ee4945f0b2ebecdc"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 596270,
+        "sha256": "29be3ff52a5084c88ced9da6b338e53006bcfe2e6f718fb96f342e3e83dd08bf"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 6,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-05.PNG",
+        "sha256": "6f074f750aabb20a8e4d0ca26ecb649cec35409309af14f53d473a9ce55c2485"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 572022,
+        "sha256": "23d0538bc04ec10e7964afa53b8a438e4f11e647da469e6cb2f1ca1394fbf5b2"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 7,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-06.PNG",
+        "sha256": "54e980f16de2c38f6adb545b480d55647dd11e6fcae0ea66d8ef5c99f677a314"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 555018,
+        "sha256": "7ef039cccdbfca3760e024006017e7edc1fa0dd1a36d943ec55e4e335cf1d0b9"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 8,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-07.PNG",
+        "sha256": "dc48a8c474f08a246032b84ae61827c5bdc1ac27f0f3c884de180490011f2532"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 563148,
+        "sha256": "33bf52495668f97156396ce202826b7be336ab539c9a771f76480eb8b70173a3"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 9,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-08.PNG",
+        "sha256": "4759e6e7b4be2271bd29b1dde576834273fc27474127ca1951024158d82c1452"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-09.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 515922,
+        "sha256": "80a8e5ccb349c8c536b052ec51141db00cce41a2857b91dea91c9cb5aa054a9f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 10,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-09.PNG",
+        "sha256": "e868c3b901baac2ce503a6de3495080b9e652c6a20b471271d235303097d29fe"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 547042,
+        "sha256": "a5994d3f65549a108b134d917db03cbd013d49a8cfc8f3ebfa36ecae8f49d77d"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 11,
+      "lang": "en",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/original/issue-06-en-page-10.PNG",
+        "sha256": "4b209329228f7b348b1f292dd47500e663b43f3dcdcf539ecec73c07fc55093c"
+      },
+      "output": {
+        "path": "assets/comics/en/mainline/issue-06/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 429640,
+        "sha256": "8adfc74ea723c94fca5b36db5d492d4b30d7c57dcef8c0f31da4bd7cb98694bc"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-01.jpg",
+        "sha256": "154461eb1e15f11d0b9e4f2914b280518e16eb15868b6a91908a7f2baf8c3b5a"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 568112,
+        "sha256": "f264ef488d55a1b5faba54627e87f5a4f0c67b9bc1c134b08295cb8fad14bb3e"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-02.jpg",
+        "sha256": "282f378751a2a379365fd0a19df957f1588ddc715abbeb60a3b017dc113d925b"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 628716,
+        "sha256": "a7c37691233cd9b5851fb9b28da6259962443a1551e46d5b0469aa51df5cdb8c"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-03.jpg",
+        "sha256": "61e58af8fca1925dea503f5e86f0077b9d99275ee5d6f204600dd392f214d8c3"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 615150,
+        "sha256": "45c1d8408df710a351bd6e62f535c9021e048e8f5e38f2276de1bdb8c22b8608"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-04.jpg",
+        "sha256": "f01de60474ea6d4ec8fcb85df338443dd8d261ba7afbae6c21d9e4dc812fff18"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 581320,
+        "sha256": "425b05d477aef0f04d1ac7a67221e62340fc35e65b5b504315561330db7ec0ba"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-05.jpg",
+        "sha256": "1af82a6c028d73381e8545d6655069c8ed1129c42f58857b1ec5823b12b678e0"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 557196,
+        "sha256": "9661fe61dcdaa68afd9372730bbc07d0351dd51ee0badc03c439af6f37493498"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-06.jpg",
+        "sha256": "9c05b30ab6feaee8d87beae6667de620450e78d85f3cc515aff3dc91d5a03f9c"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 592226,
+        "sha256": "104733eee10597f0c9d0a0c919cb27b34e3fe25cc0ab89ba2e6152cd4841c600"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-07.jpg",
+        "sha256": "22bd4a490367b3bc5f73f657b457fc9b1fc60ff44a17d46de7637b4dd5a48f78"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 593554,
+        "sha256": "e8165eaca9dc327e0c54059991f75ecf73d77aed334c3233ae13a5abe667ef27"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-08.jpg",
+        "sha256": "5ca2a747dc211a6960741bf7da2ae6f5e084aacb1f6f717a9620df4a09dec43c"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 551442,
+        "sha256": "93c1111e4441e678b302b56f98d079dec35c73e4104b860ec9b4f8b6b21a8578"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-09.jpg",
+        "sha256": "a3c6fa578b5651e44dad937d843631af78df6f5a0b88c9a27fd760695ed3330c"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 564070,
+        "sha256": "d25d8a0eaccfbe7a943b35e51e0d52497198da07b9740737970b44efebb4eb21"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 10,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-10.jpg",
+        "sha256": "56ccce60291ca0a96f1bcf5d9cf519c1f22e4fb6f83bff9b71d6d8866dc3a974"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 474024,
+        "sha256": "3dc32779b759a41745162ceb7bc85574437824f6fb8d3513fc0023a9b4367a8d"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 11,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-11.jpg",
+        "sha256": "b4381ede145d5c2635865cbb5eb04add990503f53e4af5f74a57957b25962185"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 582064,
+        "sha256": "b781405836a99bdfa360bb92fc07ec63eba146f420a83b56db4a47ec5fe054ca"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 1,
+      "page": 12,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue01/es/issue-01-es-page-12.jpg",
+        "sha256": "e944cb96df322db27e7566cf0502265ff74fe5f11ecf8640cd3ea787a12436b1"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-01/page-12.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 602062,
+        "sha256": "86eb693f68f256869c6c52719276f28cb003490450f8510f5d007054d0bd5547"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-01.jpg",
+        "sha256": "5781223a01ff04b417cb4daeb76d31a446031a36dbaaa7b331b7be213e0ca7e3"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 536146,
+        "sha256": "829455947097ea6cbaa0054b16bca7741ca10c864944351e0a375e98a5e4ab36"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-02.jpg",
+        "sha256": "eb0b5437f1b321a3bc453c4a9abc8cc6824d18c7a4769fd3bffe4c75a4b90394"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 581738,
+        "sha256": "9131e7142a6300f67c9a2d441af24c083736fe79d6c329acce0525f7d4bcd15f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-03.jpg",
+        "sha256": "8398b120b2640016f64a5f8a239d5fafe0244bdb3a2a7511cc800705dc656ac0"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 587054,
+        "sha256": "b071ab0da0260b110e0f6616f586e1c929be237ebcab1df78b5d308090f2462d"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-04.jpg",
+        "sha256": "046d62a1b47a6e393d1eca5b08bc1d99b1d6469e514a4552683fd0308488e1e9"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 611920,
+        "sha256": "5db523f7d26dffb1e9ce4fb9b072cc5c74ac817ac1abcd6361b77120d7523ced"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-05.jpg",
+        "sha256": "3abe913ccd61e093e4deee4118f1d58ec8f320cede472ae8e41389a3877f8290"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 530932,
+        "sha256": "da8d149a2375de45108be5ce2c9f7e5eee30167e6f561ba5d6d4001d058001ea"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-06.jpg",
+        "sha256": "3cffa2d69f9e84296211529b12994b01932857121fdb29eb6f6eaa1fa2f38fc5"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 566996,
+        "sha256": "51c8ee1721d527d5c7648a97501c7faf969169fff457e0e0523a9cc89b234458"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-07.jpg",
+        "sha256": "75b625aba0853eb4ca024c421199c1b6e75ba14dee534e8d2de2174ee734054b"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 557152,
+        "sha256": "1354a4c1ea8e0d2e24665ce6272fa2e7851b071a8adde8717859231d5059d833"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-08.jpg",
+        "sha256": "db85ce3f186c3b7f5a132608605c462c9f3c2fa5b160c0fddc687b942c7dbac5"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 563948,
+        "sha256": "4e0128bb6b96f1f05f6f69f67ee86b1326dd208e93f988827bdbbb9678bdd8e1"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-09.jpg",
+        "sha256": "e43cda09928b0aaf0705b1204f59898c07028f0723233477d38a6f5d451cb9bd"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 587688,
+        "sha256": "fcb43a44c20622cb5e5bb313541b912dbc93415130d24112a92999d8f1c4b6bb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 2,
+      "page": 10,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/Resources/ToneComics/Issue02/es/issue-02-es-page-10.jpg",
+        "sha256": "adbc218869e69c1107a4f59d70116bf2f12905e071b1a83dc8c89d3b4859ac21"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-02/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 568748,
+        "sha256": "ed7e89afe395a1fe7149e0706a71bd26532508861bb01fe3c0cad9d7e3c48abc"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-01.png",
+        "sha256": "13bda51a49573d789893e33415a3ebad39d011c7252a6d6213865a6a93589995"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 634734,
+        "sha256": "16050e7e0eda22ac51d4127b39a04c2f19bdcbe473a22176f2b9c24f7122d7bb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-02.png",
+        "sha256": "1106f3947e116687979dba49043afaba46a83b9420bdcf80b4f9a869d0978459"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 628248,
+        "sha256": "14d062b3ea4788b46e52d103e8d9abcb1f45fb87e089b088f0ff6d8f172e4908"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-03.png",
+        "sha256": "58d20b8ed892307e82600e451c7bf215b806e7b11f228511593b14fdf0796fa8"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 590596,
+        "sha256": "05ffcf02b9dbc444b508558864d78d657847984a16b1ef02b4ddcdb4375fbefb"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-04.png",
+        "sha256": "2518013b7c0f35229fd05e24131c9b8d82a37960554dba2265713815b4c02769"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 611412,
+        "sha256": "f707e77700bf89143aaaf6983567f30f4e48aec78a2e985defa2f627f20249b3"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-05.png",
+        "sha256": "3ddee59eb7d08b9046194472841eac6f973bea7c4d652aecb68447a1eaf7c910"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 579912,
+        "sha256": "d0db46caddf85dab1777c86947e4ad1d6de80544e4d057e555a47f171a9580c2"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-06.png",
+        "sha256": "fbaf83a720ed123abfe923b1338be8c09d623d06a21f85b0872ef7fc034d8c64"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 584650,
+        "sha256": "e626fd8fcb45e4db1f65502e78f4ea8a4b4ddc60e780818c7a1a18af1fca2452"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-07.png",
+        "sha256": "0eabd8b0bc33c25fc37e4748d0a1130a65499074c4e75a839173e24d373b1355"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 593688,
+        "sha256": "44a4c48c66cdfee98cce37ebaec3a985e8d8c934ce483b8f698347fd30c7dbbd"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-08.png",
+        "sha256": "af24e8ec0c007324bc728f8c80e2b316a7f2b4061f6878473d20edd82d10ed8a"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 596412,
+        "sha256": "27cdd40b0bc8f16ddd420bbb3d394180f58991359e2525afec3e99396dc72423"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-09.png",
+        "sha256": "eac56c557d87e5a4fce35cd9e270459061cecc157e1f2e88b9bcc1aa54e141ee"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 617778,
+        "sha256": "f8cc12160f02e0c4e7c84969f6ec6a7499212e73350a95638e9357b70a8f4be6"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 10,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-10.png",
+        "sha256": "3d23dd66844030f9c7140cd989356c0571d23a8082138f5885e755bccef0208d"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 584948,
+        "sha256": "d543c9dceca4d0d74410e08034b367081136f330a0b37d15ed6c2a0a3ac64491"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 11,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-11.png",
+        "sha256": "6c689cc4bd3e868e657aabbc833847e5d2986c258a645fa7ecea4159fd4cc842"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 555648,
+        "sha256": "e9c2edcd9e927381984bca9cce461eb7c7a577c64fcc91f117bce5cefdca6ea3"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 3,
+      "page": 12,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue03/spanish/release/issue-03-es-page-12-Epilogue.png",
+        "sha256": "d6e5cba6abd6cf8c4194f39a09a6ea8253e5d04c8d23bae3f391956648d38cef"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-03/page-12.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 650784,
+        "sha256": "1053707ce106615a8100c83007675dae532dc3f05e5968c28bc395f2681483f5"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-01.PNG",
+        "sha256": "901eb860e6c9a5050b484c5b923594e989d2eadb88fc6b364e14947a43cce63f"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 525238,
+        "sha256": "ae0119575edfde5a2d0bb6c9ebbe7d67d97ae6417212cec0e39f794914fbeab2"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-02.PNG",
+        "sha256": "9e22529df27ac847913662b957d64dc52739a3914d3702caa38cfa13334a946d"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 475454,
+        "sha256": "c851cdca6791486fbaa728e7b15a9af2135aa348b8c02a854ee9cab02b3052a9"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-03.PNG",
+        "sha256": "5d20ab54af8be15bb939da26dd90df5dd9bdb430d2eeb3044c122c2eb30f1457"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 542838,
+        "sha256": "08849d7f0b14f4a70b6c0215a64dc3edd56ee076ae34cd404c9ddb3e9db095da"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-04.PNG",
+        "sha256": "c188d21cae0fff2773be70090724d1d425a5fb7b037fc9ffcab77aef07b3914a"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 573804,
+        "sha256": "1b6fdcc78ea5fae63e05cb132df82ad56e4c107577f192938d38c069056a40d0"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-05.PNG",
+        "sha256": "db8dfe6d342e4aa4e80e31a9a8163d82c7ac1a6093300a61e95e51f831c504a2"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 494426,
+        "sha256": "0f1a3e828234aec17f27b67fc3067f3a4aa23bd6764259ab0f67663d0565a917"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-06.PNG",
+        "sha256": "bf2af3878b9d370945171e7982760fdd04957c1ccd6bd6bf13aab472a2d12f57"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 494406,
+        "sha256": "a469f539ac9404dafc754ea03f6d604802d64d0f187c8bdc1c27a3e2bd5f66d9"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-07.PNG",
+        "sha256": "4da2b257bef80d5584d58caff971be3630821f39325d2cf839ed55c9d12a6e54"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 606598,
+        "sha256": "452b28784fac782a1d87be05b747e33cee1980613c27379525dd6366cb26eaf3"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-08.PNG",
+        "sha256": "415674c90f29535a7f70b3b29450cd30805cbf6cdf5d1dcb4a72e0181af616bf"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 564734,
+        "sha256": "b2a5109ecfe4413c043304d7c64fdcdedaaab876805ac9df248a622e36352fe5"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-09.PNG",
+        "sha256": "c5164263d767e69bad7c6132afe45f3b82095ae55d22d301a2da9b5c3f40aebc"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 610120,
+        "sha256": "a27c4abdfb3398fda352a4d1078cd995f8c0ed37963aa5d71d792fcee8720198"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 10,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-10.PNG",
+        "sha256": "0df53a9cef411c7279375a1c547a7178e9840142178aad4a894e6f718e605bbf"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 565498,
+        "sha256": "d1464a352867febb0b1647491664d7bd9a5801cbc05d39261b84acfe10f64855"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 11,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-11.PNG",
+        "sha256": "c83966ea505909ad9f011e4a584c23d3c21a1e4fe94b2fcbd464e7e5941bf571"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 592962,
+        "sha256": "ab7fa7068b79a7c9ea546b3e4615d113c4cd3e8026e748d1a965e593581d7b33"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 4,
+      "page": 12,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue04/spanish/issue-04-es-page-12-Epilogue.PNG",
+        "sha256": "599327945c1e7f0f814e6cbbaf9727dc354836d15cb1a263edd2479ccc8d6ca6"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-04/page-12.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 497636,
+        "sha256": "f828ad97885c5c81829244c25efc2c71020b05b0d1d4a398b1a997aeb3b99d0a"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-01.PNG",
+        "sha256": "fc2a43965d3a4593aefc0e51b3d65279a807ee7a83de093e443b369887a060ed"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 491048,
+        "sha256": "6156ba0aa181e3c3f1c2bb0781a11ed86795ac8a4b3c7ca89d19924bc1b4ff8f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-02.PNG",
+        "sha256": "c2955d1e973834aa912df17150cad07ab6a42e633c21c2a9df6b7f52158f181b"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 526794,
+        "sha256": "5369c18ee5cd2e406697255deb37a3be3e4472efcbdc92d547765ea6e6160c58"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-03.PNG",
+        "sha256": "5d29c3cb273a88f3cf766728a66eae67325bb3808df2add388ffcc4fdbd5e1d1"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 539168,
+        "sha256": "b2220da7db2767e02b2e12a5b541bd13b8a77f106f1021c0eaea66ea9de524c7"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-04.PNG",
+        "sha256": "9f057d651a5c94b07a3ded3339156116cdf41567861dc13e35c4bf5b67b158a9"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 470492,
+        "sha256": "1d28245af3bfd063fe59405752b56f40fa2fecd6eaad0ac2aba2a57ad24de182"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-05.PNG",
+        "sha256": "04ad66415e68dd408187fd58ff74bc4c99ae256772ba4e25a53fc5e02e05a336"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 401838,
+        "sha256": "a56dc7a610cc544f79a4b30b5a33ec4ed69345c91e0bf2038e3af593303a1b02"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-06.PNG",
+        "sha256": "d96be2b656a5a2543f97b383071cc4a84a4376b5510e9a4a6d9a56ce4febeb14"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 458636,
+        "sha256": "b1dff92c0df601a6274fe5d2e2c37b9edf351e3cdf657f56a908ea2a03251419"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-07.PNG",
+        "sha256": "7750bd58a3478f1b752b335037a9bee6593501bdeca1f6bab7c275f52461488e"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 512268,
+        "sha256": "08d869cda04d54f1aa0151d245bc2da3bf391c71dd8056d0cdea882371005321"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-08.PNG",
+        "sha256": "a9dd1fe7707e5bd9659eac222b079ec53da3ff2e58583111246b8b72c13ab693"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 578744,
+        "sha256": "ccc5aa3932a738416740ba592410924ef735845f966a013bc5af7d37445a0e5c"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-09.PNG",
+        "sha256": "68a0c0217bb7c42b93df68d4bf1e7fb8676bd9c96d7cd9de8be612c1c9c5336f"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-09.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 502482,
+        "sha256": "72c7bb88577e76ab941355805e1889791eef5dd02fe095df56aff4b603ca5754"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 10,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-10.PNG",
+        "sha256": "adb8ed6805276d4e28ae4a9d5c0eeb5a0f35cf2a5b79890d744a551165ca9979"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 472014,
+        "sha256": "e5a5a859dbb5c66b02ec46db7c859a3961606c538e0dd32f7ffdc8d56ad0fe51"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 5,
+      "page": 11,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue05/spanish/issue-05-es-page-11-Epilogue.PNG",
+        "sha256": "ac3ba7e6dd063e9685584a01716eef8495598e4960cd669bd9441afb27d55bc4"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-05/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 574054,
+        "sha256": "b50226b6f78e6ddf03f896f52acf2a893efe34473ed66c207b82032691520489"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 1,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-00.PNG",
+        "sha256": "dc2ce78643913732b7ecc0179889a7deb16457f5e9c47ca1244edf874c17bc49"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-01.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 511316,
+        "sha256": "b2006566b9441846c61c9763db8e67066908ab6cfcaf6ad192d66c8ace2b571f"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 2,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-01.PNG",
+        "sha256": "ea8db6c6012a7ce078097bad95594c99ee1c8f7005114f7b4b25864223d9dbc8"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-02.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 574784,
+        "sha256": "ec0ca9ae8befac7e4e95375bc428f2244f993f2bb0dfa6c17f525e7bd3524ad4"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 3,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-02.PNG",
+        "sha256": "71224d25e3e6b7c05fd3909d3faaf478cb405f2e8227dde816b651da7f97a052"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-03.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 579730,
+        "sha256": "8aaf371d17fcd5a105e8b20877e39c5ee8d8fd0612b7679e11622137c3d63893"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 4,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-03.PNG",
+        "sha256": "b09f4dfe9f7b44001706ab13126bc85685743ef939cad5065f889bf2482f9583"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-04.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 577240,
+        "sha256": "64692df7c312531069c12a4ad0ae74c9d359e6180ac234b3d81119a2964d7bb4"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 5,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-04.PNG",
+        "sha256": "2e5e97997295040f36c7face507468dcce53d0e6416509e9733642d738fc08e4"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-05.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 593654,
+        "sha256": "2063955da583226655fee45d3a2a6b95e4157127f46d14119478407160eade53"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 6,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-05.PNG",
+        "sha256": "e1bcb27197e59c0226296e5aefaa2ee2b5c31aa9064d3359fd07d5810ecddea5"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-06.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 565392,
+        "sha256": "fd213bae3a817273298648e0b67179d3e510e130cb9d06283735fae3bc1cb388"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 7,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-06.PNG",
+        "sha256": "ead9044d21a3603f486b8c374b4782e1fce30f52371d7cc06ed175f615b53ce5"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-07.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 547120,
+        "sha256": "b6d50d8ea2a2f2af01c50b526719ec3287b5b7217382e1664638971b83bf41d6"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 8,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-07.PNG",
+        "sha256": "51ee8c5a7a7e8444e6cfb07cd4550befe19861218d22fc131f3220568a7af5e5"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-08.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 551704,
+        "sha256": "08a82225fbadcfe72bbbebc32259b09e29acde1ecb5668dfcc61c41eedad44ef"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 9,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-08.PNG",
+        "sha256": "0e39fba4207483153087207f3d26ac252e54b7b5a276d1f4d3f0c7651c06f146"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-09.webp",
+        "width": 1023,
+        "height": 1537,
+        "bytes": 512606,
+        "sha256": "1d097ac0c0f5a3658fba481885b50903467bf07300a47364b0146884a148d12b"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 10,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-09.PNG",
+        "sha256": "8fa92891544e7ae24dfdc6c1dcf3dacb41c608346fc3f1a889652c662bcfda99"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-10.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 516604,
+        "sha256": "23ec0a358cb4cd4d9c06c9893a5f499399893b19a1718843c06ca44a79ade31c"
+      }
+    },
+    {
+      "series": "mainline",
+      "issue": 6,
+      "page": 11,
+      "lang": "es",
+      "source": {
+        "path": "ToneApp/docs/tone_comics_source_archive/EditorialPass/Issue06/spanish/release/issue-06-es-page-10.PNG",
+        "sha256": "395ea0c9efcfed85b2d45db6cd605c3bbfbdb06a30897ba5ed4a90c1d695b664"
+      },
+      "output": {
+        "path": "assets/comics/es/mainline/issue-06/page-11.webp",
+        "width": 1024,
+        "height": 1536,
+        "bytes": 392018,
+        "sha256": "ff2b25f45437d3581287e7f5ff1bd807da95255898fb00133629cd569d9ddc30"
+      }
+    }
+  ]
+}
