@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-09T03:39:18.879Z",
-  "totalPages": 292,
+  "updated": "2026-08-09T08:06:08.750Z",
+  "totalPages": 326,
   "collections": [
     {
       "id": "tone-sovereign",
@@ -1785,15 +1785,192 @@
     {
       "id": "insight",
       "label": "Insight",
-      "deck": "Separate comic PDF",
+      "deck": "Image pages",
       "comics": [
         {
-          "id": "insight-pdf",
-          "type": "pdf",
+          "id": "insight",
+          "type": "image-set",
           "title": "Insight",
-          "subtitle": "A Somewhat True Story of Seeing Through the Self",
-          "pageCount": 1,
-          "href": "/tone_comics/assets/insight/insight-a-somewhat-true-story-of-seeing-through-the-self.pdf"
+          "subtitle": "A True Story of Seeing Through the Self",
+          "pageCount": 35,
+          "cover": "/tone_comics/assets/insight/insight/insight-en-page-01.jpg",
+          "pages": [
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-01.jpg",
+              "alt": "Insight page 1",
+              "label": "Insight-en-page-01"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-02.jpg",
+              "alt": "Insight page 2",
+              "label": "Insight-en-page-02"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-03.jpg",
+              "alt": "Insight page 3",
+              "label": "Insight-en-page-03"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-04.jpg",
+              "alt": "Insight page 4",
+              "label": "Insight-en-page-04"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-05.jpg",
+              "alt": "Insight page 5",
+              "label": "Insight-en-page-05"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-06.jpg",
+              "alt": "Insight page 6",
+              "label": "Insight-en-page-06"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-07.jpg",
+              "alt": "Insight page 7",
+              "label": "Insight-en-page-07"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-08.jpg",
+              "alt": "Insight page 8",
+              "label": "Insight-en-page-08"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-09.jpg",
+              "alt": "Insight page 9",
+              "label": "Insight-en-page-09"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-10.jpg",
+              "alt": "Insight page 10",
+              "label": "Insight-en-page-10"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-11.jpg",
+              "alt": "Insight page 11",
+              "label": "Insight-en-page-11"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-12.jpg",
+              "alt": "Insight page 12",
+              "label": "Insight-en-page-12"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-13.jpg",
+              "alt": "Insight page 13",
+              "label": "Insight-en-page-13"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-14.jpg",
+              "alt": "Insight page 14",
+              "label": "Insight-en-page-14"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-15.jpg",
+              "alt": "Insight page 15",
+              "label": "Insight-en-page-15"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-16.jpg",
+              "alt": "Insight page 16",
+              "label": "Insight-en-page-16"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-17.jpg",
+              "alt": "Insight page 17",
+              "label": "Insight-en-page-17"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-18.jpg",
+              "alt": "Insight page 18",
+              "label": "Insight-en-page-18"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-19.jpg",
+              "alt": "Insight page 19",
+              "label": "Insight-en-page-19"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-20.jpg",
+              "alt": "Insight page 20",
+              "label": "Insight-en-page-20"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-21a.jpg",
+              "alt": "Insight page 21",
+              "label": "Insight-en-page-21a"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-22.jpg",
+              "alt": "Insight page 22",
+              "label": "Insight-en-page-22"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-23.jpg",
+              "alt": "Insight page 23",
+              "label": "Insight-en-page-23"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-24.jpg",
+              "alt": "Insight page 24",
+              "label": "Insight-en-page-24"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-25.jpg",
+              "alt": "Insight page 25",
+              "label": "Insight-en-page-25"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-26.jpg",
+              "alt": "Insight page 26",
+              "label": "Insight-en-page-26"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-27.jpg",
+              "alt": "Insight page 27",
+              "label": "Insight-en-page-27"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-28.jpg",
+              "alt": "Insight page 28",
+              "label": "Insight-en-page-28"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-29.jpg",
+              "alt": "Insight page 29",
+              "label": "Insight-en-page-29"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-30.jpg",
+              "alt": "Insight page 30",
+              "label": "Insight-en-page-30"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-31.jpg",
+              "alt": "Insight page 31",
+              "label": "Insight-en-page-31"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-32.jpg",
+              "alt": "Insight page 32",
+              "label": "Insight-en-page-32"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-33.jpg",
+              "alt": "Insight page 33",
+              "label": "Insight-en-page-33"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-34.jpg",
+              "alt": "Insight page 34",
+              "label": "Insight-en-page-34"
+            },
+            {
+              "src": "/tone_comics/assets/insight/insight/insight-en-page-35.jpg",
+              "alt": "Insight page 35",
+              "label": "Insight-en-page-35"
+            }
+          ]
         }
       ]
     }
