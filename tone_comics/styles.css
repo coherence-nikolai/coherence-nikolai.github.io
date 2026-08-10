@@ -152,6 +152,24 @@
   padding: 18px clamp(20px, 4vw, 44px) clamp(24px, 4vw, 44px);
 }
 
+.comic-group-heading {
+  grid-column: 1 / -1;
+  margin: 22px 0 2px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid rgba(232, 215, 178, 0.16);
+  color: rgba(232, 215, 178, 0.86);
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.comic-group-heading:first-child {
+  margin-top: 0;
+}
+
 .comic-card {
   position: relative;
   min-width: 0;

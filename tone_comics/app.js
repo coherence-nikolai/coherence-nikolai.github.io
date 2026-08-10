@@ -57,11 +57,21 @@ function renderTabs() {
     button.addEventListener("click", () => {
       state.collectionId = collection.id;
       readerEl.hidden = true;
+      if (window.location.hash !== `#${collection.id}`) {
+        history.replaceState(null, "", `#${collection.id}`);
+      }
       renderTabs();
       renderGrid();
     });
     tabsEl.appendChild(button);
   });
+
+  const activeTab = tabsEl.querySelector('[aria-selected="true"]');
+  if (activeTab) {
+    requestAnimationFrame(() => {
+      activeTab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    });
+  }
 }
 
 function renderGrid() {
@@ -72,7 +82,15 @@ function renderGrid() {
     return;
   }
 
+  let currentGroup = "";
+
   collection.comics.forEach((comic) => {
+    if (comic.group && comic.group !== currentGroup) {
+      currentGroup = comic.group;
+      const heading = makeElement("h3", "comic-group-heading", currentGroup);
+      gridEl.appendChild(heading);
+    }
+
     const card = makeElement("article", "comic-card");
     const action = document.createElement(comic.type === "pdf" ? "a" : "button");
     if (comic.type === "pdf") {
@@ -149,13 +167,22 @@ function openComic(comicId) {
 
 function closeReader() {
   readerEl.hidden = true;
-  history.replaceState(null, "", window.location.pathname);
+  history.replaceState(null, "", `#${state.collectionId}`);
   document.getElementById("library").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function openFromHash() {
   const comicId = window.location.hash.replace("#", "");
   if (!comicId) {
+    return;
+  }
+  const collection = state.manifest.collections.find((item) => item.id === comicId);
+  if (collection) {
+    state.collectionId = collection.id;
+    readerEl.hidden = true;
+    renderTabs();
+    renderGrid();
+    document.getElementById("library").scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
   const match = findComic(comicId);
@@ -166,7 +193,7 @@ function openFromHash() {
 
 async function init() {
   try {
-    const response = await fetch("/tone_comics/manifest.json");
+    const response = await fetch(`/tone_comics/manifest.json?v=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) {
       throw new Error("Manifest failed to load");
     }
