@@ -13,6 +13,8 @@ const state = {
   collectionId: null,
 };
 
+const MANIFEST_URL = "/tone_comics/manifest-20260810b.json";
+
 function clear(node) {
   while (node.firstChild) {
     node.removeChild(node.firstChild);
@@ -193,7 +195,7 @@ function openFromHash() {
 
 async function init() {
   try {
-    const response = await fetch(`/tone_comics/manifest.json?v=${Date.now()}`, { cache: "no-store" });
+    const response = await fetch(`${MANIFEST_URL}?v=${Date.now()}`, { cache: "no-store" });
     if (!response.ok) {
       throw new Error("Manifest failed to load");
     }
