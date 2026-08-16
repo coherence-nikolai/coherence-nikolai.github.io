@@ -1,8 +1,8 @@
 {
   "name": "Tone Sovereign",
   "short_name": "Sovereign",
-  "description": "Choose the tone of a Golden Age.",
-  "lang": "en-AU",
+  "description": "Elige el tono de una Edad Dorada.",
+  "lang": "es-CL",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

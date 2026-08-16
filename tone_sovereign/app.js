@@ -9,6 +9,7 @@ const NOTICE = Object.freeze({
   cueDuration: 10,
   manualCueDuration: 4
 });
+const STABILISE = Object.freeze({ duration: 120 });
 const SPECTRUM = Object.freeze({
   orientation: "#e3b84f",
   practice: "#d8be82",
@@ -37,7 +38,8 @@ const STORAGE = {
   ruleOfLife: "tone-sovereign.rule-of-life.v1",
   engineDrafts: "tone-sovereign.practice-engine-drafts.v1",
   missions: "tone-sovereign.missions.v1",
-  crossMarks: "tone-sovereign.cross-marks.v1"
+  crossMarks: "tone-sovereign.cross-marks.v1",
+  lastHeldTone: "tone-sovereign.last-held-tone.v1"
 };
 
 const copy = {
@@ -281,13 +283,13 @@ const noticeVoiceCues = [
 ];
 
 const steadyStates = [
-  { id: "overwhelmed", pattern: "physiological", en: ["Overwhelmed", "Too much input, everything at once."], es: ["Demasiado a la vez", "Llegan demasiadas cosas al mismo tiempo."] },
-  { id: "anxious", pattern: "coherent", en: ["Anxious or scattered", "Racing, uneasy, hard to focus."], es: ["Ansiedad o dispersión", "Hay inquietud y cuesta concentrarse."] },
-  { id: "angry", pattern: "extended", en: ["Anger or heat", "Irritated, tense, close to reacting."], es: ["Enojo o calor", "Hay irritación, tensión o ganas de reaccionar."] },
-  { id: "stuck", pattern: "anapana", en: ["Stuck or avoiding", "Hard to begin or choose."], es: ["Bloqueo o evitación", "Cuesta comenzar o elegir."] },
-  { id: "looping", pattern: "coherent", en: ["Looping or self-attack", "The same thought keeps returning."], es: ["Pensamientos en bucle", "El mismo pensamiento sigue volviendo con dureza."] },
-  { id: "fog", pattern: "anapana", en: ["Fog or far away", "Numb, unreal, hard to locate."], es: ["Niebla o lejanía", "Hay desconexión o cuesta ubicarse."] },
-  { id: "wired", pattern: "extended", en: ["Wired or restless", "Unable to settle or wind down."], es: ["Aceleración o inquietud", "Cuesta calmarse o bajar el ritmo."] }
+  { id: "overwhelmed", pattern: "physiological", en: ["Overwhelmed", "Flooded, overloaded, too much input."], es: ["Abrumado", "Demasiadas cosas a la vez."] },
+  { id: "anxious", pattern: "coherent", en: ["Anxious / scattered", "Racing, uneasy, needing structure."], es: ["Ansioso / disperso", "Acelerado, inquieto, necesito estructura."] },
+  { id: "angry", pattern: "extended", en: ["Anger / heat", "Heat, irritation, close to reacting."], es: ["Enojo / calor", "Calor, irritación, cerca de reaccionar."] },
+  { id: "stuck", pattern: "anapana", en: ["Stuck / avoiding", "Can’t begin, avoiding, choosing nothing."], es: ["Bloqueado / evitando", "No puedo empezar, evito, no elijo nada."] },
+  { id: "looping", pattern: "coherent", en: ["Thoughts looping / being hard on myself", "Repeating thoughts, blame, self-attack."], es: ["Pensamientos repetidos / ser duro conmigo", "Pensamientos repetidos, culpa, ataques contra mí mismo."] },
+  { id: "fog", pattern: "anapana", en: ["Fog / far away", "Numb, unreal, hard to locate."], es: ["Mente nublada / sensación de lejanía", "Entumecido, irreal, difícil de ubicar."] },
+  { id: "wired", pattern: "extended", en: ["Wired / can’t settle", "Restless, wired, can’t wind down."], es: ["Inquietud / me cuesta calmarme", "Inquieto, activado, no puedo bajar."] }
 ];
 
 const BREATH_PATTERNS = Object.freeze({
@@ -688,6 +690,8 @@ const state = {
 };
 
 function newPractice() {
+  const rememberedTone = localStorage.getItem(STORAGE.lastHeldTone) || "";
+  const rememberedToneDefinition = tones.find(item => item.id === rememberedTone);
   return {
     index: 0,
     movement: "",
@@ -704,10 +708,12 @@ function newPractice() {
     noticeLastManualCue: -1,
     noticeDuration: 60,
     noticeOutcome: "",
+    noticeAcknowledged: false,
     steadyExpanded: false,
     steadyState: "",
     breathPattern: "",
     breathStartedAt: 0,
+    breathDuration: STABILISE.duration,
     facts: "",
     story: "",
     pull: "",
@@ -722,9 +728,10 @@ function newPractice() {
     crossRecent: [],
     crossSaved: false,
     crossCrossed: false,
-    tone: "love",
+    crossRemaining: false,
+    tone: rememberedToneDefinition?.id || "",
     embodyStage: "choose",
-    frequency: 528,
+    frequency: rememberedToneDefinition?.hz || 432,
     amplitude: 34,
     tonePlaying: false,
     act: "",
@@ -1167,6 +1174,11 @@ function persistPreferences() {
   }));
   document.documentElement.lang = state.lang;
   document.documentElement.classList.toggle("user-reduced-motion", state.reduceMotion);
+  const description = state.lang === "es"
+    ? "Tone Sovereign es una práctica privada de participación consciente. Elige el tono de una Edad Dorada."
+    : "Tone Sovereign is a private practice of conscious participation. Choose the tone of a Golden Age.";
+  document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+  document.querySelector('link[rel="manifest"]')?.setAttribute("href", state.lang === "es" ? "./manifest-es.webmanifest" : "./manifest.webmanifest");
 }
 
 function announce(message) { liveRegion.textContent = ""; requestAnimationFrame(() => { liveRegion.textContent = message; }); }
@@ -1923,7 +1935,8 @@ function renderNoticeMovement() {
   }
   const cue = noticeCues[lang][p.noticeCue];
   return `<section class="practice-stage focused-stage notice-live-stage">
-    <button class="instrument-region notice-instrument" type="button" data-action="notice-tap" aria-label="${lang === "en" ? "Acknowledge what you noticed" : "Reconocer lo que notaste"}"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></button>
+    <button class="instrument-region notice-instrument ${p.noticeAcknowledged ? "acknowledged" : ""}" type="button" data-action="notice-tap" aria-label="${p.noticeAcknowledged ? (lang === "en" ? "Noticed" : "Notado") : (lang === "en" ? "Ready. Acknowledge what you notice" : "Listo. Reconoce lo que notes")}"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></button>
+    <p class="notice-status" data-notice-status>${p.noticeAcknowledged ? (lang === "en" ? "Noticed" : "Notado") : (lang === "en" ? "Ready" : "Listo")}</p>
     ${renderMovementHeading(cue, state.quietWords ? (lang === "en" ? "Tap the centre when you notice something." : "Toca el centro cuando notes algo.") : (lang === "en" ? "No naming is needed." : "No hace falta nombrarlo."))}
     <p class="timer" data-notice-timer>1:00</p>
     <div class="button-row"><button class="secondary-button" type="button" data-action="another-notice-cue">${lang === "en" ? "Another cue" : "Otra indicación"}</button><button class="text-button" type="button" data-action="end-notice">${lang === "en" ? "End practice" : "Terminar práctica"}</button></div>
@@ -1937,11 +1950,13 @@ function renderStabiliseMovement() {
     <div class="completion-seal"><div class="seal-orb"><span>│</span></div></div>
     <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button></section>`;
   if (p.stage === "patterns") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a breath" : "Elige una respiración", lang === "en" ? "Choose the rhythm that asks least from you right now. Every hold is optional." : "Elige el ritmo que te pida menos ahora. Cada pausa es opcional.")}
-    <div class="state-list">${Object.entries(BREATH_PATTERNS).map(([key, item]) => `<button class="state-choice" type="button" data-breath-pattern="${key}"><span class="state-mini-orb" style="--pattern-rgb:${item.rgb}"></span><span><strong>${item[lang].title}</strong><small>${item[lang].cue}</small></span><b>›</b></button>`).join("")}</div></section>`;
+    <div class="stabilise-instrument" role="img" aria-label="${lang === "en" ? "A steady vertical line meeting a calm horizon" : "Una línea vertical estable que se encuentra con un horizonte tranquilo"}"><span></span><i></i></div>
+    <div class="state-list">${Object.entries(BREATH_PATTERNS).map(([key, item]) => `<button class="state-choice" type="button" data-breath-pattern="${key}"><span class="state-mini-axis" style="--pattern-rgb:${item.rgb}" aria-hidden="true"></span><span><strong>${item[lang].title}</strong><small>${item[lang].cue}</small></span><b>›</b></button>`).join("")}</div></section>`;
   if (!p.steadyState) {
-    const visible = p.steadyExpanded ? steadyStates : steadyStates.slice(0, 4);
+    const visible = p.steadyExpanded ? steadyStates : steadyStates.slice(0, 3);
     return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "What feels difficult now?" : "¿Qué se siente difícil ahora?", lang === "en" ? "Choose the closest state. You can change it." : "Elige el estado más cercano. Puedes cambiarlo.")}
-      <div class="state-list">${visible.map(item => `<button class="state-choice" type="button" data-steady="${item.id}"><span class="state-mini-orb"></span><span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></span><b>›</b></button>`).join("")}</div>
+      <div class="stabilise-instrument" role="img" aria-label="${lang === "en" ? "A steady vertical line meeting a calm horizon" : "Una línea vertical estable que se encuentra con un horizonte tranquilo"}"><span></span><i></i></div>
+      <div class="state-list">${visible.map(item => `<button class="state-choice" type="button" data-steady="${item.id}"><span class="state-mini-axis" aria-hidden="true"></span><span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></span><b>›</b></button>`).join("")}</div>
       ${p.steadyExpanded ? "" : `<button class="text-button" type="button" data-action="more-steady">${lang === "en" ? "More states" : "Más estados"} ↓</button>`}
     </section>`;
   }
@@ -1956,6 +1971,35 @@ function renderStabiliseMovement() {
   </section>`;
 }
 
+function renderCapacityInstrument(id, step, lang, answers, selectedOption) {
+  const visibleAnswers = [...answers];
+  if (selectedOption) visibleAnswers[step] = selectedOption;
+  const answerAt = index => visibleAnswers[index] || (lang === "en" ? "No response selected" : "No has seleccionado una respuesta");
+  if (id === "discern") {
+    const labels = lang === "en"
+      ? ["Directly known", "Added interpretation", "Honest next step"]
+      : ["Conocido directamente", "Interpretación añadida", "Siguiente paso honesto"];
+    return `<div class="capacity-instrument discern-lenses step-${step}" role="img" aria-label="${escapeAttribute(`${labels[step]}. ${answerAt(step)}`)}">
+      <div class="discern-lens direct"><span>${labels[0]}<small>${escapeHTML(answerAt(0))}</small></span></div>
+      <div class="discern-channel" aria-hidden="true"></div>
+      <div class="discern-lens added"><span>${labels[1]}<small>${escapeHTML(answerAt(1))}</small></span></div>
+      <p>${labels[2]}<small>${escapeHTML(answerAt(2))}</small></p>
+    </div>`;
+  }
+  const labels = lang === "en"
+    ? ["Included signal", "Not sole authority", "Carry forward"]
+    : ["Señal incluida", "No es la única autoridad", "Llevar adelante"];
+  return `<div class="capacity-instrument integrate-strands step-${step}" role="img" aria-label="${escapeAttribute(`${labels[step]}. ${answerAt(step)}`)}">
+    <svg viewBox="0 0 600 150" preserveAspectRatio="none" aria-hidden="true">
+      <path class="strand one" d="M18 26 C160 26 244 74 390 74 S510 74 580 74"></path>
+      <path class="strand two" d="M18 74 C170 74 250 74 390 74 S510 74 580 74"></path>
+      <path class="strand three" d="M18 124 C162 124 250 74 390 74 S510 74 580 74"></path>
+      <circle cx="390" cy="74" r="13"></circle>
+    </svg>
+    <div class="instrument-labels"><span>${labels[0]}<small>${escapeHTML(answerAt(0))}</small></span><span>${labels[1]}<small>${escapeHTML(answerAt(1))}</small></span><span>${labels[2]}<small>${escapeHTML(answerAt(2))}</small></span></div>
+  </div>`;
+}
+
 function renderCapacityMovement(id) {
   const p = state.practice;
   const lang = state.lang;
@@ -1964,6 +2008,7 @@ function renderCapacityMovement(id) {
   return `<section class="practice-stage focused-stage capacity-stage">
     <p class="eyebrow">${p.capacityStep + 1} ${lang === "en" ? "of" : "de"} ${flow.length}</p>
     ${renderMovementHeading(item[0], item[1])}
+    ${renderCapacityInstrument(id, p.capacityStep, lang, p.capacityAnswers, p.selectedOption)}
     <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
     <button class="primary-button" type="button" data-action="capacity-continue" ${p.selectedOption ? "" : "disabled"}>${p.capacityStep === flow.length - 1 ? (lang === "en" ? "Complete practice" : "Completar práctica") : tr("continue")}</button>
   </section>`;
@@ -1972,7 +2017,16 @@ function renderCapacityMovement(id) {
 function renderReclaimMovement() {
   const p = state.practice;
   const lang = state.lang;
+  const pullIsUnclear = p.pull === "Nothing clear" || p.pull === "Nada claro";
+  const unbindingSupport = pullIsUnclear
+    ? (lang === "en" ? "What is unclear can remain outside your centre. It does not have to choose for you." : "Lo que no está claro puede permanecer fuera de tu centro. No tiene que elegir por ti.")
+    : (lang === "en" ? `${p.pull} may still be here, outside your centre. It does not have to choose for you.` : `${p.pull} puede seguir aquí, fuera de tu centro. No tiene que elegir por ti.`);
+  const relationshipSupport = pullIsUnclear
+    ? (lang === "en" ? "What is unclear can remain visible without taking the centre. Choose the relationship that leaves you room to act." : "Lo que no está claro puede seguir visible sin ocupar el centro. Elige una forma de relacionarte que te deje espacio para actuar.")
+    : (lang === "en" ? `${p.pull} remains visible outside your centre. Choose the relationship that leaves you room to act.` : `${p.pull} sigue visible fuera de tu centro. Elige una forma de relacionarte que te deje espacio para actuar.`);
   if (p.stage === "authority") return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "What is pulling at your attention?" : "¿Qué está tirando de tu atención?", lang === "en" ? "Choose the closest name. You can leave it unclear." : "Elige el nombre más cercano. Puedes dejarlo sin aclarar.")}
+    <div class="instrument-region reclaim-instrument reclaim-opening" role="img" aria-label="${lang === "en" ? "Open spiral with your centre held clear" : "Espiral abierta con tu centro despejado"}" aria-description="${lang === "en" ? "No pull selected" : "No has seleccionado qué tira de ti"}"><svg class="reclaim-spiral" viewBox="0 0 120 120" aria-hidden="true"><path d="M63 58 C72 54 76 63 72 70 C66 82 45 78 40 64 C33 44 51 27 72 31 C97 36 105 65 91 85 C74 109 37 103 24 77"></path></svg><span class="reclaim-point"></span></div>
+    <p class="reclaim-centre-copy">${lang === "en" ? "The pull can be present without occupying your centre." : "Eso que tira de ti puede estar presente sin ocupar tu centro."}</p>
     <div class="choice-grid">${pulls[lang].map((item, index) => `<button class="choice" type="button" data-pull="${index}">${item}</button>`).join("")}</div>
     <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button></section>`;
   if (p.stage === "custom") return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Name it plainly." : "Nómbralo con sencillez.", lang === "en" ? "A few words are enough. You can leave it unclear." : "Bastan unas pocas palabras. Puedes dejarlo sin aclarar.")}
@@ -1981,11 +2035,11 @@ function renderReclaimMovement() {
     <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button></section>`;
   if (p.stage === "pause") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
     <button class="instrument-region reclaim-instrument ${p.reclaimHolding ? "hold-active" : ""} ${p.reclaimComplete ? "is-complete" : ""}" type="button" data-action="reclaim-hold" aria-label="${lang === "en" ? "Press and hold through one natural breath" : "Mantén pulsado durante una respiración natural"}"><svg class="reclaim-spiral" viewBox="0 0 120 120" aria-hidden="true"><path d="M63 58 C72 54 76 63 72 70 C66 82 45 78 40 64 C33 44 51 27 72 31 C97 36 105 65 91 85 C74 109 37 103 24 77"></path></svg><span class="reclaim-line"></span><span class="reclaim-point"></span></button>
-    ${renderMovementHeading(p.reclaimComplete ? (lang === "en" ? "You can still choose." : "Todavía puedes elegir.") : (lang === "en" ? "Hold your centre for one breath." : "Mantén tu centro durante una respiración."), p.reclaimComplete ? (lang === "en" ? "The feeling may still be here. It does not have to choose for you." : "La sensación puede seguir aquí. No tiene que elegir por ti.") : (lang === "en" ? "Hold the spiral for one breath, or continue when ready." : "Mantén la espiral durante una respiración o continúa cuando estés listo."))}
+    ${renderMovementHeading(p.reclaimComplete ? (lang === "en" ? "You can still choose." : "Todavía puedes elegir.") : (lang === "en" ? "Hold your centre for one breath." : "Mantén tu centro durante una respiración."), p.reclaimComplete ? unbindingSupport : (lang === "en" ? "Hold the spiral for one breath, or continue when ready." : "Mantén la espiral durante una respiración o continúa cuando estés listo."))}
     <button class="primary-button" type="button" data-action="reclaim-to-relationship">${lang === "en" ? "Choose how to respond" : "Elegir cómo responder"}</button></section>`;
   if (p.stage === "relationship") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
     <div class="instrument-region reclaim-instrument small" aria-hidden="true"><span class="reclaim-line"></span><span class="reclaim-point"></span></div>
-    ${renderMovementHeading(lang === "en" ? "Choose how you will respond to it." : "Elige cómo responderás.", lang === "en" ? "You can notice every pull. Choose what gives you the most room to act." : "Puedes notar cada impulso. Elige lo que te dé más espacio para actuar.")}
+    ${renderMovementHeading(lang === "en" ? "Choose how you will respond to it." : "Elige cómo responderás.", relationshipSupport)}
     <div class="choice-grid">${relations[lang].map(item => `<button class="choice ${p.relation === item ? "selected" : ""}" type="button" data-relation="${escapeAttribute(item)}">${item}</button>`).join("")}</div>
     <button class="primary-button" type="button" data-action="reclaim-complete" ${p.relation ? "" : "disabled"}>${tr("continue")}</button></section>`;
   const relationIndex = relations[lang].indexOf(p.relation);
@@ -2012,6 +2066,7 @@ function chooseCrossQuestion({ avoidCurrent = false } = {}) {
   p.crossRecent = [currentCrossQuestionKey(), ...p.crossRecent.filter(item => item !== currentCrossQuestionKey())].slice(0, 6);
   p.crossSaved = crossQuestionIsSaved();
   p.crossCrossed = false;
+  p.crossRemaining = false;
 }
 
 function crossQuestionIsSaved() {
@@ -2026,20 +2081,27 @@ function renderCrossMovement() {
   if (p.stage === "focuses") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose the focus that best fits this moment. You can change it." : "Elige el enfoque que mejor encaje con este momento. Puedes cambiarlo.")}
     <div class="cross-focus-grid">${crossFocuses.map(item => `<button class="cross-focus-choice" type="button" data-cross-focus="${item.id}"><span>${item.glyph}</span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></button>`).join("")}</div></section>`;
   if (p.stage === "question" || p.stage === "crossed") return `<section class="practice-stage focused-stage cross-question-stage">
-    <div class="doorway-instrument cross-door ${p.stage === "crossed" ? "open" : ""}" aria-hidden="true"><span>${focus.glyph}</span></div>
+    <div class="doorway-instrument cross-door ${p.stage === "crossed" ? "open" : ""}" role="img" aria-label="${lang === "en" ? `Selected focus: ${focus.en[0]}. ${focus.en[1]}` : `Enfoque seleccionado: ${focus.es[0]}. ${focus.es[1]}`}"><span>${focus.glyph}</span></div>
     <p class="eyebrow">${escapeHTML(focus[lang][0])} · ${lang === "en" ? "QUESTION" : "PREGUNTA"}</p>
     <h1 class="practice-title cross-question">${escapeHTML(currentCrossQuestion())}</h1>
     <p class="lede">${lang === "en" ? "Stay with this for one breath. No answer is required." : "Quédate con esto durante una respiración. No hace falta responder."}</p>
     <div class="cross-tools"><button class="text-button" type="button" data-action="save-cross-question">${p.crossSaved ? (lang === "en" ? "Saved" : "Guardada") : (lang === "en" ? "Save question" : "Guardar pregunta")}</button><button class="text-button" type="button" data-action="another-cross-question">${lang === "en" ? "Another question" : "Otra pregunta"}</button></div>
     <p class="consent-copy">${lang === "en" ? "No answer is required. Leave whenever you have enough." : "No hace falta responder. Sal cuando hayas tenido suficiente."}</p>
-    <button class="primary-button" type="button" data-action="cross-ready">${p.stage === "crossed" ? tr("continue") : (lang === "en" ? "Cross when ready" : "Cruzar cuando estés listo")}</button>
+    ${p.stage === "crossed" ? `<button class="primary-button" type="button" data-action="cross-ready">${tr("continue")}</button>` : `<div class="cross-decisions" aria-label="${lang === "en" ? "Threshold choices" : "Opciones del umbral"}">
+      <p id="cross-choice-hint" class="sr-only">${lang === "en" ? "Cross when ready opens the threshold without leaving this question." : "Cruzar cuando estés listo abre el umbral sin dejar esta pregunta."}</p>
+      <p id="cross-remain-hint" class="sr-only">${lang === "en" ? "Keeps the threshold open without requiring a crossing" : "Mantiene abierto el umbral sin exigir que lo cruces"}</p>
+      <p id="cross-return-hint" class="sr-only">${lang === "en" ? "Returns without treating the crossing as required" : "Vuelve sin tratar el cruce como una obligación"}</p>
+      <button type="button" data-action="cross-ready" aria-describedby="cross-choice-hint">${lang === "en" ? "Cross when ready" : "Cruzar cuando estés listo"}</button>
+      <button type="button" data-action="cross-remain" aria-pressed="${p.crossRemaining}" aria-describedby="cross-remain-hint">${lang === "en" ? "Remain with the question" : "Permanecer con la pregunta"}${p.crossRemaining ? `<small>${lang === "en" ? "Chosen for now" : "Elegido por ahora"}</small>` : ""}</button>
+      <button type="button" data-action="cross-return-focus" aria-describedby="cross-return-hint">${lang === "en" ? "Return to focus choices" : "Volver a las opciones de enfoque"}</button>
+    </div>${p.crossRemaining ? `<p class="consent-copy remaining-copy">${lang === "en" ? "Remaining with the question. Cross or return only if you choose." : "Te quedas con la pregunta. Cruza o vuelve solo si así lo eliges."}</p>` : ""}`}
   </section>`;
   if (p.stage === "close") return `<section class="practice-stage focused-stage"><div class="doorway-instrument cross-door open" aria-hidden="true"><span>│</span></div><p class="eyebrow">${lang === "en" ? "RETURN" : "REGRESO"}</p>
     ${renderMovementHeading(lang === "en" ? "Take only what feels useful." : "Quédate solo con lo que sea útil.", lang === "en" ? "Keep the question, or leave it here." : "Guarda la pregunta o déjala aquí.")}
     <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button></section>`;
   const focusIndex = crossFocuses.findIndex(item => item.id === focus.id);
   return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose what feels closest." : "Elige lo que se sienta más cercano.")}
-    <div class="cross-focus-carousel"><button class="icon-button" type="button" data-action="previous-cross-focus">‹</button><div><span class="cross-focus-glyph">${focus.glyph}</span><h2>${focus[lang][0]}</h2><p>${focus[lang][1]}</p></div><button class="icon-button" type="button" data-action="next-cross-focus">›</button></div>
+    <div class="cross-focus-carousel"><button class="icon-button" type="button" data-action="previous-cross-focus" aria-label="${lang === "en" ? "Previous focus" : "Enfoque anterior"}">‹</button><div><span class="cross-focus-glyph" role="img" aria-label="${lang === "en" ? `${focus.en[0]} focus at the threshold` : `Enfoque en el umbral: ${focus.es[0]}`}">${focus.glyph}</span><h2>${focus[lang][0]}</h2><p>${focus[lang][1]}</p></div><button class="icon-button" type="button" data-action="next-cross-focus" aria-label="${lang === "en" ? "Next focus" : "Enfoque siguiente"}">›</button></div>
     <button class="secondary-button" type="button" data-action="show-cross-focuses">${lang === "en" ? "Change focus" : "Cambiar enfoque"}</button>
     ${readJSON(STORAGE.crossMarks, []).length ? `<button class="text-button" type="button" data-action="return-saved-cross">${lang === "en" ? "Return to saved question" : "Volver a una pregunta guardada"}</button>` : ""}
     <button class="primary-button" type="button" data-action="open-cross-question">${lang === "en" ? `Open the ${focus.en[0]} question` : `Abrir la pregunta de ${focus.es[0]}`}</button>
@@ -2049,19 +2111,33 @@ function renderCrossMovement() {
 function renderEmbodyMovement() {
   const p = state.practice;
   const lang = state.lang;
-  const tone = tones.find(item => item.id === p.tone) || tones[0];
-  const toneIndex = tones.findIndex(item => item.id === tone.id);
+  const tone = tones.find(item => item.id === p.tone) || null;
+  const rememberedTone = localStorage.getItem(STORAGE.lastHeldTone);
   if (p.embodyStage === "all") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a tone" : "Elige un tono", lang === "en" ? "Choose the quality you want to practise." : "Elige la cualidad que quieres practicar.")}
     <div class="choice-grid">${tones.map(item => `<button class="choice" type="button" data-tone="${item.id}" data-select-tone="1">${item[lang]}</button>`).join("")}</div></section>`;
-  if (p.embodyStage === "tune") return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
+  if (p.embodyStage === "tune" && tone) return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(tone[lang], lang === "en" ? `Adjust the sound until it feels close enough to ${tone.en}.` : `Ajusta el sonido hasta que se sienta suficientemente cercano a ${tone.es}.`)}
     <div class="tone-controls"><label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="180" max="880" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label><label class="range-label">${lang === "en" ? "Strength" : "Intensidad"}<input type="range" min="10" max="70" value="${p.amplitude}" data-range="amplitude"><span>${p.amplitude}</span></label></div>
-    <button class="primary-button" type="button" data-action="embody-hold">${lang === "en" ? "This is it" : "Este es"}</button></section>`;
-  if (p.embodyStage === "hold") return `<section class="practice-stage focused-stage embody-hold-stage"><div class="tone-field large" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
+    <button class="primary-button" type="button" data-action="embody-hold">${lang === "en" ? "This is it" : "Este es el tono"}</button></section>`;
+  if (p.embodyStage === "hold" && tone) return `<section class="practice-stage focused-stage embody-hold-stage"><div class="tone-field large" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(tone[lang], lang === "en" ? "Stay with the tone." : "Quédate con el tono.")}
     <button class="primary-button" type="button" data-action="embody-complete">${lang === "en" ? "Complete practice" : "Completar práctica"}</button></section>`;
-  return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field compact" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div><p class="eyebrow">${lang === "en" ? "Choose the tone" : "Elige el tono"}</p><h1 class="practice-title" style="color:${tone.color}">${tone[lang]}</h1>
-    <div class="tone-carousel"><button class="icon-button" type="button" data-action="previous-tone">‹</button><button class="primary-button" type="button" data-action="enter-tone">${lang === "en" ? "Enter this tone" : "Entrar en este tono"}</button><button class="icon-button" type="button" data-action="next-tone">›</button></div>
+  if (p.embodyStage === "after" && tone) return `<section class="practice-stage focused-stage embody-hold-stage embody-after-stage">
+    <div class="tone-field large after-image" style="color:${tone.color}" role="img" aria-label="${lang === "en" ? `The after-image of ${tone.en} as its sound recedes` : `La huella de ${tone.es} mientras el sonido se desvanece`}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
+    ${renderMovementHeading(tone[lang], lang === "en" ? "This tone is ready. Carry it if it feels right for you." : "Este tono está listo. Llévalo contigo si sientes que es adecuado para ti.")}
+    <p class="consent-copy">${lang === "en" ? "Notice what remains when the sound recedes." : "Observa qué permanece cuando el sonido se desvanece."}</p>
+    <button class="primary-button" type="button" data-action="embody-carry">${lang === "en" ? "Carry this tone" : "Llevar este tono"}</button>
+    <button class="text-button" type="button" data-action="embody-choose-another">${lang === "en" ? "Choose another tone" : "Elegir otro tono"}</button>
+  </section>`;
+  const toneColor = tone?.color || "#b7afa2";
+  const toneName = tone?.[lang] || (lang === "en" ? "No tone selected" : "Ningún tono seleccionado");
+  const selectionContext = tone && rememberedTone === tone.id
+    ? (lang === "en" ? "Last held tone — choose again if it no longer fits." : "Último tono guardado — vuelve a elegir si ya no encaja.")
+    : tone
+      ? (lang === "en" ? "Choose the tone" : "Elige el tono")
+      : (lang === "en" ? "Begin without a prescribed tone." : "Empieza sin un tono preestablecido.");
+  return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field compact ${tone ? "" : "neutral"}" style="color:${toneColor}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div><p class="eyebrow embody-selection-context">${selectionContext}</p><h1 class="practice-title" style="color:${toneColor}">${toneName}</h1>
+    <div class="tone-carousel"><button class="icon-button" type="button" data-action="previous-tone" aria-label="${lang === "en" ? "Previous tone" : "Tono anterior"}">‹</button><button class="primary-button" type="button" data-action="enter-tone" ${tone ? "" : "disabled"}>${lang === "en" ? "Enter this tone" : "Entrar en este tono"}</button><button class="icon-button" type="button" data-action="next-tone" aria-label="${lang === "en" ? "Next tone" : "Tono siguiente"}">›</button></div>
     <button class="text-button" type="button" data-action="show-all-tones">${lang === "en" ? "All tones" : "Todos los tonos"}</button></section>`;
 }
 
@@ -2158,6 +2234,7 @@ function movementBack() {
   else if (id === "reclaim" && p.stage === "custom") p.stage = "authority";
   else if (id === "cross" && p.stage === "close") p.stage = "question";
   else if (id === "cross" && (p.stage === "question" || p.stage === "crossed" || p.stage === "focuses")) p.stage = "choose";
+  else if (id === "embody" && p.embodyStage === "after") p.embodyStage = "hold";
   else if (id === "embody" && p.embodyStage === "hold") p.embodyStage = "tune";
   else if (id === "embody" && p.embodyStage === "tune") p.embodyStage = "choose";
   else if (id === "embody" && p.embodyStage === "all") p.embodyStage = "choose";
@@ -2178,10 +2255,13 @@ function finishMovement(save) {
   const p = state.practice;
   const movement = movementByID();
   if (save) {
+    const noticeOutcomes = state.lang === "en"
+      ? ["Clearer", "Different", "No change", "Not sure"]
+      : ["Más claro", "Diferente", "Sin cambio", "No lo sé"];
     const detail = p.movement === "cross" ? currentCrossQuestion()
       : p.movement === "reclaim" ? p.relation
       : p.movement === "embody" ? (tones.find(item => item.id === p.tone)?.[state.lang] || "")
-      : p.movement === "notice" ? (["Clearer", "Different", "No change", "Not sure"][Number(p.noticeOutcome)] || "")
+      : p.movement === "notice" ? (noticeOutcomes[Number(p.noticeOutcome)] || "")
       : p.capacityAnswers.filter(Boolean).join(" · ");
     addTrace({ type: "practice", title: local(movement).name, detail: detail || local(movement).line });
     showToast(tr("saved"));
@@ -2230,6 +2310,7 @@ function renderStabiliseSession() {
       <div><strong>${lang === "en" ? "Stabilise" : "Estabilizar"}</strong><span>${escapeHTML(selectedState?.[lang]?.[0] || patternCopy.title)}</span></div>
     </header>
     <footer class="steady-session-footer">
+      <strong class="steady-session-timer" data-breath-timer>2:00</strong>
       <p>${consent}</p>
       <button class="primary-button" type="button" data-action="stop-breath">${lang === "en" ? "Enough" : "Suficiente"}</button>
     </footer>
@@ -2425,6 +2506,7 @@ async function beginNoticePractice() {
   state.practice.noticeManualCue = -1;
   state.practice.noticeManualUntil = 0;
   state.practice.noticeLastManualCue = -1;
+  state.practice.noticeAcknowledged = false;
   render();
   sound.playVoice(noticeVoiceCues[0]);
   announce(noticeCues[state.lang][0]);
@@ -2440,6 +2522,7 @@ function offerAnotherNoticeCue() {
   state.practice.noticeManualCue = cue;
   state.practice.noticeManualUntil = Date.now() + NOTICE.manualCueDuration * 1000;
   state.practice.noticeCue = cue;
+  state.practice.noticeAcknowledged = false;
   render();
   sound.playVoice(noticeVoiceCues[cue]);
   announce(noticeCues[state.lang][cue]);
@@ -2494,6 +2577,19 @@ async function startBreathTimer(reset = true) {
   window.clearInterval(practiceTimer);
   const update = () => {
     const elapsed = (Date.now() - state.practice.breathStartedAt) / 1000;
+    const remaining = Math.max(0, state.practice.breathDuration - Math.floor(elapsed));
+    const timerNode = document.querySelector("[data-breath-timer]");
+    if (timerNode) timerNode.textContent = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`;
+    if (remaining <= 0) {
+      window.clearInterval(practiceTimer);
+      practiceTimer = 0;
+      state.practice.breathStartedAt = 0;
+      sound.stop();
+      state.practice.stage = "complete";
+      announce(state.lang === "en" ? "Breathing practice complete" : "Práctica de respiración completada");
+      render();
+      return;
+    }
     const frame = breathFrameAt(pattern, elapsed);
     if (frame.key !== breathLastPhaseKey) {
       breathLastPhaseKey = frame.key;
@@ -3070,6 +3166,7 @@ function eraseData() {
   localStorage.removeItem(STORAGE.engineDrafts);
   localStorage.removeItem(STORAGE.missions);
   localStorage.removeItem(STORAGE.crossMarks);
+  localStorage.removeItem(STORAGE.lastHeldTone);
   state.ruleOfLife = { principleIDs: [], commitmentIDs: [] };
   state.engineDrafts = {};
   state.missions = [];
@@ -3118,7 +3215,7 @@ app.addEventListener("click", async event => {
   }
   if (button.dataset.capacityOption !== undefined) { state.practice.selectedOption = button.dataset.capacityOption; render(); return; }
   if (button.dataset.noticeOutcome !== undefined) { state.practice.noticeOutcome = button.dataset.noticeOutcome; render(); return; }
-  if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.stage = "choose"; render(); return; }
+  if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.crossRemaining = false; state.practice.stage = "choose"; render(); return; }
   if (button.dataset.breathPattern) { state.practice.breathPattern = button.dataset.breathPattern; state.practice.stage = "setup"; render(); return; }
   if (steady) { state.practice.steadyState = steady; state.practice.breathPattern = ""; state.practice.stage = "setup"; render(); return; }
   if (pull !== undefined) {
@@ -3232,7 +3329,14 @@ app.addEventListener("click", async event => {
   if (action === "start-notice") beginNoticePractice();
   if (action === "another-notice-cue") offerAnotherNoticeCue();
   if (action === "end-notice") { stopPracticeTimers(); state.practice.noticeStarted = false; state.practice.stage = "close"; render(); sound.playVoice("ts_notice_close_v1", state.reduceMotion ? 0 : 0.22); }
-  if (action === "notice-tap" && state.quietWords) showToast(state.lang === "en" ? "Noticed" : "Notado");
+  if (action === "notice-tap") {
+    state.practice.noticeAcknowledged = true;
+    button.classList.add("acknowledged");
+    button.setAttribute("aria-label", state.lang === "en" ? "Noticed" : "Notado");
+    const status = document.querySelector("[data-notice-status]");
+    if (status) status.textContent = state.lang === "en" ? "Noticed" : "Notado";
+    announce(state.lang === "en" ? "Noticed" : "Notado");
+  }
   if (action === "start-breath") await beginBreathPractice();
   if (action === "stop-breath") { state.practice.breathStartedAt = 0; stopPracticeTimers(); state.practice.stage = "complete"; render(); }
   if (action === "more-steady") { state.practice.steadyExpanded = true; render(); }
@@ -3243,6 +3347,13 @@ app.addEventListener("click", async event => {
     state.practice.capacityAnswers[state.practice.capacityStep] = state.practice.selectedOption;
     if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; render(); playCapacityStageVoice(state.practice.movement, state.practice.capacityStep); }
     else requestMovementCompletion();
+  }
+  if (action === "reclaim-hold" && event.detail === 0 && !state.practice.reclaimComplete) {
+    state.practice.reclaimHolding = false;
+    state.practice.reclaimComplete = true;
+    sound.playVoice("ts_reclaim_centre_remains_v1");
+    announce(state.lang === "en" ? "You can still choose." : "Todavía puedes elegir.");
+    render();
   }
   if (action === "reclaim-nothing-clear") { state.practice.pull = state.lang === "en" ? "Nothing clear" : "Nada claro"; state.practice.customPull = ""; state.practice.stage = "pause"; render(); }
   if (action === "reclaim-custom-continue") { state.practice.pull = state.practice.customPull.trim(); state.practice.stage = "pause"; render(); }
@@ -3256,6 +3367,7 @@ app.addEventListener("click", async event => {
     state.practice.crossQuestion = 0;
     state.practice.crossSaved = false;
     state.practice.crossCrossed = false;
+    state.practice.crossRemaining = false;
     render();
   }
   if (action === "open-cross-question") { chooseCrossQuestion(); state.practice.stage = "question"; sound.threshold().catch(() => {}); render(); }
@@ -3274,6 +3386,17 @@ app.addEventListener("click", async event => {
     state.practice.crossSaved = existing < 0;
     render();
   }
+  if (action === "cross-remain") {
+    state.practice.crossRemaining = true;
+    render();
+    announce(state.lang === "en" ? "Chosen for now" : "Elegido por ahora");
+  }
+  if (action === "cross-return-focus") {
+    state.practice.crossCrossed = false;
+    state.practice.crossRemaining = false;
+    state.practice.stage = "choose";
+    render();
+  }
   if (action === "return-saved-cross") {
     const saved = readJSON(STORAGE.crossMarks, [])[0];
     if (saved) {
@@ -3284,6 +3407,7 @@ app.addEventListener("click", async event => {
       state.practice.crossQuestion = Number(saved.questionIndex) || 0;
       state.practice.crossSaved = true;
       state.practice.crossCrossed = false;
+      state.practice.crossRemaining = false;
       state.practice.stage = "question";
       sound.threshold().catch(() => {});
       render();
@@ -3293,6 +3417,7 @@ app.addEventListener("click", async event => {
     if (state.practice.stage === "question") {
       state.practice.stage = "crossed";
       state.practice.crossCrossed = true;
+      state.practice.crossRemaining = false;
       sound.thresholdCrossing().catch(() => {});
       if (state.practice.crossSaved) {
         const id = currentCrossQuestionKey();
@@ -3305,13 +3430,28 @@ app.addEventListener("click", async event => {
   if (action === "previous-tone" || action === "next-tone") {
     const current = tones.findIndex(item => item.id === state.practice.tone);
     const offset = action === "previous-tone" ? -1 : 1;
-    const selected = tones[(current + offset + tones.length) % tones.length];
+    const start = current < 0 ? (offset > 0 ? -1 : 0) : current;
+    const selected = tones[(start + offset + tones.length) % tones.length];
     state.practice.tone = selected.id; state.practice.frequency = selected.hz; render();
   }
   if (action === "show-all-tones") { state.practice.embodyStage = "all"; render(); }
   if (action === "enter-tone") { state.practice.embodyStage = "tune"; sound.tone(state.practice.frequency, state.practice.amplitude); state.practice.tonePlaying = true; render(); }
   if (action === "embody-hold") { state.practice.embodyStage = "hold"; sound.tone(state.practice.frequency, state.practice.amplitude); state.practice.tonePlaying = true; render(); }
-  if (action === "embody-complete") { sound.stop(); state.practice.tonePlaying = false; sound.playVoice("ts_embody_silence_v1", 0.72); requestMovementCompletion(); }
+  if (action === "embody-complete") {
+    sound.stop();
+    state.practice.tonePlaying = false;
+    if (state.practice.tone) localStorage.setItem(STORAGE.lastHeldTone, state.practice.tone);
+    sound.playVoice("ts_embody_silence_v1", 0.72);
+    state.practice.embodyStage = "after";
+    render();
+  }
+  if (action === "embody-carry") requestMovementCompletion();
+  if (action === "embody-choose-another") {
+    state.practice.tone = "";
+    state.practice.frequency = 432;
+    state.practice.embodyStage = "choose";
+    render();
+  }
   if (action === "save-question") { state.practice.questionSaved = !state.practice.questionSaved; render(); }
   if (action === "toggle-tone") { state.practice.tonePlaying = !state.practice.tonePlaying; if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); else sound.stop(); render(); }
   if (action === "save-field-practice") { const item = contentByID(catalogFor(state.lang).fields, button.dataset.field); addTrace({ type: "field", title: `${item.dimension}D · ${item.title}`, detail: item.returnPractice }); showToast(tr("saved")); }
@@ -3471,11 +3611,6 @@ document.addEventListener("keydown", event => {
   if (state.view === "comicReader" && !event.target.matches("input, textarea, select") && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
     event.preventDefault();
     turnComicPage(event.key === "ArrowLeft" ? -1 : 1);
-    return;
-  }
-  if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-action='notice-tap']")) {
-    event.preventDefault();
-    if (state.quietWords) showToast(state.lang === "en" ? "Noticed" : "Notado");
   }
 });
 

@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v25";
+const CACHE = "tone-sovereign-v27";
 const COMIC_CACHE = "tone-sovereign-comics-v1";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
@@ -58,6 +58,7 @@ const CORE = [
   "./app.js",
   "./breath-instrument.html",
   "./manifest.webmanifest",
+  "./manifest-es.webmanifest",
   "./sword-mark.png",
   "./tone-sovereign-logo.png",
   "./assets/sound/ts_first_light_arrival_full.wav",
