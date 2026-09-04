@@ -1,6 +1,7 @@
 const ROOT = "./";
 const FIRST_LIGHT = Object.freeze({
   duration: 16.20,
+  entryDelay: 2.60,
   voiceDelay: 13.48,
   ambienceDelay: 15.18
 });
@@ -174,6 +175,14 @@ const guidedLibraryPaths = {
   ]
 };
 
+const theLockAssetSet = language => Object.freeze({
+  cover: `${ROOT}assets/comics/${language}/specials/the-lock/cover.webp`,
+  pages: Object.freeze(Array.from(
+    { length: 30 },
+    (_, index) => `${ROOT}assets/comics/${language}/specials/the-lock/page-${String(index + 1).padStart(2, "0")}.webp`
+  ))
+});
+
 const comicSeries = [
   {
     id: "mainline",
@@ -215,6 +224,39 @@ const comicSeries = [
       { number: 8, pages: 4, esReady: true, en: "The Divider", es: "El Divisor" },
       { number: 9, pages: 4, esReady: true, en: "The Architect", es: "El Arquitecto" },
       { number: 10, pages: 9, esReady: true, philosophicalFiction: true, en: "The Self", es: "El Yo" }
+    ]
+  },
+  {
+    id: "specials",
+    kind: "specials",
+    en: {
+      title: "Special Stories",
+      subtitle: "Optional long-form fiction from the world of Tone Sovereign. Read it as story, not as diagnosis, doctrine or instruction."
+    },
+    es: {
+      title: "Historias especiales",
+      subtitle: "Ficción larga y opcional del mundo de Tone Sovereign. Léela como relato, no como diagnóstico, doctrina ni instrucción."
+    },
+    issues: [
+      {
+        id: "the-lock",
+        number: 1,
+        pages: 30,
+        hasCover: true,
+        assetReady: true,
+        esReady: true,
+        philosophicalFiction: true,
+        en: "THE LOCK",
+        es: "EL BLOQUEO",
+        assets: {
+          en: theLockAssetSet("en"),
+          es: theLockAssetSet("es")
+        },
+        transcriptPaths: {
+          en: `${ROOT}assets/comics/en/specials/the-lock/transcript.json`,
+          es: `${ROOT}assets/comics/es/specials/the-lock/transcript.json`
+        }
+      }
     ]
   }
 ];
@@ -290,6 +332,12 @@ const steadyStates = [
   { id: "looping", pattern: "coherent", en: ["Thoughts looping / being hard on myself", "Repeating thoughts, blame, self-attack."], es: ["Pensamientos repetidos / ser duro conmigo", "Pensamientos repetidos, culpa, ataques contra mí mismo."] },
   { id: "fog", pattern: "anapana", en: ["Fog / far away", "Numb, unreal, hard to locate."], es: ["Mente nublada / sensación de lejanía", "Entumecido, irreal, difícil de ubicar."] },
   { id: "wired", pattern: "extended", en: ["Wired / can’t settle", "Restless, wired, can’t wind down."], es: ["Inquietud / me cuesta calmarme", "Inquieto, activado, no puedo bajar."] }
+];
+
+const steadyModes = [
+  { id: "overwhelmed", en: ["Too much", "Reduce intensity and make room."], es: ["Demasiado", "Reduce la intensidad y abre espacio."] },
+  { id: "anxious", en: ["Too activated", "Find a steadier rhythm."], es: ["Demasiada activación", "Encuentra un ritmo más estable."] },
+  { id: "fog", en: ["Too far away", "Return gently to what is here."], es: ["Demasiado lejos", "Vuelve con suavidad a lo que está aquí."] }
 ];
 
 const BREATH_PATTERNS = Object.freeze({
@@ -646,6 +694,9 @@ const state = {
   quietWords: savedPreferences.quietWords !== false,
   ceremonyKey: 1,
   ceremonySettled: false,
+  ceremonyEntryReady: false,
+  resetConfirmationOpen: false,
+  resetError: "",
   selectedField: "1d-presence",
   selectedTeaching: "golden-age",
   selectedLaw: "law-01",
@@ -665,7 +716,7 @@ const state = {
   selectedComicSeries: "mainline",
   selectedComicIssue: 1,
   comicPage: 1,
-  comicIssue10Accepted: false,
+  acceptedComicNotices: new Set(),
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
@@ -697,6 +748,8 @@ function newPractice() {
     movement: "",
     sequence: false,
     stage: "",
+    interrupted: false,
+    interruptedAt: 0,
     capacityStep: 0,
     capacityAnswers: [],
     selectedOption: "",
@@ -707,6 +760,7 @@ function newPractice() {
     noticeManualUntil: 0,
     noticeLastManualCue: -1,
     noticeDuration: 60,
+    guidance: "quiet",
     noticeOutcome: "",
     noticeAcknowledged: false,
     steadyExpanded: false,
@@ -717,6 +771,7 @@ function newPractice() {
     facts: "",
     story: "",
     pull: "",
+    pendingPull: "",
     reclaimHolding: false,
     reclaimComplete: false,
     relation: "",
@@ -724,6 +779,7 @@ function newPractice() {
     doorway: "self",
     questionSaved: false,
     crossFocus: "self",
+    crossExpanded: false,
     crossQuestion: 0,
     crossRecent: [],
     crossSaved: false,
@@ -767,6 +823,7 @@ const liveRegion = document.querySelector("#live-region");
 const canvas = document.querySelector("#ambient-field");
 const ctx = canvas.getContext("2d", { alpha: true });
 let ceremonyTimer = 0;
+let ceremonyEntryTimer = 0;
 let practiceTimer = 0;
 let guidedSitTimer = 0;
 let toastTimer = 0;
@@ -932,9 +989,9 @@ class SoundEngine {
     oscillator.addEventListener("ended", () => this.nodes.delete(oscillator));
   }
 
-  async ceremony() {
+  async ceremony(includeVoice = false) {
     this.stop();
-    if (!state.sound && !state.voice) return;
+    if (!state.sound && !(state.voice && includeVoice)) return;
     const context = await this.prepareFirstLight();
     const start = context.currentTime + 0.06;
 
@@ -950,16 +1007,16 @@ class SoundEngine {
       const ambienceNode = this.scheduleBuffer(
         ambience,
         start + FIRST_LIGHT.ambienceDelay,
-        state.voice ? 0.0125 : 0.052,
+        state.voice && includeVoice ? 0.0125 : 0.052,
         { loop: true, firstLight: true }
       );
-      if (state.voice) {
+      if (state.voice && includeVoice) {
         ambienceNode.gain.gain.setValueAtTime(0.0125, start + FIRST_LIGHT.voiceDelay + 4.08);
         ambienceNode.gain.gain.linearRampToValueAtTime(0.052, start + FIRST_LIGHT.voiceDelay + 4.80);
       }
     }
 
-    if (state.voice) {
+    if (state.voice && includeVoice) {
       const buffer = await this.loadBuffer(this.voiceURL("ts_first_light_tagline_v1"), context);
       const { source } = this.scheduleBuffer(buffer, start + FIRST_LIGHT.voiceDelay, 0.86);
       this.voiceSource = source;
@@ -1183,6 +1240,15 @@ function persistPreferences() {
 
 function announce(message) { liveRegion.textContent = ""; requestAnimationFrame(() => { liveRegion.textContent = message; }); }
 
+function focusCurrentView() {
+  requestAnimationFrame(() => {
+    const heading = app.querySelector("main h1, main [role='heading']");
+    if (!heading) return;
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  });
+}
+
 function showToast(message) {
   state.toast = message;
   window.clearTimeout(toastTimer);
@@ -1231,7 +1297,7 @@ function navigate(view, options = {}) {
     if (remembersView) window.history.pushState(historyState, "", window.location.href);
     else window.history.replaceState(historyState, "", window.location.href);
   }
-  if (view === "practiceEngine") playEngineStageVoice();
+  if (changedView) focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -1240,6 +1306,7 @@ function restorePreviousView() {
   if (state.view === "guidedSits") resetGuidedSitSession();
   state.view = state.stack.pop() || "home";
   render();
+  focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -1258,6 +1325,7 @@ function goHome() {
   state.view = "home";
   window.history.replaceState({ app: HISTORY_MARKER, view: "home" }, "", window.location.href);
   render();
+  focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -1374,11 +1442,13 @@ function renderLivingApexStar() {
 }
 
 function renderLanding() {
-  return `<main class="landing ceremony ${state.ceremonySettled ? "is-settled" : "is-playing"}" data-ceremony="${state.ceremonyKey}">
+  const immediateEntry = state.ceremonySettled || state.ceremonyEntryReady || state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return `<main class="landing ceremony ${state.ceremonySettled ? "is-settled" : "is-playing"} ${immediateEntry ? "entry-ready" : ""}" data-ceremony="${state.ceremonyKey}">
     <div class="gold-wash" aria-hidden="true"></div>
     <div class="landing-inner">
       <div class="landing-tools" ${state.ceremonySettled ? "" : "inert"}>
         <button class="landing-replay-button delayed-control" type="button" data-action="replay-ceremony" aria-label="${tr("replayWithSound")}" title="${tr("replayWithSound")}">${renderSoundIcon(true)}<span>${tr("replayWithSound")}</span></button>
+        <button class="text-button delayed-control" type="button" data-action="listen-first-light">${phrase("Hear the invitation", "Escuchar la invitación")}</button>
         <button class="text-button delayed-control" type="button" data-action="toggle-language">${tr("language")}</button>
       </div>
       <section class="landing-title" aria-label="Tone Sovereign">
@@ -1403,7 +1473,7 @@ function renderLanding() {
         <strong>${tr("goldenAge")}</strong>
         <button class="symbol-link" type="button" data-view="symbol">${tr("symbol")}</button>
       </section>
-      <div class="landing-actions" ${state.ceremonySettled ? "" : "inert"}>
+      <div class="landing-actions" ${immediateEntry ? "" : "inert"}>
         <button class="enter-button" type="button" data-view="home">${tr("enter")} &nbsp;→</button>
       </div>
     </div>
@@ -1412,7 +1482,16 @@ function renderLanding() {
 
 function settleCeremonyLater() {
   window.clearTimeout(ceremonyTimer);
+  window.clearTimeout(ceremonyEntryTimer);
+  const reduced = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const entryDelay = reduced ? 100 : FIRST_LIGHT.entryDelay * 1000;
   const duration = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : FIRST_LIGHT.duration * 1000;
+  ceremonyEntryTimer = window.setTimeout(() => {
+    state.ceremonyEntryReady = true;
+    const actions = document.querySelector(".ceremony .landing-actions");
+    document.querySelector(".ceremony")?.classList.add("entry-ready");
+    actions?.removeAttribute("inert");
+  }, entryDelay);
   ceremonyTimer = window.setTimeout(() => {
     state.ceremonySettled = true;
     const ceremony = document.querySelector(".ceremony");
@@ -1434,8 +1513,9 @@ async function replayCeremony(withAudio = true) {
   }
   state.ceremonyKey += 1;
   state.ceremonySettled = false;
+  state.ceremonyEntryReady = false;
   render();
-  if (shouldPlayAudio) sound.ceremony().catch(() => {
+  if (shouldPlayAudio) sound.ceremony(false).catch(() => {
     showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
   });
 }
@@ -1448,11 +1528,6 @@ function renderHome() {
         <h1 class="display">${tr("beginQuestion")}</h1>
         <p class="lede hero-copy">${tr("beginSupport")}</p>
       </header>
-      <button class="orientation-invitation spectrum-row" style="--item-color:${SPECTRUM.orientation}" type="button" data-view="about">
-        <span class="door-mark" aria-hidden="true">✦</span>
-        <span><strong>${phrase("Begin Here", "Comienza aquí")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
-        <b aria-hidden="true">→</b>
-      </button>
       <section class="door-stack" aria-label="${tr("fiveDoors")}">
         ${doors.map(door => `<button class="door spectrum-row ${door.primary ? "primary-door" : ""}" style="--item-color:${SPECTRUM[door.spectrum]}" type="button" data-view="${door.id}">
           <span class="door-mark" aria-hidden="true">${door.mark}</span>
@@ -1460,6 +1535,11 @@ function renderHome() {
           <span class="door-arrow" aria-hidden="true">→</span>
         </button>`).join("")}
       </section>
+      <button class="orientation-invitation spectrum-row" style="--item-color:${SPECTRUM.orientation}" type="button" data-view="about">
+        <span class="door-mark" aria-hidden="true">✦</span>
+        <span><strong>${phrase("Begin Here", "Comienza aquí")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
+        <b aria-hidden="true">→</b>
+      </button>
       <footer class="home-footer">
         <button class="text-button" type="button" data-view="foundations">${phrase("Foundations", "Fundamentos")}</button>
         <button class="text-button" type="button" data-view="ruleOfLife">${phrase("My compass", "Mi brújula")}</button>
@@ -1881,6 +1961,7 @@ function movementTopbar(movement) {
 function renderMovementSession() {
   const p = state.practice;
   const movement = movementByID();
+  if (p.interrupted) return `${movementTopbar(movement)}<main class="page movement-session-page"><section class="practice-stage focused-stage interrupted-practice">${renderMovementHeading(phrase("Paused when you stepped away", "En pausa cuando saliste"), phrase("Nothing resumed by itself. Continue only when you are ready, or leave here.", "Nada se reanudó por sí solo. Continúa solo cuando estés listo o sal de aquí."))}<div class="practice-actions"><button class="primary-button" type="button" data-action="resume-interrupted-practice">${phrase("Resume", "Reanudar")}</button><button class="text-button" type="button" data-action="leave-interrupted-practice">${phrase("Leave practice", "Salir de la práctica")}</button></div></section></main>`;
   if (movement.id === "stabilise" && p.stage === "breath" && p.breathStartedAt) return renderStabiliseSession();
   if (p.stage === "continuity") return renderContinuityChoice(movement);
   return `${movementTopbar(movement)}
@@ -1891,13 +1972,23 @@ function renderMovementSession() {
 
 function renderContinuityChoice(movement) {
   const lang = state.lang;
+  const bridge = {
+    notice: ["stabilise", "Create room for the signal.", "Abrir espacio para la señal."],
+    stabilise: ["discern", "Look with enough steadiness.", "Mirar con suficiente estabilidad."],
+    discern: ["reclaim", "Decide what may govern.", "Decidir qué puede gobernar."],
+    reclaim: ["cross", "Meet the threshold without rushing it.", "Encontrar el umbral sin apresurarlo."],
+    cross: ["embody", "Give the direction a felt form.", "Dar a la dirección una forma sentida."],
+    embody: ["integrate", "Place the tone beside the rest of life.", "Colocar el tono junto al resto de la vida."]
+  }[movement.id];
+  const nextMovement = bridge ? movementByID(bridge[0]) : null;
   return `${movementTopbar(movement)}<main class="page continuity-page">
     <div class="completion-seal"><div class="seal-orb"><span>${movement.mark}</span></div>
       <h1 class="practice-title">${lang === "en" ? "Save this practice on this device?" : "¿Guardar esta práctica en este dispositivo?"}</h1>
       <p class="lede">${lang === "en" ? "This saves the practice and the response you chose. Tone Sovereign will not tell you what your choices mean." : "Esto guarda la práctica y la respuesta que elegiste. Tone Sovereign no te dirá qué significan tus elecciones."}</p>
     </div>
     <div class="practice-actions"><button class="primary-button" type="button" data-action="finish-movement-save">${lang === "en" ? "Save on this device" : "Guardar en este dispositivo"}</button>
-    <button class="text-button" type="button" data-action="finish-movement-pass">${lang === "en" ? "Finish without saving" : "Terminar sin guardar"}</button></div>
+    <button class="text-button" type="button" data-action="finish-movement-pass">${lang === "en" ? "Finish here without saving" : "Terminar aquí sin guardar"}</button>
+    ${bridge && nextMovement ? `<aside class="adjacent-bridge"><p>${lang === "en" ? bridge[1] : bridge[2]}</p><button class="secondary-button" type="button" data-open-movement="${nextMovement.id}">${lang === "en" ? `Continue with ${nextMovement.en.name}` : `Continuar con ${nextMovement.es.name}`}</button></aside>` : ""}</div>
   </main>`;
 }
 
@@ -1918,8 +2009,9 @@ function renderNoticeMovement() {
   const p = state.practice;
   const lang = state.lang;
   if (p.stage === "arrive") return `<section class="practice-stage focused-stage">
-    ${renderMovementHeading(lang === "en" ? "Notice one simple feeling in your body." : "Nota una sensación sencilla en tu cuerpo.", lang === "en" ? "Four brief cues, then notice freely." : "Cuatro indicaciones breves y luego atención libre.")}
+    ${renderMovementHeading(lang === "en" ? "Notice one simple feeling in your body." : "Nota una sensación sencilla en tu cuerpo.", p.guidance === "guided" ? (lang === "en" ? "Four optional spoken cues, then notice freely." : "Cuatro indicaciones habladas opcionales y luego atención libre.") : (lang === "en" ? "A quiet minute with brief words on screen." : "Un minuto en silencio con palabras breves en pantalla."))}
     <div class="instrument-region notice-instrument still" aria-hidden="true"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></div>
+    <div class="segmented practice-guidance" aria-label="${lang === "en" ? "Notice guidance" : "Guía para Notar"}"><button type="button" data-practice-guidance="quiet" aria-pressed="${p.guidance === "quiet"}">${lang === "en" ? "Quiet" : "Silencio"}</button><button type="button" data-practice-guidance="guided" aria-pressed="${p.guidance === "guided"}">${lang === "en" ? "Guided" : "Guiada"}</button></div>
     <button class="primary-button" type="button" data-action="start-notice">${lang === "en" ? "Begin" : "Comenzar"}</button>
     <div class="practice-settings-row"><button class="text-button" type="button" data-action="toggle-words">${state.quietWords ? (lang === "en" ? "Use quiet labels" : "Usar etiquetas suaves") : (lang === "en" ? "Without labels" : "Sin etiquetas")}</button>
     <label>${lang === "en" ? "Duration" : "Duración"}<select data-notice-duration><option value="30" ${p.noticeDuration === 30 ? "selected" : ""}>30s</option><option value="60" ${p.noticeDuration === 60 ? "selected" : ""}>60s</option><option value="90" ${p.noticeDuration === 90 ? "selected" : ""}>90s</option></select></label></div>
@@ -1938,7 +2030,7 @@ function renderNoticeMovement() {
     <button class="instrument-region notice-instrument ${p.noticeAcknowledged ? "acknowledged" : ""}" type="button" data-action="notice-tap" aria-label="${p.noticeAcknowledged ? (lang === "en" ? "Noticed" : "Notado") : (lang === "en" ? "Ready. Acknowledge what you notice" : "Listo. Reconoce lo que notes")}"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></button>
     <p class="notice-status" data-notice-status>${p.noticeAcknowledged ? (lang === "en" ? "Noticed" : "Notado") : (lang === "en" ? "Ready" : "Listo")}</p>
     ${renderMovementHeading(cue, state.quietWords ? (lang === "en" ? "Tap the centre when you notice something." : "Toca el centro cuando notes algo.") : (lang === "en" ? "No naming is needed." : "No hace falta nombrarlo."))}
-    <p class="timer" data-notice-timer>1:00</p>
+    <p class="timer" data-notice-timer>${Math.floor(p.noticeDuration / 60)}:${String(p.noticeDuration % 60).padStart(2, "0")}</p>
     <div class="button-row"><button class="secondary-button" type="button" data-action="another-notice-cue">${lang === "en" ? "Another cue" : "Otra indicación"}</button><button class="text-button" type="button" data-action="end-notice">${lang === "en" ? "End practice" : "Terminar práctica"}</button></div>
   </section>`;
 }
@@ -1953,11 +2045,11 @@ function renderStabiliseMovement() {
     <div class="stabilise-instrument" role="img" aria-label="${lang === "en" ? "A steady vertical line meeting a calm horizon" : "Una línea vertical estable que se encuentra con un horizonte tranquilo"}"><span></span><i></i></div>
     <div class="state-list">${Object.entries(BREATH_PATTERNS).map(([key, item]) => `<button class="state-choice" type="button" data-breath-pattern="${key}"><span class="state-mini-axis" style="--pattern-rgb:${item.rgb}" aria-hidden="true"></span><span><strong>${item[lang].title}</strong><small>${item[lang].cue}</small></span><b>›</b></button>`).join("")}</div></section>`;
   if (!p.steadyState) {
-    const visible = p.steadyExpanded ? steadyStates : steadyStates.slice(0, 3);
+    const visible = p.steadyExpanded ? steadyStates : steadyModes;
     return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "What feels difficult now?" : "¿Qué se siente difícil ahora?", lang === "en" ? "Choose the closest state. You can change it." : "Elige el estado más cercano. Puedes cambiarlo.")}
       <div class="stabilise-instrument" role="img" aria-label="${lang === "en" ? "A steady vertical line meeting a calm horizon" : "Una línea vertical estable que se encuentra con un horizonte tranquilo"}"><span></span><i></i></div>
       <div class="state-list">${visible.map(item => `<button class="state-choice" type="button" data-steady="${item.id}"><span class="state-mini-axis" aria-hidden="true"></span><span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></span><b>›</b></button>`).join("")}</div>
-      ${p.steadyExpanded ? "" : `<button class="text-button" type="button" data-action="more-steady">${lang === "en" ? "More states" : "Más estados"} ↓</button>`}
+      ${p.steadyExpanded ? `<button class="text-button" type="button" data-action="less-steady">${lang === "en" ? "Back to three simple choices" : "Volver a tres opciones sencillas"}</button>` : `<button class="text-button" type="button" data-action="more-steady">${lang === "en" ? "Choose a more specific state" : "Elegir un estado más específico"} ↓</button>`}
     </section>`;
   }
   const chosen = steadyStates.find(item => item.id === p.steadyState);
@@ -1965,6 +2057,8 @@ function renderStabiliseMovement() {
   return `<section class="practice-stage focused-stage">
     ${renderMovementHeading(pattern[lang].title, pattern[lang].cue, chosen[lang][0])}
     <p class="consent-copy">${lang === "en" ? "Stop at any time. Let the breath return to its natural rhythm." : "Detente cuando quieras. Deja que la respiración vuelva a su ritmo natural."}</p>
+    <div class="segmented practice-duration" aria-label="${lang === "en" ? "Breathing duration" : "Duración de la respiración"}">${[[10,"10 sec","10 s"],[120,"2 min","2 min"],[300,"5 min","5 min"]].map(([seconds,en,es]) => `<button type="button" data-breath-duration="${seconds}" aria-pressed="${p.breathDuration === seconds}">${lang === "en" ? en : es}</button>`).join("")}</div>
+    <div class="segmented practice-guidance" aria-label="${lang === "en" ? "Breathing guidance" : "Guía de respiración"}"><button type="button" data-practice-guidance="quiet" aria-pressed="${p.guidance === "quiet"}">${lang === "en" ? "Quiet" : "Silencio"}</button><button type="button" data-practice-guidance="guided" aria-pressed="${p.guidance === "guided"}">${lang === "en" ? "Guided" : "Guiada"}</button></div>
     <button class="primary-button" type="button" data-action="start-breath">${lang === "en" ? "Begin breathing" : "Comenzar respiración"}</button>
     <button class="text-button" type="button" data-action="change-breath-pattern">${lang === "en" ? "Change breath" : "Cambiar respiración"}</button>
     <button class="text-button" type="button" data-action="change-steady">${lang === "en" ? "Choose another state" : "Elegir otro estado"}</button>
@@ -2005,9 +2099,12 @@ function renderCapacityMovement(id) {
   const lang = state.lang;
   const flow = capacityFlows[id];
   const item = flow[p.capacityStep][lang];
+  const heldTone = id === "integrate" && p.sequence ? tones.find(tone => tone.id === localStorage.getItem(STORAGE.lastHeldTone)) : null;
   return `<section class="practice-stage focused-stage capacity-stage">
     <p class="eyebrow">${p.capacityStep + 1} ${lang === "en" ? "of" : "de"} ${flow.length}</p>
     ${renderMovementHeading(item[0], item[1])}
+    <button class="text-button voice-invitation" type="button" data-action="listen-capacity-stage">${lang === "en" ? "Hear this invitation" : "Escuchar esta invitación"}</button>
+    ${heldTone ? `<p class="gentle-note">${lang === "en" ? `Also present: the ${heldTone.en} tone held in Embody. It is one strand, not the whole choice.` : `También está presente el tono ${heldTone.es} guardado en Encarnar. Es una hebra, no toda la elección.`}</p>` : ""}
     ${renderCapacityInstrument(id, p.capacityStep, lang, p.capacityAnswers, p.selectedOption)}
     <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
     <button class="primary-button" type="button" data-action="capacity-continue" ${p.selectedOption ? "" : "disabled"}>${p.capacityStep === flow.length - 1 ? (lang === "en" ? "Complete practice" : "Completar práctica") : tr("continue")}</button>
@@ -2033,6 +2130,11 @@ function renderReclaimMovement() {
     <label class="field-label reclaim-custom-field"><span>${lang === "en" ? "What is pulling at your attention?" : "¿Qué está tirando de tu atención?"}</span><input class="field-input" data-input="customPull" value="${escapeAttribute(p.customPull)}" maxlength="80" autocomplete="off"></label>
     <button class="primary-button" type="button" data-action="reclaim-custom-continue" ${p.customPull.trim() ? "" : "disabled"}>${tr("continue")}</button>
     <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button></section>`;
+  if (p.stage === "confirm") return `<section class="practice-stage focused-stage">
+    ${renderMovementHeading(lang === "en" ? "Is this close enough?" : "¿Esto se acerca lo suficiente?", lang === "en" ? "You can change it, leave it unclear, or continue. Naming does not make it the authority." : "Puedes cambiarlo, dejarlo sin aclarar o continuar. Nombrarlo no le da autoridad.")}
+    <p class="reclaim-confirmed-pull">${escapeHTML(p.pendingPull)}</p>
+    <div class="practice-actions"><button class="primary-button" type="button" data-action="confirm-reclaim-pull">${lang === "en" ? "Continue with this" : "Continuar con esto"}</button><button class="text-button" type="button" data-action="change-reclaim-pull">${lang === "en" ? "Change it" : "Cambiarlo"}</button></div>
+  </section>`;
   if (p.stage === "pause") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
     <button class="instrument-region reclaim-instrument ${p.reclaimHolding ? "hold-active" : ""} ${p.reclaimComplete ? "is-complete" : ""}" type="button" data-action="reclaim-hold" aria-label="${lang === "en" ? "Press and hold through one natural breath" : "Mantén pulsado durante una respiración natural"}"><svg class="reclaim-spiral" viewBox="0 0 120 120" aria-hidden="true"><path d="M63 58 C72 54 76 63 72 70 C66 82 45 78 40 64 C33 44 51 27 72 31 C97 36 105 65 91 85 C74 109 37 103 24 77"></path></svg><span class="reclaim-line"></span><span class="reclaim-point"></span></button>
     ${renderMovementHeading(p.reclaimComplete ? (lang === "en" ? "You can still choose." : "Todavía puedes elegir.") : (lang === "en" ? "Hold your centre for one breath." : "Mantén tu centro durante una respiración."), p.reclaimComplete ? unbindingSupport : (lang === "en" ? "Hold the spiral for one breath, or continue when ready." : "Mantén la espiral durante una respiración o continúa cuando estés listo."))}
@@ -2078,8 +2180,6 @@ function renderCrossMovement() {
   const p = state.practice;
   const lang = state.lang;
   const focus = currentCrossFocus();
-  if (p.stage === "focuses") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose the focus that best fits this moment. You can change it." : "Elige el enfoque que mejor encaje con este momento. Puedes cambiarlo.")}
-    <div class="cross-focus-grid">${crossFocuses.map(item => `<button class="cross-focus-choice" type="button" data-cross-focus="${item.id}"><span>${item.glyph}</span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></button>`).join("")}</div></section>`;
   if (p.stage === "question" || p.stage === "crossed") return `<section class="practice-stage focused-stage cross-question-stage">
     <div class="doorway-instrument cross-door ${p.stage === "crossed" ? "open" : ""}" role="img" aria-label="${lang === "en" ? `Selected focus: ${focus.en[0]}. ${focus.en[1]}` : `Enfoque seleccionado: ${focus.es[0]}. ${focus.es[1]}`}"><span>${focus.glyph}</span></div>
     <p class="eyebrow">${escapeHTML(focus[lang][0])} · ${lang === "en" ? "QUESTION" : "PREGUNTA"}</p>
@@ -2099,10 +2199,9 @@ function renderCrossMovement() {
   if (p.stage === "close") return `<section class="practice-stage focused-stage"><div class="doorway-instrument cross-door open" aria-hidden="true"><span>│</span></div><p class="eyebrow">${lang === "en" ? "RETURN" : "REGRESO"}</p>
     ${renderMovementHeading(lang === "en" ? "Take only what feels useful." : "Quédate solo con lo que sea útil.", lang === "en" ? "Keep the question, or leave it here." : "Guarda la pregunta o déjala aquí.")}
     <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button></section>`;
-  const focusIndex = crossFocuses.findIndex(item => item.id === focus.id);
   return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose what feels closest." : "Elige lo que se sienta más cercano.")}
-    <div class="cross-focus-carousel"><button class="icon-button" type="button" data-action="previous-cross-focus" aria-label="${lang === "en" ? "Previous focus" : "Enfoque anterior"}">‹</button><div><span class="cross-focus-glyph" role="img" aria-label="${lang === "en" ? `${focus.en[0]} focus at the threshold` : `Enfoque en el umbral: ${focus.es[0]}`}">${focus.glyph}</span><h2>${focus[lang][0]}</h2><p>${focus[lang][1]}</p></div><button class="icon-button" type="button" data-action="next-cross-focus" aria-label="${lang === "en" ? "Next focus" : "Enfoque siguiente"}">›</button></div>
-    <button class="secondary-button" type="button" data-action="show-cross-focuses">${lang === "en" ? "Change focus" : "Cambiar enfoque"}</button>
+    <div class="cross-focus-grid">${(p.crossExpanded ? crossFocuses : crossFocuses.slice(0, 6)).map(item => `<button class="cross-focus-choice ${item.id === focus.id ? "selected" : ""}" type="button" data-cross-focus="${item.id}" aria-pressed="${item.id === focus.id}"><span>${item.glyph}</span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></button>`).join("")}</div>
+    <button class="text-button" type="button" data-action="toggle-cross-more">${p.crossExpanded ? (lang === "en" ? "Show six core doors" : "Mostrar seis puertas principales") : (lang === "en" ? "More doors" : "Más puertas")}</button>
     ${readJSON(STORAGE.crossMarks, []).length ? `<button class="text-button" type="button" data-action="return-saved-cross">${lang === "en" ? "Return to saved question" : "Volver a una pregunta guardada"}</button>` : ""}
     <button class="primary-button" type="button" data-action="open-cross-question">${lang === "en" ? `Open the ${focus.en[0]} question` : `Abrir la pregunta de ${focus.es[0]}`}</button>
   </section>`;
@@ -2113,10 +2212,16 @@ function renderEmbodyMovement() {
   const lang = state.lang;
   const tone = tones.find(item => item.id === p.tone) || null;
   const rememberedTone = localStorage.getItem(STORAGE.lastHeldTone);
+  if (p.embodyStage === "remembered" && tone) return `<section class="practice-stage focused-stage embody-stage">
+    <div class="tone-field compact" style="color:${tone.color}" aria-hidden="true"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
+    ${renderMovementHeading(lang === "en" ? `Return to ${tone.en}?` : `¿Volver a ${tone.es}?`, lang === "en" ? "This was your last held tone. It is offered as a memory, not a recommendation." : "Este fue tu último tono guardado. Se ofrece como recuerdo, no como recomendación.")}
+    <div class="practice-actions"><button class="primary-button" type="button" data-action="use-remembered-tone">${lang === "en" ? "Use this tone" : "Usar este tono"}</button><button class="text-button" type="button" data-action="choose-fresh-tone">${lang === "en" ? "Choose fresh" : "Elegir de nuevo"}</button></div>
+  </section>`;
   if (p.embodyStage === "all") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a tone" : "Elige un tono", lang === "en" ? "Choose the quality you want to practise." : "Elige la cualidad que quieres practicar.")}
     <div class="choice-grid">${tones.map(item => `<button class="choice" type="button" data-tone="${item.id}" data-select-tone="1">${item[lang]}</button>`).join("")}</div></section>`;
   if (p.embodyStage === "tune" && tone) return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(tone[lang], lang === "en" ? `Adjust the sound until it feels close enough to ${tone.en}.` : `Ajusta el sonido hasta que se sienta suficientemente cercano a ${tone.es}.`)}
+    <details class="dial-help"><summary>${lang === "en" ? "What do the dials change?" : "¿Qué cambian los controles?"}</summary><p><strong>${lang === "en" ? "Frequency:" : "Frecuencia:"}</strong> ${lang === "en" ? "moves the pitch higher or lower; it does not assign meaning or healing." : "sube o baja el tono; no asigna significado ni curación."}</p><p><strong>${lang === "en" ? "Strength:" : "Intensidad:"}</strong> ${lang === "en" ? "changes loudness only. Keep it comfortable, or leave sound off." : "solo cambia el volumen. Mantenlo cómodo o deja el sonido apagado."}</p></details>
     <div class="tone-controls"><label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="180" max="880" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label><label class="range-label">${lang === "en" ? "Strength" : "Intensidad"}<input type="range" min="10" max="70" value="${p.amplitude}" data-range="amplitude"><span>${p.amplitude}</span></label></div>
     <button class="primary-button" type="button" data-action="embody-hold">${lang === "en" ? "This is it" : "Este es el tono"}</button></section>`;
   if (p.embodyStage === "hold" && tone) return `<section class="practice-stage focused-stage embody-hold-stage"><div class="tone-field large" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
@@ -2154,10 +2259,11 @@ function startMovement(id) {
     embody: "choose",
     integrate: "practice"
   }[id] || "practice";
+  if (id === "embody" && state.practice.tone) state.practice.embodyStage = "remembered";
   state.view = "movement";
   if (state.stack.at(-1) !== "practice") state.stack.push("practice");
   render();
-  playCapacityStageVoice(id, state.practice.capacityStep);
+  focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -2169,7 +2275,11 @@ function playCapacityStageVoice(id, step) {
     "integrate:0": "ts_integrate_include_v1",
     "integrate:2": "ts_integrate_carry_v1"
   }[`${id}:${step}`];
-  if (cue) sound.playVoice(cue, state.reduceMotion ? 0 : 0.18);
+  if (!state.voice) {
+    showToast(phrase("Voice is off. You can turn it on in Settings.", "La voz está desactivada. Puedes activarla en Ajustes."));
+    return;
+  }
+  if (cue) sound.playVoice(cue);
 }
 
 function playEngineStageVoice() {
@@ -2187,7 +2297,11 @@ function playEngineStageVoice() {
     "attunement-compass-meeting": "ts_attunement_meeting_v1",
     "attunement-compass-next-step": "ts_attunement_next_step_v1"
   }[stepID];
-  if (cue) sound.playVoice(cue, state.reduceMotion ? 0 : 0.18);
+  if (!state.voice) {
+    showToast(phrase("Voice is off. You can turn it on in Settings.", "La voz está desactivada. Puedes activarla en Ajustes."));
+    return;
+  }
+  if (cue) sound.playVoice(cue);
 }
 
 function startFullPractice() {
@@ -2231,6 +2345,7 @@ function movementBack() {
   } else if (id === "reclaim" && p.stage === "complete") p.stage = "relationship";
   else if (id === "reclaim" && p.stage === "relationship") p.stage = "pause";
   else if (id === "reclaim" && p.stage === "pause") p.stage = p.customPull ? "custom" : "authority";
+  else if (id === "reclaim" && p.stage === "confirm") p.stage = p.customPull ? "custom" : "authority";
   else if (id === "reclaim" && p.stage === "custom") p.stage = "authority";
   else if (id === "cross" && p.stage === "close") p.stage = "question";
   else if (id === "cross" && (p.stage === "question" || p.stage === "crossed" || p.stage === "focuses")) p.stage = "choose";
@@ -2241,7 +2356,7 @@ function movementBack() {
   else { returnToMovementField(); return; }
   stopPracticeTimers();
   render();
-  playCapacityStageVoice(id, p.capacityStep);
+  focusCurrentView();
 }
 
 function requestMovementCompletion() {
@@ -2310,7 +2425,7 @@ function renderStabiliseSession() {
       <div><strong>${lang === "en" ? "Stabilise" : "Estabilizar"}</strong><span>${escapeHTML(selectedState?.[lang]?.[0] || patternCopy.title)}</span></div>
     </header>
     <footer class="steady-session-footer">
-      <strong class="steady-session-timer" data-breath-timer>2:00</strong>
+      <strong class="steady-session-timer" data-breath-timer>${Math.floor(state.practice.breathDuration / 60)}:${String(state.practice.breathDuration % 60).padStart(2, "0")}</strong>
       <p>${consent}</p>
       <button class="primary-button" type="button" data-action="stop-breath">${lang === "en" ? "Enough" : "Suficiente"}</button>
     </footer>
@@ -2390,7 +2505,6 @@ function nextMovement() {
     stopPracticeTimers();
     state.practice.index += 1;
     render();
-    playMovementVoice(movements[state.practice.index].id);
     window.scrollTo({ top: 0, behavior: "auto" });
     return;
   }
@@ -2402,7 +2516,6 @@ function previousMovement() {
   stopPracticeTimers();
   state.practice.index -= 1;
   render();
-  playMovementVoice(movements[state.practice.index].id);
 }
 
 function playMovementVoice(id) {
@@ -2471,7 +2584,7 @@ function startNoticeTimer(reset = true) {
     }
     if (cue !== state.practice.noticeCue) {
       state.practice.noticeCue = cue;
-      sound.playVoice(noticeVoiceCues[cue]);
+      if (state.practice.guidance === "guided") sound.playVoice(noticeVoiceCues[cue]);
       announce(noticeCues[state.lang][cue]);
     }
     const remaining = Math.max(0, state.practice.noticeDuration - Math.floor(elapsed));
@@ -2486,7 +2599,6 @@ function startNoticeTimer(reset = true) {
       state.practice.stage = "close";
       announce(state.lang === "en" ? "Practice complete" : "Práctica completa");
       render();
-      sound.playVoice("ts_notice_close_v1", state.reduceMotion ? 0 : 0.22);
     }
   };
   update();
@@ -2495,7 +2607,7 @@ function startNoticeTimer(reset = true) {
 
 async function beginNoticePractice() {
   try {
-    if (state.voice) await sound.prepareVoiceCues(noticeVoiceCues);
+    if (state.practice.guidance === "guided" && state.voice) await sound.prepareVoiceCues(noticeVoiceCues);
   } catch {
     showToast(state.lang === "en" ? "Voice guidance could not start." : "No se pudo iniciar la guía de voz.");
   }
@@ -2508,7 +2620,7 @@ async function beginNoticePractice() {
   state.practice.noticeLastManualCue = -1;
   state.practice.noticeAcknowledged = false;
   render();
-  sound.playVoice(noticeVoiceCues[0]);
+  if (state.practice.guidance === "guided") sound.playVoice(noticeVoiceCues[0]);
   announce(noticeCues[state.lang][0]);
 }
 
@@ -2524,7 +2636,7 @@ function offerAnotherNoticeCue() {
   state.practice.noticeCue = cue;
   state.practice.noticeAcknowledged = false;
   render();
-  sound.playVoice(noticeVoiceCues[cue]);
+  if (state.practice.guidance === "guided") sound.playVoice(noticeVoiceCues[cue]);
   announce(noticeCues[state.lang][cue]);
 }
 
@@ -2553,7 +2665,7 @@ function breathVoiceCues(pattern) {
 async function beginBreathPractice() {
   const pattern = selectedBreathPattern();
   try {
-    if (state.voice) await sound.prepareVoiceCues(breathVoiceCues(pattern));
+    if (state.practice.guidance === "guided" && state.voice) await sound.prepareVoiceCues(breathVoiceCues(pattern));
     else if (state.sound) await sound.ready();
   } catch {
     showToast(state.lang === "en" ? "Breathing audio could not start." : "No se pudo iniciar el audio de respiración.");
@@ -2596,7 +2708,7 @@ async function startBreathTimer(reset = true) {
       sound.breathPhase(patternKey, frame.phase.sound).catch(() => {});
       let voiceCue = frame.phase.voice;
       if (patternKey === "anapana" && frame.index === 0 && frame.cycleIndex > 0) voiceCue = "ts_stabilise_return_attention_v1";
-      if (voiceCue) sound.playVoice(voiceCue);
+      if (voiceCue && state.practice.guidance === "guided") sound.playVoice(voiceCue);
       const phaseLabels = state.lang === "en"
         ? { inhale: "Inhale", "inhale-again": "Inhale again", exhale: "Exhale", observe: "Observe the natural breath", "breath-in": "Notice the breath coming in", "breath-out": "Notice the breath going out", natural: "Let breath stay natural" }
         : { inhale: "Inhala", "inhale-again": "Inhala otra vez", exhale: "Exhala", observe: "Observa la respiración natural", "breath-in": "Nota cómo entra la respiración", "breath-out": "Nota cómo sale la respiración", natural: "Deja que la respiración siga natural" };
@@ -2801,7 +2913,7 @@ function renderLibrary() {
     <section><p class="eyebrow">${phrase("Two-minute practices", "Prácticas de dos minutos")}</p><div class="list">${featured.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>2 min</b></button>`).join("")}</div><button class="secondary-button" type="button" data-action="browse-two-minute">${phrase("Browse all two-minute practices", "Ver todas las prácticas de dos minutos")}</button></section>
     ${state.showAllPractices ? `<section class="list">${catalog.libraryEntries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry-practice="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("")}</section>` : ""}
     <section class="start-here"><button class="primary-button" type="button" data-view="practiceEngines">${phrase("Explore all guided practices", "Explorar todas las prácticas guiadas")}</button></section>`;
-  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.reclaim}" type="button" data-view="comics"><span><strong>${phrase("Comics", "Cómics")}</strong><span>${phrase("Explore the teachings through two distinct illustrated story series.", "Explora las enseñanzas mediante dos series narrativas ilustradas y distintas.")}</span></span><b>→</b></button></section>
+  const teachingContent = `<section class="start-here"><p class="eyebrow">${phrase("Begin here", "Comienza aquí")}</p><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.teachings}" type="button" data-view="foundations"><span><strong>${phrase("Laws & Principles", "Leyes y principios")}</strong><span>${phrase("The foundations of conscious participation, with plain-language and deeper explanations.", "Los fundamentos de la participación consciente, con explicaciones sencillas y profundas.")}</span></span><b>→</b></button><button class="list-row spectrum-row" style="--item-color:${SPECTRUM.reclaim}" type="button" data-view="comics"><span><strong>${phrase("Comics", "Cómics")}</strong><span>${phrase("Explore illustrated teachings and optional fiction in distinct story collections.", "Explora enseñanzas ilustradas y ficción opcional en colecciones narrativas distintas.")}</span></span><b>→</b></button></section>
     <section class="library-tools"><label class="search-field"><span>${phrase("Search teachings", "Buscar enseñanzas")}</span><input class="field-input" type="search" value="${escapeAttribute(state.libraryQuery)}" data-library-query placeholder="${phrase("A question, quality or situation", "Una pregunta, cualidad o situación")}"></label><div class="filter-grid"><label>${phrase("Field", "Campo")}<select data-library-filter="field"><option value="all">${phrase("All Fields", "Todos los Campos")}</option>${libraryFilterOptions(fields, state.libraryField)}</select></label><label>${phrase("Theme", "Tema")}<select data-library-filter="domain"><option value="all">${phrase("All themes", "Todos los temas")}</option>${libraryFilterOptions(domains, state.libraryDomain)}</select></label><label>${phrase("Need", "Necesidad")}<select data-library-filter="need"><option value="all">${phrase("All needs", "Todas las necesidades")}</option>${libraryFilterOptions(needs, state.libraryNeed)}</select></label></div><p class="result-count">${entries.length} ${phrase("teachings", "enseñanzas")}</p></section>
     <section class="list">${visibleEntries.map(entry => `<button class="list-row spectrum-row" style="--item-color:${entrySpectrumColor(entry, catalog)}" type="button" data-entry="${entry.id}"><span><strong>${escapeHTML(entry.title)}</strong><span>${escapeHTML(entry.summary)}</span></span><b>→</b></button>`).join("") || `<p class="empty-state">${phrase("No teaching matches those filters. Nothing is missing; try a wider search.", "Ninguna enseñanza coincide con esos filtros. No falta nada; prueba una búsqueda más amplia.")}</p>`}</section>
     ${visibleEntries.length < entries.length ? `<button class="secondary-button progressive-disclosure" type="button" data-action="show-more-teachings">${phrase("Show 8 more", "Mostrar 8 más")} · ${entries.length - visibleEntries.length} ${phrase("remaining", "restantes")}</button>` : ""}`;
@@ -2819,19 +2931,51 @@ function comicContext() {
   return { series, issue };
 }
 
-function comicAssetPath(seriesID, issueNumber, pageNumber, language = state.lang) {
-  const issue = String(issueNumber).padStart(2, "0");
-  const page = String(pageNumber).padStart(2, "0");
-  return `${ROOT}assets/comics/${language}/${seriesID}/issue-${issue}/page-${page}.webp`;
+function comicImageCount(issue) {
+  return issue.pages + (issue.hasCover ? 1 : 0);
 }
 
-function comicImageAlt(series, issue, page = 1) {
+function comicPageDescriptor(issue, position = 1) {
+  if (issue.hasCover && position === 1) return { key: "cover", label: phrase("Cover", "Portada"), storyPage: 0 };
+  const storyPage = issue.hasCover ? position - 1 : position;
+  return {
+    key: `page-${String(storyPage).padStart(2, "0")}`,
+    label: `${phrase("Page", "Página")} ${storyPage}`,
+    storyPage
+  };
+}
+
+function comicAssetPath(seriesID, issueOrNumber, position, language = state.lang) {
+  const issue = typeof issueOrNumber === "object"
+    ? issueOrNumber
+    : comicSeries.find(item => item.id === seriesID)?.issues.find(item => item.number === Number(issueOrNumber));
+  const descriptor = comicPageDescriptor(issue || { pages: position, hasCover: false }, position);
+  const assetSet = issue?.assets?.[language];
+  if (assetSet) return descriptor.key === "cover" ? assetSet.cover : assetSet.pages[descriptor.storyPage - 1];
+  const issueNumber = String(issue?.number ?? issueOrNumber).padStart(2, "0");
+  const pageNumber = String(position).padStart(2, "0");
+  return `${ROOT}assets/comics/${language}/${seriesID}/issue-${issueNumber}/page-${pageNumber}.webp`;
+}
+
+function comicImageAlt(series, issue, position = 1) {
   const seriesTitle = series[state.lang].title;
   const issueTitle = issue[state.lang];
+  const descriptor = comicPageDescriptor(issue, position);
+  if (descriptor.key === "cover") {
+    return phrase(
+      `${seriesTitle}: ${issueTitle}, cover`,
+      `${seriesTitle}: ${issueTitle}, portada`
+    );
+  }
   return phrase(
-    `${seriesTitle}, Issue ${issue.number}: ${issueTitle}, page ${page} of ${issue.pages}`,
-    `${seriesTitle}, número ${issue.number}: ${issueTitle}, página ${page} de ${issue.pages}`
+    `${seriesTitle}${series.kind === "specials" ? ":" : `, Issue ${issue.number}:`} ${issueTitle}, page ${descriptor.storyPage} of ${issue.pages}`,
+    `${seriesTitle}${series.kind === "specials" ? ":" : `, número ${issue.number}:`} ${issueTitle}, página ${descriptor.storyPage} de ${issue.pages}`
   );
+}
+
+function comicIssueLabel(series, issue) {
+  if (series.kind === "specials") return phrase("Special story", "Historia especial");
+  return `${phrase("Issue", "Número")} ${issue.number}`;
 }
 
 function renderComicLanguageControl() {
@@ -2844,10 +2988,15 @@ function renderComicLanguageControl() {
 function renderComicIssueCard(series, issue) {
   const spanishFallback = state.lang === "es" && !issue.esReady;
   const artLanguage = spanishFallback ? "en" : state.lang;
-  const openLabel = phrase(`Open ${series.en.title}, Issue ${issue.number}: ${issue.en}`, `Abrir ${series.es.title}, número ${issue.number}: ${issue.es}`);
+  const issueLabel = comicIssueLabel(series, issue);
+  const openLabel = phrase(`Open ${series.en.title}, ${issueLabel}: ${issue.en}`, `Abrir ${series.es.title}, ${issueLabel}: ${issue.es}`);
+  const coverPath = comicAssetPath(series.id, issue, 1, artLanguage);
+  const cover = issue.assetReady === false
+    ? `<span class="comic-cover-placeholder" role="img" aria-label="${escapeAttribute(phrase("Cover artwork in preparation", "Ilustración de portada en preparación"))}" data-comic-asset-path="${escapeAttribute(coverPath)}"><small>${escapeHTML(issueLabel)}</small><strong>${escapeHTML(issue[state.lang])}</strong><span>${phrase("Artwork in preparation", "Ilustraciones en preparación")}</span></span>`
+    : `<img src="${coverPath}" data-comic-fallback="${comicAssetPath(series.id, issue, 1, "en")}" loading="lazy" decoding="async" alt="">`;
   return `<button class="comic-issue-card" type="button" data-comic-series="${series.id}" data-comic-issue="${issue.number}" aria-label="${escapeAttribute(openLabel)}">
-    <span class="comic-cover-wrap"><img src="${comicAssetPath(series.id, issue.number, 1, artLanguage)}" data-comic-fallback="${comicAssetPath(series.id, issue.number, 1, "en")}" loading="lazy" decoding="async" alt=""></span>
-    <span class="comic-card-copy"><small>${phrase("Issue", "Número")} ${issue.number} · ${issue.pages} ${phrase("pages", "páginas")}</small><strong>${escapeHTML(issue[state.lang])}</strong>${spanishFallback ? `<span>${phrase("Spanish edition in preparation · English available", "Edición en español en preparación · disponible en inglés")}</span>` : ""}</span>
+    <span class="comic-cover-wrap">${cover}</span>
+    <span class="comic-card-copy"><small>${escapeHTML(issueLabel)} · ${series.kind === "specials" ? `${issue.pages} ${phrase("story pages", "páginas de historia")} + ${phrase("cover", "portada")}` : `${issue.pages} ${phrase("pages", "páginas")}`}</small><strong>${escapeHTML(issue[state.lang])}</strong>${spanishFallback ? `<span>${phrase("Spanish edition in preparation · English available", "Edición en español en preparación · disponible en inglés")}</span>` : ""}${issue.assetReady === false ? `<span>${phrase("Reader scaffold ready · artwork forthcoming", "Lector preparado · ilustraciones próximamente")}</span>` : ""}</span>
   </button>`;
 }
 
@@ -2855,46 +3004,107 @@ function renderComics() {
   return `${renderTopbar(phrase("Comics", "Cómics"), phrase("Illustrated teachings", "Enseñanzas ilustradas"))}
     <main class="page wide comics-library-page">
       <header class="section-intro comics-intro"><div><p class="eyebrow">${phrase("Practices & Teachings", "Prácticas y enseñanzas")}</p><h1 class="page-title">${phrase("Stories for discernment.", "Historias para el discernimiento.")}</h1><p class="lede measure">${phrase("Read in any order. These stories offer images and questions; they do not diagnose you or decide what your experience means.", "Lee en cualquier orden. Estas historias ofrecen imágenes y preguntas; no te diagnostican ni deciden qué significa tu experiencia.")}</p></div>${renderComicLanguageControl()}</header>
-      ${comicSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
+      ${comicSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : series.kind === "specials" ? phrase("Optional fiction", "Ficción opcional") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
       <p class="gentle-note">${phrase("Comic images load only as you open or approach them. Your reading position is not recorded.", "Las imágenes se cargan solo cuando las abres o te acercas a ellas. Tu posición de lectura no se registra.")}</p>
     </main>`;
 }
 
 function renderComicNotice() {
   const { series, issue } = comicContext();
-  return `${renderTopbar(series[state.lang].title, `${phrase("Issue", "Número")} ${issue.number} · ${issue[state.lang]}`)}
+  const isTheLock = series.id === "specials" && issue.id === "the-lock";
+  const eyebrow = isTheLock
+    ? phrase("Before this special story", "Antes de esta historia especial")
+    : phrase("Before Issue 10", "Antes del número 10");
+  const body = isTheLock
+    ? phrase(
+        "This is a fictional story about one person's interpretation of inner experience. It is not a diagnosis, a prediction, or a claim about anyone else's identity or physical symptoms.",
+        "Esta es una historia de ficción sobre la interpretación que una persona hace de su experiencia interior. No es un diagnóstico, una predicción ni una afirmación sobre la identidad o los síntomas físicos de otra persona."
+      )
+    : phrase(
+        "This finale explores not-self, identity, awareness and the Empty Throne. These ideas belong to the comic’s imaginative universe. They are not app guidance, a diagnosis, or a claim about who you are.",
+        "Este final explora el no-yo, la identidad, la consciencia y el Trono Vacío. Estas ideas pertenecen al universo imaginativo del cómic. No son orientación de la app, un diagnóstico ni una afirmación sobre quién eres."
+      );
+  const continueLabel = isTheLock
+    ? phrase("I understand · read THE LOCK", "Entiendo · leer EL BLOQUEO")
+    : phrase("I understand · read Issue 10", "Entiendo · leer el número 10");
+  return `${renderTopbar(series[state.lang].title, `${comicIssueLabel(series, issue)} · ${issue[state.lang]}`)}
     <main class="page comic-notice-page">
       <article class="comic-philosophical-notice" role="note" aria-labelledby="comic-notice-title">
-        <p class="eyebrow">${phrase("Before Issue 10", "Antes del número 10")}</p>
+        <p class="eyebrow">${eyebrow}</p>
         <h1 id="comic-notice-title" class="page-title">${phrase("Philosophical fiction, not instruction.", "Ficción filosófica, no instrucción.")}</h1>
-        <p>${phrase("This finale explores not-self, identity, awareness and the Empty Throne. These ideas belong to the comic’s imaginative universe. They are not app guidance, a diagnosis, or a claim about who you are.", "Este final explora el no-yo, la identidad, la consciencia y el Trono Vacío. Estas ideas pertenecen al universo imaginativo del cómic. No son orientación de la app, un diagnóstico ni una afirmación sobre quién eres.")}</p>
+        <p>${body}</p>
         <p>${phrase("You do not need to agree or continue. If the story feels disorienting, stop and return to something concrete: the room, your body, another person, or ordinary life.", "No necesitas estar de acuerdo ni continuar. Si la historia te desorienta, detente y vuelve a algo concreto: la habitación, tu cuerpo, otra persona o la vida cotidiana.")}</p>
-        <div class="practice-actions"><button class="primary-button" type="button" data-action="accept-comic-notice">${phrase("I understand · read Issue 10", "Entiendo · leer el número 10")}</button><button class="text-button" type="button" data-action="back">${phrase("Not now", "Ahora no")}</button></div>
+        <div class="practice-actions"><button class="primary-button" type="button" data-action="accept-comic-notice">${continueLabel}</button><button class="text-button" type="button" data-action="back">${phrase("Not now", "Ahora no")}</button></div>
       </article>
     </main>`;
 }
 
 function renderComicReader() {
   const { series, issue } = comicContext();
-  const page = Math.min(Math.max(1, state.comicPage), issue.pages);
+  const imageCount = comicImageCount(issue);
+  const page = Math.min(Math.max(1, state.comicPage), imageCount);
   state.comicPage = page;
   const spanishFallback = state.lang === "es" && !issue.esReady;
   const artLanguage = spanishFallback ? "en" : state.lang;
-  const progress = `${page} / ${issue.pages}`;
-  return `${renderTopbar(series[state.lang].title, `${phrase("Issue", "Número")} ${issue.number} · ${issue[state.lang]}`)}
+  const descriptor = comicPageDescriptor(issue, page);
+  const progress = descriptor.key === "cover" ? `${phrase("Cover", "Portada")} · 1 / ${imageCount}` : `${descriptor.storyPage} / ${issue.pages}`;
+  const assetPath = comicAssetPath(series.id, issue, page, artLanguage);
+  const comicPage = issue.assetReady === false
+    ? `<div class="comic-page-placeholder" role="img" aria-label="${escapeAttribute(comicImageAlt(series, issue, page))}" data-comic-asset-path="${escapeAttribute(assetPath)}"><p class="eyebrow">${escapeHTML(descriptor.label)}</p><strong>${escapeHTML(issue[state.lang])}</strong><span>${phrase("Artwork in preparation", "Ilustración en preparación")}</span></div>`
+    : `<img class="comic-page-image" src="${assetPath}" data-comic-fallback="${comicAssetPath(series.id, issue, page, "en")}" loading="lazy" decoding="async" alt="${escapeAttribute(comicImageAlt(series, issue, page))}">`;
+  const pagePicker = imageCount > 12
+    ? `<label class="comic-page-picker"><span>${phrase("Go to", "Ir a")}</span><select data-comic-page-picker aria-label="${phrase("Go to comic page", "Ir a una página del cómic")}">${Array.from({ length: imageCount }, (_, index) => { const position = index + 1; const item = comicPageDescriptor(issue, position); return `<option value="${position}" ${position === page ? "selected" : ""}>${escapeHTML(item.label)}</option>`; }).join("")}</select></label>`
+    : "";
+  const transcript = issue.transcriptPaths
+    ? `<details class="comic-transcript" data-comic-transcript data-transcript-key="${escapeAttribute(`${state.lang}:${series.id}:${issue.id || issue.number}:${descriptor.key}`)}"><summary>${phrase("Page transcript and image description", "Transcripción y descripción de la imagen")}</summary><div class="comic-transcript-content"><section><h2>${phrase("Image description", "Descripción de la imagen")}</h2><p data-comic-image-description>${phrase("Open this section to load the description.", "Abre esta sección para cargar la descripción.")}</p></section><section><h2>${phrase("Transcript", "Transcripción")}</h2><p data-comic-transcript-copy>${phrase("Open this section to load the transcript.", "Abre esta sección para cargar la transcripción.")}</p></section></div></details>`
+    : "";
+  return `${renderTopbar(series[state.lang].title, `${comicIssueLabel(series, issue)} · ${issue[state.lang]}`)}
     <main class="comic-reader-page">
-      <header class="comic-reader-heading"><div><p class="eyebrow">${phrase("Issue", "Número")} ${issue.number}</p><h1>${escapeHTML(issue[state.lang])}</h1></div>${renderComicLanguageControl()}</header>
+      <header class="comic-reader-heading"><div><p class="eyebrow">${escapeHTML(comicIssueLabel(series, issue))}</p><h1>${escapeHTML(issue[state.lang])}</h1></div>${renderComicLanguageControl()}</header>
       <p id="comic-language-note" class="comic-language-note" ${spanishFallback ? "" : "hidden"}>${phrase("Spanish edition in preparation. Showing the English artwork.", "La edición en español está en preparación. Se muestra la versión gráfica en inglés.")}</p>
       <figure class="comic-page-stage" data-comic-swipe tabindex="0" aria-label="${phrase("Comic page. Swipe or use the arrow keys to turn pages.", "Página del cómic. Desliza o usa las flechas para cambiar de página.")}">
-        <img class="comic-page-image" src="${comicAssetPath(series.id, issue.number, page, artLanguage)}" data-comic-fallback="${comicAssetPath(series.id, issue.number, page, "en")}" loading="lazy" decoding="async" alt="${escapeAttribute(comicImageAlt(series, issue, page))}">
+        ${comicPage}
       </figure>
       <nav class="comic-reader-controls" aria-label="${phrase("Comic page navigation", "Navegación de páginas del cómic")}">
         <button class="secondary-button" type="button" data-action="previous-comic-page" ${page === 1 ? "disabled" : ""}>← <span>${phrase("Previous", "Anterior")}</span></button>
         <output aria-live="polite" aria-atomic="true">${progress}</output>
-        <button class="secondary-button" type="button" data-action="next-comic-page" ${page === issue.pages ? "disabled" : ""}><span>${phrase("Next", "Siguiente")}</span> →</button>
+        <button class="secondary-button" type="button" data-action="next-comic-page" ${page === imageCount ? "disabled" : ""}><span>${phrase("Next", "Siguiente")}</span> →</button>
       </nav>
+      ${pagePicker}
       <p class="comic-reader-help">${phrase("Swipe left or right · Arrow keys turn pages", "Desliza a la izquierda o derecha · las flechas cambian de página")}</p>
+      ${transcript}
     </main>`;
+}
+
+const comicTranscriptCache = new Map();
+
+async function loadComicTranscript(details) {
+  const { series, issue } = comicContext();
+  const path = issue.transcriptPaths?.[state.lang];
+  if (!path) return;
+  const descriptor = comicPageDescriptor(issue, state.comicPage);
+  const expectedKey = `${state.lang}:${series.id}:${issue.id || issue.number}:${descriptor.key}`;
+  if (details.dataset.transcriptKey !== expectedKey) return;
+  const descriptionNode = details.querySelector("[data-comic-image-description]");
+  const transcriptNode = details.querySelector("[data-comic-transcript-copy]");
+  descriptionNode.textContent = phrase("Loading description…", "Cargando descripción…");
+  transcriptNode.textContent = phrase("Loading transcript…", "Cargando transcripción…");
+  try {
+    let document = comicTranscriptCache.get(path);
+    if (!document) {
+      const response = await fetch(path, { cache: "no-cache" });
+      if (!response.ok) throw new Error(`Transcript request failed: ${response.status}`);
+      document = await response.json();
+      comicTranscriptCache.set(path, document);
+    }
+    if (details.dataset.transcriptKey !== expectedKey) return;
+    const entry = document.entries?.[descriptor.key] || {};
+    descriptionNode.textContent = entry.imageDescription?.trim() || phrase("Image description in preparation.", "Descripción de la imagen en preparación.");
+    transcriptNode.textContent = entry.transcript?.trim() || phrase("Page transcript in preparation.", "Transcripción de la página en preparación.");
+  } catch {
+    descriptionNode.textContent = phrase("Image description is not available yet.", "La descripción de la imagen aún no está disponible.");
+    transcriptNode.textContent = phrase("Page transcript is not available yet.", "La transcripción de la página aún no está disponible.");
+  }
 }
 
 function prepareComicImages() {
@@ -2912,9 +3122,9 @@ function prepareComicImages() {
   });
   if (state.view !== "comicReader") return;
   const { series, issue } = comicContext();
-  if (state.comicPage >= issue.pages) return;
+  if (issue.assetReady === false || state.comicPage >= comicImageCount(issue)) return;
   const preload = new Image();
-  preload.src = comicAssetPath(series.id, issue.number, state.comicPage + 1, state.lang === "es" && !issue.esReady ? "en" : state.lang);
+  preload.src = comicAssetPath(series.id, issue, state.comicPage + 1, state.lang === "es" && !issue.esReady ? "en" : state.lang);
 }
 
 function openComicIssue(seriesID, issueNumber) {
@@ -2924,14 +3134,15 @@ function openComicIssue(seriesID, issueNumber) {
   state.selectedComicSeries = series.id;
   state.selectedComicIssue = issue.number;
   state.comicPage = 1;
-  if (issue.philosophicalFiction && !state.comicIssue10Accepted) navigate("comicNotice");
+  const noticeKey = `${series.id}:${issue.id || issue.number}`;
+  if (issue.philosophicalFiction && !state.acceptedComicNotices.has(noticeKey)) navigate("comicNotice");
   else navigate("comicReader");
 }
 
 function turnComicPage(offset) {
   if (state.view !== "comicReader") return;
   const { issue } = comicContext();
-  const next = Math.min(issue.pages, Math.max(1, state.comicPage + offset));
+  const next = Math.min(comicImageCount(issue), Math.max(1, state.comicPage + offset));
   if (next === state.comicPage) return;
   state.comicPage = next;
   render();
@@ -3000,7 +3211,10 @@ function renderLibraryEntry() {
   const catalog = catalogFor(state.lang);
   const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
   const field = catalog.fields.find(item => entry.tags.fields.includes(item.id));
-  return `${renderTopbar(phrase("Practices & Teachings", "Prácticas y enseñanzas"), field ? `${field.dimension}D · ${field.title}` : phrase("Teaching", "Enseñanza"))}<main class="page"><header class="section-intro"><p class="eyebrow">${field ? `${field.dimension}D · ${escapeHTML(field.title)}` : phrase("Living teaching", "Enseñanza viva")}</p><h1 class="page-title">${escapeHTML(entry.title)}</h1><p class="lede">${escapeHTML(entry.summary)}</p></header><article class="prose"><section><h2>${phrase("Orientation", "Orientación")}</h2><p>${escapeHTML(entry.libraryCopy)}</p></section><section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(entry.sovereignQuestion)}</blockquote></section><section class="embodied-invitation"><h2>${phrase("Live this today", "Vívelo hoy")}</h2><p>${escapeHTML(entry.embodiedAct)}</p></section>${state.showFullTeaching ? `<section><h2>${phrase("Core teaching", "Enseñanza central")}</h2><p>${escapeHTML(entry.coreTeaching)}</p></section><section><h2>${phrase("Shadow form", "Forma de sombra")}</h2><p>${escapeHTML(entry.shadowForm)}</p></section><section><h2>${phrase("Recognition", "Reconocimiento")}</h2><p>${escapeHTML(entry.recognition)}</p></section><section><h2>${phrase("Two-minute practice", "Práctica de dos minutos")}</h2><ol>${entry.twoMinutePractice.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol></section><section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(entry.goldenAgeExpression)}</p></section>` : ""}</article><div class="practice-actions entry-actions"><button class="primary-button" type="button" data-entry-practice="${entry.id}">${phrase("Experience this", "Experimentar esto")}</button><button class="secondary-button" type="button" data-action="toggle-full-teaching">${state.showFullTeaching ? phrase("Show the summary", "Mostrar el resumen") : phrase("Read the full teaching", "Leer la enseñanza completa")}</button><button class="text-button" type="button" data-entry-crossing="${entry.id}">${phrase("Cross this pattern", "Cruzar este patrón")}</button><button class="text-button" type="button" data-entry-act="${entry.id}">${phrase("Live this today", "Vivir esto hoy")}</button><button class="text-button" type="button" data-entry-deeper="${entry.id}">${phrase("Go deeper", "Profundizar")}</button>${field ? `<button class="text-button" type="button" data-field="${field.id}">${phrase("Explore the Field", "Explorar el Campo")}</button>` : ""}</div></main>`;
+  const relatedStory = entry.id === "separate-event-from-interpretation"
+    ? `<aside class="gentle-note"><p class="eyebrow">${phrase("A related story", "Una historia relacionada")}</p><p>${phrase("THE LOCK explores the difference between an experience and the story built around it, without deciding what either must mean.", "EL BLOQUEO explora la diferencia entre una experiencia y la historia que se construye a su alrededor, sin decidir qué debe significar ninguna de las dos.")}</p><button class="secondary-button" type="button" data-comic-series="specials" data-comic-issue="1">${phrase("Read THE LOCK", "Leer EL BLOQUEO")}</button></aside>`
+    : "";
+  return `${renderTopbar(phrase("Practices & Teachings", "Prácticas y enseñanzas"), field ? `${field.dimension}D · ${field.title}` : phrase("Teaching", "Enseñanza"))}<main class="page"><header class="section-intro"><p class="eyebrow">${field ? `${field.dimension}D · ${escapeHTML(field.title)}` : phrase("Living teaching", "Enseñanza viva")}</p><h1 class="page-title">${escapeHTML(entry.title)}</h1><p class="lede">${escapeHTML(entry.summary)}</p></header><article class="prose"><section><h2>${phrase("Orientation", "Orientación")}</h2><p>${escapeHTML(entry.libraryCopy)}</p></section><section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(entry.sovereignQuestion)}</blockquote></section><section class="embodied-invitation"><h2>${phrase("Live this today", "Vívelo hoy")}</h2><p>${escapeHTML(entry.embodiedAct)}</p></section>${state.showFullTeaching ? `<section><h2>${phrase("Core teaching", "Enseñanza central")}</h2><p>${escapeHTML(entry.coreTeaching)}</p></section><section><h2>${phrase("Shadow form", "Forma de sombra")}</h2><p>${escapeHTML(entry.shadowForm)}</p></section><section><h2>${phrase("Recognition", "Reconocimiento")}</h2><p>${escapeHTML(entry.recognition)}</p></section><section><h2>${phrase("Two-minute practice", "Práctica de dos minutos")}</h2><ol>${entry.twoMinutePractice.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol></section><section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(entry.goldenAgeExpression)}</p></section>` : ""}</article>${relatedStory}<div class="practice-actions entry-actions"><button class="primary-button" type="button" data-entry-practice="${entry.id}">${phrase("Experience this", "Experimentar esto")}</button><button class="secondary-button" type="button" data-action="toggle-full-teaching">${state.showFullTeaching ? phrase("Show the summary", "Mostrar el resumen") : phrase("Read the full teaching", "Leer la enseñanza completa")}</button><button class="text-button" type="button" data-entry-crossing="${entry.id}">${phrase("Cross this pattern", "Cruzar este patrón")}</button><button class="text-button" type="button" data-entry-act="${entry.id}">${phrase("Live this today", "Vivir esto hoy")}</button><button class="text-button" type="button" data-entry-deeper="${entry.id}">${phrase("Go deeper", "Profundizar")}</button>${field ? `<button class="text-button" type="button" data-field="${field.id}">${phrase("Explore the Field", "Explorar el Campo")}</button>` : ""}</div></main>`;
 }
 
 function renderPracticeEngines() {
@@ -3020,7 +3234,7 @@ function renderPracticeEngine() {
   const responseControl = step.responseKind === "pause"
     ? `<div class="pause-field" aria-hidden="true"><span></span></div>`
     : `<label class="field-label"><span>${step.responseKind === "action" ? phrase("One action, if useful", "Una acción, si es útil") : phrase("A few words, if useful", "Unas palabras, si son útiles")}</span><textarea class="field-textarea" data-engine-response="${step.id}">${escapeHTML(response)}</textarea></label>`;
-  return `${renderTopbar(engine.title, `${state.engineDuration} min · ${state.engineStep + 1} ${phrase("of", "de")} ${engine.steps.length}`)}<main class="page practice-engine-page"><nav class="movement-strip" aria-label="${phrase("Practice steps", "Pasos de la práctica")}">${engine.steps.map((item, index) => `<span class="movement-dot ${index < state.engineStep ? "done" : ""} ${index === state.engineStep ? "active" : ""}"></span>`).join("")}</nav><header class="section-intro"><p class="eyebrow">${escapeHTML(engine.title)}</p><h1 class="practice-title">${escapeHTML(step.prompt)}</h1>${step.optionalSupport ? `<p class="lede">${escapeHTML(step.optionalSupport)}</p>` : ""}</header>${responseControl}<div class="duration-row" aria-label="${phrase("Practice length", "Duración de la práctica")}">${engine.recommendedDurations.map(duration => `<button class="chip" type="button" data-engine-duration="${duration}" aria-pressed="${state.engineDuration === duration}">${duration} min</button>`).join("")}</div><footer class="practice-actions"><div class="button-row"><button class="secondary-button" type="button" data-action="previous-engine-step" ${state.engineStep === 0 ? "disabled" : ""}>${tr("back")}</button><button class="primary-button" type="button" data-action="next-engine-step">${isLast ? phrase("Complete practice", "Completar la práctica") : tr("continue")}</button></div><button class="text-button" type="button" data-view="practiceEngines">${phrase("Choose another practice", "Elegir otra práctica")}</button></footer></main>`;
+  return `${renderTopbar(engine.title, `${state.engineDuration} min · ${state.engineStep + 1} ${phrase("of", "de")} ${engine.steps.length}`)}<main class="page practice-engine-page"><nav class="movement-strip" aria-label="${phrase("Practice steps", "Pasos de la práctica")}">${engine.steps.map((item, index) => `<span class="movement-dot ${index < state.engineStep ? "done" : ""} ${index === state.engineStep ? "active" : ""}"></span>`).join("")}</nav><header class="section-intro"><p class="eyebrow">${escapeHTML(engine.title)}</p><h1 class="practice-title">${escapeHTML(step.prompt)}</h1>${step.optionalSupport ? `<p class="lede">${escapeHTML(step.optionalSupport)}</p>` : ""}<button class="text-button voice-invitation" type="button" data-action="listen-engine-stage">${phrase("Hear this invitation", "Escuchar esta invitación")}</button></header>${responseControl}<div class="duration-row" aria-label="${phrase("Practice length", "Duración de la práctica")}">${engine.recommendedDurations.map(duration => `<button class="chip" type="button" data-engine-duration="${duration}" aria-pressed="${state.engineDuration === duration}">${duration} min</button>`).join("")}</div><footer class="practice-actions"><div class="button-row"><button class="secondary-button" type="button" data-action="previous-engine-step" ${state.engineStep === 0 ? "disabled" : ""}>${tr("back")}</button><button class="primary-button" type="button" data-action="next-engine-step">${isLast ? phrase("Complete practice", "Completar la práctica") : tr("continue")}</button></div><button class="text-button" type="button" data-view="practiceEngines">${phrase("Choose another practice", "Elegir otra práctica")}</button></footer></main>`;
 }
 
 function currentActPool() {
@@ -3077,10 +3291,18 @@ function renderThreshold() {
 }
 
 function renderHistory() {
-  return `${renderTopbar(tr("history"), phrase("Saved only when you choose", "Guardado solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Personal Sovereign Path", "Camino soberano personal")}</p><h1 class="page-title">${state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length ? phrase("Your saved choices are here.", "Tus elecciones guardadas están aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Practices, responses, principles and directions appear here only when you choose to save them. Tone Sovereign does not interpret them.", "Las prácticas, respuestas, principios y direcciones aparecen aquí solo cuando eliges guardarlos. Tone Sovereign no los interpreta.")}</p></header><section class="continuity-links"><p class="eyebrow">${phrase("Continue from here", "Continuar desde aquí")}</p><button class="orientation-invitation" type="button" data-library-path="overwhelm-to-contribution"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Find where to contribute", "Descubre dónde contribuir")}</strong><small>${phrase("Meet inward aliveness with outward reality, without forcing a final purpose.", "Encuentra la vitalidad interior con la realidad exterior, sin forzar un propósito final.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="ruleOfLife"><span class="door-mark" aria-hidden="true">│</span><span><strong>${phrase("My Golden Age Rule of Life", "Mi regla de vida de la Edad Dorada")}</strong><small>${phrase("Keep chosen principles and commitments as a living orientation.", "Conserva principios y compromisos elegidos como orientación viva.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="missions"><span class="door-mark" aria-hidden="true">↗</span><span><strong>${phrase("Mission Path", "Camino de misión")}</strong><small>${phrase("Protect a direction, its next visible step and a sustainable rhythm.", "Protege una dirección, su próximo paso visible y un ritmo sostenible.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="foundations"><span class="door-mark" aria-hidden="true">≋</span><span><strong>${phrase("Foundations", "Fundamentos")}</strong><small>${phrase("Return to the Laws, Principles and scales of participation.", "Vuelve a las Leyes, los Principios y las escalas de participación.")}</small></span><b>→</b></button></section>${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}<p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
+  const rememberedID = localStorage.getItem(STORAGE.lastHeldTone);
+  const remembered = tones.find(item => item.id === rememberedID);
+  const hasKept = state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length || remembered;
+  return `${renderTopbar(phrase("Kept on this device", "Guardado en este dispositivo"), phrase("Only when you choose", "Solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Kept on this device", "Guardado en este dispositivo")}</p><h1 class="page-title">${hasKept ? phrase("Your chosen material is here.", "El material que elegiste está aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Saved traces and a remembered tone stay distinct. Tone Sovereign does not combine or interpret them.", "Las huellas guardadas y un tono recordado permanecen separados. Tone Sovereign no los combina ni los interpreta.")}</p></header>
+    <section class="kept-device-section"><p class="eyebrow">${phrase("Remembered tone", "Tono recordado")}</p>${remembered ? `<h2>${escapeHTML(remembered[state.lang])}</h2><p>${phrase("Your last held Embody tone—not a score, recommendation or diagnosis.", "Tu último tono guardado en Encarnar: no es una puntuación, recomendación ni diagnóstico.")}</p><button class="text-button" type="button" data-action="return-remembered-tone">${phrase("Return to Embody", "Volver a Encarnar")}</button>` : `<p>${phrase("No tone is being remembered.", "No hay ningún tono recordado.")}</p>`}</section>
+    ${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}
+    <section class="continuity-links"><p class="eyebrow">${phrase("Continue from here", "Continuar desde aquí")}</p><button class="orientation-invitation" type="button" data-view="ruleOfLife"><span class="door-mark" aria-hidden="true">│</span><span><strong>${phrase("My Golden Age Rule of Life", "Mi regla de vida de la Edad Dorada")}</strong><small>${phrase("Keep chosen principles and commitments as a living orientation.", "Conserva principios y compromisos elegidos como orientación viva.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="missions"><span class="door-mark" aria-hidden="true">↗</span><span><strong>${phrase("Mission Path", "Camino de misión")}</strong><small>${phrase("Protect a direction and its next visible step.", "Protege una dirección y su próximo paso visible.")}</small></span><b>→</b></button></section>
+    <p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
 }
 
 function renderSettings() {
+  if (state.resetConfirmationOpen) return `${renderTopbar(tr("settings"), phrase("Confirm local reset", "Confirmar borrado local"))}<main class="page reset-confirmation"><section role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-description"><p class="eyebrow">${phrase("LOCAL AND IRREVERSIBLE", "LOCAL E IRREVERSIBLE")}</p><h1 id="reset-title" class="page-title">${phrase("Reset saved practice data?", "¿Borrar los datos guardados de práctica?")}</h1><p id="reset-description" class="lede">${phrase("This permanently removes the following material from this browser. It cannot be undone unless you exported a copy.", "Esto elimina de forma permanente el siguiente material de este navegador. No se puede deshacer salvo que hayas exportado una copia.")}</p><ul class="reset-list"><li>${phrase("Saved practices, reflections and questions", "Prácticas, reflexiones y preguntas guardadas")}</li><li>${phrase("Compass principles, commitments and mission paths", "Principios, compromisos y caminos de misión")}</li><li>${phrase("Cross marks, carried acts and remembered tones", "Marcas de Cruce, actos llevados y tonos recordados")}</li><li>${phrase("Unfinished practice responses and breath preferences", "Respuestas de práctica sin terminar y preferencias de respiración")}</li></ul><p class="gentle-note">${phrase("Your language, sound and accessibility settings will remain.", "Se conservarán tus ajustes de idioma, sonido y accesibilidad.")}</p>${state.resetError ? `<p class="reset-error" role="alert">${escapeHTML(state.resetError)}</p>` : ""}<div class="practice-actions"><button class="primary-button danger-button" type="button" data-action="confirm-erase">${phrase("Reset saved data", "Borrar datos guardados")}</button><button class="text-button" type="button" data-action="cancel-erase">${phrase("Cancel", "Cancelar")}</button></div></section></main>`;
   return `${renderTopbar(tr("settings"), state.lang === "en" ? "Private, local and yours" : "Privado, local y tuyo")}
     <main class="page"><header class="section-intro"><p class="eyebrow">${state.lang === "en" ? "Your instrument" : "Tu instrumento"}</p><h1 class="page-title">${tr("settings")}</h1></header>
       <section class="settings-group">
@@ -3093,7 +3315,7 @@ function renderSettings() {
       <section class="settings-group">
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Export your data" : "Exportar tus datos"}</strong><span>${state.lang === "en" ? "Download one readable JSON file" : "Descargar un archivo JSON legible"}</span></div><button class="text-button" type="button" aria-label="${state.lang === "en" ? "Export your data" : "Exportar tus datos"}" data-action="export">↓</button></div>
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Import your data" : "Importar tus datos"}</strong><span>${state.lang === "en" ? "Restore a Tone Sovereign export" : "Restaurar una exportación de Tone Sovereign"}</span></div><button class="text-button" type="button" aria-label="${state.lang === "en" ? "Import your data" : "Importar tus datos"}" data-action="import">↑</button><input class="file-input" type="file" accept="application/json" aria-label="${state.lang === "en" ? "Choose a Tone Sovereign export" : "Elegir una exportación de Tone Sovereign"}" data-import-file></div>
-        <div class="setting-row"><div><strong>${state.lang === "en" ? "Erase local data" : "Borrar datos locales"}</strong><span>${state.lang === "en" ? "Remove all saved traces from this browser" : "Eliminar todas las huellas de este navegador"}</span></div><button class="text-button danger" type="button" data-action="erase">${state.lang === "en" ? "Erase" : "Borrar"}</button></div>
+        <div class="setting-row"><div><strong>${state.lang === "en" ? "Reset saved practice data" : "Borrar datos guardados de práctica"}</strong><span>${state.lang === "en" ? "Review exactly what will be removed first" : "Revisar primero qué se eliminará exactamente"}</span></div><button class="text-button danger" type="button" data-action="erase">${state.lang === "en" ? "Review" : "Revisar"}</button></div>
       </section>
       <div class="practice-actions"><button class="secondary-button" type="button" data-action="replay-from-settings">${tr("replay")}</button></div>
     </main>`;
@@ -3157,20 +3379,27 @@ function importData(file) {
 }
 
 function eraseData() {
-  const message = state.lang === "en" ? "Erase all saved traces on this device?" : "¿Borrar todas las huellas guardadas en este dispositivo?";
-  if (!window.confirm(message)) return;
+  const resetKeys = [STORAGE.traces, STORAGE.carriedAct, STORAGE.ruleOfLife, STORAGE.engineDrafts, STORAGE.missions, STORAGE.crossMarks, STORAGE.lastHeldTone];
+  const failed = [];
+  resetKeys.forEach(key => {
+    try { localStorage.removeItem(key); } catch { failed.push(key); }
+  });
+  if (failed.length) {
+    state.resetError = phrase("Some saved data could not be removed. Nothing is being reported as fully reset; please try again.", "No se pudieron borrar algunos datos guardados. No se indica que el borrado esté completo; inténtalo de nuevo.");
+    render();
+    return;
+  }
   state.traces = [];
-  localStorage.removeItem(STORAGE.traces);
-  localStorage.removeItem(STORAGE.carriedAct);
-  localStorage.removeItem(STORAGE.ruleOfLife);
-  localStorage.removeItem(STORAGE.engineDrafts);
-  localStorage.removeItem(STORAGE.missions);
-  localStorage.removeItem(STORAGE.crossMarks);
-  localStorage.removeItem(STORAGE.lastHeldTone);
+  state.actIndex = 0;
   state.ruleOfLife = { principleIDs: [], commitmentIDs: [] };
   state.engineDrafts = {};
   state.missions = [];
-  showToast(state.lang === "en" ? "Local traces erased." : "Huellas locales borradas.");
+  state.guidedSit = { ...newGuidedSit(), duration: 900, guidance: "regular", backgroundTone: false, introduction: true };
+  state.practice = newPractice();
+  state.resetConfirmationOpen = false;
+  state.resetError = "";
+  persistPreferences();
+  showToast(state.lang === "en" ? "Saved practice data was reset." : "Se borraron los datos guardados de práctica.");
   render();
 }
 
@@ -3213,6 +3442,13 @@ app.addEventListener("click", async event => {
     render();
     return;
   }
+  if (button.dataset.practiceGuidance) {
+    state.practice.guidance = button.dataset.practiceGuidance;
+    if (state.practice.guidance === "guided" && !state.voice) showToast(phrase("Voice is off; this practice will stay quiet unless you turn it on in Settings.", "La voz está desactivada; esta práctica seguirá en silencio salvo que la actives en Ajustes."));
+    render();
+    return;
+  }
+  if (button.dataset.breathDuration) { state.practice.breathDuration = Number(button.dataset.breathDuration); render(); return; }
   if (button.dataset.capacityOption !== undefined) { state.practice.selectedOption = button.dataset.capacityOption; render(); return; }
   if (button.dataset.noticeOutcome !== undefined) { state.practice.noticeOutcome = button.dataset.noticeOutcome; render(); return; }
   if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.crossRemaining = false; state.practice.stage = "choose"; render(); return; }
@@ -3220,9 +3456,9 @@ app.addEventListener("click", async event => {
   if (steady) { state.practice.steadyState = steady; state.practice.breathPattern = ""; state.practice.stage = "setup"; render(); return; }
   if (pull !== undefined) {
     const pullIndex = Number(pull);
-    state.practice.pull = pulls[state.lang][pullIndex];
+    state.practice.pendingPull = pulls[state.lang][pullIndex];
     state.practice.customPull = "";
-    state.practice.stage = pullIndex === pulls[state.lang].length - 1 ? "custom" : "pause";
+    state.practice.stage = pullIndex === pulls[state.lang].length - 1 ? "custom" : "confirm";
     render();
     return;
   }
@@ -3261,7 +3497,11 @@ app.addEventListener("click", async event => {
   if (action === "home") goHome();
   if (action === "previous-comic-page") turnComicPage(-1);
   if (action === "next-comic-page") turnComicPage(1);
-  if (action === "accept-comic-notice") { state.comicIssue10Accepted = true; navigate("comicReader", { remember: false }); }
+  if (action === "accept-comic-notice") {
+    const { series, issue } = comicContext();
+    state.acceptedComicNotices.add(`${series.id}:${issue.id || issue.number}`);
+    navigate("comicReader", { remember: false });
+  }
   if (action === "begin-guided-sit") await beginGuidedSit();
   if (action === "preview-guided-sit-introduction") previewGuidedSitIntroduction();
   if (action === "replay-guided-sit-introduction") replayGuidedSitIntroduction();
@@ -3290,6 +3530,17 @@ app.addEventListener("click", async event => {
   if (action === "show-more-teachings") { state.libraryVisibleCount += 8; render(); }
   if (action === "show-more-foundations") { state.foundationVisibleCount += 10; render(); }
   if (action === "movement-back") movementBack();
+  if (action === "resume-interrupted-practice") {
+    const pausedFor = Math.max(0, Date.now() - state.practice.interruptedAt);
+    if (state.practice.noticeStartedAt) state.practice.noticeStartedAt += pausedFor;
+    if (state.practice.breathStartedAt) state.practice.breathStartedAt += pausedFor;
+    const crossingWasPaused = state.practice.movement === "cross";
+    state.practice.interrupted = false;
+    state.practice.interruptedAt = 0;
+    render();
+    if (crossingWasPaused) sound.threshold().catch(() => {});
+  }
+  if (action === "leave-interrupted-practice") returnToMovementField();
   if (action === "start-full-practice") startFullPractice();
   if (action === "return-movement-field") returnToMovementField();
   if (action === "complete-movement") requestMovementCompletion();
@@ -3301,6 +3552,10 @@ app.addEventListener("click", async event => {
     state.sound = true;
     persistPreferences();
     await replayCeremony(true);
+  }
+  if (action === "listen-first-light") {
+    if (!state.voice) showToast(phrase("Voice is off. You can turn it on in Settings.", "La voz está desactivada. Puedes activarla en Ajustes."));
+    else sound.playVoice("ts_first_light_tagline_v1");
   }
   if (action === "replay-from-home" || action === "replay-from-settings") { state.stack = []; state.view = "landing"; replayCeremony(true); }
   if (action === "toggle-sound") {
@@ -3328,7 +3583,7 @@ app.addEventListener("click", async event => {
   if (action === "open-inclusion-principle") { state.teachingDepth = 1; navigate("principle", { principle: "principle-31" }); }
   if (action === "start-notice") beginNoticePractice();
   if (action === "another-notice-cue") offerAnotherNoticeCue();
-  if (action === "end-notice") { stopPracticeTimers(); state.practice.noticeStarted = false; state.practice.stage = "close"; render(); sound.playVoice("ts_notice_close_v1", state.reduceMotion ? 0 : 0.22); }
+  if (action === "end-notice") { stopPracticeTimers(); state.practice.noticeStarted = false; state.practice.stage = "close"; render(); }
   if (action === "notice-tap") {
     state.practice.noticeAcknowledged = true;
     button.classList.add("acknowledged");
@@ -3340,26 +3595,31 @@ app.addEventListener("click", async event => {
   if (action === "start-breath") await beginBreathPractice();
   if (action === "stop-breath") { state.practice.breathStartedAt = 0; stopPracticeTimers(); state.practice.stage = "complete"; render(); }
   if (action === "more-steady") { state.practice.steadyExpanded = true; render(); }
+  if (action === "less-steady") { state.practice.steadyExpanded = false; render(); }
   if (action === "change-breath-pattern") { state.practice.stage = "patterns"; render(); }
   if (action === "change-steady") { state.practice.steadyState = ""; state.practice.breathPattern = ""; state.practice.stage = "chooser"; state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
   if (action === "capacity-continue") {
     const flow = capacityFlows[state.practice.movement];
     state.practice.capacityAnswers[state.practice.capacityStep] = state.practice.selectedOption;
-    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; render(); playCapacityStageVoice(state.practice.movement, state.practice.capacityStep); }
+    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; render(); }
     else requestMovementCompletion();
   }
+  if (action === "listen-capacity-stage") playCapacityStageVoice(state.practice.movement, state.practice.capacityStep);
+  if (action === "listen-engine-stage") playEngineStageVoice();
   if (action === "reclaim-hold" && event.detail === 0 && !state.practice.reclaimComplete) {
     state.practice.reclaimHolding = false;
     state.practice.reclaimComplete = true;
-    sound.playVoice("ts_reclaim_centre_remains_v1");
     announce(state.lang === "en" ? "You can still choose." : "Todavía puedes elegir.");
     render();
   }
-  if (action === "reclaim-nothing-clear") { state.practice.pull = state.lang === "en" ? "Nothing clear" : "Nada claro"; state.practice.customPull = ""; state.practice.stage = "pause"; render(); }
-  if (action === "reclaim-custom-continue") { state.practice.pull = state.practice.customPull.trim(); state.practice.stage = "pause"; render(); }
+  if (action === "reclaim-nothing-clear") { state.practice.pendingPull = state.lang === "en" ? "Nothing clear" : "Nada claro"; state.practice.customPull = ""; state.practice.stage = "confirm"; render(); }
+  if (action === "reclaim-custom-continue") { state.practice.pendingPull = state.practice.customPull.trim(); state.practice.stage = "confirm"; render(); }
+  if (action === "confirm-reclaim-pull") { state.practice.pull = state.practice.pendingPull; state.practice.stage = "pause"; render(); }
+  if (action === "change-reclaim-pull") { state.practice.pendingPull = ""; state.practice.stage = state.practice.customPull ? "custom" : "authority"; render(); }
   if (action === "reclaim-to-relationship") { state.practice.stage = "relationship"; render(); }
   if (action === "reclaim-complete") { state.practice.stage = "complete"; render(); }
   if (action === "show-cross-focuses") { state.practice.stage = "focuses"; render(); }
+  if (action === "toggle-cross-more") { state.practice.crossExpanded = !state.practice.crossExpanded; render(); }
   if (action === "previous-cross-focus" || action === "next-cross-focus") {
     const current = crossFocuses.findIndex(item => item.id === state.practice.crossFocus);
     const offset = action === "previous-cross-focus" ? -1 : 1;
@@ -3370,7 +3630,16 @@ app.addEventListener("click", async event => {
     state.practice.crossRemaining = false;
     render();
   }
-  if (action === "open-cross-question") { chooseCrossQuestion(); state.practice.stage = "question"; sound.threshold().catch(() => {}); render(); }
+  if (action === "open-cross-question") {
+    state.practice.crossQuestion = 0;
+    state.practice.crossRecent = [currentCrossQuestionKey(), ...state.practice.crossRecent.filter(item => item !== currentCrossQuestionKey())].slice(0, 6);
+    state.practice.crossSaved = crossQuestionIsSaved();
+    state.practice.crossCrossed = false;
+    state.practice.crossRemaining = false;
+    state.practice.stage = "question";
+    sound.threshold().catch(() => {});
+    render();
+  }
   if (action === "another-cross-question") {
     chooseCrossQuestion({ avoidCurrent: true });
     state.practice.stage = "question";
@@ -3425,7 +3694,7 @@ app.addEventListener("click", async event => {
       }
       render();
     }
-    else { stopPracticeTimers(); state.practice.stage = "close"; sound.playVoice("ts_cross_return_v1"); render(); }
+    else { stopPracticeTimers(); state.practice.stage = "close"; render(); }
   }
   if (action === "previous-tone" || action === "next-tone") {
     const current = tones.findIndex(item => item.id === state.practice.tone);
@@ -3435,13 +3704,14 @@ app.addEventListener("click", async event => {
     state.practice.tone = selected.id; state.practice.frequency = selected.hz; render();
   }
   if (action === "show-all-tones") { state.practice.embodyStage = "all"; render(); }
+  if (action === "use-remembered-tone") { state.practice.embodyStage = "tune"; render(); }
+  if (action === "choose-fresh-tone") { state.practice.tone = ""; state.practice.frequency = 432; state.practice.embodyStage = "choose"; render(); }
   if (action === "enter-tone") { state.practice.embodyStage = "tune"; sound.tone(state.practice.frequency, state.practice.amplitude); state.practice.tonePlaying = true; render(); }
   if (action === "embody-hold") { state.practice.embodyStage = "hold"; sound.tone(state.practice.frequency, state.practice.amplitude); state.practice.tonePlaying = true; render(); }
   if (action === "embody-complete") {
     sound.stop();
     state.practice.tonePlaying = false;
     if (state.practice.tone) localStorage.setItem(STORAGE.lastHeldTone, state.practice.tone);
-    sound.playVoice("ts_embody_silence_v1", 0.72);
     state.practice.embodyStage = "after";
     render();
   }
@@ -3452,6 +3722,7 @@ app.addEventListener("click", async event => {
     state.practice.embodyStage = "choose";
     render();
   }
+  if (action === "return-remembered-tone") startMovement("embody");
   if (action === "save-question") { state.practice.questionSaved = !state.practice.questionSaved; render(); }
   if (action === "toggle-tone") { state.practice.tonePlaying = !state.practice.tonePlaying; if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); else sound.stop(); render(); }
   if (action === "save-field-practice") { const item = contentByID(catalogFor(state.lang).fields, button.dataset.field); addTrace({ type: "field", title: `${item.dimension}D · ${item.title}`, detail: item.returnPractice }); showToast(tr("saved")); }
@@ -3471,9 +3742,11 @@ app.addEventListener("click", async event => {
   if (action === "leave-threshold") goHome();
   if (action === "export") exportData();
   if (action === "import") document.querySelector("[data-import-file]")?.click();
-  if (action === "erase") eraseData();
+  if (action === "erase") { state.resetError = ""; state.resetConfirmationOpen = true; render(); focusCurrentView(); }
+  if (action === "cancel-erase") { state.resetError = ""; state.resetConfirmationOpen = false; render(); focusCurrentView(); }
+  if (action === "confirm-erase") eraseData();
   if (action === "read-about") readAbout();
-  if (action === "previous-engine-step") { state.engineStep = Math.max(0, state.engineStep - 1); render(); playEngineStageVoice(); }
+  if (action === "previous-engine-step") { state.engineStep = Math.max(0, state.engineStep - 1); render(); }
   if (action === "next-engine-step") {
     const engineItem = contentByID(catalogFor(state.lang).practiceEngines, state.selectedEngine);
     if (state.engineStep < engineItem.steps.length - 1) state.engineStep += 1;
@@ -3484,7 +3757,6 @@ app.addEventListener("click", async event => {
       localStorage.setItem(STORAGE.engineDrafts, JSON.stringify(state.engineDrafts));
     }
     render();
-    if (!state.engineComplete) playEngineStageVoice();
   }
   if (action === "restart-engine") { state.engineStep = 0; state.engineComplete = false; state.engineResponses = {}; render(); }
   if (action === "finish-engine") { state.libraryMode = "practices"; navigate("practiceEngines", { remember: false }); }
@@ -3551,7 +3823,6 @@ app.addEventListener("pointerdown", event => {
     reclaimHoldTimer = 0;
     state.practice.reclaimHolding = false;
     state.practice.reclaimComplete = true;
-    sound.playVoice("ts_reclaim_centre_remains_v1");
     announce(state.lang === "en" ? "You can still choose." : "Todavía puedes elegir.");
     render();
   }, 3200);
@@ -3586,9 +3857,19 @@ app.addEventListener("pointerup", event => {
 });
 app.addEventListener("pointercancel", () => { comicSwipeStart = null; });
 
+app.addEventListener("toggle", event => {
+  const details = event.target.closest?.("[data-comic-transcript]");
+  if (details?.open) loadComicTranscript(details);
+}, true);
+
 app.addEventListener("change", event => {
   if (event.target.matches("[data-import-file]") && event.target.files[0]) importData(event.target.files[0]);
   if (event.target.matches("[data-notice-duration]")) { state.practice.noticeDuration = Number(event.target.value); }
+  if (event.target.matches("[data-comic-page-picker]")) {
+    state.comicPage = Number(event.target.value);
+    render();
+    document.querySelector("[data-comic-swipe]")?.focus({ preventScroll: true });
+  }
   const libraryFilter = event.target.dataset.libraryFilter;
   if (libraryFilter === "field") state.libraryField = event.target.value;
   if (libraryFilter === "domain") state.libraryDomain = event.target.value;
@@ -3654,11 +3935,12 @@ window.addEventListener("popstate", event => {
   if (event.state?.app === HISTORY_MARKER) restorePreviousView();
 });
 document.addEventListener("visibilitychange", () => {
+  const noticing = state.view === "movement" && state.practice.movement === "notice" && state.practice.noticeStarted;
   const breathing = state.view === "movement" && state.practice.movement === "stabilise" && state.practice.breathStartedAt;
   const crossing = state.view === "movement" && state.practice.movement === "cross" && (state.practice.stage === "question" || state.practice.stage === "crossed");
   const guidedSitting = state.view === "guidedSits" && state.guidedSit.phase === "session";
   const guidedIntroduction = state.view === "guidedSits" && state.guidedSit.phase === "introduction";
-  if (!breathing && !crossing && !guidedSitting && !guidedIntroduction) return;
+  if (!noticing && !breathing && !crossing && !guidedSitting && !guidedIntroduction) return;
   if (document.hidden) {
     if (guidedIntroduction) {
       sound.stopVoice();
@@ -3671,17 +3953,21 @@ document.addEventListener("visibilitychange", () => {
     guidedSitTimer = 0;
     breathLastPhaseKey = "";
     sound.stop();
+    if (guidedSitting) state.guidedSit.paused = true;
+    if (noticing || breathing || crossing) {
+      state.practice.interrupted = true;
+      state.practice.interruptedAt = Date.now();
+    }
   } else if (guidedIntroduction) {
     render();
     announce(phrase("Introduction paused.", "Introducción en pausa."));
-  } else if (guidedSitting && !state.guidedSit.paused) {
-    startGuidedSitTimer();
-    sound.startGuidedSitAmbient(guidedSitPractice().id).catch(() => {});
-    replayGuidedSitCue();
-  } else if (breathing) {
-    startBreathTimer(false);
-  } else if (crossing) {
-    sound.threshold().catch(() => {});
+  } else if (guidedSitting) {
+    render();
+    announce(phrase("Practice paused.", "Práctica en pausa."));
+  } else if (noticing || breathing || crossing) {
+    render();
+    focusCurrentView();
+    announce(phrase("Practice paused.", "Práctica en pausa."));
   }
 });
 window.addEventListener("beforeunload", () => { cancelAnimationFrame(fieldFrame); stopPracticeTimers(); });

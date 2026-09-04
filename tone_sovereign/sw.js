@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v27";
+const CACHE = "tone-sovereign-v30";
 const COMIC_CACHE = "tone-sovereign-comics-v1";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
@@ -61,6 +61,8 @@ const CORE = [
   "./manifest-es.webmanifest",
   "./sword-mark.png",
   "./tone-sovereign-logo.png",
+  "./assets/comics/en/specials/the-lock/transcript.json",
+  "./assets/comics/es/specials/the-lock/transcript.json",
   "./assets/sound/ts_first_light_arrival_full.wav",
   "./assets/sound/ts_first_light_living_ambience.wav",
   ...["en", "es"].flatMap(language => [...VOICE_CUES, ...GUIDED_SIT_VOICE_CUES].map(cue => `./assets/voice/${language}/${cue}.mp3`))
@@ -84,10 +86,10 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   if (url.origin === self.location.origin && url.pathname.includes("/assets/comics/")) {
     event.respondWith(
-      caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-        if (response.ok) cache.put(event.request, response.clone());
-        return response;
-      })))
+      caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || caches.match(event.request).then(coreCached => coreCached || fetch(event.request).then(response => {
+          if (response.ok) cache.put(event.request, response.clone());
+          return response;
+        }))))
     );
     return;
   }
