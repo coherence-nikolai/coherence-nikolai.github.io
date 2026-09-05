@@ -1,4 +1,4 @@
-const CACHE = "tone-sovereign-v30";
+const CACHE = "tone-sovereign-v31";
 const COMIC_CACHE = "tone-sovereign-comics-v1";
 const VOICE_CUES = [
   "ts_about_introduction_v1",

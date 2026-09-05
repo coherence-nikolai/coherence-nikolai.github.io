@@ -30,12 +30,8 @@ for (const fragment of [
   "Leer EL BLOQUEO"
 ]) assert.ok(app.includes(fragment), `Missing app scaffold fragment: ${fragment}`);
 
-for (const fragment of [
-  "acceptedComicNotices: new Set()",
-  "Before this special story",
-  "This is a fictional story about one person's interpretation of inner experience.",
-  "Esta es una historia de ficción sobre la interpretación que una persona hace de su experiencia interior."
-]) assert.ok(app.includes(fragment), `Missing governed notice fragment: ${fragment}`);
+assert.ok(app.includes("published: false"), "THE LOCK must remain unpublished until its lettering passes visual review");
+assert.ok(!app.includes("comicNotice"), "The interruptive comic warning route must remain removed");
 
 for (const selector of [
   ".comic-cover-placeholder",

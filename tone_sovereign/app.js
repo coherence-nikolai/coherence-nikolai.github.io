@@ -243,6 +243,7 @@ const comicSeries = [
         number: 1,
         pages: 30,
         hasCover: true,
+        published: false,
         assetReady: true,
         esReady: true,
         philosophicalFiction: true,
@@ -716,7 +717,6 @@ const state = {
   selectedComicSeries: "mainline",
   selectedComicIssue: 1,
   comicPage: 1,
-  acceptedComicNotices: new Set(),
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
@@ -1340,7 +1340,7 @@ function currentSpectrum() {
   if (["fields", "nestedFields", "field"].includes(state.view)) {
     return { name: "fields", color: SPECTRUM.fields };
   }
-  if (["library", "libraryPath", "teaching", "foundations", "law", "principle", "entry", "scales", "comics", "comicNotice", "comicReader"].includes(state.view)) {
+  if (["library", "libraryPath", "teaching", "foundations", "law", "principle", "entry", "scales", "comics", "comicReader"].includes(state.view)) {
     return { name: "teachings", color: SPECTRUM.teachings };
   }
   if (["acts", "ruleOfLife", "missions", "mission", "history"].includes(state.view)) {
@@ -1359,7 +1359,7 @@ function currentInterfaceMode() {
   if (["movement", "guided", "practiceEngine", "acts", "mission"].includes(state.view)) {
     return "practice";
   }
-  if (["nestedFields", "field", "libraryPath", "teaching", "law", "principle", "entry", "scales", "comics", "comicNotice", "comicReader", "symbol", "about", "ruleOfLife"].includes(state.view)) {
+  if (["nestedFields", "field", "libraryPath", "teaching", "law", "principle", "entry", "scales", "comics", "comicReader", "symbol", "about", "ruleOfLife"].includes(state.view)) {
     return "teaching";
   }
   if (state.view === "threshold") return "threshold";
@@ -1386,7 +1386,6 @@ function render() {
     principle: renderPrinciple,
     entry: renderLibraryEntry,
     comics: renderComics,
-    comicNotice: renderComicNotice,
     comicReader: renderComicReader,
     practiceEngines: renderPracticeEngines,
     practiceEngine: renderPracticeEngine,
@@ -3001,41 +3000,14 @@ function renderComicIssueCard(series, issue) {
 }
 
 function renderComics() {
+  const publishedSeries = comicSeries
+    .map(series => ({ ...series, issues: series.issues.filter(issue => issue.published !== false) }))
+    .filter(series => series.issues.length > 0);
   return `${renderTopbar(phrase("Comics", "Cómics"), phrase("Illustrated teachings", "Enseñanzas ilustradas"))}
     <main class="page wide comics-library-page">
       <header class="section-intro comics-intro"><div><p class="eyebrow">${phrase("Practices & Teachings", "Prácticas y enseñanzas")}</p><h1 class="page-title">${phrase("Stories for discernment.", "Historias para el discernimiento.")}</h1><p class="lede measure">${phrase("Read in any order. These stories offer images and questions; they do not diagnose you or decide what your experience means.", "Lee en cualquier orden. Estas historias ofrecen imágenes y preguntas; no te diagnostican ni deciden qué significa tu experiencia.")}</p></div>${renderComicLanguageControl()}</header>
-      ${comicSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : series.kind === "specials" ? phrase("Optional fiction", "Ficción opcional") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
+      ${publishedSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : series.kind === "specials" ? phrase("Optional fiction", "Ficción opcional") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
       <p class="gentle-note">${phrase("Comic images load only as you open or approach them. Your reading position is not recorded.", "Las imágenes se cargan solo cuando las abres o te acercas a ellas. Tu posición de lectura no se registra.")}</p>
-    </main>`;
-}
-
-function renderComicNotice() {
-  const { series, issue } = comicContext();
-  const isTheLock = series.id === "specials" && issue.id === "the-lock";
-  const eyebrow = isTheLock
-    ? phrase("Before this special story", "Antes de esta historia especial")
-    : phrase("Before Issue 10", "Antes del número 10");
-  const body = isTheLock
-    ? phrase(
-        "This is a fictional story about one person's interpretation of inner experience. It is not a diagnosis, a prediction, or a claim about anyone else's identity or physical symptoms.",
-        "Esta es una historia de ficción sobre la interpretación que una persona hace de su experiencia interior. No es un diagnóstico, una predicción ni una afirmación sobre la identidad o los síntomas físicos de otra persona."
-      )
-    : phrase(
-        "This finale explores not-self, identity, awareness and the Empty Throne. These ideas belong to the comic’s imaginative universe. They are not app guidance, a diagnosis, or a claim about who you are.",
-        "Este final explora el no-yo, la identidad, la consciencia y el Trono Vacío. Estas ideas pertenecen al universo imaginativo del cómic. No son orientación de la app, un diagnóstico ni una afirmación sobre quién eres."
-      );
-  const continueLabel = isTheLock
-    ? phrase("I understand · read THE LOCK", "Entiendo · leer EL BLOQUEO")
-    : phrase("I understand · read Issue 10", "Entiendo · leer el número 10");
-  return `${renderTopbar(series[state.lang].title, `${comicIssueLabel(series, issue)} · ${issue[state.lang]}`)}
-    <main class="page comic-notice-page">
-      <article class="comic-philosophical-notice" role="note" aria-labelledby="comic-notice-title">
-        <p class="eyebrow">${eyebrow}</p>
-        <h1 id="comic-notice-title" class="page-title">${phrase("Philosophical fiction, not instruction.", "Ficción filosófica, no instrucción.")}</h1>
-        <p>${body}</p>
-        <p>${phrase("You do not need to agree or continue. If the story feels disorienting, stop and return to something concrete: the room, your body, another person, or ordinary life.", "No necesitas estar de acuerdo ni continuar. Si la historia te desorienta, detente y vuelve a algo concreto: la habitación, tu cuerpo, otra persona o la vida cotidiana.")}</p>
-        <div class="practice-actions"><button class="primary-button" type="button" data-action="accept-comic-notice">${continueLabel}</button><button class="text-button" type="button" data-action="back">${phrase("Not now", "Ahora no")}</button></div>
-      </article>
     </main>`;
 }
 
@@ -3130,13 +3102,11 @@ function prepareComicImages() {
 function openComicIssue(seriesID, issueNumber) {
   const series = comicSeries.find(item => item.id === seriesID);
   const issue = series?.issues.find(item => item.number === Number(issueNumber));
-  if (!series || !issue) return;
+  if (!series || !issue || issue.published === false) return;
   state.selectedComicSeries = series.id;
   state.selectedComicIssue = issue.number;
   state.comicPage = 1;
-  const noticeKey = `${series.id}:${issue.id || issue.number}`;
-  if (issue.philosophicalFiction && !state.acceptedComicNotices.has(noticeKey)) navigate("comicNotice");
-  else navigate("comicReader");
+  navigate("comicReader");
 }
 
 function turnComicPage(offset) {
@@ -3211,7 +3181,10 @@ function renderLibraryEntry() {
   const catalog = catalogFor(state.lang);
   const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
   const field = catalog.fields.find(item => entry.tags.fields.includes(item.id));
-  const relatedStory = entry.id === "separate-event-from-interpretation"
+  const theLockIsPublished = comicSeries
+    .find(series => series.id === "specials")
+    ?.issues.some(issue => issue.id === "the-lock" && issue.published !== false);
+  const relatedStory = entry.id === "separate-event-from-interpretation" && theLockIsPublished
     ? `<aside class="gentle-note"><p class="eyebrow">${phrase("A related story", "Una historia relacionada")}</p><p>${phrase("THE LOCK explores the difference between an experience and the story built around it, without deciding what either must mean.", "EL BLOQUEO explora la diferencia entre una experiencia y la historia que se construye a su alrededor, sin decidir qué debe significar ninguna de las dos.")}</p><button class="secondary-button" type="button" data-comic-series="specials" data-comic-issue="1">${phrase("Read THE LOCK", "Leer EL BLOQUEO")}</button></aside>`
     : "";
   return `${renderTopbar(phrase("Practices & Teachings", "Prácticas y enseñanzas"), field ? `${field.dimension}D · ${field.title}` : phrase("Teaching", "Enseñanza"))}<main class="page"><header class="section-intro"><p class="eyebrow">${field ? `${field.dimension}D · ${escapeHTML(field.title)}` : phrase("Living teaching", "Enseñanza viva")}</p><h1 class="page-title">${escapeHTML(entry.title)}</h1><p class="lede">${escapeHTML(entry.summary)}</p></header><article class="prose"><section><h2>${phrase("Orientation", "Orientación")}</h2><p>${escapeHTML(entry.libraryCopy)}</p></section><section><h2>${phrase("Sovereign question", "Pregunta soberana")}</h2><blockquote>${escapeHTML(entry.sovereignQuestion)}</blockquote></section><section class="embodied-invitation"><h2>${phrase("Live this today", "Vívelo hoy")}</h2><p>${escapeHTML(entry.embodiedAct)}</p></section>${state.showFullTeaching ? `<section><h2>${phrase("Core teaching", "Enseñanza central")}</h2><p>${escapeHTML(entry.coreTeaching)}</p></section><section><h2>${phrase("Shadow form", "Forma de sombra")}</h2><p>${escapeHTML(entry.shadowForm)}</p></section><section><h2>${phrase("Recognition", "Reconocimiento")}</h2><p>${escapeHTML(entry.recognition)}</p></section><section><h2>${phrase("Two-minute practice", "Práctica de dos minutos")}</h2><ol>${entry.twoMinutePractice.map(step => `<li>${escapeHTML(step)}</li>`).join("")}</ol></section><section><h2>${phrase("Golden Age expression", "Expresión de la Edad Dorada")}</h2><p>${escapeHTML(entry.goldenAgeExpression)}</p></section>` : ""}</article>${relatedStory}<div class="practice-actions entry-actions"><button class="primary-button" type="button" data-entry-practice="${entry.id}">${phrase("Experience this", "Experimentar esto")}</button><button class="secondary-button" type="button" data-action="toggle-full-teaching">${state.showFullTeaching ? phrase("Show the summary", "Mostrar el resumen") : phrase("Read the full teaching", "Leer la enseñanza completa")}</button><button class="text-button" type="button" data-entry-crossing="${entry.id}">${phrase("Cross this pattern", "Cruzar este patrón")}</button><button class="text-button" type="button" data-entry-act="${entry.id}">${phrase("Live this today", "Vivir esto hoy")}</button><button class="text-button" type="button" data-entry-deeper="${entry.id}">${phrase("Go deeper", "Profundizar")}</button>${field ? `<button class="text-button" type="button" data-field="${field.id}">${phrase("Explore the Field", "Explorar el Campo")}</button>` : ""}</div></main>`;
@@ -3497,11 +3470,6 @@ app.addEventListener("click", async event => {
   if (action === "home") goHome();
   if (action === "previous-comic-page") turnComicPage(-1);
   if (action === "next-comic-page") turnComicPage(1);
-  if (action === "accept-comic-notice") {
-    const { series, issue } = comicContext();
-    state.acceptedComicNotices.add(`${series.id}:${issue.id || issue.number}`);
-    navigate("comicReader", { remember: false });
-  }
   if (action === "begin-guided-sit") await beginGuidedSit();
   if (action === "preview-guided-sit-introduction") previewGuidedSitIntroduction();
   if (action === "replay-guided-sit-introduction") replayGuidedSitIntroduction();

@@ -1447,9 +1447,6 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .comic-card-copy small { display: block; color: var(--gold); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }
 .comic-card-copy strong { display: block; margin-top: 5px; font-family: var(--serif); font-size: 1.16rem; font-weight: 400; line-height: 1.25; }
 .comic-card-copy > span { display: block; margin-top: 7px; color: var(--ivory-soft); font-size: .74rem; line-height: 1.4; }
-.comic-notice-page { min-height: calc(100svh - 82px); display: grid; align-items: center; }
-.comic-philosophical-notice { max-width: 700px; margin: 34px auto; padding: 34px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.comic-philosophical-notice > p:not(.eyebrow) { color: var(--ivory-soft); font-size: 1.02rem; line-height: 1.75; }
 .comic-reader-page { width: min(100%, 1080px); margin: 0 auto; padding: 28px 24px var(--safe-bottom); }
 .comic-reader-heading { display: flex; align-items: end; justify-content: space-between; gap: 22px; margin: 0 auto 18px; }
 .comic-reader-heading .eyebrow { margin: 0 0 5px; }
