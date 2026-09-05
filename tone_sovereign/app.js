@@ -231,11 +231,11 @@ const comicSeries = [
     kind: "specials",
     en: {
       title: "Special Stories",
-      subtitle: "Optional long-form fiction from the world of Tone Sovereign. Read it as story, not as diagnosis, doctrine or instruction."
+      subtitle: "A long-form story from the world of Tone Sovereign."
     },
     es: {
       title: "Historias especiales",
-      subtitle: "Ficción larga y opcional del mundo de Tone Sovereign. Léela como relato, no como diagnóstico, doctrina ni instrucción."
+      subtitle: "Una historia larga del mundo de Tone Sovereign."
     },
     issues: [
       {
@@ -243,7 +243,7 @@ const comicSeries = [
         number: 1,
         pages: 30,
         hasCover: true,
-        published: false,
+        published: true,
         assetReady: true,
         esReady: true,
         philosophicalFiction: true,

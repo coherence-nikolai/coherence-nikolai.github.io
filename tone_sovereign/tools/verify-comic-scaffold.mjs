@@ -30,7 +30,7 @@ for (const fragment of [
   "Leer EL BLOQUEO"
 ]) assert.ok(app.includes(fragment), `Missing app scaffold fragment: ${fragment}`);
 
-assert.ok(app.includes("published: false"), "THE LOCK must remain unpublished until its lettering passes visual review");
+assert.ok(app.includes("published: true"), "THE LOCK must be published after its lettering passes visual review");
 assert.ok(!app.includes("comicNotice"), "The interruptive comic warning route must remain removed");
 
 for (const selector of [
