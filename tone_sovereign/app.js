@@ -1,11 +1,14 @@
 import {mountOfflineDownloads, cancelOfflineDownloads} from './offline-downloads.js';
 import {homeIllustration, stageIllustration, completionStory, livedExperience} from './narrative-ui.js';
+import {additionalComicSeries} from './comic-catalogue.mjs';
+import {INTEGRATE_OPTIONS, INTEGRATE_GUIDANCE, newIntegrate, chooseIntegrate, integrateStepValid, integratePayload, integrateSummary} from './integrate-practice.mjs';
 import {STORAGE, JOURNAL_KEY, createBackup, parseBackup, planRestore, readPersistentState, recoverTransaction, transact, withStorageLock, weeklyPrompt, validateCategory} from './tone-state.mjs';
 const ROOT = "./";
-const comicEditions = await fetch('./comic-editions.json').then(response => {
+const comicManifest = await fetch('./comic-editions.json').then(response => {
   if (!response.ok) throw new Error('Edition manifest unavailable');
   return response.json();
-}).then(manifest => manifest.version === 1 && Array.isArray(manifest.editions) ? manifest.editions : []).catch(() => []);
+}).then(manifest => manifest.version === 1 && Array.isArray(manifest.editions) ? manifest : {version: 1, editions: []}).catch(() => ({version: 1, editions: []}));
+const comicEditions = comicManifest.editions;
 const FIRST_LIGHT = Object.freeze({
   duration: 16.20,
   entryDelay: 2.60,
@@ -271,6 +274,8 @@ const comicSeries = [
     ]
   }
 ];
+
+comicSeries.push(...additionalComicSeries(comicManifest));
 
 const movements = [
   {
@@ -738,6 +743,7 @@ const state = {
   selectedComicIssue: 1,
   comicPage: 1,
   comicZoom: 1,
+  comicTranscriptOpen: false,
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
@@ -773,6 +779,8 @@ function newPractice() {
     interruptedAt: 0,
     capacityStep: 0,
     capacityAnswers: [],
+    integrate: newIntegrate(),
+    completionDestination: "",
     storyExpanded: true,
     selectedOption: "",
     noticeStarted: false,
@@ -931,6 +939,7 @@ class SoundEngine {
   }
 
   voiceURL(cue, language = state.lang) {
+    if (cue === INTEGRATE_GUIDANCE.cue) return `${ROOT}assets/voice/${language}/${cue}.m4a`;
     return `${ROOT}assets/voice/${language}/${cue}.mp3`;
   }
 
@@ -2059,6 +2068,7 @@ function renderMovementSession() {
 
 function renderContinuityChoice(movement) {
   const lang = state.lang;
+  const destination = movements.find(item => item.id === state.practice.completionDestination);
   const relatedStory = completionStory(movement.id);
   const bridge = {
     notice: ["stabilise", "Create room for the signal.", "Abrir espacio para la señal."],
@@ -2074,9 +2084,11 @@ function renderContinuityChoice(movement) {
       <h1 class="practice-title">${lang === "en" ? "Save this practice on this device?" : "¿Guardar esta práctica en este dispositivo?"}</h1>
       <p class="lede">${lang === "en" ? "This saves the practice and the response you chose. Tone Sovereign will not tell you what your choices mean." : "Esto guarda la práctica y la respuesta que elegiste. Tone Sovereign no te dirá qué significan tus elecciones."}</p>
     </div>
-    <div class="practice-actions"><button class="primary-button" type="button" data-action="finish-movement-save">${lang === "en" ? "Save on this device" : "Guardar en este dispositivo"}</button>
-    <button class="text-button" type="button" data-action="finish-movement-pass">${lang === "en" ? "Finish here without saving" : "Terminar aquí sin guardar"}</button>
-    ${bridge && nextMovement ? `<aside class="adjacent-bridge"><p>${lang === "en" ? bridge[1] : bridge[2]}</p><button class="secondary-button" type="button" data-open-movement="${nextMovement.id}">${lang === "en" ? `Continue with ${nextMovement.en.name}` : `Continuar con ${nextMovement.es.name}`}</button></aside>` : ""}</div>
+    ${destination ? `<p class="lede">${phrase(`Next: ${destination.en.name}. Choose whether to keep this practice first.`, `Después: ${destination.es.name}. Elige primero si quieres guardar esta práctica.`)}</p>` : ''}
+    <div class="practice-actions"><button class="primary-button" type="button" data-action="finish-movement-pass">${destination ? phrase('Continue without saving', 'Continuar sin guardar') : phrase('Finish here without saving', 'Terminar aquí sin guardar')}</button>
+    <button class="secondary-button" type="button" data-action="finish-movement-save">${destination ? phrase('Save and continue', 'Guardar y continuar') : phrase('Save on this device', 'Guardar en este dispositivo')}</button>
+    ${destination ? `<button class="text-button" type="button" data-action="cancel-adjacent-movement">${phrase('Stay here', 'Quedarme aquí')}</button>` : ''}
+    ${!destination && bridge && nextMovement ? `<aside class="adjacent-bridge"><p>${lang === "en" ? bridge[1] : bridge[2]}</p><button class="secondary-button" type="button" data-action="choose-adjacent-movement" data-destination="${nextMovement.id}">${lang === "en" ? `Continue with ${nextMovement.en.name}` : `Continuar con ${nextMovement.es.name}`}</button></aside>` : ""}</div>
     ${relatedStory ? `<aside class="completion-story"><p>${escapeHTML(relatedStory.invitation[lang])}</p><button id="practice-story-link" class="text-button" type="button" data-action="practice-story" data-story-movement="${movement.id}">${phrase("Read an optional story", "Leer una historia opcional")} →</button><p class="gentle-note">${phrase("Return here afterwards. Nothing is saved by opening a story.", "Vuelve aquí después. Abrir una historia no guarda nada.")}</p></aside>` : ''}
   </main>`;
 }
@@ -2106,7 +2118,7 @@ function renderNoticeMovement() {
     <label>${lang === "en" ? "Duration" : "Duración"}<select data-notice-duration><option value="30" ${p.noticeDuration === 30 ? "selected" : ""}>30s</option><option value="60" ${p.noticeDuration === 60 ? "selected" : ""}>60s</option><option value="90" ${p.noticeDuration === 90 ? "selected" : ""}>90s</option></select></label></div>
   </section>`;
   if (p.stage === "close") {
-    const outcomes = lang === "en" ? ["Clearer", "Different", "No change", "Not sure"] : ["Más claro", "Diferente", "Sin cambio", "No lo sé"];
+    const outcomes = lang === "en" ? ["Clearer", "Different", "No change", "Not sure"] : ["Más claro", "Diferente", "Sin cambios", "No estoy seguro"];
     return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "What is different, if anything?" : "¿Qué ha cambiado, si algo cambió?", lang === "en" ? "A response is optional." : "Responder es opcional.")}
       <div class="instrument-region notice-instrument still" aria-hidden="true"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></div>
       <div class="choice-grid">${outcomes.map((item, index) => `<button class="choice ${p.noticeOutcome === String(index) ? "selected" : ""}" type="button" data-notice-outcome="${index}">${item}</button>`).join("")}</div>
@@ -2118,7 +2130,7 @@ function renderNoticeMovement() {
   return `<section class="practice-stage focused-stage notice-live-stage">
     <button class="instrument-region notice-instrument ${p.noticeAcknowledged ? "acknowledged" : ""}" type="button" data-action="notice-tap" aria-label="${p.noticeAcknowledged ? (lang === "en" ? "Noticed" : "Notado") : (lang === "en" ? "Ready. Acknowledge what you notice" : "Listo. Reconoce lo que notes")}"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></button>
     <p class="notice-status" data-notice-status>${p.noticeAcknowledged ? (lang === "en" ? "Noticed" : "Notado") : (lang === "en" ? "Ready" : "Listo")}</p>
-    ${renderMovementHeading(cue, state.quietWords ? (lang === "en" ? "Tap the centre when you notice something." : "Toca el centro cuando notes algo.") : (lang === "en" ? "No naming is needed." : "No hace falta nombrarlo."))}
+    ${renderMovementHeading(cue, state.quietWords ? (lang === "en" ? "Tap the centre when you notice something." : "Toca el centro cuando notes algo.") : (lang === "en" ? "No naming is needed." : "No hace falta nombrarlo.")).replace('class="practice-title"', 'class="practice-title" data-notice-cue')}
     <p class="timer" data-notice-timer>${Math.floor(p.noticeDuration / 60)}:${String(p.noticeDuration % 60).padStart(2, "0")}</p>
     <div class="button-row"><button class="secondary-button" type="button" data-action="another-notice-cue">${lang === "en" ? "Another cue" : "Otra indicación"}</button><button class="text-button" type="button" data-action="end-notice">${lang === "en" ? "End practice" : "Terminar práctica"}</button></div>
   </section>`;
@@ -2142,7 +2154,7 @@ function renderStabiliseMovement() {
     </section>`;
   }
   const chosen = steadyStates.find(item => item.id === p.steadyState);
-  const pattern = BREATH_PATTERNS[p.breathPattern || chosen.pattern];
+  const pattern = selectedBreathPattern();
   return `<section class="practice-stage focused-stage">
     ${renderMovementHeading(pattern[lang].title, pattern[lang].cue, chosen[lang][0])}
     <p class="consent-copy">${lang === "en" ? "Stop at any time. Let the breath return to its natural rhythm." : "Detente cuando quieras. Deja que la respiración vuelva a su ritmo natural."}</p>
@@ -2184,6 +2196,7 @@ function renderCapacityInstrument(id, step, lang, answers, selectedOption) {
 }
 
 function renderCapacityMovement(id) {
+  if (id === 'integrate') return renderIntegrateMovement();
   const p = state.practice;
   const lang = state.lang;
   const flow = capacityFlows[id];
@@ -2198,6 +2211,28 @@ function renderCapacityMovement(id) {
     ${renderCapacityInstrument(id, p.capacityStep, lang, p.capacityAnswers, p.selectedOption)}
     <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" aria-pressed="${p.selectedOption === option}" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
     <button class="primary-button" type="button" data-action="capacity-continue" ${p.selectedOption ? "" : "disabled"}>${p.capacityStep === flow.length - 1 ? (lang === "en" ? "Complete practice" : "Completar práctica") : tr("continue")}</button>
+  </section>`;
+}
+
+function renderIntegrateMovement() {
+  const p = state.practice, lang = state.lang, value = p.integrate ||= newIntegrate();
+  const step = p.capacityStep, item = capacityFlows.integrate[step][lang];
+  const label = option => option[lang === 'es' ? 2 : 1];
+  const choices = (group, selected) => INTEGRATE_OPTIONS[group].map(option => `<button id="integrate-${option[0]}" class="choice ${selected(option[0]) ? 'selected' : ''}" type="button" aria-pressed="${selected(option[0])}" data-integrate-group="${group}" data-integrate-option="${option[0]}">${escapeHTML(label(option))}</button>`).join('');
+  const hasAnswer = integrateStepValid(value, step);
+  const firstStep = `<fieldset class="integrate-choice-group"><legend>${phrase('Signals · choose up to two', 'Señales · elige hasta dos')}</legend><p class="gentle-note">${phrase('One signal is enough. A limit alone is enough too.', 'Una señal basta. Un límite por sí solo también basta.')}</p><div class="choice-grid">${choices('signal', id => value.signals.includes(id))}</div></fieldset>
+    <fieldset class="integrate-choice-group"><legend>${phrase('A limit, if one matters', 'Un límite, si es pertinente')}</legend><div class="choice-grid">${choices('limit', id => value.inclusionDecision !== 'nothingMore' && value.limitDecision === id)}</div></fieldset>
+    <button id="integrate-nothingMore" class="choice ${value.inclusionDecision === 'nothingMore' ? 'selected' : ''}" type="button" aria-pressed="${value.inclusionDecision === 'nothingMore'}" data-integrate-group="nothing" data-integrate-option="nothingMore">${phrase('Nothing more', 'Nada más')}</button><p class="gentle-note">${phrase('Nothing more clears these selections. You can change your mind.', 'Nada más borra estas selecciones. Puedes cambiar de opinión.')}</p>`;
+  const payload = integratePayload(value);
+  return `<section class="practice-stage focused-stage capacity-stage integrate-practice">
+    <p class="eyebrow">${step + 1} ${phrase('of', 'de')} 3</p>
+    ${renderMovementHeading(item[0], item[1])}
+    <button class="text-button" type="button" data-action="return-movement-field">${phrase('Pass for now', 'Dejarlo por ahora')}</button>
+    ${step === 1 ? `<div class="button-row"><button class="text-button voice-invitation" type="button" data-action="listen-integrate-guidance">${phrase('Hear this guidance', 'Escuchar esta orientación')}</button><button class="text-button" type="button" data-action="stop-integrate-guidance">${phrase('Stop voice', 'Detener la voz')}</button></div><details class="guided-sit-transcript"><summary>${phrase('Read the words', 'Leer las palabras')}</summary><p>${escapeHTML(INTEGRATE_GUIDANCE[lang])}</p></details>` : ''}
+    ${stageIllustration('integrate', step, lang, state.illustrationsEnabled, hasAnswer, p.storyExpanded)}
+    ${step === 0 ? firstStep : `<div class="choice-grid capacity-choices">${step === 1 ? choices('authority', id => value.notSoleAuthority === id) : choices('response', id => value.response === id)}</div>`}
+    ${step === 2 && payload ? `<div class="integrate-summary"><p class="eyebrow">${phrase('Your choices', 'Tus elecciones')}</p><p>${escapeHTML(integrateSummary(payload, lang))}</p></div>` : ''}
+    <button class="primary-button" type="button" data-action="integrate-continue" ${hasAnswer ? '' : 'disabled'}>${step === 2 ? phrase('Complete practice', 'Completar práctica') : tr('continue')}</button>
   </section>`;
 }
 
@@ -2312,7 +2347,7 @@ function renderEmbodyMovement() {
   if (p.embodyStage === "tune" && tone) return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(tone[lang], lang === "en" ? `Adjust the sound until it feels close enough to ${tone.en}.` : `Ajusta el sonido hasta que se sienta suficientemente cercano a ${tone.es}.`)}
     <details class="dial-help"><summary>${lang === "en" ? "What do the dials change?" : "¿Qué cambian los controles?"}</summary><p><strong>${lang === "en" ? "Frequency:" : "Frecuencia:"}</strong> ${lang === "en" ? "moves the pitch higher or lower; it does not assign meaning or healing." : "sube o baja el tono; no asigna significado ni curación."}</p><p><strong>${lang === "en" ? "Strength:" : "Intensidad:"}</strong> ${lang === "en" ? "changes loudness only. Keep it comfortable, or leave sound off." : "solo cambia el volumen. Mantenlo cómodo o deja el sonido apagado."}</p></details>
-    <div class="tone-controls"><label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="180" max="880" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label><label class="range-label">${lang === "en" ? "Strength" : "Intensidad"}<input type="range" min="10" max="70" value="${p.amplitude}" data-range="amplitude"><span>${p.amplitude}</span></label></div>
+    <div class="tone-controls"><label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="160" max="1000" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label><label class="range-label">${lang === "en" ? "Strength" : "Intensidad"}<input type="range" min="10" max="70" value="${p.amplitude}" data-range="amplitude"><span>${p.amplitude}</span></label></div>
     <button class="primary-button" type="button" data-action="embody-hold">${lang === "en" ? "This is it" : "Este es el tono"}</button></section>`;
   if (p.embodyStage === "hold" && tone) return `<section class="practice-stage focused-stage embody-hold-stage"><div class="tone-field large" style="color:${tone.color}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-halo" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path><path class="tone-wave-light" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(tone[lang], lang === "en" ? "Stay with the tone." : "Quédate con el tono.")}
@@ -2426,6 +2461,7 @@ function movementBack() {
   const p = state.practice;
   const id = p.movement;
   if (p.stage === "continuity") {
+    p.completionDestination = '';
     p.stage = id === "notice" ? "close" : id === "stabilise" ? "complete" : id === "reclaim" ? "complete" : id === "cross" ? "close" : id === "embody" ? "hold" : "practice";
   } else if (id === "notice" && p.stage === "close") p.stage = "noting";
   else if (id === "notice" && p.stage === "noting") p.stage = "arrive";
@@ -2453,9 +2489,11 @@ function movementBack() {
   focusCurrentView();
 }
 
-function requestMovementCompletion() {
+function requestMovementCompletion(destination = '') {
   stopPracticeTimers();
-  if (state.practice.sequence && state.practice.movement !== movements.at(-1).id) { advanceFullPractice(); return; }
+  // Every practice gets an explicit pause, including the full seven-practice
+  // route. Choosing the next movement never silently loses the save decision.
+  state.practice.completionDestination = movements.some(item => item.id === destination && item.id !== state.practice.movement) ? destination : '';
   state.practice.stage = "continuity";
   render();
 }
@@ -2466,27 +2504,46 @@ async function finishMovement(save) {
   if (save) {
     const noticeOutcomes = state.lang === "en"
       ? ["Clearer", "Different", "No change", "Not sure"]
-      : ["Más claro", "Diferente", "Sin cambio", "No lo sé"];
+      : ["Más claro", "Diferente", "Sin cambios", "No estoy seguro"];
     const detail = p.movement === "cross" ? currentCrossQuestion()
       : p.movement === "reclaim" ? p.relation
       : p.movement === "embody" ? (tones.find(item => item.id === p.tone)?.[state.lang] || "")
-      : p.movement === "notice" ? (noticeOutcomes[Number(p.noticeOutcome)] || "")
+      : p.movement === "notice" ? (typeof p.noticeOutcome === "string" && /^[0-3]$/.test(p.noticeOutcome) ? noticeOutcomes[Number(p.noticeOutcome)] : (state.lang === "en" ? "No response" : "Sin respuesta"))
       : p.capacityAnswers.filter(Boolean).join(" · ");
-    if (!(await addTrace({ type: "practice", title: local(movement).name, detail: detail || local(movement).line }))) return;
+    const integration = p.movement === 'integrate' ? integratePayload(p.integrate) : null;
+    if (p.movement === 'integrate' && !integration) return;
+    if (!(await addTrace({ type: "practice", title: local(movement).name, detail: integration ? integrateSummary(integration, state.lang) : detail || local(movement).line, ...(integration ? {data: {integrate: integration}} : {}) }))) return;
     showToast(tr("saved"));
   }
-  returnToMovementField();
+  if (p.completionDestination) {
+    const sequence = p.sequence;
+    startMovement(p.completionDestination);
+    state.practice.sequence = sequence;
+  } else returnToMovementField();
 }
 
 function selectedBreathPattern() {
-  const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
-  return BREATH_PATTERNS[state.practice.breathPattern || selectedState?.pattern] || BREATH_PATTERNS.extended;
+  return BREATH_PATTERNS[selectedBreathPatternKey()];
+}
+
+function recommendedSteadyPattern(need, seconds = 120) {
+  if (![10, 120, 300].includes(seconds)) return 'anapana';
+  switch (need) {
+    case 'overwhelmed': return seconds === 10 ? 'physiological' : seconds === 120 ? 'extended' : 'coherent';
+    case 'anxious':
+    case 'conversation': return 'coherent';
+    case 'angry':
+    case 'wired': return 'extended';
+    case 'stuck': return seconds === 300 ? 'coherent' : 'anapana';
+    case 'looping': return seconds === 300 ? 'anapana' : 'coherent';
+    default: return 'anapana';
+  }
 }
 
 function selectedBreathPatternKey() {
-  const selectedState = steadyStates.find(item => item.id === state.practice.steadyState);
-  const key = state.practice.breathPattern || selectedState?.pattern;
-  return BREATH_PATTERNS[key] ? key : "extended";
+  const p = state.practice;
+  return typeof p.breathPattern === 'string' && Object.hasOwn(BREATH_PATTERNS, p.breathPattern)
+    ? p.breathPattern : recommendedSteadyPattern(p.steadyState, p.breathDuration);
 }
 
 function breathInstrumentURL() {
@@ -2583,7 +2640,7 @@ function renderMovement(id) {
       <div class="practice-copy"><p class="eyebrow">${lang === "en" ? "Choose the tone" : "Elige el tono"}</p><h2 class="practice-title" style="color:${tone.color}">${tone[lang]}</h2></div>
       <div class="choice-grid">${tones.map(item => `<button class="choice ${item.id === p.tone ? "selected" : ""}" type="button" data-tone="${item.id}">${item[lang]}</button>`).join("")}</div>
       <div class="tone-controls">
-        <label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="180" max="880" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label>
+        <label class="range-label">${lang === "en" ? "Frequency" : "Frecuencia"}<input type="range" min="160" max="1000" value="${p.frequency}" data-range="frequency"><span>${p.frequency} Hz</span></label>
         <label class="range-label">${lang === "en" ? "Strength" : "Intensidad"}<input type="range" min="10" max="70" value="${p.amplitude}" data-range="amplitude"><span>${p.amplitude}</span></label>
       </div>
       <button class="primary-button" type="button" data-action="toggle-tone">${p.tonePlaying ? (lang === "en" ? "Let the tone rest" : "Dejar descansar el tono") : (lang === "en" ? "Enter this tone" : "Entrar en este tono")}</button>`;
@@ -3062,13 +3119,15 @@ function comicImageAlt(series, issue, position = 1) {
     );
   }
   return phrase(
-    `${seriesTitle}${series.kind === "specials" ? ":" : `, Issue ${issue.number}:`} ${issueTitle}, page ${descriptor.storyPage} of ${issue.pages}`,
-    `${seriesTitle}${series.kind === "specials" ? ":" : `, número ${issue.number}:`} ${issueTitle}, página ${descriptor.storyPage} de ${issue.pages}`
+    `${seriesTitle}${series.kind === "specials" ? ":" : `, ${comicIssueLabel(series, issue)}:`} ${issueTitle}, page ${descriptor.storyPage} of ${issue.pages}`,
+    `${seriesTitle}${series.kind === "specials" ? ":" : `, ${comicIssueLabel(series, issue)}:`} ${issueTitle}, página ${descriptor.storyPage} de ${issue.pages}`
   );
 }
 
 function comicIssueLabel(series, issue) {
   if (series.kind === "specials") return phrase("Special story", "Historia especial");
+  if (series.kind === "practice-books") return `${phrase("Book", "Libro")} ${issue.number}`;
+  if (series.kind === "archive") return phrase("From the archive", "Del archivo");
   return `${phrase("Issue", "Número")} ${issue.number}`;
 }
 
@@ -3091,7 +3150,7 @@ function renderComicIssueCard(series, issue) {
     : `<img src="${shelfImage}" data-comic-fallback="${coverPath}" loading="lazy" decoding="async" width="320" height="480" alt="">`;
   return `<button class="comic-issue-card" type="button" data-comic-series="${series.id}" data-comic-issue="${issue.number}" aria-label="${escapeAttribute(openLabel)}">
     <span class="comic-cover-wrap">${cover}</span>
-    <span class="comic-card-copy"><small>${escapeHTML(issueLabel)} · ${series.kind === "specials" ? `${issue.pages} ${phrase("story pages", "páginas de historia")} + ${phrase("cover", "portada")}` : `${issue.pages} ${phrase("pages", "páginas")}`}</small><strong>${escapeHTML(issue[state.lang])}</strong>${spanishFallback ? `<span>${phrase("Spanish edition in preparation · English available", "Edición en español en preparación · disponible en inglés")}</span>` : ""}${issue.assetReady === false ? `<span>${phrase("Reader scaffold ready · artwork forthcoming", "Lector preparado · ilustraciones próximamente")}</span>` : ""}</span>
+    <span class="comic-card-copy"><small>${escapeHTML(issueLabel)} · ${issue.hasCover ? `${issue.pages} ${phrase("story pages", "páginas de historia")} + ${phrase("cover", "portada")}` : `${issue.pages} ${phrase("pages", "páginas")}`}</small><strong>${escapeHTML(issue[state.lang])}</strong>${spanishFallback ? `<span>${phrase("Spanish edition in preparation · English available", "Edición en español en preparación · disponible en inglés")}</span>` : ""}${issue.assetReady === false ? `<span>${phrase("Reader scaffold ready · artwork forthcoming", "Lector preparado · ilustraciones próximamente")}</span>` : ""}</span>
   </button>`;
 }
 
@@ -3102,8 +3161,10 @@ function renderComics() {
   return `${renderTopbar(phrase("Comics", "Cómics"), phrase("Illustrated teachings", "Enseñanzas ilustradas"))}
     <main class="page wide comics-library-page">
       <header class="section-intro comics-intro"><div><p class="eyebrow">${phrase("Practices & Teachings", "Prácticas y enseñanzas")}</p><h1 class="page-title">${phrase("Stories for discernment.", "Historias para el discernimiento.")}</h1><p class="lede measure">${phrase("Read in any order. These stories offer images and questions; they do not diagnose you or decide what your experience means.", "Lee en cualquier orden. Estas historias ofrecen imágenes y preguntas; no te diagnostican ni deciden qué significa tu experiencia.")}</p></div>${renderComicLanguageControl()}</header>
+      <nav class="comic-collection-links" aria-label="${phrase("Choose a collection", "Elige una colección")}">${publishedSeries.map(series => `<a href="#comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</a>`).join("")}</nav>
       ${publishedSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : series.kind === "specials" ? phrase("Optional fiction", "Ficción opcional") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
       <p class="gentle-note">${phrase("Comic images load only as you open or approach them. Your reading position is not recorded.", "Las imágenes se cargan solo cuando las abres o te acercas a ellas. Tu posición de lectura no se registra.")}</p>
+      <p class="gentle-note"><a href="/tone_comics/">${phrase("Earlier editions and original archive", "Ediciones anteriores y archivo original")} →</a></p>
     </main>`;
 }
 
@@ -3119,12 +3180,12 @@ function renderComicReader() {
   const assetPath = comicAssetPath(series.id, issue, page, artLanguage);
   const comicPage = issue.assetReady === false
     ? `<div class="comic-page-placeholder" role="img" aria-label="${escapeAttribute(comicImageAlt(series, issue, page))}" data-comic-asset-path="${escapeAttribute(assetPath)}"><p class="eyebrow">${escapeHTML(descriptor.label)}</p><strong>${escapeHTML(issue[state.lang])}</strong><span>${phrase("Artwork in preparation", "Ilustración en preparación")}</span></div>`
-    : `<img class="comic-page-image" src="${assetPath}" data-comic-fallback="${comicAssetPath(series.id, issue, page, "en")}" loading="lazy" decoding="async" alt="${escapeAttribute(comicImageAlt(series, issue, page))}">`;
-  const pagePicker = imageCount > 12
+    : `<img class="comic-page-image" src="${assetPath}" data-comic-fallback="${comicAssetPath(series.id, issue, page, "en")}" loading="eager" decoding="async" alt="${escapeAttribute(comicImageAlt(series, issue, page))}">`;
+  const pagePicker = imageCount > 1
     ? `<label class="comic-page-picker"><span>${phrase("Go to", "Ir a")}</span><select data-comic-page-picker aria-label="${phrase("Go to comic page", "Ir a una página del cómic")}">${Array.from({ length: imageCount }, (_, index) => { const position = index + 1; const item = comicPageDescriptor(issue, position); return `<option value="${position}" ${position === page ? "selected" : ""}>${escapeHTML(item.label)}</option>`; }).join("")}</select></label>`
     : "";
   const transcript = issue.transcriptPaths
-    ? `<details class="comic-transcript" data-comic-transcript data-transcript-key="${escapeAttribute(`${state.lang}:${series.id}:${issue.id || issue.number}:${descriptor.key}`)}"><summary>${phrase("Page transcript and image description", "Transcripción y descripción de la imagen")}</summary><div class="comic-transcript-content"><section><h2>${phrase("Image description", "Descripción de la imagen")}</h2><p data-comic-image-description>${phrase("Open this section to load the description.", "Abre esta sección para cargar la descripción.")}</p></section><section><h2>${phrase("Transcript", "Transcripción")}</h2><p data-comic-transcript-copy>${phrase("Open this section to load the transcript.", "Abre esta sección para cargar la transcripción.")}</p></section></div></details>`
+    ? `<details class="comic-transcript" ${state.comicTranscriptOpen ? "open" : ""} data-comic-transcript data-transcript-key="${escapeAttribute(`${state.lang}:${series.id}:${issue.id || issue.number}:${descriptor.key}`)}"><summary>${phrase("Page transcript and image description", "Transcripción y descripción de la imagen")}</summary><div class="comic-transcript-content"><section><h2>${phrase("Image description", "Descripción de la imagen")}</h2><p data-comic-image-description>${phrase("Open this section to load the description.", "Abre esta sección para cargar la descripción.")}</p></section><section><h2>${phrase("Transcript", "Transcripción")}</h2><p data-comic-transcript-copy>${phrase("Open this section to load the transcript.", "Abre esta sección para cargar la transcripción.")}</p></section></div></details>`
     : "";
   return `${renderTopbar(series[state.lang].title, `${comicIssueLabel(series, issue)} · ${issue[state.lang]}`)}
     <main class="comic-reader-page">
@@ -3132,15 +3193,16 @@ function renderComicReader() {
       <p id="comic-language-note" class="comic-language-note" ${spanishFallback ? "" : "hidden"}>${phrase("Spanish edition in preparation. Showing the English artwork.", "La edición en español está en preparación. Se muestra la versión gráfica en inglés.")}</p>
       <label class="comic-zoom-control"><span>${phrase("Reading size", "Tamaño de lectura")}</span><select data-comic-zoom aria-describedby="comic-zoom-help">${[1, 1.5, 2, 3].map(zoom => `<option value="${zoom}" ${state.comicZoom === zoom ? "selected" : ""}>${zoom === 1 ? phrase("Fit page", "Ajustar página") : `${zoom * 100}%`}</option>`).join("")}</select></label>
       <p id="comic-zoom-help" class="comic-zoom-help">${phrase("Enlarge to read the lettering. Scroll within the enlarged page; use Previous and Next to turn pages.", "Amplía para leer el texto. Desplázate dentro de la página ampliada; usa Anterior y Siguiente para pasar de página.")}</p>
+      <div class="comic-reading-tools">${pagePicker}${issue.assetReady === false ? "" : `<a href="${escapeAttribute(assetPath)}" target="_blank" rel="noopener" class="text-button">${phrase("Open full-size image ↗", "Abrir imagen a tamaño completo ↗")}<span class="sr-only">${phrase(" (new tab)", " (pestaña nueva)")}</span></a>`}</div>
       <figure class="comic-page-stage ${state.comicZoom > 1 ? "is-enlarged" : ""}" style="--comic-zoom: ${state.comicZoom}" data-comic-swipe tabindex="0" aria-label="${phrase("Comic artwork. Enlarge using Reading size above.", "Ilustración del cómic. Amplía con Tamaño de lectura arriba.")}">
         ${comicPage}
       </figure>
+      <p class="comic-image-error gentle-note" data-comic-image-error role="status" hidden></p>
       <nav class="comic-reader-controls" aria-label="${phrase("Comic page navigation", "Navegación de páginas del cómic")}">
         <button class="secondary-button" type="button" data-action="previous-comic-page" ${page === 1 ? "disabled" : ""}>← <span>${phrase("Previous", "Anterior")}</span></button>
         <output aria-live="polite" aria-atomic="true">${progress}</output>
         <button class="secondary-button" type="button" data-action="next-comic-page" ${page === imageCount ? "disabled" : ""}><span>${phrase("Next", "Siguiente")}</span> →</button>
       </nav>
-      ${pagePicker}
       <p class="comic-reader-help">${phrase("Swipe left or right · Arrow keys turn pages", "Desliza a la izquierda o derecha · las flechas cambian de página")}</p>
       ${transcript}
     </main>`;
@@ -3179,10 +3241,24 @@ async function loadComicTranscript(details) {
 
 function prepareComicImages() {
   document.querySelectorAll("img[data-comic-fallback]").forEach(image => {
+    const reportFailure = () => {
+      if (!image.isConnected) return;
+      const error = document.querySelector('[data-comic-image-error]');
+      if (image.classList.contains('comic-page-image') && error) {
+        error.hidden = false;
+        error.textContent = phrase("This image could not load. Check your connection, then reopen this page. Text remains available below where a transcript exists.", "No se pudo cargar esta imagen. Comprueba tu conexión y vuelve a abrir esta página. El texto sigue disponible abajo cuando hay una transcripción.");
+      }
+    };
     image.addEventListener("error", () => {
+      if (!image.isConnected) return;
       const fallback = image.dataset.comicFallback;
       if (!fallback || image.dataset.fallbackApplied === "true") return;
+      if (new URL(fallback, location.href).href === image.src) {
+        reportFailure();
+        return;
+      }
       image.dataset.fallbackApplied = "true";
+      image.addEventListener('error', reportFailure, {once: true});
       image.src = fallback;
       if (image.classList.contains("comic-page-image")) {
         document.querySelector("#comic-language-note")?.removeAttribute("hidden");
@@ -3191,6 +3267,8 @@ function prepareComicImages() {
     }, { once: true });
   });
   if (state.view !== "comicReader") return;
+  const transcriptDetails = document.querySelector('[data-comic-transcript][open]');
+  if (transcriptDetails) loadComicTranscript(transcriptDetails);
   const { series, issue } = comicContext();
   if (issue.assetReady === false || state.comicPage >= comicImageCount(issue)) return;
   const preload = new Image();
@@ -3205,6 +3283,7 @@ function openComicIssue(seriesID, issueNumber) {
   state.selectedComicIssue = issue.number;
   state.comicPage = 1;
   state.comicZoom = 1;
+  state.comicTranscriptOpen = false;
   navigate("comicReader");
 }
 
@@ -3387,7 +3466,7 @@ function renderHistory() {
   const hasKept = state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length || remembered;
   return `${renderTopbar(phrase("Kept on this device", "Guardado en este dispositivo"), phrase("Only when you choose", "Solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Kept on this device", "Guardado en este dispositivo")}</p><h1 class="page-title">${hasKept ? phrase("Your chosen material is here.", "El material que elegiste está aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Saved traces and a remembered tone stay distinct. Tone Sovereign does not combine or interpret them.", "Las huellas guardadas y un tono recordado permanecen separados. Tone Sovereign no los combina ni los interpreta.")}</p></header>
     <section class="kept-device-section"><p class="eyebrow">${phrase("Remembered tone", "Tono recordado")}</p>${remembered ? `<h2>${escapeHTML(remembered[state.lang])}</h2><p>${phrase("Your last held Embody tone—not a score, recommendation or diagnosis.", "Tu último tono guardado en Encarnar: no es una puntuación, recomendación ni diagnóstico.")}</p><button class="text-button" type="button" data-action="return-remembered-tone">${phrase("Return to Embody", "Volver a Encarnar")}</button>` : `<p>${phrase("No tone is being remembered.", "No hay ningún tono recordado.")}</p>`}</section>
-    ${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}
+    ${state.traces.length ? `<section class="trace-list"><p class="eyebrow">${phrase("Saved practices and questions", "Prácticas y preguntas guardadas")}</p>${state.traces.map(trace => `<article class="trace-row"><div><h3>${escapeHTML(trace.title)}</h3><p>${escapeHTML(integrateSummary(trace.data?.integrate, state.lang) || trace.detail || "")}</p></div><time datetime="${trace.createdAt}">${new Intl.DateTimeFormat(state.lang === "es" ? "es-CL" : "en-AU", { dateStyle: "medium" }).format(new Date(trace.createdAt))}</time></article>`).join("")}</section>` : `<p class="empty-state">${phrase("No saved practices yet. Nothing is missing.", "Todavía no hay prácticas guardadas. No falta nada.")}</p>`}
     <section class="continuity-links"><p class="eyebrow">${phrase("Continue from here", "Continuar desde aquí")}</p><button class="orientation-invitation" type="button" data-view="ruleOfLife"><span class="door-mark" aria-hidden="true">│</span><span><strong>${phrase("My Golden Age Rule of Life", "Mi regla de vida de la Edad Dorada")}</strong><small>${phrase("Keep chosen principles and commitments as a living orientation.", "Conserva principios y compromisos elegidos como orientación viva.")}</small></span><b>→</b></button><button class="orientation-invitation" type="button" data-view="missions"><span class="door-mark" aria-hidden="true">↗</span><span><strong>${phrase("Mission Path", "Camino de misión")}</strong><small>${phrase("Protect a direction and its next visible step.", "Protege una dirección y su próximo paso visible.")}</small></span><b>→</b></button></section>
     <p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
 }
@@ -3638,6 +3717,15 @@ app.addEventListener("click", async event => {
     return;
   }
   if (button.dataset.breathDuration) { state.practice.breathDuration = Number(button.dataset.breathDuration); render(); return; }
+  if (button.dataset.integrateOption && state.practice.movement === 'integrate') {
+    const result = chooseIntegrate(state.practice.integrate, button.dataset.integrateGroup, button.dataset.integrateOption);
+    if (result.limitReached) { announce(phrase('Choose up to two signals. Deselect one to choose another.', 'Elige hasta dos señales. Desmarca una para elegir otra.')); return; }
+    state.practice.integrate = result.value;
+    state.practice.storyExpanded = false;
+    render();
+    document.getElementById(`integrate-${button.dataset.integrateOption}`)?.focus({preventScroll: true});
+    return;
+  }
   if (button.dataset.capacityOption !== undefined) {
     state.practice.selectedOption = button.dataset.capacityOption;
     state.practice.storyExpanded = false;
@@ -3736,8 +3824,10 @@ app.addEventListener("click", async event => {
   if (action === "complete-movement") requestMovementCompletion();
   if (action === "finish-movement-save") finishMovement(true);
   if (action === "finish-movement-pass") finishMovement(false);
-  if (action === "continue-stabilise") startMovement("stabilise");
-  if (action === "continue-embody") startMovement("embody");
+  if (action === "continue-stabilise") requestMovementCompletion("stabilise");
+  if (action === "continue-embody") requestMovementCompletion("embody");
+  if (action === 'choose-adjacent-movement') requestMovementCompletion(button.dataset.destination);
+  if (action === 'cancel-adjacent-movement') { state.practice.completionDestination = ''; render(); }
   if (action === "replay-ceremony") {
     state.sound = true;
     persistPreferences();
@@ -3788,12 +3878,25 @@ app.addEventListener("click", async event => {
   if (action === "less-steady") { state.practice.steadyExpanded = false; render(); }
   if (action === "change-breath-pattern") { state.practice.stage = "patterns"; render(); }
   if (action === "change-steady") { state.practice.steadyState = ""; state.practice.breathPattern = ""; state.practice.stage = "chooser"; state.practice.breathStartedAt = 0; stopPracticeTimers(); render(); }
+  if (action === 'integrate-continue' && state.practice.movement === 'integrate') {
+    const p = state.practice;
+    if (!integrateStepValid(p.integrate, p.capacityStep)) return;
+    sound.stopVoice();
+    if (p.capacityStep < 2) { p.capacityStep += 1; p.storyExpanded = true; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
+    else if (integratePayload(p.integrate)) requestMovementCompletion();
+    return;
+  }
   if (action === "capacity-continue") {
     const flow = capacityFlows[state.practice.movement];
     state.practice.capacityAnswers[state.practice.capacityStep] = state.practice.selectedOption;
     if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; state.practice.storyExpanded = true; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
     else requestMovementCompletion();
   }
+  if (action === 'listen-integrate-guidance' && state.practice.movement === 'integrate' && state.practice.capacityStep === 1) {
+    if (state.voice) sound.playVoice(INTEGRATE_GUIDANCE.cue);
+    else showToast(phrase('Voice is off. You can turn it on in Settings.', 'La voz está desactivada. Puedes activarla en Ajustes.'));
+  }
+  if (action === 'stop-integrate-guidance') sound.stopVoice();
   if (action === "listen-capacity-stage") playCapacityStageVoice(state.practice.movement, state.practice.capacityStep);
   if (action === "listen-engine-stage") playEngineStageVoice();
   if (action === "reclaim-hold" && event.detail === 0 && !state.practice.reclaimComplete) {
@@ -4061,6 +4164,7 @@ app.addEventListener("pointercancel", () => { comicSwipeStart = null; });
 
 app.addEventListener("toggle", event => {
   const details = event.target.closest?.("[data-comic-transcript]");
+  if (details && state.view === "comicReader") state.comicTranscriptOpen = details.open;
   if (details?.open) loadComicTranscript(details);
 }, true);
 

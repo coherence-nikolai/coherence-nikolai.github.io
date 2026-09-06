@@ -1,8 +1,8 @@
-const CACHE = "tone-sovereign-v35";
+const CACHE = "tone-sovereign-v36";
 const COMIC_CACHE = "tone-sovereign-comics-v2";
 const MEDIA_CACHE = "tone-sovereign-media-v1";
 // v1 is also used by a sibling app. Only retire editions positively identified here.
-const RETIRED_APP_CACHES = ["tone-sovereign-v32", "tone-sovereign-v33", "tone-sovereign-v34"];
+const RETIRED_APP_CACHES = ["tone-sovereign-v32", "tone-sovereign-v33", "tone-sovereign-v34", "tone-sovereign-v35"];
 const THE_LOCK_EDITION = "ink-v4";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
@@ -20,6 +20,7 @@ const VOICE_CUES = [
   "ts_first_light_tagline_v1",
   "ts_integrate_carry_v1",
   "ts_integrate_include_v1",
+  "ts_integrate_decentre_v1",
   "ts_notice_close_v1",
   "ts_notice_contact_v1",
   "ts_notice_open_v1",
@@ -66,6 +67,8 @@ const CORE = [
   "./narrative-metadata.js",
   "./tone-state.mjs",
   "./comic-editions.json",
+  "./comic-catalogue.mjs",
+  "./integrate-practice.mjs",
   "./breath-instrument.html",
   "./manifest.webmanifest",
   "./manifest-es.webmanifest",
@@ -111,7 +114,7 @@ self.addEventListener("fetch", event => {
     }));
     return;
   }
-  if (url.origin === self.location.origin && url.pathname.includes("/assets/comics/")) {
+  if (url.origin === self.location.origin && (url.pathname.includes("/assets/comics/") || url.pathname.startsWith("/tone_comics/assets/"))) {
     event.respondWith(
       caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || caches.match(event.request).then(coreCached => coreCached || fetch(event.request).then(async response => {
           if (response.ok) {

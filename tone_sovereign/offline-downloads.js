@@ -23,7 +23,7 @@ export function validatePacks(manifest) {
     ids.add(pack.id);
     const paths = new Set();
     for (const file of pack.files) {
-      if (!/^\.\/assets\/(voice\/(en|es)\/ts_[a-z0-9_]+\.mp3|sound\/ts_first_light_[a-z0-9_]+\.wav)$/.test(file.path) || !Number.isSafeInteger(file.bytes) || file.bytes <= 0 || paths.has(file.path)) throw new Error('Invalid audio file');
+      if (!/^\.\/assets\/(voice\/(en|es)\/ts_[a-z0-9_]+\.(mp3|m4a)|sound\/ts_first_light_[a-z0-9_]+\.wav)$/.test(file.path) || !Number.isSafeInteger(file.bytes) || file.bytes <= 0 || paths.has(file.path)) throw new Error('Invalid audio file');
       paths.add(file.path);
     }
     if (pack.bytes !== pack.files.reduce((sum, file) => sum + file.bytes, 0)) throw new Error('Incorrect pack size');
@@ -100,7 +100,7 @@ export async function mountOfflineDownloads(container, language) {
               const blob = await audio.blob();
               if (blob.size !== pack.files[index].bytes) throw new Error('Incomplete audio');
               if (!live()) return;
-              await cache.put(urls[index], new Response(blob, {headers: {'Content-Type': pack.files[index].path.endsWith('.mp3') ? 'audio/mpeg' : 'audio/wav'}}));
+              await cache.put(urls[index], new Response(blob, {headers: {'Content-Type': pack.files[index].path.endsWith('.mp3') ? 'audio/mpeg' : pack.files[index].path.endsWith('.m4a') ? 'audio/mp4' : 'audio/wav'}}));
             }
             if (live()) status.textContent = text(`Downloading ${index + 1} of ${urls.length}…`, `Descargando ${index + 1} de ${urls.length}…`);
           }

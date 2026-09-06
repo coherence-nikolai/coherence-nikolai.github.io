@@ -12,7 +12,7 @@ const packs = [];
 for (const language of ['en', 'es']) {
   for (const [kind, cues] of [['practice', practice], ['sits', sits]]) {
     const files = await Promise.all(cues.map(async cue => {
-      const path = `./assets/voice/${language}/${cue}.mp3`;
+      const path = `./assets/voice/${language}/${cue}.${cue === 'ts_integrate_decentre_v1' ? 'm4a' : 'mp3'}`;
       return {path, bytes: (await stat(resolve(root, path))).size};
     }));
     packs.push({id: `${language}-${kind}`, language, kind, bytes: files.reduce((sum, file) => sum + file.bytes, 0), files});

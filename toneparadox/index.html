@@ -25,6 +25,24 @@
     <link rel="manifest" href="manifest.webmanifest">
     <script type="module" crossorigin src="./assets/index-BUv8H0vQ.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-BXwd8-Ib.css">
+    <style>
+      .segmented-field.voice-field input:checked + span {
+        color: var(--gold-strong, #fff0a8);
+        background:
+          radial-gradient(circle at 50% 0%, rgba(255, 215, 111, 0.22), transparent 62%),
+          linear-gradient(180deg, rgba(255, 215, 111, 0.16), rgba(8, 17, 31, 0.86));
+        border-color: rgba(255, 215, 111, 0.66);
+        box-shadow: 0 0 0 1px rgba(255, 215, 111, 0.14), 0 0 24px rgba(255, 188, 77, 0.18);
+        text-shadow: none;
+      }
+
+      .segmented-field.voice-field input[value="off"]:checked + span {
+        color: rgba(242, 234, 223, 0.72);
+        background: linear-gradient(180deg, rgba(242, 234, 223, 0.08), rgba(1, 5, 12, 0.82));
+        border-color: rgba(242, 234, 223, 0.20);
+        box-shadow: none;
+      }
+    </style>
   </head>
   <body data-mode="landing">
     <div id="app" class="practice-app">
@@ -366,20 +384,20 @@
               <fieldset class="segmented-field compact voice-field" aria-label="Guide voice">
                 <label>
                   <input type="radio" name="voiceGuide" value="off" checked>
-                  <span>Off</span>
+                  <span>Voice off</span>
                 </label>
                 <label>
                   <input type="radio" name="voiceGuide" value="soft">
-                  <span>Guide</span>
+                  <span>Guide on</span>
                 </label>
                 <label>
                   <input type="radio" name="voiceGuide" value="mine">
-                  <span>Mine</span>
+                  <span>My voice</span>
                 </label>
               </fieldset>
             </div>
             <p class="audio-hint">
-              Guide plays the built-in cues. Mine uses your local recordings when you add them below.
+              Voice off mutes spoken cues. Guide on plays built-in cues. My voice uses your local recordings, with built-in cues where a recording is missing.
             </p>
 
             <section class="voice-recorder-panel" id="voiceRecorderPanel" aria-label="My voice guide" hidden>

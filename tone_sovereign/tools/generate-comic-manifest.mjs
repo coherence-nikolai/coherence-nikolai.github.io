@@ -7,7 +7,10 @@ const require = createRequire(import.meta.url);
 const sharp = require(process.env.TONE_SHARP_MODULE || 'sharp');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = await readFile(resolve(root, 'app.js'), 'utf8');
-const context = vm.createContext({ROOT: './', state: {lang: 'en'}, phrase: en => en});
+const previousManifest = JSON.parse(await readFile(resolve(root, 'comic-editions.json'), 'utf8'));
+// This generator owns the original app collections. Archive editions use
+// verified existing paths and keep their independent edition provenance.
+const context = vm.createContext({ROOT: './', state: {lang: 'en'}, phrase: en => en, additionalComicSeries: () => [], comicManifest: previousManifest});
 vm.runInContext(source.slice(source.indexOf('const THE_LOCK_EDITION'), source.indexOf('const movements')), context);
 vm.runInContext(source.slice(source.indexOf('function comicImageCount('), source.indexOf('function comicImageAlt(')), context);
 const series = vm.runInContext('comicSeries', context);
@@ -28,5 +31,7 @@ for (const shelf of series) for (const issue of shelf.issues) {
     editions.push({id: `${shelf.id}-${issue.number}-${language}`, series: shelf.id, issue: issue.number, language, title: issue[language], imageCount: paths.length, hasSeparateCover: Boolean(issue.hasCover), storyPageCount: issue.hasCover ? issue.pages : null, countConvention: issue.hasCover ? 'story-pages-plus-cover' : 'total-images', paths, bytes, thumbnail, thumbnailBytes: (await stat(resolve(root, thumbnail))).size, transcript});
   }
 }
-await writeFile(resolve(root, 'comic-editions.json'), JSON.stringify({version: 1, source: 'Tone Sovereign published reader catalogue', editions}, null, 2) + '\n');
+const extraCollections = previousManifest.extraCollections || [];
+editions.push(...previousManifest.editions.filter(entry => extraCollections.some(collection => collection.id === entry.series)));
+await writeFile(resolve(root, 'comic-editions.json'), JSON.stringify({version: 1, source: 'Tone Sovereign published reader catalogue', editions, extraCollections}, null, 2) + '\n');
 console.log({editions: editions.length, images: editions.reduce((sum, e) => sum + e.imageCount, 0), thumbnailBytes: editions.reduce((sum, e) => sum + e.thumbnailBytes, 0)});

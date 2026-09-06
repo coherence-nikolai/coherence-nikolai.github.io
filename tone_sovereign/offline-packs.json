@@ -5,7 +5,7 @@
       "id": "en-practice",
       "language": "en",
       "kind": "practice",
-      "bytes": 5178118,
+      "bytes": 5346377,
       "files": [
         {
           "path": "./assets/voice/en/ts_about_introduction_v1.mp3",
@@ -66,6 +66,10 @@
         {
           "path": "./assets/voice/en/ts_integrate_include_v1.mp3",
           "bytes": 163048
+        },
+        {
+          "path": "./assets/voice/en/ts_integrate_decentre_v1.m4a",
+          "bytes": 168259
         },
         {
           "path": "./assets/voice/en/ts_notice_close_v1.mp3",
@@ -509,7 +513,7 @@
       "id": "es-practice",
       "language": "es",
       "kind": "practice",
-      "bytes": 5695969,
+      "bytes": 5885760,
       "files": [
         {
           "path": "./assets/voice/es/ts_about_introduction_v1.mp3",
@@ -570,6 +574,10 @@
         {
           "path": "./assets/voice/es/ts_integrate_include_v1.mp3",
           "bytes": 261477
+        },
+        {
+          "path": "./assets/voice/es/ts_integrate_decentre_v1.m4a",
+          "bytes": 189791
         },
         {
           "path": "./assets/voice/es/ts_notice_close_v1.mp3",

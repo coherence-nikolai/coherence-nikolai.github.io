@@ -1,4 +1,5 @@
 /** Dependency-free proposal. No DOM, network, automatic persistence or logging. */
+import {validIntegratePayload} from './integrate-practice.mjs';
 export const STORAGE = Object.freeze({
   preferences: "tone-sovereign.preferences.v1",
   traces: "tone-sovereign.traces.v1",
@@ -103,6 +104,7 @@ export function validateCategory(category, value) {
         string(record.id, `${at}.id`, { nonempty: true });
         string(record.title, `${at}.title`); date(record.createdAt, `${at}.createdAt`);
         optional(record, "detail", string, at); optional(record, "type", string, at);
+        if (record.data && own(record.data, 'integrate')) requireValue(validIntegratePayload(record.data.integrate), `${at}.data.integrate`, 'unsupported-integrate-record');
       } else if (category === "missions") {
         string(record.id, `${at}.id`, { nonempty: true });
         string(record.title, `${at}.title`); string(record.direction, `${at}.direction`);

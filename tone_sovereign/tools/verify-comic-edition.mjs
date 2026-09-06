@@ -40,7 +40,7 @@ const cache={
 const context=vm.createContext({
   URL,Response,
   self:{location:{origin},addEventListener:(name,handler)=>{handlers[name]=handler;},skipWaiting:()=>{},clients:{claim:()=>{}}},
-  caches:{open:async()=>cache,keys:async()=>['tone-sovereign-v1','tone-sovereign-v32','tone-sovereign-v33','tone-sovereign-v34','tone-sovereign-v35','tone-sovereign-comics-v2','tone-sovereign-media-v1','northstar-v1','catastic-v9','field-v2'],delete:async name=>{deletedCaches.push(name);return true;},match:async()=>undefined},
+  caches:{open:async()=>cache,keys:async()=>['tone-sovereign-v1','tone-sovereign-v32','tone-sovereign-v33','tone-sovereign-v34','tone-sovereign-v35','tone-sovereign-v36','tone-sovereign-comics-v2','tone-sovereign-media-v1','northstar-v1','catastic-v9','field-v2'],delete:async name=>{deletedCaches.push(name);return true;},match:async()=>undefined},
   fetch:async request=>{networkRequests.push(request.url);return {ok:true,label:'new edition',clone(){return this;}};}
 });
 vm.runInContext(sw,context);
@@ -48,8 +48,8 @@ let work;
 handlers.install({waitUntil:p=>{work=p;}});await work;
 for(const lang of ['en','es'])assert(core.includes(`./assets/comics/${lang}/specials/the-lock/transcript.json?edition=ink-v4`));
 handlers.activate({waitUntil:p=>{work=p;}});await work;
-assert.deepEqual(deletedCaches,['tone-sovereign-v32','tone-sovereign-v33','tone-sovereign-v34']);
-assert(!deletedCaches.includes('tone-sovereign-v35'),'Keep the current website cache.');
+assert.deepEqual(deletedCaches,['tone-sovereign-v32','tone-sovereign-v33','tone-sovereign-v34','tone-sovereign-v35']);
+assert(!deletedCaches.includes('tone-sovereign-v36'),'Keep the current website cache.');
 assert(!deletedCaches.includes('tone-sovereign-v1'),'Keep the sibling app cache.');
 assert.deepEqual(deletedRequests,[oldRequest.url]);
 assert(imageCache.has(otherComic.url));assert(imageCache.has(foreign.url));
