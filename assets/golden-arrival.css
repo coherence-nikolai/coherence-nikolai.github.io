@@ -1,0 +1,139 @@
+/* Golden Age arrival prototype. Original artwork; semantic, usable HTML above it. */
+.golden-arrival {
+  --arrival-ink: #102d39;
+  --arrival-gold: #efbd53;
+  --arrival-paper: #fff4d9;
+  --arrival-red: #a62f32;
+  background: var(--arrival-paper);
+  color: var(--arrival-ink);
+  color-scheme: light;
+}
+.golden-arrival main { width: 100%; }
+.golden-arrival .site-header {
+  width: 100%; margin: 0; padding: 18px max(28px, calc((100vw - 1280px) / 2));
+  background: var(--arrival-ink); border-bottom: 3px solid var(--arrival-gold);
+}
+.golden-arrival .wordmark { color: var(--arrival-paper); font-weight: 600; }
+.golden-arrival .nav { color: var(--arrival-paper); font-size: .9375rem; }
+.golden-arrival .nav a:hover { color: var(--arrival-gold); }
+.golden-arrival a:focus-visible, .golden-arrival summary:focus-visible {
+  outline: 3px solid var(--arrival-red); outline-offset: 5px;
+}
+.golden-arrival .site-header a:focus-visible,
+.golden-arrival .studio-story a:focus-visible,
+.golden-arrival .footer a:focus-visible { outline-color: var(--arrival-gold); }
+.arrival-hero {
+  position: relative; isolation: isolate; min-height: 700px;
+  overflow: hidden; background: #f5dba5;
+  padding: 54px max(40px, calc((100vw - 1280px) / 2)) 92px;
+}
+.arrival-world { position: absolute; inset: 0; z-index: -2; margin: 0; }
+.arrival-world img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 48%; }
+.arrival-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(255,244,217,.98) 0%, rgba(255,244,217,.90) 25%, rgba(255,244,217,.35) 45%, transparent 63%);
+}
+.arrival-copy { position: relative; width: min(49%, 610px); }
+.golden-arrival .arrival-copy .label { color: #584318; font-weight: 700; font-size: .875rem; letter-spacing: .1em; }
+.golden-arrival .arrival-copy h1 { margin: 24px 0; line-height: 1; overflow-wrap: normal; }
+.arrival-title-lead { display: block; font-size: clamp(1.35rem, 2.2vw, 2rem); font-weight: 400; letter-spacing: -.02em; line-height: 1.35; }
+.arrival-title-world {
+  display: block; padding-top: 8px; font-family: var(--display);
+  font-size: clamp(5rem, 8.4vw, 8rem); font-weight: 700; letter-spacing: -.065em; line-height: .86;
+}
+.golden-arrival .arrival-copy .studio-intro { color: var(--arrival-ink); font-size: 1.125rem; line-height: 1.6; max-width: 29rem; margin: 26px 0; }
+.golden-arrival .arrival-copy .hero-actions { gap: 12px 22px; }
+.golden-arrival .button.primary {
+  background: var(--arrival-ink); color: var(--arrival-paper); border: 2px solid var(--arrival-ink);
+  border-radius: 0; box-shadow: 4px 4px 0 #cb972b; padding: 12px 20px; font-weight: 600;
+}
+.golden-arrival .button.primary:hover { background: #1a4856; }
+.golden-arrival .text-link { color: inherit; font-weight: 600; }
+.golden-arrival .arrival-copy .studio-meta { color: #594b30; font-size: .875rem; margin-top: 22px; }
+.arrival-caption {
+  position: absolute; inset: auto 0 0; display: flex; justify-content: space-between; gap: 18px;
+  padding: 13px max(40px, calc((100vw - 1280px) / 2)); color: var(--arrival-paper);
+  background: rgba(16,45,57,.95); font-size: .9375rem; text-decoration: none; min-height: 50px;
+}
+.arrival-caption:focus-visible { outline-offset: -5px !important; outline-color: var(--arrival-gold) !important; }
+.arrival-motto {
+  display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 5vw;
+  padding: 20px 24px; border-bottom: 2px solid var(--arrival-ink);
+  background: var(--arrival-gold); color: var(--arrival-ink);
+  font-family: 'Arial Narrow', Impact, sans-serif; font-weight: 800; text-transform: uppercase;
+  font-size: clamp(.95rem, 1.4vw, 1.25rem); letter-spacing: .04em;
+}
+.golden-arrival .section { padding: 64px max(28px, calc((100vw - 1280px) / 2)); border-top: 0; }
+.golden-arrival .section .label { color: var(--arrival-red); font-weight: 700; }
+.golden-arrival h2 { font-size: clamp(2.6rem, 4.8vw, 4.5rem); line-height: 1.04; color: var(--arrival-ink); }
+.golden-arrival .section p { color: #38525a; }
+.golden-arrival .studio-way-grid { gap: 32px; margin-top: 34px; }
+.golden-arrival .studio-way-grid > a { border-top: 3px solid var(--arrival-ink); padding-top: 16px; }
+.golden-arrival .way-number { font-family: var(--mono); color: var(--arrival-red); font-size: 1rem; font-weight: 700; }
+.golden-arrival .studio-way-grid h3 { margin: 12px 0; font-size: 2rem; }
+.golden-arrival .studio-way-grid .text-link { text-decoration: underline; text-underline-offset: 6px; }
+.golden-arrival .studio-story {
+  position: relative; color: var(--arrival-paper); background: var(--arrival-ink);
+  grid-template-columns: minmax(0, .65fr) minmax(0, 1fr); gap: 6vw;
+  border-block: 5px solid var(--arrival-gold); padding-block: 72px;
+}
+.golden-arrival .studio-story .label { color: var(--arrival-gold); }
+.golden-arrival .studio-story h2 {
+  color: var(--arrival-paper); font-family: Impact, 'Arial Narrow', sans-serif;
+  font-size: clamp(3.5rem, 6vw, 6.5rem); letter-spacing: -.025em; line-height: 1; margin: 18px 0;
+}
+.golden-arrival .studio-story p { color: #e1e6dd; }
+.golden-arrival .studio-story .studio-story-line { color: var(--arrival-gold); font-size: clamp(1.7rem, 2.5vw, 2.5rem); }
+.golden-arrival .studio-story .studio-meta { color: #d4dccd; }
+.golden-arrival .studio-cover { width: min(100%, 360px); border: 7px solid var(--arrival-paper); box-shadow: 12px 12px 0 #061d26; }
+.golden-arrival .studio-story .button.primary { background: var(--arrival-gold); color: var(--arrival-ink); border-color: var(--arrival-gold); box-shadow: none; }
+.golden-arrival .studio-directory { border-color: var(--arrival-ink); }
+.golden-arrival .studio-directory > summary { font-size: 1.25rem; font-weight: 600; }
+.golden-arrival .studio-directory > summary span { color: var(--arrival-red); }
+.golden-arrival .catalog-heading { padding-block: 12px; }
+.golden-arrival .app-card, .golden-arrival .app-card.featured { border-top-color: #b2ad8e; }
+.golden-arrival .app-card strong { color: var(--arrival-ink); }
+.golden-arrival .app-card > span:not(.app-card-mark):not(.lab-kicker):not(.app-card-note):not(.best-for):not(.privacy-badge) { color: #38525a; }
+.golden-arrival .founder-section { background: #f2d28c; border-top: 2px solid var(--arrival-ink); }
+.golden-arrival .founder-card::before { display: none; }
+.golden-arrival .founder-audio .lab-kicker { color: var(--arrival-ink); }
+.golden-arrival .footer { width: 100%; margin: 0; padding: 30px max(28px, calc((100vw - 1280px) / 2)); background: var(--arrival-ink); color: var(--arrival-paper); border: 0; }
+.golden-arrival .footer a { color: var(--arrival-paper); }
+.golden-arrival .footer p { color: #cad4ca; font-size: .875rem; }
+@media (min-width: 1600px) { .arrival-hero { min-height: 760px; padding-top: 76px; } }
+@media (max-width: 900px) {
+  .golden-arrival .site-header { padding: 14px 24px; flex-wrap: wrap; gap: 8px 20px; }
+  .golden-arrival .nav { flex-wrap: wrap; gap: 4px 20px; }
+  .arrival-hero { min-height: 690px; padding: 38px 28px 86px; }
+  .arrival-copy { width: 55%; }
+  .arrival-title-world { font-size: clamp(4.8rem, 10vw, 6.5rem); }
+  .arrival-world img { object-position: 59% 50%; }
+  .golden-arrival .section { padding: 44px 28px; }
+  .golden-arrival .studio-story { gap: 40px; }
+}
+@media (max-width: 600px) {
+  .golden-arrival .site-header { padding: 14px 20px 8px; }
+  .golden-arrival .wordmark { font-size: .8125rem; letter-spacing: .13em; }
+  .golden-arrival .nav { gap: 0 18px; font-size: .875rem; }
+  .arrival-hero { display: flex; flex-direction: column; min-height: 0; padding: 0; }
+  .arrival-copy { order: 1; width: 100%; padding: 24px 22px 28px; background: #fff1ce; }
+  .golden-arrival .arrival-copy h1 { margin: 14px 0; }
+  .arrival-title-lead { font-size: 1.25rem; }
+  .arrival-title-world { font-size: clamp(3rem, 14.5vw, 5.5rem); line-height: 1; padding-top: 4px; }
+  .golden-arrival .arrival-copy .studio-intro { font-size: 1rem; margin: 18px 0; }
+  .golden-arrival .arrival-copy .studio-intro br { display: none; }
+  .golden-arrival .arrival-copy .hero-actions { gap: 8px 18px; }
+  .golden-arrival .arrival-copy .studio-meta { margin-top: 16px; }
+  .arrival-world { position: relative; z-index: 0; order: 0; height: clamp(220px, 60vw, 300px); background: #f5dba5; }
+  .arrival-world img { object-position: 76% 50%; }
+  .arrival-hero::before { display: none; }
+  .arrival-caption { position: relative; order: 2; padding: 14px 22px; font-size: .875rem; }
+  .arrival-motto { font-size: .875rem; gap: 8px 24px; padding: 17px 20px; }
+  .golden-arrival .section { padding: 40px 22px; }
+  .golden-arrival h2 { font-size: 2.6rem; }
+  .golden-arrival .studio-way-grid { grid-template-columns: 1fr; gap: 24px; }
+  .golden-arrival .studio-story { grid-template-columns: 1fr; gap: 30px; }
+  .golden-arrival .studio-cover { width: min(78%, 310px); }
+  .golden-arrival .studio-story h2 { font-size: 4rem; }
+  .golden-arrival .footer { padding: 26px 22px; }
+}

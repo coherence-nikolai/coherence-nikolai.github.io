@@ -1,0 +1,1029 @@
+{
+  "version": 1,
+  "packs": [
+    {
+      "id": "en-practice",
+      "language": "en",
+      "kind": "practice",
+      "bytes": 5178118,
+      "files": [
+        {
+          "path": "./assets/voice/en/ts_about_introduction_v1.mp3",
+          "bytes": 2184925
+        },
+        {
+          "path": "./assets/voice/en/ts_attunement_capacity_v1.mp3",
+          "bytes": 84053
+        },
+        {
+          "path": "./assets/voice/en/ts_attunement_context_v1.mp3",
+          "bytes": 105369
+        },
+        {
+          "path": "./assets/voice/en/ts_attunement_meeting_v1.mp3",
+          "bytes": 101608
+        },
+        {
+          "path": "./assets/voice/en/ts_attunement_next_step_v1.mp3",
+          "bytes": 139851
+        },
+        {
+          "path": "./assets/voice/en/ts_attunement_pull_v1.mp3",
+          "bytes": 68380
+        },
+        {
+          "path": "./assets/voice/en/ts_cross_return_v1.mp3",
+          "bytes": 138597
+        },
+        {
+          "path": "./assets/voice/en/ts_discern_added_v1.mp3",
+          "bytes": 132955
+        },
+        {
+          "path": "./assets/voice/en/ts_discern_direct_v1.mp3",
+          "bytes": 139851
+        },
+        {
+          "path": "./assets/voice/en/ts_discern_honest_v1.mp3",
+          "bytes": 131701
+        },
+        {
+          "path": "./assets/voice/en/ts_embody_enter_v1.mp3",
+          "bytes": 33898
+        },
+        {
+          "path": "./assets/voice/en/ts_embody_silence_v1.mp3",
+          "bytes": 91577
+        },
+        {
+          "path": "./assets/voice/en/ts_first_light_tagline_v1.mp3",
+          "bytes": 98473
+        },
+        {
+          "path": "./assets/voice/en/ts_integrate_carry_v1.mp3",
+          "bytes": 157405
+        },
+        {
+          "path": "./assets/voice/en/ts_integrate_include_v1.mp3",
+          "bytes": 163048
+        },
+        {
+          "path": "./assets/voice/en/ts_notice_close_v1.mp3",
+          "bytes": 91577
+        },
+        {
+          "path": "./assets/voice/en/ts_notice_contact_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/en/ts_notice_open_v1.mp3",
+          "bytes": 41422
+        },
+        {
+          "path": "./assets/voice/en/ts_notice_sight_v1.mp3",
+          "bytes": 115400
+        },
+        {
+          "path": "./assets/voice/en/ts_notice_sound_v1.mp3",
+          "bytes": 41422
+        },
+        {
+          "path": "./assets/voice/en/ts_notice_thought_v1.mp3",
+          "bytes": 68380
+        },
+        {
+          "path": "./assets/voice/en/ts_reclaim_centre_remains_v1.mp3",
+          "bytes": 174333
+        },
+        {
+          "path": "./assets/voice/en/ts_reciprocal_action_v1.mp3",
+          "bytes": 107250
+        },
+        {
+          "path": "./assets/voice/en/ts_reciprocal_contribution_v1.mp3",
+          "bytes": 102862
+        },
+        {
+          "path": "./assets/voice/en/ts_reciprocal_desire_v1.mp3",
+          "bytes": 52706
+        },
+        {
+          "path": "./assets/voice/en/ts_reciprocal_include_fear_v1.mp3",
+          "bytes": 109758
+        },
+        {
+          "path": "./assets/voice/en/ts_reciprocal_nourishment_v1.mp3",
+          "bytes": 66499
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_exhale_v1.mp3",
+          "bytes": 20733
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_inhale_again_v1.mp3",
+          "bytes": 33898
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_inhale_v1.mp3",
+          "bytes": 41422
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_long_exhale_v1.mp3",
+          "bytes": 55214
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_natural_breath_v1.mp3",
+          "bytes": 79665
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_optional_hold_v1.mp3",
+          "bytes": 41422
+        },
+        {
+          "path": "./assets/voice/en/ts_stabilise_return_attention_v1.mp3",
+          "bytes": 85307
+        }
+      ]
+    },
+    {
+      "id": "en-sits",
+      "language": "en",
+      "kind": "sits",
+      "bytes": 15366971,
+      "files": [
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_01_v1.mp3",
+          "bytes": 80919
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_02_v1.mp3",
+          "bytes": 151136
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_03_v1.mp3",
+          "bytes": 211322
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_04_v1.mp3",
+          "bytes": 138597
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_05_v1.mp3",
+          "bytes": 177467
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_06_v1.mp3",
+          "bytes": 196902
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_07_v1.mp3",
+          "bytes": 184364
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_08_v1.mp3",
+          "bytes": 221980
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_09_v1.mp3",
+          "bytes": 292197
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_10_v1.mp3",
+          "bytes": 156778
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_breath_at_the_threshold_intro_v1.mp3",
+          "bytes": 784971
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_01_v1.mp3",
+          "bytes": 145493
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_02_v1.mp3",
+          "bytes": 228876
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_03_v1.mp3",
+          "bytes": 267746
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_04_v1.mp3",
+          "bytes": 284674
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_05_v1.mp3",
+          "bytes": 200037
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_06_v1.mp3",
+          "bytes": 241415
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_07_v1.mp3",
+          "bytes": 218845
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_08_v1.mp3",
+          "bytes": 309124
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_09_v1.mp3",
+          "bytes": 237653
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_10_v1.mp3",
+          "bytes": 108504
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_simple_noting_intro_v1.mp3",
+          "bytes": 799391
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_01_v1.mp3",
+          "bytes": 51453
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_02_v1.mp3",
+          "bytes": 95338
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_03_v1.mp3",
+          "bytes": 95338
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_04_v1.mp3",
+          "bytes": 75276
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_05_v1.mp3",
+          "bytes": 129820
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_06_v1.mp3",
+          "bytes": 82800
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_07_v1.mp3",
+          "bytes": 104115
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_08_v1.mp3",
+          "bytes": 60857
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_09_v1.mp3",
+          "bytes": 80919
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_10_v1.mp3",
+          "bytes": 91577
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_the_living_body_intro_v1.mp3",
+          "bytes": 816318
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_01_v1.mp3",
+          "bytes": 71515
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_02_v1.mp3",
+          "bytes": 68380
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_03_v1.mp3",
+          "bytes": 50826
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_04_v1.mp3",
+          "bytes": 84053
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_05_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_06_v1.mp3",
+          "bytes": 58349
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_07_v1.mp3",
+          "bytes": 94084
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_08_v1.mp3",
+          "bytes": 97219
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_09_v1.mp3",
+          "bytes": 59603
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_10_v1.mp3",
+          "bytes": 94084
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_open_field_intro_v1.mp3",
+          "bytes": 803152
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_01_v1.mp3",
+          "bytes": 82800
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_02_v1.mp3",
+          "bytes": 85307
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_03_v1.mp3",
+          "bytes": 94084
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_04_v1.mp3",
+          "bytes": 101608
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_05_v1.mp3",
+          "bytes": 95338
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_06_v1.mp3",
+          "bytes": 69634
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_07_v1.mp3",
+          "bytes": 58349
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_08_v1.mp3",
+          "bytes": 127312
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_09_v1.mp3",
+          "bytes": 58349
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_10_v1.mp3",
+          "bytes": 58349
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_golden_age_goodwill_intro_v1.mp3",
+          "bytes": 879639
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_01_v1.mp3",
+          "bytes": 55214
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_02_v1.mp3",
+          "bytes": 81546
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_03_v1.mp3",
+          "bytes": 53960
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_04_v1.mp3",
+          "bytes": 81546
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_05_v1.mp3",
+          "bytes": 78411
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_06_v1.mp3",
+          "bytes": 59603
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_07_v1.mp3",
+          "bytes": 87188
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_08_v1.mp3",
+          "bytes": 89696
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_09_v1.mp3",
+          "bytes": 56468
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_10_v1.mp3",
+          "bytes": 57095
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sound_and_silence_intro_v1.mp3",
+          "bytes": 780582
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_01_v1.mp3",
+          "bytes": 58349
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_02_v1.mp3",
+          "bytes": 104115
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_03_v1.mp3",
+          "bytes": 111012
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_04_v1.mp3",
+          "bytes": 92831
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_05_v1.mp3",
+          "bytes": 75276
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_06_v1.mp3",
+          "bytes": 87188
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_07_v1.mp3",
+          "bytes": 86561
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_08_v1.mp3",
+          "bytes": 108504
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_09_v1.mp3",
+          "bytes": 116654
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_10_v1.mp3",
+          "bytes": 66499
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_holding_opposites_intro_v1.mp3",
+          "bytes": 830737
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_01_v1.mp3",
+          "bytes": 71515
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_02_v1.mp3",
+          "bytes": 78411
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_03_v1.mp3",
+          "bytes": 75276
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_04_v1.mp3",
+          "bytes": 43929
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_05_v1.mp3",
+          "bytes": 82800
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_06_v1.mp3",
+          "bytes": 71515
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_07_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_08_v1.mp3",
+          "bytes": 60857
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_09_v1.mp3",
+          "bytes": 89696
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_10_v1.mp3",
+          "bytes": 111639
+        },
+        {
+          "path": "./assets/voice/en/ts_sit_sovereign_rest_intro_v1.mp3",
+          "bytes": 793748
+        }
+      ]
+    },
+    {
+      "id": "es-practice",
+      "language": "es",
+      "kind": "practice",
+      "bytes": 5695969,
+      "files": [
+        {
+          "path": "./assets/voice/es/ts_about_introduction_v1.mp3",
+          "bytes": 2279593
+        },
+        {
+          "path": "./assets/voice/es/ts_attunement_capacity_v1.mp3",
+          "bytes": 111012
+        },
+        {
+          "path": "./assets/voice/es/ts_attunement_context_v1.mp3",
+          "bytes": 134209
+        },
+        {
+          "path": "./assets/voice/es/ts_attunement_meeting_v1.mp3",
+          "bytes": 131701
+        },
+        {
+          "path": "./assets/voice/es/ts_attunement_next_step_v1.mp3",
+          "bytes": 166809
+        },
+        {
+          "path": "./assets/voice/es/ts_attunement_pull_v1.mp3",
+          "bytes": 61484
+        },
+        {
+          "path": "./assets/voice/es/ts_cross_return_v1.mp3",
+          "bytes": 134209
+        },
+        {
+          "path": "./assets/voice/es/ts_discern_added_v1.mp3",
+          "bytes": 177467
+        },
+        {
+          "path": "./assets/voice/es/ts_discern_direct_v1.mp3",
+          "bytes": 125431
+        },
+        {
+          "path": "./assets/voice/es/ts_discern_honest_v1.mp3",
+          "bytes": 171825
+        },
+        {
+          "path": "./assets/voice/es/ts_embody_enter_v1.mp3",
+          "bytes": 39541
+        },
+        {
+          "path": "./assets/voice/es/ts_embody_silence_v1.mp3",
+          "bytes": 106623
+        },
+        {
+          "path": "./assets/voice/es/ts_first_light_tagline_v1.mp3",
+          "bytes": 97219
+        },
+        {
+          "path": "./assets/voice/es/ts_integrate_carry_v1.mp3",
+          "bytes": 131701
+        },
+        {
+          "path": "./assets/voice/es/ts_integrate_include_v1.mp3",
+          "bytes": 261477
+        },
+        {
+          "path": "./assets/voice/es/ts_notice_close_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/es/ts_notice_contact_v1.mp3",
+          "bytes": 89696
+        },
+        {
+          "path": "./assets/voice/es/ts_notice_open_v1.mp3",
+          "bytes": 45183
+        },
+        {
+          "path": "./assets/voice/es/ts_notice_sight_v1.mp3",
+          "bytes": 88442
+        },
+        {
+          "path": "./assets/voice/es/ts_notice_sound_v1.mp3",
+          "bytes": 43929
+        },
+        {
+          "path": "./assets/voice/es/ts_notice_thought_v1.mp3",
+          "bytes": 131074
+        },
+        {
+          "path": "./assets/voice/es/ts_reclaim_centre_remains_v1.mp3",
+          "bytes": 205680
+        },
+        {
+          "path": "./assets/voice/es/ts_reciprocal_action_v1.mp3",
+          "bytes": 131074
+        },
+        {
+          "path": "./assets/voice/es/ts_reciprocal_contribution_v1.mp3",
+          "bytes": 71515
+        },
+        {
+          "path": "./assets/voice/es/ts_reciprocal_desire_v1.mp3",
+          "bytes": 51453
+        },
+        {
+          "path": "./assets/voice/es/ts_reciprocal_include_fear_v1.mp3",
+          "bytes": 156778
+        },
+        {
+          "path": "./assets/voice/es/ts_reciprocal_nourishment_v1.mp3",
+          "bytes": 78411
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_exhale_v1.mp3",
+          "bytes": 22613
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_inhale_again_v1.mp3",
+          "bytes": 35152
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_inhale_v1.mp3",
+          "bytes": 23867
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_long_exhale_v1.mp3",
+          "bytes": 58349
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_natural_breath_v1.mp3",
+          "bytes": 79665
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_optional_hold_v1.mp3",
+          "bytes": 62737
+        },
+        {
+          "path": "./assets/voice/es/ts_stabilise_return_attention_v1.mp3",
+          "bytes": 112893
+        }
+      ]
+    },
+    {
+      "id": "es-sits",
+      "language": "es",
+      "kind": "sits",
+      "bytes": 16736207,
+      "files": [
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_01_v1.mp3",
+          "bytes": 112893
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_02_v1.mp3",
+          "bytes": 131074
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_03_v1.mp3",
+          "bytes": 234519
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_04_v1.mp3",
+          "bytes": 108504
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_05_v1.mp3",
+          "bytes": 142986
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_06_v1.mp3",
+          "bytes": 201918
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_07_v1.mp3",
+          "bytes": 161167
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_08_v1.mp3",
+          "bytes": 207560
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_09_v1.mp3",
+          "bytes": 275897
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_10_v1.mp3",
+          "bytes": 200037
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_breath_at_the_threshold_intro_v1.mp3",
+          "bytes": 845157
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_01_v1.mp3",
+          "bytes": 176840
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_02_v1.mp3",
+          "bytes": 241415
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_03_v1.mp3",
+          "bytes": 230130
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_04_v1.mp3",
+          "bytes": 277777
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_05_v1.mp3",
+          "bytes": 191260
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_06_v1.mp3",
+          "bytes": 263358
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_07_v1.mp3",
+          "bytes": 257089
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_08_v1.mp3",
+          "bytes": 293451
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_09_v1.mp3",
+          "bytes": 211949
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_10_v1.mp3",
+          "bytes": 165555
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_simple_noting_intro_v1.mp3",
+          "bytes": 1006907
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_01_v1.mp3",
+          "bytes": 53960
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_02_v1.mp3",
+          "bytes": 94084
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_03_v1.mp3",
+          "bytes": 111639
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_04_v1.mp3",
+          "bytes": 75276
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_05_v1.mp3",
+          "bytes": 88442
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_06_v1.mp3",
+          "bytes": 112893
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_07_v1.mp3",
+          "bytes": 109758
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_08_v1.mp3",
+          "bytes": 76530
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_09_v1.mp3",
+          "bytes": 87188
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_10_v1.mp3",
+          "bytes": 92831
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_the_living_body_intro_v1.mp3",
+          "bytes": 959887
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_01_v1.mp3",
+          "bytes": 59603
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_02_v1.mp3",
+          "bytes": 60857
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_03_v1.mp3",
+          "bytes": 50826
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_04_v1.mp3",
+          "bytes": 89696
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_05_v1.mp3",
+          "bytes": 72769
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_06_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_07_v1.mp3",
+          "bytes": 112893
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_08_v1.mp3",
+          "bytes": 87188
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_09_v1.mp3",
+          "bytes": 55214
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_10_v1.mp3",
+          "bytes": 96592
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_open_field_intro_v1.mp3",
+          "bytes": 988099
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_01_v1.mp3",
+          "bytes": 76530
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_02_v1.mp3",
+          "bytes": 84053
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_03_v1.mp3",
+          "bytes": 89696
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_04_v1.mp3",
+          "bytes": 111639
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_05_v1.mp3",
+          "bytes": 92831
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_06_v1.mp3",
+          "bytes": 74022
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_07_v1.mp3",
+          "bytes": 57095
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_08_v1.mp3",
+          "bytes": 104115
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_09_v1.mp3",
+          "bytes": 98473
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_10_v1.mp3",
+          "bytes": 68380
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_golden_age_goodwill_intro_v1.mp3",
+          "bytes": 943586
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_01_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_02_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_03_v1.mp3",
+          "bytes": 57095
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_04_v1.mp3",
+          "bytes": 77157
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_05_v1.mp3",
+          "bytes": 95338
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_06_v1.mp3",
+          "bytes": 59603
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_07_v1.mp3",
+          "bytes": 118535
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_08_v1.mp3",
+          "bytes": 100981
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_09_v1.mp3",
+          "bytes": 88442
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_10_v1.mp3",
+          "bytes": 63991
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sound_and_silence_intro_v1.mp3",
+          "bytes": 848919
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_01_v1.mp3",
+          "bytes": 66499
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_02_v1.mp3",
+          "bytes": 129820
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_03_v1.mp3",
+          "bytes": 90950
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_04_v1.mp3",
+          "bytes": 115400
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_05_v1.mp3",
+          "bytes": 105369
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_06_v1.mp3",
+          "bytes": 94084
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_07_v1.mp3",
+          "bytes": 88442
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_08_v1.mp3",
+          "bytes": 139851
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_09_v1.mp3",
+          "bytes": 115400
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_10_v1.mp3",
+          "bytes": 92831
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_holding_opposites_intro_v1.mp3",
+          "bytes": 954244
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_01_v1.mp3",
+          "bytes": 87188
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_02_v1.mp3",
+          "bytes": 99727
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_03_v1.mp3",
+          "bytes": 68380
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_04_v1.mp3",
+          "bytes": 46437
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_05_v1.mp3",
+          "bytes": 59603
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_06_v1.mp3",
+          "bytes": 87188
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_07_v1.mp3",
+          "bytes": 61484
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_08_v1.mp3",
+          "bytes": 67126
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_09_v1.mp3",
+          "bytes": 79665
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_10_v1.mp3",
+          "bytes": 121043
+        },
+        {
+          "path": "./assets/voice/es/ts_sit_sovereign_rest_intro_v1.mp3",
+          "bytes": 949856
+        }
+      ]
+    },
+    {
+      "id": "first-light",
+      "language": null,
+      "kind": "first-light",
+      "bytes": 5680168,
+      "files": [
+        {
+          "path": "./assets/sound/ts_first_light_arrival_full.wav",
+          "bytes": 2857724
+        },
+        {
+          "path": "./assets/sound/ts_first_light_living_ambience.wav",
+          "bytes": 2822444
+        }
+      ]
+    }
+  ]
+}

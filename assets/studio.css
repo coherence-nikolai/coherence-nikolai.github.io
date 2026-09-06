@@ -1,0 +1,76 @@
+/* Public studio only: lineage sites retain their own visual systems. */
+.studio { background: #110d0d; font-size: 1rem; line-height: 1.65; overflow-x: clip; }
+.studio .site-header, .studio main, .studio .footer { width: min(1280px, calc(100% - 64px)); margin-inline: auto; }
+.studio .site-header { padding-block: 25px; border-bottom: 1px solid #514136; }
+.studio .wordmark { font-size: .875rem; color: #f2eadf; letter-spacing: .16em; }
+.studio .nav { font-size: 1rem; gap: 1.6rem; color: #d6c8b9; }
+.studio .nav a { min-height: 44px; display: inline-flex; align-items: center; }
+.skip-link { position: fixed; left: 16px; top: -100px; padding: 12px 20px; background: #f2eadf; color: #110d0d; z-index: 100; }
+.skip-link:focus { top: 12px; }
+.studio .label { font-size: .875rem; letter-spacing: .13em; color: #d8b674; }
+.studio h1, .studio h2, .studio h3 { text-shadow: none; overflow-wrap: anywhere; }
+.studio main > *, .studio-opening > *, .studio-story > *, .studio-way-grid > * { min-width: 0; }
+.studio .button, .studio .text-link { overflow-wrap: anywhere; }
+.studio [hidden] { display: none !important; }
+.studio-opening { display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(32px, 5vw, 76px); padding-block: 54px 64px; }
+.studio-opening h1 { font-size: clamp(3.4rem, 6.3vw, 6.5rem); line-height: .98; letter-spacing: -.05em; margin-bottom: 26px; }
+.studio-opening h1 em { color: #e4bc74; font-weight: 400; }
+.studio-intro { font-size: clamp(1.125rem, 1.8vw, 1.35rem); max-width: 29rem; color: #e0d2c3; line-height: 1.6; }
+.studio .hero-actions { justify-content: flex-start; align-items: center; gap: 18px 24px; }
+.studio .button { border-radius: 3px; box-shadow: none; min-height: 48px; font-size: 1rem; padding: 13px 20px; }
+.studio .button.primary { background: #e4bc74; color: #201910; border-color: #e4bc74; }
+.studio .text-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; text-underline-offset: 5px; }
+.studio .studio-meta { font-size: .875rem; color: #bdada0; margin: 20px 0 0; }
+.studio-opening-art { margin: 0; }
+.studio-opening-art img { display: block; width: 100%; height: auto; border: 1px solid #8b7145; }
+.studio-opening-art figcaption { color: #bdada0; font-size: .875rem; margin-top: 10px; }
+.studio .section { width: 100%; padding-block: 48px; margin: 0; border-top: 1px solid #514136; }
+.studio h2 { font-size: clamp(2rem, 3.4vw, 3.3rem); line-height: 1.13; letter-spacing: -.03em; }
+.studio h3 { line-height: 1.3; }
+.studio .founder-card { background: none; box-shadow: none; padding: 0; border: 0; border-radius: 0; }
+.studio .founder-copy p { font-size: 1rem; }
+.studio .founder-audio { background: none; border: 0; padding: 0; }
+.studio .section-head.centered { text-align: left; margin-bottom: 26px; }
+.studio .catalog-group { margin-top: 24px; }
+.studio .catalog-heading { scroll-margin-top: 20px; }
+.studio .app-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 30px; }
+.studio .app-card, .studio .app-card.featured { min-height: 0; grid-column: auto; padding: 21px 0; border: 0; border-top: 1px solid #443831; border-radius: 0; background: none; box-shadow: none; transform: none; gap: 6px; }
+.studio .app-card strong { font-size: 1.5rem; line-height: 1.25; overflow-wrap: anywhere; }
+.studio .app-grid.tone-family-grid .app-card { min-height: 0; padding: 21px 0; }
+.studio .app-grid.tone-family-grid .app-card strong { font-size: 1.5rem; }
+.studio .app-card > span:not(.app-card-mark) { font-size: 1rem; color: #d6c8b9; }
+.studio .app-card .app-card-copy, .studio .app-card .best-for, .studio .app-card .privacy-badge, .studio .app-card .lab-kicker, .studio .app-card-mark { display: none; }
+.studio .app-card:hover strong { text-decoration: underline; text-underline-offset: 5px; }
+.studio .footer { padding-block: 34px; border-top: 1px solid #514136; }
+.studio .footer a { display: inline-flex; align-items: center; min-height: 44px; font-size: .875rem; }
+.studio-way-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; margin-top: 34px; }
+.studio-way-grid > a { text-decoration: none; border-top: 1px solid #66513f; padding-top: 20px; }
+.studio-way-grid h3 { font-size: 1.8rem; margin-top: 10px; }
+.studio-way-grid p { color: #d6c8b9; }
+.way-number { color: #d8b674; font-size: .875rem; }
+.studio-story { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1fr); gap: clamp(28px, 6vw, 80px); align-items: center; }
+.studio-cover { display: block; max-width: 360px; margin: 0 auto; }
+.studio-cover img { display: block; width: 100%; height: auto; }
+.studio .studio-story-line { font-family: var(--display); font-size: clamp(1.5rem, 3vw, 2.2rem); line-height: 1.3; color: #e4bc74; }
+.studio-story .hero-actions { margin-top: 28px; }
+.studio-archive-link { margin-top: 22px; color: #d6c8b9; }
+.studio-directory { border-block: 1px solid #66513f; padding-block: 8px; }
+.studio-directory > summary { font-size: 1.125rem; min-height: 52px; padding-block: 12px; cursor: pointer; }
+.studio-directory > summary span { float: right; color: #d8b674; }
+.studio-directory[open] > summary span { transform: rotate(45deg); }
+.studio .founder-audio .lab-kicker { font-size: .875rem; }
+.studio .founder-audio audio { width: 100%; max-width: 100%; }
+.studio-directory summary:focus-visible { outline: 2px solid #e4bc74; outline-offset: 4px; }
+@media (max-width: 800px) {
+  .studio .site-header, .studio main, .studio .footer { width: calc(100% - 36px); }
+  .studio .site-header { flex-wrap: wrap; gap: 12px; padding-block: 18px 10px; }
+  .studio .nav { gap: 4px 20px; flex-wrap: wrap; }
+  .studio-opening { grid-template-columns: 1fr; gap: 26px; padding-block: 32px 36px; }
+  .studio-opening h1 { font-size: clamp(3.3rem, 12vw, 5rem); margin-bottom: 20px; }
+  .studio .app-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; }
+  .studio-way-grid { grid-template-columns: 1fr; gap: 18px; }
+  .studio-story { grid-template-columns: 1fr; }
+  .studio-cover { width: min(70%, 300px); }
+}
+@media (max-width: 480px) { .studio .app-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .studio * { transition: none !important; } }

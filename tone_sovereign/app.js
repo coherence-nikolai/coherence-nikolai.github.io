@@ -1,4 +1,11 @@
+import {mountOfflineDownloads, cancelOfflineDownloads} from './offline-downloads.js';
+import {homeIllustration, stageIllustration, completionStory, livedExperience} from './narrative-ui.js';
+import {STORAGE, JOURNAL_KEY, createBackup, parseBackup, planRestore, readPersistentState, recoverTransaction, transact, withStorageLock, weeklyPrompt, validateCategory} from './tone-state.mjs';
 const ROOT = "./";
+const comicEditions = await fetch('./comic-editions.json').then(response => {
+  if (!response.ok) throw new Error('Edition manifest unavailable');
+  return response.json();
+}).then(manifest => manifest.version === 1 && Array.isArray(manifest.editions) ? manifest.editions : []).catch(() => []);
 const FIRST_LIGHT = Object.freeze({
   duration: 16.20,
   entryDelay: 2.60,
@@ -32,16 +39,18 @@ const guidedSitsManifest = await fetch(`${ROOT}guided-sits.json`, { cache: "no-c
     return response.json();
   })
   .catch(() => ({ durationsSeconds: [900, 1800, 2700, 3600], practices: [] }));
-const STORAGE = {
-  preferences: "tone-sovereign.preferences.v1",
-  traces: "tone-sovereign.traces.v1",
-  carriedAct: "tone-sovereign.carried-act.v1",
-  ruleOfLife: "tone-sovereign.rule-of-life.v1",
-  engineDrafts: "tone-sovereign.practice-engine-drafts.v1",
-  missions: "tone-sovereign.missions.v1",
-  crossMarks: "tone-sovereign.cross-marks.v1",
-  lastHeldTone: "tone-sovereign.last-held-tone.v1"
-};
+let deviceStorage;
+try { deviceStorage = window.localStorage; } catch {
+  deviceStorage = {getItem() {throw new Error('Storage unavailable');}, setItem() {throw new Error('Storage unavailable');}, removeItem() {throw new Error('Storage unavailable');}};
+}
+let storageQueue = Promise.resolve();
+const recovery = await withStorageLock(() => recoverTransaction(deviceStorage), navigator.locks)
+  .catch(() => ({ok: false, error: {code: 'storage-lock-unavailable'}}));
+let storageProblem = recovery.ok ? '' : recovery.error.code;
+const initialStoredState = recovery.ok ? readPersistentState(deviceStorage) : recovery;
+if (!initialStoredState.ok) storageProblem ||= initialStoredState.error.code;
+let persistentRaw = initialStoredState.ok ? initialStoredState.raw : null;
+function storedText(key) { try { return deviceStorage.getItem(key); } catch { return null; } }
 
 const copy = {
   en: {
@@ -267,7 +276,7 @@ const movements = [
   {
     id: "notice", mark: "·", color: SPECTRUM.notice,
     en: { name: "Notice", line: "See clearly", title: "Notice what is here.", body: "Four simple invitations, then open noticing." },
-    es: { name: "Notar", line: "Ver con claridad", title: "Nota lo que está aquí.", body: "Cuatro invitaciones sencillas y luego atención abierta." }
+    es: { name: "Observar", line: "Ver con claridad", title: "Nota lo que está aquí.", body: "Cuatro invitaciones sencillas y luego atención abierta." }
   },
   {
     id: "stabilise", mark: "│", color: SPECTRUM.stabilise,
@@ -673,7 +682,7 @@ const spanishTagLabels = {
   alone: "A solas", "creative-project": "Proyecto creativo", group: "Grupo", online: "En línea", relationship: "Relación", "sleep-threshold": "Antes de dormir", work: "Trabajo",
   beauty: "Belleza", cooperation: "Cooperación", courage: "Valentía", creativity: "Creatividad", dignity: "Dignidad", kindness: "Amabilidad", repair: "Reparación", restraint: "Moderación", service: "Servicio", truth: "Verdad",
   body: "Cuerpo", "chosen-connection": "Conexión elegida", "daily-task": "Tarea cotidiana", "digital-life": "Vida digital", "immediate-space": "Espacio cercano", "inner-attention": "Atención interior", "shared-world": "Mundo compartido",
-  small: "Pequeño", spacious: "Espacioso", steady: "Constante", notice: "Notar", stabilise: "Estabilizar", discern: "Discernir", reclaim: "Recuperar", cross: "Cruzar", embody: "Encarnar", integrate: "Integrar"
+  small: "Pequeño", spacious: "Espacioso", steady: "Constante", notice: "Observar", stabilise: "Estabilizar", discern: "Discernir", reclaim: "Recuperar", cross: "Cruzar", embody: "Encarnar", integrate: "Integrar"
 };
 const tagLabel = value => state.lang === "es" ? (spanishTagLabels[value] || readableTag(value)) : readableTag(value);
 
@@ -682,7 +691,11 @@ function contentByID(collection, id) {
 }
 
 function readJSON(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+  try {
+    const value = JSON.parse(deviceStorage.getItem(key)) ?? fallback;
+    const category = Object.keys(STORAGE).find(name => STORAGE[name] === key);
+    return category ? validateCategory(category, value) : value;
+  } catch { storageProblem ||= 'stored-data-unavailable'; return fallback; }
 }
 
 const savedPreferences = readJSON(STORAGE.preferences, {});
@@ -694,6 +707,12 @@ const state = {
   voice: savedPreferences.voice !== false,
   reduceMotion: Boolean(savedPreferences.reduceMotion),
   quietWords: savedPreferences.quietWords !== false,
+  illustrationsEnabled: savedPreferences.illustrationsEnabled !== false,
+  livedNeed: '',
+  storyReturn: null,
+  pendingBackup: null,
+  backupCategories: [],
+  backupIncludeDrafts: false,
   ceremonyKey: 1,
   ceremonySettled: false,
   ceremonyEntryReady: false,
@@ -729,7 +748,7 @@ const state = {
   engineDuration: 2,
   engineResponses: {},
   engineComplete: false,
-  actIndex: Number(localStorage.getItem(STORAGE.carriedAct) || 0) % canonicalCatalogs.en.sovereignActs.length,
+  actIndex: (initialStoredState.ok ? initialStoredState.value.carriedAct || 0 : 0) % canonicalCatalogs.en.sovereignActs.length,
   actQuality: "all",
   actContext: "all",
   actEffort: "all",
@@ -743,7 +762,7 @@ const state = {
 };
 
 function newPractice() {
-  const rememberedTone = localStorage.getItem(STORAGE.lastHeldTone) || "";
+  const rememberedTone = storedText(STORAGE.lastHeldTone) || "";
   const rememberedToneDefinition = tones.find(item => item.id === rememberedTone);
   return {
     index: 0,
@@ -754,6 +773,7 @@ function newPractice() {
     interruptedAt: 0,
     capacityStep: 0,
     capacityAnswers: [],
+    storyExpanded: true,
     selectedOption: "",
     noticeStarted: false,
     noticeStartedAt: 0,
@@ -1219,18 +1239,54 @@ class SoundEngine {
 const sound = new SoundEngine();
 const HISTORY_MARKER = "tone-sovereign";
 
-function persistPreferences() {
-  localStorage.setItem(STORAGE.preferences, JSON.stringify({
+function preferenceSnapshot() {
+  return {
     lang: state.lang,
     sound: state.sound,
     voice: state.voice,
     reduceMotion: state.reduceMotion,
     quietWords: state.quietWords,
+    illustrationsEnabled: state.illustrationsEnabled,
     guidedSitDuration: state.guidedSit.duration,
     guidedSitGuidance: state.guidedSit.guidance,
     guidedSitBackgroundTone: state.guidedSit.backgroundTone,
     guidedSitIntroduction: state.guidedSit.introduction
-  }));
+  };
+}
+let previousPreferenceSnapshot = preferenceSnapshot();
+let preferenceRevision = 0;
+const pendingPreferenceChanges = new Map();
+function hasFailedPreferenceChanges() {
+  return [...pendingPreferenceChanges.values()].some(change => change.failed);
+}
+function persistPreferences() {
+  const next = preferenceSnapshot();
+  for (const [key, value] of Object.entries(next)) {
+    if (previousPreferenceSnapshot[key] !== value) pendingPreferenceChanges.set(key, {value, revision: ++preferenceRevision, failed: false});
+  }
+  // Track queued intent immediately, so a rapid off→on still queues the reversal.
+  previousPreferenceSnapshot = next;
+  // Retry uncommitted settings with the next explicit settings change. Revisions
+  // prevent an older completion from acknowledging a newer off→on→off intent.
+  const requested = [...pendingPreferenceChanges.entries()];
+  const delta = Object.fromEntries(requested.map(([key, change]) => [key, change.value]));
+  if (requested.length) saveCategories(current => ({preferences: {...current.preferences, ...delta}}), {quiet: true}).then(ok => {
+    for (const [key, change] of requested) {
+      if (pendingPreferenceChanges.get(key)?.revision !== change.revision) continue;
+      if (ok) pendingPreferenceChanges.delete(key);
+      else pendingPreferenceChanges.set(key, {...change, failed: true});
+    }
+    if (!ok || hasFailedPreferenceChanges()) {
+      storageProblem ||= 'preferences-unsaved';
+      showStorageFailure();
+    } else if (storageProblem === 'preferences-unsaved') {
+      storageProblem = '';
+      document.getElementById('storage-warning')?.remove();
+    }
+  });
+  applyInterfacePreferences();
+}
+function applyInterfacePreferences() {
   document.documentElement.lang = state.lang;
   document.documentElement.classList.toggle("user-reduced-motion", state.reduceMotion);
   const description = state.lang === "es"
@@ -1261,6 +1317,7 @@ function showToast(message) {
 }
 
 function navigate(view, options = {}) {
+  cancelOfflineDownloads();
   stopPracticeTimers();
   if (state.view === "guidedSits" && view !== "guidedSits") resetGuidedSitSession();
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -1268,6 +1325,7 @@ function navigate(view, options = {}) {
   const remembersView = changedView && options.remember !== false;
   if (remembersView) state.stack.push(state.view);
   state.view = view;
+  if (view === 'home' || view === 'landing') state.storyReturn = null;
   if (options.field) state.selectedField = options.field;
   if (options.teaching) state.selectedTeaching = options.teaching;
   if (options.law) state.selectedLaw = options.law;
@@ -1304,12 +1362,25 @@ function navigate(view, options = {}) {
 }
 
 function restorePreviousView() {
+  cancelOfflineDownloads();
   stopPracticeTimers();
   if (state.view === "guidedSits") resetGuidedSitSession();
   state.view = state.stack.pop() || "home";
+  const storyReturn = state.storyReturn?.view === state.view ? state.storyReturn : null;
+  if (storyReturn) {
+    state.practice = storyReturn.practice;
+    // A story's reading language must not reinterpret an in-progress practice.
+    state.lang = storyReturn.lang || state.lang;
+    state.storyReturn = null;
+    persistPreferences();
+  }
   render();
   focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
+  if (storyReturn) requestAnimationFrame(() => {
+    document.getElementById('practice-story-link')?.focus({preventScroll: true});
+    window.scrollTo({top: storyReturn.scrollY, behavior: 'instant'});
+  });
 }
 
 function goBack() {
@@ -1321,6 +1392,8 @@ function goBack() {
 }
 
 function goHome() {
+  cancelOfflineDownloads();
+  state.storyReturn = null;
   stopPracticeTimers();
   if (state.view === "guidedSits") resetGuidedSitSession();
   state.stack = [];
@@ -1369,10 +1442,11 @@ function currentInterfaceMode() {
 }
 
 function render() {
-  persistPreferences();
+  applyInterfacePreferences();
   const renderers = {
     landing: renderLanding,
     home: renderHome,
+    livedExperience: renderLivedExperience,
     practice: renderPractice,
     guidedSits: renderGuidedSits,
     movement: renderMovementSession,
@@ -1399,18 +1473,22 @@ function render() {
     threshold: renderThreshold,
     history: renderHistory,
     settings: renderSettings,
+    offline: renderOffline,
+    backup: renderBackup,
     symbol: renderSymbol,
     about: renderAbout
   };
   const spectrum = currentSpectrum();
   const interfaceMode = currentInterfaceMode();
   app.innerHTML = `<div class="app-shell spectrum-${spectrum.name} interface-${interfaceMode}" style="--section-color:${spectrum.color}">${(renderers[state.view] || renderHome)()}</div>`;
+  if (storageProblem) showStorageFailure();
   if (state.view === "symbol") observeSymbolSections();
   if (state.view === "landing" && !state.ceremonySettled) settleCeremonyLater();
   if (state.view === "movement") resumePracticeView();
   if (state.view === "guidedSits" && state.guidedSit.phase === "session" && !state.guidedSit.paused) startGuidedSitTimer();
   if (state.view === "threshold") sound.threshold().catch(() => {});
   if (state.view === "comics" || state.view === "comicReader") prepareComicImages();
+  if (state.view === "offline") mountOfflineDownloads(document.querySelector('#offline-downloads'), state.lang);
 }
 
 function renderTopbar(title, subtitle = "") {
@@ -1529,6 +1607,7 @@ function renderHome() {
         <h1 class="display">${tr("beginQuestion")}</h1>
         <p class="lede hero-copy">${tr("beginSupport")}</p>
       </header>
+      ${homeIllustration(state.lang, state.illustrationsEnabled)}
       <section class="door-stack" aria-label="${tr("fiveDoors")}">
         ${doors.map(door => `<button class="door spectrum-row ${door.primary ? "primary-door" : ""}" style="--item-color:${SPECTRUM[door.spectrum]}" type="button" data-view="${door.id}">
           <span class="door-mark" aria-hidden="true">${door.mark}</span>
@@ -1536,6 +1615,7 @@ function renderHome() {
           <span class="door-arrow" aria-hidden="true">→</span>
         </button>`).join("")}
       </section>
+      <button class="orientation-invitation" type="button" data-view="livedExperience"><span><strong>${escapeHTML(livedExperience.title[state.lang])}</strong><small>${escapeHTML(livedExperience.support[state.lang])}</small></span><b aria-hidden="true">→</b></button>
       <button class="orientation-invitation spectrum-row" style="--item-color:${SPECTRUM.orientation}" type="button" data-view="about">
         <span class="door-mark" aria-hidden="true">✦</span>
         <span><strong>${phrase("Begin Here", "Comienza aquí")}</strong><small>${phrase("A short introduction to tone, sovereignty and the Golden Age.", "Una breve introducción al tono, la soberanía y la Edad Dorada.")}</small></span>
@@ -1543,12 +1623,18 @@ function renderHome() {
       </button>
       <footer class="home-footer">
         <button class="text-button" type="button" data-view="foundations">${phrase("Foundations", "Fundamentos")}</button>
+        <button class="text-button" type="button" data-view="comics">${phrase("Read a story", "Leer una historia")}</button>
         <button class="text-button" type="button" data-view="ruleOfLife">${phrase("My compass", "Mi brújula")}</button>
         <button class="text-button" type="button" data-view="history">${tr("history")}</button>
         <button class="text-button" type="button" data-view="settings">${tr("settings")}</button>
         <button class="text-button" type="button" data-action="replay-from-home">${tr("replay")}</button>
       </footer>
     </main>`;
+}
+
+function renderLivedExperience() {
+  const selected = livedExperience.entries.find(item => item.id === state.livedNeed);
+  return `${renderTopbar(livedExperience.title[state.lang])}<main class="page"><header class="section-intro"><h1 class="page-title">${escapeHTML(livedExperience.title[state.lang])}</h1><p class="lede">${escapeHTML(livedExperience.support[state.lang])}</p></header><div class="choice-grid">${livedExperience.entries.map(item => `<button type="button" class="choice ${item.id === state.livedNeed ? 'selected' : ''}" aria-pressed="${item.id === state.livedNeed}" data-lived-need="${item.id}">${escapeHTML(item.prompt[state.lang])}</button>`).join('')}</div>${selected ? `<section class="lived-offer" aria-live="polite"><p class="eyebrow">${escapeHTML(livedExperience.offerEyebrow[state.lang])}</p><p class="lede">${escapeHTML(selected.bridge[state.lang])}</p><button type="button" class="secondary-button" data-field="${selected.fieldID}">${escapeHTML(livedExperience.openLabel[state.lang])}</button><button type="button" class="text-button" data-action="clear-lived-need">${escapeHTML(livedExperience.changeLabel[state.lang])}</button></section>` : ''}<p class="gentle-note">${phrase("All seven Fields remain available. This choice is not saved or interpreted.", "Los siete Campos siguen disponibles. Esta elección no se guarda ni se interpreta.")}</p><button type="button" class="text-button" data-view="fields">${phrase("Browse all seven Fields", "Explorar los siete Campos")}</button></main>`;
 }
 
 function renderPractice() {
@@ -1560,7 +1646,7 @@ function renderPractice() {
         <h1 class="display">${lang === "en" ? "What do you need now?" : "¿Qué necesitas ahora?"}</h1>
         <p class="lede">${lang === "en" ? "Follow all seven steps, or choose one step below." : "Sigue los siete pasos o elige un paso a continuación."}</p>
       </header>
-      <button class="full-practice-entry" type="button" data-action="start-full-practice"><span aria-hidden="true">✦</span><span><strong>${lang === "en" ? "Begin the full seven-step practice" : "Comenzar la práctica completa de siete pasos"}</strong><small>${lang === "en" ? "Notice → Stabilise → Discern → Reclaim → Cross → Embody → Integrate" : "Notar → Estabilizar → Discernir → Recuperar → Cruzar → Encarnar → Integrar"}</small></span><b>→</b></button>
+      <button class="full-practice-entry" type="button" data-action="start-full-practice"><span aria-hidden="true">✦</span><span><strong>${lang === "en" ? "Begin the full seven-step practice" : "Comenzar la práctica completa de siete pasos"}</strong><small>${lang === "en" ? "Notice → Stabilise → Discern → Reclaim → Cross → Embody → Integrate" : "Observar → Estabilizar → Discernir → Recuperar → Cruzar → Encarnar → Integrar"}</small></span><b>→</b></button>
       <button class="guided-practice-entry" type="button" data-view="guidedSits"><span aria-hidden="true">◷</span><span><strong>${lang === "en" ? "Guided Sits" : "Meditaciones guiadas"}</strong><small>${lang === "en" ? "15, 30, 45, or 60 minutes with optional voice guidance" : "15, 30, 45 o 60 minutos con guía de voz opcional"}</small></span><b>›</b></button>
       <button class="guided-practice-entry" type="button" data-view="practiceEngines"><span aria-hidden="true">◌</span><span><strong>${lang === "en" ? "Short guided practices" : "Prácticas guiadas breves"}</strong><small>${lang === "en" ? "One-minute check-in, or choose a reusable practice" : "Una revisión de un minuto o una práctica para repetir"}</small></span><b>›</b></button>
       <p class="movement-or-label">${lang === "en" ? "OR CHOOSE ONE STEP" : "O ELIGE UN PASO"}</p>
@@ -1973,6 +2059,7 @@ function renderMovementSession() {
 
 function renderContinuityChoice(movement) {
   const lang = state.lang;
+  const relatedStory = completionStory(movement.id);
   const bridge = {
     notice: ["stabilise", "Create room for the signal.", "Abrir espacio para la señal."],
     stabilise: ["discern", "Look with enough steadiness.", "Mirar con suficiente estabilidad."],
@@ -1990,6 +2077,7 @@ function renderContinuityChoice(movement) {
     <div class="practice-actions"><button class="primary-button" type="button" data-action="finish-movement-save">${lang === "en" ? "Save on this device" : "Guardar en este dispositivo"}</button>
     <button class="text-button" type="button" data-action="finish-movement-pass">${lang === "en" ? "Finish here without saving" : "Terminar aquí sin guardar"}</button>
     ${bridge && nextMovement ? `<aside class="adjacent-bridge"><p>${lang === "en" ? bridge[1] : bridge[2]}</p><button class="secondary-button" type="button" data-open-movement="${nextMovement.id}">${lang === "en" ? `Continue with ${nextMovement.en.name}` : `Continuar con ${nextMovement.es.name}`}</button></aside>` : ""}</div>
+    ${relatedStory ? `<aside class="completion-story"><p>${escapeHTML(relatedStory.invitation[lang])}</p><button id="practice-story-link" class="text-button" type="button" data-action="practice-story" data-story-movement="${movement.id}">${phrase("Read an optional story", "Leer una historia opcional")} →</button><p class="gentle-note">${phrase("Return here afterwards. Nothing is saved by opening a story.", "Vuelve aquí después. Abrir una historia no guarda nada.")}</p></aside>` : ''}
   </main>`;
 }
 
@@ -2010,9 +2098,9 @@ function renderNoticeMovement() {
   const p = state.practice;
   const lang = state.lang;
   if (p.stage === "arrive") return `<section class="practice-stage focused-stage">
-    ${renderMovementHeading(lang === "en" ? "Notice one simple feeling in your body." : "Nota una sensación sencilla en tu cuerpo.", p.guidance === "guided" ? (lang === "en" ? "Four optional spoken cues, then notice freely." : "Cuatro indicaciones habladas opcionales y luego atención libre.") : (lang === "en" ? "A quiet minute with brief words on screen." : "Un minuto en silencio con palabras breves en pantalla."))}
+    ${renderMovementHeading(lang === "en" ? "Notice one simple feeling in your body." : "Nota una sensación sencilla en tu cuerpo.", p.guidance === "guided" ? (lang === "en" ? "Four optional spoken cues, then notice freely." : "Cuatro indicaciones habladas opcionales y luego atención libre.") : (lang === "en" ? "A quiet practice with brief words on screen." : "Una práctica en silencio con palabras breves en pantalla."))}
     <div class="instrument-region notice-instrument still" aria-hidden="true"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></div>
-    <div class="segmented practice-guidance" aria-label="${lang === "en" ? "Notice guidance" : "Guía para Notar"}"><button type="button" data-practice-guidance="quiet" aria-pressed="${p.guidance === "quiet"}">${lang === "en" ? "Quiet" : "Silencio"}</button><button type="button" data-practice-guidance="guided" aria-pressed="${p.guidance === "guided"}">${lang === "en" ? "Guided" : "Guiada"}</button></div>
+    <div class="segmented practice-guidance" aria-label="${lang === "en" ? "Notice guidance" : "Guía para Observar"}"><button type="button" data-practice-guidance="quiet" aria-pressed="${p.guidance === "quiet"}">${lang === "en" ? "Quiet" : "Silencio"}</button><button type="button" data-practice-guidance="guided" aria-pressed="${p.guidance === "guided"}">${lang === "en" ? "Guided" : "Guiada"}</button></div>
     <button class="primary-button" type="button" data-action="start-notice">${lang === "en" ? "Begin" : "Comenzar"}</button>
     <div class="practice-settings-row"><button class="text-button" type="button" data-action="toggle-words">${state.quietWords ? (lang === "en" ? "Use quiet labels" : "Usar etiquetas suaves") : (lang === "en" ? "Without labels" : "Sin etiquetas")}</button>
     <label>${lang === "en" ? "Duration" : "Duración"}<select data-notice-duration><option value="30" ${p.noticeDuration === 30 ? "selected" : ""}>30s</option><option value="60" ${p.noticeDuration === 60 ? "selected" : ""}>60s</option><option value="90" ${p.noticeDuration === 90 ? "selected" : ""}>90s</option></select></label></div>
@@ -2100,14 +2188,15 @@ function renderCapacityMovement(id) {
   const lang = state.lang;
   const flow = capacityFlows[id];
   const item = flow[p.capacityStep][lang];
-  const heldTone = id === "integrate" && p.sequence ? tones.find(tone => tone.id === localStorage.getItem(STORAGE.lastHeldTone)) : null;
+  const heldTone = id === "integrate" && p.sequence ? tones.find(tone => tone.id === storedText(STORAGE.lastHeldTone)) : null;
   return `<section class="practice-stage focused-stage capacity-stage">
     <p class="eyebrow">${p.capacityStep + 1} ${lang === "en" ? "of" : "de"} ${flow.length}</p>
     ${renderMovementHeading(item[0], item[1])}
     <button class="text-button voice-invitation" type="button" data-action="listen-capacity-stage">${lang === "en" ? "Hear this invitation" : "Escuchar esta invitación"}</button>
     ${heldTone ? `<p class="gentle-note">${lang === "en" ? `Also present: the ${heldTone.en} tone held in Embody. It is one strand, not the whole choice.` : `También está presente el tono ${heldTone.es} guardado en Encarnar. Es una hebra, no toda la elección.`}</p>` : ""}
+    ${stageIllustration(id, p.capacityStep, lang, state.illustrationsEnabled, Boolean(p.selectedOption), p.storyExpanded)}
     ${renderCapacityInstrument(id, p.capacityStep, lang, p.capacityAnswers, p.selectedOption)}
-    <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
+    <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" aria-pressed="${p.selectedOption === option}" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
     <button class="primary-button" type="button" data-action="capacity-continue" ${p.selectedOption ? "" : "disabled"}>${p.capacityStep === flow.length - 1 ? (lang === "en" ? "Complete practice" : "Completar práctica") : tr("continue")}</button>
   </section>`;
 }
@@ -2212,7 +2301,7 @@ function renderEmbodyMovement() {
   const p = state.practice;
   const lang = state.lang;
   const tone = tones.find(item => item.id === p.tone) || null;
-  const rememberedTone = localStorage.getItem(STORAGE.lastHeldTone);
+  const rememberedTone = storedText(STORAGE.lastHeldTone);
   if (p.embodyStage === "remembered" && tone) return `<section class="practice-stage focused-stage embody-stage">
     <div class="tone-field compact" style="color:${tone.color}" aria-hidden="true"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(lang === "en" ? `Return to ${tone.en}?` : `¿Volver a ${tone.es}?`, lang === "en" ? "This was your last held tone. It is offered as a memory, not a recommendation." : "Este fue tu último tono guardado. Se ofrece como recuerdo, no como recomendación.")}
@@ -2248,6 +2337,8 @@ function renderEmbodyMovement() {
 }
 
 function startMovement(id) {
+  state.storyReturn = null;
+  cancelOfflineDownloads();
   stopPracticeTimers();
   state.practice = newPractice();
   state.practice.movement = id;
@@ -2322,6 +2413,7 @@ function advanceFullPractice() {
 }
 
 function returnToMovementField() {
+  state.storyReturn = null;
   stopPracticeTimers();
   state.practice = newPractice();
   state.view = "practice";
@@ -2343,6 +2435,7 @@ function movementBack() {
   else if ((id === "discern" || id === "integrate") && p.capacityStep > 0) {
     p.capacityStep -= 1;
     p.selectedOption = p.capacityAnswers[p.capacityStep] || "";
+    p.storyExpanded = !p.selectedOption;
   } else if (id === "reclaim" && p.stage === "complete") p.stage = "relationship";
   else if (id === "reclaim" && p.stage === "relationship") p.stage = "pause";
   else if (id === "reclaim" && p.stage === "pause") p.stage = p.customPull ? "custom" : "authority";
@@ -2367,7 +2460,7 @@ function requestMovementCompletion() {
   render();
 }
 
-function finishMovement(save) {
+async function finishMovement(save) {
   const p = state.practice;
   const movement = movementByID();
   if (save) {
@@ -2379,7 +2472,7 @@ function finishMovement(save) {
       : p.movement === "embody" ? (tones.find(item => item.id === p.tone)?.[state.lang] || "")
       : p.movement === "notice" ? (noticeOutcomes[Number(p.noticeOutcome)] || "")
       : p.capacityAnswers.filter(Boolean).join(" · ");
-    addTrace({ type: "practice", title: local(movement).name, detail: detail || local(movement).line });
+    if (!(await addTrace({ type: "practice", title: local(movement).name, detail: detail || local(movement).line }))) return;
     showToast(tr("saved"));
   }
   returnToMovementField();
@@ -2529,17 +2622,17 @@ function playMovementVoice(id) {
   if (cues[id]) sound.playVoice(cues[id], 0.28);
 }
 
-function savePracticeTrace() {
+async function savePracticeTrace() {
   const p = state.practice;
   const tone = tones.find(item => item.id === p.tone) || tones[0];
   const doorway = doorways.find(item => item.id === p.doorway) || doorways[0];
   const fallbackAct = currentAct()[state.lang === "en" ? 0 : 2];
-  addTrace({
+  if (!(await addTrace({
     type: "practice",
     title: state.lang === "en" ? `${tone.en} carried forward` : `Tono elegido: ${tone.es}`,
     detail: p.act.trim() || fallbackAct,
     data: { facts: p.facts, story: p.story, pull: p.pull, relation: p.relation, doorway: doorway[state.lang][0], question: doorway[state.lang][2], tone: tone[state.lang] }
-  });
+  }))) return;
   state.practice = newPractice();
   showToast(tr("saved"));
   navigate("home", { remember: false });
@@ -2835,7 +2928,7 @@ function renderGuidedExperience() {
     <main class="page guided-experience-page"><section class="guided-phase"><p class="eyebrow">${escapeHTML(definition.eyebrow)}</p>${title ? `<h2>${escapeHTML(title)}</h2>` : ""}<h1 class="practice-title">${escapeHTML(prompt)}</h1>${support ? `<p class="lede">${escapeHTML(support)}</p>` : ""}</section><div class="practice-actions"><button class="primary-button" type="button" data-action="guided-next">${final ? definition.finalTitle : tr("continue")}</button><button class="text-button" type="button" data-action="guided-leave">${phrase("Leave it here", "Dejarlo aquí")}</button></div></main>`;
 }
 
-function completeGuidedExperience() {
+async function completeGuidedExperience() {
   const catalog = catalogFor(state.lang);
   const entry = contentByID(catalog.libraryEntries, state.selectedEntry);
   const field = contentByID(catalog.fields, state.selectedField);
@@ -2848,7 +2941,7 @@ function completeGuidedExperience() {
     return;
   }
   if (state.guidedKind === "entry-act") {
-    addTrace({ type: "act", title: entry.title, detail: entry.embodiedAct });
+    if (!(await addTrace({ type: "act", title: entry.title, detail: entry.embodiedAct }))) return;
     navigate("history", { remember: false });
     return;
   }
@@ -2992,9 +3085,10 @@ function renderComicIssueCard(series, issue) {
   const issueLabel = comicIssueLabel(series, issue);
   const openLabel = phrase(`Open ${series.en.title}, ${issueLabel}: ${issue.en}`, `Abrir ${series.es.title}, ${issueLabel}: ${issue.es}`);
   const coverPath = comicAssetPath(series.id, issue, 1, artLanguage);
+  const shelfImage = comicEditions.find(edition => edition.series === series.id && edition.issue === issue.number && edition.language === artLanguage)?.thumbnail || coverPath;
   const cover = issue.assetReady === false
     ? `<span class="comic-cover-placeholder" role="img" aria-label="${escapeAttribute(phrase("Cover artwork in preparation", "Ilustración de portada en preparación"))}" data-comic-asset-path="${escapeAttribute(coverPath)}"><small>${escapeHTML(issueLabel)}</small><strong>${escapeHTML(issue[state.lang])}</strong><span>${phrase("Artwork in preparation", "Ilustraciones en preparación")}</span></span>`
-    : `<img src="${coverPath}" data-comic-fallback="${comicAssetPath(series.id, issue, 1, "en")}" loading="lazy" decoding="async" alt="">`;
+    : `<img src="${shelfImage}" data-comic-fallback="${coverPath}" loading="lazy" decoding="async" width="320" height="480" alt="">`;
   return `<button class="comic-issue-card" type="button" data-comic-series="${series.id}" data-comic-issue="${issue.number}" aria-label="${escapeAttribute(openLabel)}">
     <span class="comic-cover-wrap">${cover}</span>
     <span class="comic-card-copy"><small>${escapeHTML(issueLabel)} · ${series.kind === "specials" ? `${issue.pages} ${phrase("story pages", "páginas de historia")} + ${phrase("cover", "portada")}` : `${issue.pages} ${phrase("pages", "páginas")}`}</small><strong>${escapeHTML(issue[state.lang])}</strong>${spanishFallback ? `<span>${phrase("Spanish edition in preparation · English available", "Edición en español en preparación · disponible en inglés")}</span>` : ""}${issue.assetReady === false ? `<span>${phrase("Reader scaffold ready · artwork forthcoming", "Lector preparado · ilustraciones próximamente")}</span>` : ""}</span>
@@ -3222,7 +3316,7 @@ function renderPracticeEngine() {
   const catalog = catalogFor(state.lang);
   const engine = contentByID(catalog.practiceEngines, state.selectedEngine);
   if (state.engineComplete) {
-    return `${renderTopbar(engine.title, phrase("Practice complete", "Práctica completada"))}<main class="page"><section class="engine-completion"><div class="completion-seal"><div class="seal-orb" aria-hidden="true"></div><p class="eyebrow">${phrase("Return", "Regreso")}</p><h1 class="page-title">${phrase("Take only what feels useful.", "Lleva solo lo que te resulte útil.")}</h1><p class="lede">${phrase("The practice can end here. Its meaning remains yours.", "La práctica puede terminar aquí. Su significado sigue siendo tuyo.")}</p></div><div class="practice-actions"><button class="primary-button" type="button" data-action="finish-engine">${phrase("Return to practices", "Volver a las prácticas")}</button><button class="secondary-button" type="button" data-action="restart-engine">${phrase("Begin again", "Comenzar de nuevo")}</button></div></section></main>`;
+    return `${renderTopbar(engine.title, phrase("Practice complete", "Práctica completada"))}<main class="page"><section class="engine-completion"><div class="completion-seal"><div class="seal-orb" aria-hidden="true"></div><p class="eyebrow">${phrase("Return", "Regreso")}</p><h1 class="page-title">${phrase("Take only what feels useful.", "Lleva solo lo que te resulte útil.")}</h1><p class="lede">${phrase("The practice can end here. Its meaning remains yours.", "La práctica puede terminar aquí. Su significado sigue siendo tuyo.")}</p></div><div class="practice-actions"><button class="primary-button" type="button" data-action="finish-engine">${phrase("Return to practices", "Volver a las prácticas")}</button><button class="secondary-button" type="button" data-action="restart-engine">${phrase("Begin again", "Comenzar de nuevo")}</button><button class="text-button" type="button" data-action="keep-engine">${phrase("Keep this practice and my responses", "Guardar esta práctica y mis respuestas")}</button></div><p class="gentle-note">${phrase("Nothing is saved unless you choose to keep it.", "Nada se guarda salvo que tú lo elijas.")}</p></section></main>`;
   }
   const step = engine.steps[state.engineStep];
   const response = state.engineResponses[step.id] || "";
@@ -3230,7 +3324,7 @@ function renderPracticeEngine() {
   const responseControl = step.responseKind === "pause"
     ? `<div class="pause-field" aria-hidden="true"><span></span></div>`
     : `<label class="field-label"><span>${step.responseKind === "action" ? phrase("One action, if useful", "Una acción, si es útil") : phrase("A few words, if useful", "Unas palabras, si son útiles")}</span><textarea class="field-textarea" data-engine-response="${step.id}">${escapeHTML(response)}</textarea></label>`;
-  return `${renderTopbar(engine.title, `${state.engineDuration} min · ${state.engineStep + 1} ${phrase("of", "de")} ${engine.steps.length}`)}<main class="page practice-engine-page"><nav class="movement-strip" aria-label="${phrase("Practice steps", "Pasos de la práctica")}">${engine.steps.map((item, index) => `<span class="movement-dot ${index < state.engineStep ? "done" : ""} ${index === state.engineStep ? "active" : ""}"></span>`).join("")}</nav><header class="section-intro"><p class="eyebrow">${escapeHTML(engine.title)}</p><h1 class="practice-title">${escapeHTML(step.prompt)}</h1>${step.optionalSupport ? `<p class="lede">${escapeHTML(step.optionalSupport)}</p>` : ""}<button class="text-button voice-invitation" type="button" data-action="listen-engine-stage">${phrase("Hear this invitation", "Escuchar esta invitación")}</button></header>${responseControl}<div class="duration-row" aria-label="${phrase("Practice length", "Duración de la práctica")}">${engine.recommendedDurations.map(duration => `<button class="chip" type="button" data-engine-duration="${duration}" aria-pressed="${state.engineDuration === duration}">${duration} min</button>`).join("")}</div><footer class="practice-actions"><div class="button-row"><button class="secondary-button" type="button" data-action="previous-engine-step" ${state.engineStep === 0 ? "disabled" : ""}>${tr("back")}</button><button class="primary-button" type="button" data-action="next-engine-step">${isLast ? phrase("Complete practice", "Completar la práctica") : tr("continue")}</button></div><button class="text-button" type="button" data-view="practiceEngines">${phrase("Choose another practice", "Elegir otra práctica")}</button></footer></main>`;
+  return `${renderTopbar(engine.title, `${state.engineDuration} min · ${state.engineStep + 1} ${phrase("of", "de")} ${engine.steps.length}`)}<main class="page practice-engine-page"><nav class="movement-strip" aria-label="${phrase("Practice steps", "Pasos de la práctica")}">${engine.steps.map((item, index) => `<span class="movement-dot ${index < state.engineStep ? "done" : ""} ${index === state.engineStep ? "active" : ""}"></span>`).join("")}</nav><header class="section-intro"><p class="eyebrow">${escapeHTML(engine.title)}</p><h1 class="practice-title">${escapeHTML(step.prompt)}</h1>${step.optionalSupport ? `<p class="lede">${escapeHTML(step.optionalSupport)}</p>` : ""}<button class="text-button voice-invitation" type="button" data-action="listen-engine-stage">${phrase("Hear this invitation", "Escuchar esta invitación")}</button></header>${responseControl}<div class="duration-row" aria-label="${phrase("Practice length", "Duración de la práctica")}">${engine.recommendedDurations.map(duration => `<button class="chip" type="button" data-engine-duration="${duration}" aria-pressed="${state.engineDuration === duration}">${duration} min</button>`).join("")}</div><footer class="practice-actions"><div class="button-row"><button class="secondary-button" type="button" data-action="previous-engine-step" ${state.engineStep === 0 ? "disabled" : ""}>${tr("back")}</button><button class="primary-button" type="button" data-action="next-engine-step">${isLast ? phrase("Complete practice", "Completar la práctica") : tr("continue")}</button></div><button class="text-button" type="button" data-action="save-engine-draft">${phrase("Save a draft on this device", "Guardar un borrador en este dispositivo")}</button><button class="text-button" type="button" data-view="practiceEngines">${phrase("Choose another practice", "Elegir otra práctica")}</button></footer></main>`;
 }
 
 function currentActPool() {
@@ -3255,12 +3349,12 @@ function renderActs() {
 function renderRuleOfLife() {
   const catalog = catalogFor(state.lang);
   const keptPrinciples = catalog.principles.filter(item => state.ruleOfLife.principleIDs.includes(item.id));
-  const prompt = catalog.weeklyReviewPrompts[new Date().getDay() % catalog.weeklyReviewPrompts.length];
+  const prompt = weeklyPrompt(catalog.weeklyReviewPrompts).prompt;
   return `${renderTopbar(phrase("My Compass", "Mi brújula"), phrase("Chosen locally, editable at any time", "Elegida localmente, editable en cualquier momento"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("A living rule of life", "Una regla de vida viva")}</p><h1 class="page-title">${phrase("My Compass", "Mi brújula")}</h1><p class="lede">${phrase("Keep only the principles and commitments you want to remember. This is not a score, identity or promise to be perfect.", "Guarda solo los principios y compromisos que quieras recordar. Esto no es una puntuación, identidad ni promesa de perfección.")}</p></header><section class="start-here"><p class="eyebrow">${phrase("This week's question", "La pregunta de esta semana")}</p><blockquote>${escapeHTML(prompt.prompt)}</blockquote></section><section><h2>${phrase("Principles I chose", "Principios que elegí")}</h2>${keptPrinciples.length ? `<div class="list">${keptPrinciples.map(item => `<button class="list-row" type="button" data-principle="${item.id}"><span><strong>${escapeHTML(item.title)}</strong><span>${escapeHTML(item.sovereignAct)}</span></span><b>→</b></button>`).join("")}</div>` : `<p class="empty-state">${phrase("No principles kept yet. Explore Foundations and keep only what feels worth practising.", "Todavía no guardaste principios. Explora Fundamentos y conserva solo lo que valga la pena practicar.")}</p>`}</section><section><h2>${phrase("Commitments", "Compromisos")}</h2><div class="commitment-list">${catalog.ruleCommitments.map(item => `<label class="commitment-row"><input type="checkbox" data-commitment="${item.id}" ${state.ruleOfLife.commitmentIDs.includes(item.id) ? "checked" : ""}><span><strong>${escapeHTML(item.domain)}</strong>${escapeHTML(item.text)}</span></label>`).join("")}</div></section></main>`;
 }
 
 function renderMissions() {
-  return `${renderTopbar(phrase("Mission Path", "Camino de misión"), phrase("Optional project orientation", "Orientación opcional para un proyecto"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Direction before explanation", "Dirección antes que explicación")}</p><h1 class="page-title">${phrase("Protect a direction.", "Protege una dirección.")}</h1><p class="lede">${phrase("This is not a task manager. It holds direction, the next visible step and the rhythm that preserves the person serving it.", "Esto no es un gestor de tareas. Sostiene la dirección, el próximo paso visible y el ritmo que cuida a la persona que la sirve.")}</p></header>${state.missions.length ? `<section class="list">${state.missions.map(mission => `<button class="list-row" type="button" data-mission="${mission.id}"><span><strong>${escapeHTML(mission.title)}</strong><span>${escapeHTML(mission.direction)}</span></span><b>→</b></button>`).join("")}</section>` : `<p class="empty-state">${phrase("No direction has been saved yet.", "Todavía no se ha guardado ninguna dirección.")}</p>`}<div class="practice-actions"><button class="primary-button" type="button" data-action="new-mission">${phrase("Begin a Mission Path", "Comenzar un camino de misión")}</button></div></main>`;
+  return `${renderTopbar(phrase("Mission Path", "Camino de misión"), phrase("Optional project orientation", "Orientación opcional para un proyecto"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Direction before explanation", "Dirección antes que explicación")}</p><h1 class="page-title">${phrase("Protect a direction.", "Protege una dirección.")}</h1><p class="lede">${phrase("This is not a task manager. It holds direction, the next visible step and the rhythm that preserves the person serving it.", "Esto no es un gestor de tareas. Sostiene la dirección, el próximo paso visible y el ritmo que cuida a la persona que la sirve.")}</p></header>${state.missions.length ? `<section class="list">${state.missions.map(mission => `<button class="list-row" type="button" data-mission="${escapeAttribute(mission.id)}"><span><strong>${escapeHTML(mission.title)}</strong><span>${escapeHTML(mission.direction)}</span></span><b>→</b></button>`).join("")}</section>` : `<p class="empty-state">${phrase("No direction has been saved yet.", "Todavía no se ha guardado ninguna dirección.")}</p>`}<div class="practice-actions"><button class="primary-button" type="button" data-action="new-mission">${phrase("Begin a Mission Path", "Comenzar un camino de misión")}</button></div></main>`;
 }
 
 function renderMission() {
@@ -3287,7 +3381,8 @@ function renderThreshold() {
 }
 
 function renderHistory() {
-  const rememberedID = localStorage.getItem(STORAGE.lastHeldTone);
+  if (storageProblem) return `${renderTopbar(phrase('Kept on this device', 'Guardado en este dispositivo'))}<main class="page"><h1 class="page-title">${phrase('Saved material is temporarily unavailable.', 'El material guardado no está disponible temporalmente.')}</h1><p class="lede">${phrase('This is not an empty archive. The app could not safely read or finish a saved update. Your current practice can continue without saving.', 'Esto no es un archivo vacío. La aplicación no pudo leer con seguridad o terminar una actualización guardada. Puedes continuar la práctica actual sin guardar.')}</p><button class="secondary-button" data-view="settings" type="button">${tr('settings')}</button></main>`;
+  const rememberedID = storedText(STORAGE.lastHeldTone);
   const remembered = tones.find(item => item.id === rememberedID);
   const hasKept = state.traces.length || state.missions.length || state.ruleOfLife.principleIDs.length || remembered;
   return `${renderTopbar(phrase("Kept on this device", "Guardado en este dispositivo"), phrase("Only when you choose", "Solo cuando tú eliges"))}<main class="page"><header class="section-intro"><p class="eyebrow">${phrase("Kept on this device", "Guardado en este dispositivo")}</p><h1 class="page-title">${hasKept ? phrase("Your chosen material is here.", "El material que elegiste está aquí.") : phrase("Nothing saved yet.", "Todavía no hay nada guardado.")}</h1><p class="lede">${phrase("Saved traces and a remembered tone stay distinct. Tone Sovereign does not combine or interpret them.", "Las huellas guardadas y un tono recordado permanecen separados. Tone Sovereign no los combina ni los interpreta.")}</p></header>
@@ -3297,11 +3392,16 @@ function renderHistory() {
     <p class="gentle-note">${phrase("Everything shown here stays in this browser unless you export it. You can erase it in Settings. It does not rank, diagnose or define you.", "Todo lo que aparece aquí permanece en este navegador salvo que lo exportes. Puedes borrarlo en Ajustes. No te clasifica, diagnostica ni define.")}</p></main>`;
 }
 
+function renderOffline() {
+  return `${renderTopbar(phrase("Offline downloads", "Descargas sin conexión"))}<main class="page"><header class="section-intro"><h1 class="page-title">${phrase("Take only what you need.", "Lleva solo lo que necesitas.")}</h1><p class="lede">${phrase("Text and silent practice come first. Voice is optional. Leaving this screen pauses a download; completed files remain.", "El texto y la práctica en silencio son lo primero. La voz es opcional. Al salir de esta pantalla, la descarga se detiene; los archivos completos se conservan.")}</p></header><div id="offline-downloads"><p role="status">${phrase("Checking downloads…", "Revisando descargas…")}</p></div><p class="gentle-note">${phrase("Removing downloaded audio does not erase your saved practices. Your browser may free cached files when storage is low; check readiness before travelling.", "Borrar audio descargado no elimina tus prácticas guardadas. El navegador puede liberar archivos si falta espacio; comprueba la disponibilidad antes de viajar.")}</p></main>`;
+}
+
 function renderSettings() {
   if (state.resetConfirmationOpen) return `${renderTopbar(tr("settings"), phrase("Confirm local reset", "Confirmar borrado local"))}<main class="page reset-confirmation"><section role="alertdialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-description"><p class="eyebrow">${phrase("LOCAL AND IRREVERSIBLE", "LOCAL E IRREVERSIBLE")}</p><h1 id="reset-title" class="page-title">${phrase("Reset saved practice data?", "¿Borrar los datos guardados de práctica?")}</h1><p id="reset-description" class="lede">${phrase("This permanently removes the following material from this browser. It cannot be undone unless you exported a copy.", "Esto elimina de forma permanente el siguiente material de este navegador. No se puede deshacer salvo que hayas exportado una copia.")}</p><ul class="reset-list"><li>${phrase("Saved practices, reflections and questions", "Prácticas, reflexiones y preguntas guardadas")}</li><li>${phrase("Compass principles, commitments and mission paths", "Principios, compromisos y caminos de misión")}</li><li>${phrase("Cross marks, carried acts and remembered tones", "Marcas de Cruce, actos llevados y tonos recordados")}</li><li>${phrase("Unfinished practice responses and breath preferences", "Respuestas de práctica sin terminar y preferencias de respiración")}</li></ul><p class="gentle-note">${phrase("Your language, sound and accessibility settings will remain.", "Se conservarán tus ajustes de idioma, sonido y accesibilidad.")}</p>${state.resetError ? `<p class="reset-error" role="alert">${escapeHTML(state.resetError)}</p>` : ""}<div class="practice-actions"><button class="primary-button danger-button" type="button" data-action="confirm-erase">${phrase("Reset saved data", "Borrar datos guardados")}</button><button class="text-button" type="button" data-action="cancel-erase">${phrase("Cancel", "Cancelar")}</button></div></section></main>`;
   return `${renderTopbar(tr("settings"), state.lang === "en" ? "Private, local and yours" : "Privado, local y tuyo")}
     <main class="page"><header class="section-intro"><p class="eyebrow">${state.lang === "en" ? "Your instrument" : "Tu instrumento"}</p><h1 class="page-title">${tr("settings")}</h1></header>
       <section class="settings-group">
+        <div class="setting-row"><div><strong>${phrase("Show illustrated scenes", "Mostrar escenas ilustradas")}</strong><span>${phrase("Optional story artwork. Every practice remains complete without it.", "Ilustraciones opcionales. Cada práctica sigue completa sin ellas.")}</span></div><button class="switch" type="button" role="switch" aria-label="${phrase("Show illustrated scenes", "Mostrar escenas ilustradas")}" aria-checked="${state.illustrationsEnabled}" data-action="toggle-illustrations"></button></div>
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Language" : "Idioma"}</strong><span>${state.lang === "en" ? "English" : "Español"}</span></div><button class="text-button" type="button" data-action="toggle-language">${tr("language")}</button></div>
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Sound" : "Sonido"}</strong><span>${state.lang === "en" ? "Ceremony, breath, tone and threshold sound" : "Sonido de ceremonia, respiración, tono y umbral"}</span></div><button class="switch" type="button" role="switch" aria-checked="${state.sound}" data-action="toggle-sound"><span class="sr-only">${state.sound ? tr("soundOn") : tr("soundOff")}</span></button></div>
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Nikolai's voice" : "Voz de Nikolai"}</strong><span>${state.lang === "en" ? "Optional spoken invitations in English" : "Invitaciones habladas opcionales en español"}</span></div><button class="switch" type="button" role="switch" aria-checked="${state.voice}" data-action="toggle-voice"><span class="sr-only">${state.voice ? tr("voiceOn") : tr("voiceOff")}</span></button></div>
@@ -3313,7 +3413,7 @@ function renderSettings() {
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Import your data" : "Importar tus datos"}</strong><span>${state.lang === "en" ? "Restore a Tone Sovereign export" : "Restaurar una exportación de Tone Sovereign"}</span></div><button class="text-button" type="button" aria-label="${state.lang === "en" ? "Import your data" : "Importar tus datos"}" data-action="import">↑</button><input class="file-input" type="file" accept="application/json" aria-label="${state.lang === "en" ? "Choose a Tone Sovereign export" : "Elegir una exportación de Tone Sovereign"}" data-import-file></div>
         <div class="setting-row"><div><strong>${state.lang === "en" ? "Reset saved practice data" : "Borrar datos guardados de práctica"}</strong><span>${state.lang === "en" ? "Review exactly what will be removed first" : "Revisar primero qué se eliminará exactamente"}</span></div><button class="text-button danger" type="button" data-action="erase">${state.lang === "en" ? "Review" : "Revisar"}</button></div>
       </section>
-      <div class="practice-actions"><button class="secondary-button" type="button" data-action="replay-from-settings">${tr("replay")}</button></div>
+      <div class="practice-actions"><button class="secondary-button" type="button" data-view="offline">${phrase("Manage offline downloads", "Gestionar descargas sin conexión")}</button><button class="secondary-button" type="button" data-action="replay-from-settings">${tr("replay")}</button></div>
     </main>`;
 }
 
@@ -3333,54 +3433,126 @@ function observeSymbolSections() {
   document.querySelectorAll("[data-symbol-section]").forEach(node => observer.observe(node));
 }
 
-function addTrace(trace) {
-  state.traces = [{ id: crypto.randomUUID?.() || String(Date.now()), createdAt: new Date().toISOString(), ...trace }, ...state.traces].slice(0, 100);
-  localStorage.setItem(STORAGE.traces, JSON.stringify(state.traces));
+function showStorageFailure() {
+  const message = phrase('Saving is unavailable. Your current practice can continue, but no save or restore is being reported as successful. Existing saved data has not been intentionally cleared.', 'No se puede guardar. Puedes continuar con la práctica, pero no se confirma ningún guardado ni restauración. No se han borrado deliberadamente los datos existentes.');
+  let banner = document.getElementById('storage-warning');
+  if (!banner) { banner = document.createElement('p'); banner.id = 'storage-warning'; banner.className = 'storage-warning'; banner.setAttribute('role', 'alert'); app.prepend(banner); }
+  banner.textContent = message;
 }
 
-function exportData() {
-  const data = { app: "Tone Sovereign", version: 3, exportedAt: new Date().toISOString(), preferences: { lang: state.lang, sound: state.sound, voice: state.voice, reduceMotion: state.reduceMotion, quietWords: state.quietWords }, traces: state.traces, crossMarks: readJSON(STORAGE.crossMarks, []), ruleOfLife: state.ruleOfLife, missions: state.missions };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `tone-sovereign-${new Date().toISOString().slice(0, 10)}.json`;
-  link.click();
-  URL.revokeObjectURL(link.href);
-}
-
-function importData(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(String(reader.result));
-      if (data.app !== "Tone Sovereign" || !Array.isArray(data.traces)) throw new Error("Invalid export");
-      state.traces = data.traces.slice(0, 100);
-      localStorage.setItem(STORAGE.traces, JSON.stringify(state.traces));
-      if (data.ruleOfLife && Array.isArray(data.ruleOfLife.principleIDs) && Array.isArray(data.ruleOfLife.commitmentIDs)) {
-        state.ruleOfLife = data.ruleOfLife;
-        localStorage.setItem(STORAGE.ruleOfLife, JSON.stringify(state.ruleOfLife));
-      }
-      if (Array.isArray(data.missions)) {
-        state.missions = data.missions;
-        localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
-      }
-      if (Array.isArray(data.crossMarks)) localStorage.setItem(STORAGE.crossMarks, JSON.stringify(data.crossMarks.slice(0, 30)));
-      showToast(state.lang === "en" ? "Your local data was restored." : "Tus datos locales fueron restaurados.");
-      render();
-    } catch {
-      showToast(state.lang === "en" ? "That file is not a Tone Sovereign export." : "Ese archivo no es una exportación de Tone Sovereign.");
+function saveCategories(patchOrBuilder, {quiet = false, expectedRaw} = {}) {
+  const work = storageQueue.then(() => withStorageLock(() => {
+    const recovered = recoverTransaction(deviceStorage);
+    if (!recovered.ok) return recovered;
+    const current = readPersistentState(deviceStorage);
+    if (!current.ok) return current;
+    const patch = typeof patchOrBuilder === 'function' ? patchOrBuilder(current.value) : patchOrBuilder;
+    const expected = expectedRaw || Object.fromEntries(Object.keys(patch).map(key => [STORAGE[key], persistentRaw?.[STORAGE[key]] ?? null]));
+    const result = transact(deviceStorage, patch, {expectedRaw: expected});
+    if (result.ok) {
+      for (const key of ['traces', 'missions', 'ruleOfLife', 'engineDrafts']) if (key in patch) state[key] = patch[key];
+      const updated = readPersistentState(deviceStorage);
+      // Advance only the snapshots whose UI state this action updated. A save
+      // to preferences cannot silently acknowledge another tab's unseen drafts.
+      if (updated.ok) persistentRaw = {...persistentRaw, ...Object.fromEntries(Object.keys(patch).map(key => [STORAGE[key], updated.raw[STORAGE[key]]]))};
+      if (result.cleanupPending) storageProblem = 'recovery-required';
+    } else if (result.error.code === 'storage-conflict') {
+      persistentRaw = current.raw;
+      for (const key of ['traces', 'missions', 'ruleOfLife', 'engineDrafts']) state[key] = current.value[key];
+      if (state.pendingBackup) state.pendingBackup.expectedRaw = current.raw;
     }
-  };
-  reader.readAsText(file);
+    return result;
+  }, navigator.locks));
+  storageQueue = work.catch(() => {});
+  return work.then(result => {
+    if (!result.ok && result.error.code === 'storage-conflict') {
+      storageProblem = '';
+      showToast(phrase('Saved data changed in another tab. Review the updated material and try again; this change was not applied.', 'Los datos guardados cambiaron en otra pestaña. Revisa el material actualizado e inténtalo de nuevo; este cambio no se aplicó.'));
+      if (state.view === 'backup') render();
+    } else if (!result.ok) { storageProblem = result.error.code; if (!quiet) showStorageFailure(); }
+    else if (!result.cleanupPending) {
+      storageProblem = hasFailedPreferenceChanges() ? 'preferences-unsaved' : '';
+      if (!storageProblem) document.getElementById('storage-warning')?.remove();
+    }
+    return result.ok;
+  }).catch(() => { storageProblem = 'storage-write-failed'; if (!quiet) showStorageFailure(); return false; });
 }
 
-function eraseData() {
-  const resetKeys = [STORAGE.traces, STORAGE.carriedAct, STORAGE.ruleOfLife, STORAGE.engineDrafts, STORAGE.missions, STORAGE.crossMarks, STORAGE.lastHeldTone];
-  const failed = [];
-  resetKeys.forEach(key => {
-    try { localStorage.removeItem(key); } catch { failed.push(key); }
-  });
-  if (failed.length) {
+async function addTrace(trace, extraPatch = {}) {
+  return saveCategories(current => ({...(typeof extraPatch === 'function' ? extraPatch(current) : extraPatch), traces: [{id: crypto.randomUUID?.() || String(Date.now()), createdAt: new Date().toISOString(), ...trace}, ...current.traces]}));
+}
+
+const backupLabels = {
+  preferences: ['Language, sound and accessibility settings', 'Ajustes de idioma, sonido y accesibilidad'],
+  traces: ['Saved practices and questions', 'Prácticas y preguntas guardadas'],
+  carriedAct: ['Carried act', 'Acto elegido'], ruleOfLife: ['Principles and commitments', 'Principios y compromisos'],
+  missions: ['Mission paths', 'Caminos de misión'], crossMarks: ['Saved threshold questions', 'Preguntas de umbral guardadas'],
+  lastHeldTone: ['Remembered tone', 'Tono recordado'], engineDrafts: ['Previously saved practice drafts', 'Borradores de práctica guardados anteriormente']
+};
+function renderBackup() {
+  const pending = state.pendingBackup;
+  return `${renderTopbar(phrase('Backup and restore', 'Copia y restauración'))}<main class="page"><h1 class="page-title">${phrase('Your material, in your hands.', 'Tu material, en tus manos.')}</h1><p class="lede">${phrase('A backup is a readable file you keep yourself—not automatic phone or cloud sync. Current unsaved answers and audio downloads are not included.', 'Una copia es un archivo legible que tú conservas; no es sincronización automática con el teléfono ni la nube. No incluye respuestas actuales sin guardar ni descargas de audio.')}</p><section class="settings-group"><h2>${phrase('Make a backup', 'Crear una copia')}</h2><p>${phrase('Includes saved practices, questions, directions, commitments, your remembered tone and settings.', 'Incluye prácticas, preguntas, direcciones, compromisos, tu tono recordado y ajustes.')}</p><label class="backup-choice"><input type="checkbox" data-backup-drafts ${state.backupIncludeDrafts ? 'checked' : ''}>${phrase('Also include previously saved drafts', 'Incluir también borradores guardados anteriormente')}</label><button class="secondary-button" type="button" data-action="download-backup">${phrase('Download backup', 'Descargar copia')}</button></section><section class="settings-group"><h2>${phrase('Restore from a file', 'Restaurar desde un archivo')}</h2><button class="secondary-button" type="button" data-action="import">${phrase('Choose backup file', 'Elegir archivo de copia')}</button><input class="file-input" type="file" accept="application/json" data-import-file aria-label="${phrase('Choose backup file', 'Elegir archivo de copia')}">${pending ? `<h3>${phrase('Review what will be replaced', 'Revisar qué se reemplazará')}</h3><p>${phrase('Selected categories replace their current contents in this browser. Other categories remain untouched. Download a backup first if you want to keep both versions.', 'Las categorías seleccionadas reemplazan su contenido actual en este navegador. Las demás no cambian. Descarga primero una copia si quieres conservar ambas versiones.')}</p>${pending.categories.map(key => `<label class="backup-choice"><input type="checkbox" data-backup-category="${key}" ${state.backupCategories.includes(key) ? 'checked' : ''}>${escapeHTML(phrase(...backupLabels[key]))}</label>`).join('')}<div class="button-row"><button type="button" class="primary-button" data-action="confirm-restore" ${state.backupCategories.length ? '' : 'disabled'}>${phrase('Replace selected categories', 'Reemplazar categorías seleccionadas')}</button><button class="text-button" type="button" data-action="cancel-restore">${phrase('Cancel', 'Cancelar')}</button></div>` : ''}</section></main>`;
+}
+async function exportData() {
+  await storageQueue;
+  try {
+    const current = await withStorageLock(() => {
+      const recovered = recoverTransaction(deviceStorage);
+      return recovered.ok ? readPersistentState(deviceStorage) : recovered;
+    }, navigator.locks);
+    if (!current.ok) { storageProblem = current.error.code; showStorageFailure(); return; }
+    const categories = Object.keys(STORAGE).filter(key => key !== 'engineDrafts' || state.backupIncludeDrafts);
+    const defaults = {lang: 'en', sound: true, voice: true, reduceMotion: false, quietWords: true, illustrationsEnabled: true, guidedSitDuration: 900, guidedSitGuidance: 'regular', guidedSitBackgroundTone: false, guidedSitIntroduction: true};
+    const data = createBackup({...current.value, preferences: {...defaults, ...current.value.preferences}}, {categories});
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}));
+    link.href = url; link.download = `tone-sovereign-${new Date().toISOString().slice(0, 10)}.json`; link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch { showToast(phrase('The backup could not be created. Existing data is unchanged.', 'No se pudo crear la copia. Los datos existentes no han cambiado.')); }
+}
+async function importData(file) {
+  try {
+    if (file.size > 20 * 1048576) throw new Error('Too large');
+    const parsed = parseBackup(await file.text());
+    await storageQueue;
+    const current = readPersistentState(deviceStorage);
+    if (!current.ok) throw new Error('Storage unavailable');
+    state.pendingBackup = {...parsed, expectedRaw: current.raw};
+    state.backupCategories = [...parsed.categories];
+    navigate('backup');
+  } catch { showToast(phrase('That file cannot be restored. Check that it is a supported Tone Sovereign backup. Nothing was changed.', 'No se puede restaurar ese archivo. Comprueba que sea una copia compatible de Tone Sovereign. No se cambió nada.')); }
+}
+async function confirmRestore() {
+  const pending = state.pendingBackup;
+  if (!pending || !state.backupCategories.length) return;
+  await storageQueue;
+  const current = readPersistentState(deviceStorage);
+  if (!current.ok) { storageProblem = current.error.code; showStorageFailure(); return; }
+  const plan = planRestore(pending, current.value, {mode: 'replace-selected', categories: state.backupCategories});
+  if (!(await saveCategories(plan.patch, {expectedRaw: pending.expectedRaw}))) return;
+  const preferences = plan.next.preferences;
+  if (plan.categories.includes('preferences')) {
+    state.lang = preferences.lang === 'es' ? 'es' : 'en';
+    for (const key of ['sound', 'voice', 'quietWords', 'illustrationsEnabled']) state[key] = preferences[key] !== false;
+    state.reduceMotion = Boolean(preferences.reduceMotion);
+    state.guidedSit.duration = [900,1800,2700,3600].includes(preferences.guidedSitDuration) ? preferences.guidedSitDuration : 900;
+    state.guidedSit.guidance = preferences.guidedSitGuidance || 'regular';
+    state.guidedSit.backgroundTone = preferences.guidedSitBackgroundTone === true;
+    state.guidedSit.introduction = preferences.guidedSitIntroduction !== false;
+    previousPreferenceSnapshot = preferenceSnapshot();
+    pendingPreferenceChanges.clear();
+    if (storageProblem === 'preferences-unsaved') {
+      storageProblem = '';
+      document.getElementById('storage-warning')?.remove();
+    }
+  }
+  if (plan.categories.includes('carriedAct')) state.actIndex = (plan.next.carriedAct || 0) % canonicalCatalogs.en.sovereignActs.length;
+  state.practice = newPractice(); sound.stop(); state.pendingBackup = null;
+  render(); showToast(phrase('Selected categories restored.', 'Categorías seleccionadas restauradas.'));
+}
+
+async function eraseData() {
+  if (!(await saveCategories({traces: [], carriedAct: null, ruleOfLife: {principleIDs: [], commitmentIDs: []}, engineDrafts: {}, missions: [], crossMarks: [], lastHeldTone: null}))) {
     state.resetError = phrase("Some saved data could not be removed. Nothing is being reported as fully reset; please try again.", "No se pudieron borrar algunos datos guardados. No se indica que el borrado esté completo; inténtalo de nuevo.");
     render();
     return;
@@ -3407,6 +3579,16 @@ function readAbout() {
   sound.playVoice("ts_about_introduction_v1");
 }
 
+// Optional artwork can fail without taking the question or its controls away.
+app.addEventListener('error', event => {
+  if (event.target?.tagName !== 'IMG') return;
+  const optionalStory = event.target.closest('.practice-story, .home-city-still');
+  if (optionalStory) optionalStory.hidden = true;
+}, true);
+app.addEventListener('toggle', event => {
+  if (event.target?.matches('.practice-story') && state.view === 'movement') state.practice.storyExpanded = event.target.open;
+}, true);
+
 app.addEventListener("click", async event => {
   const button = event.target.closest("button");
   if (!button) return;
@@ -3414,6 +3596,17 @@ app.addEventListener("click", async event => {
 
   if (view === "threshold") { startMovement("cross"); return; }
   if (view) { navigate(view); return; }
+  if (button.dataset.livedNeed) { state.livedNeed = button.dataset.livedNeed; render(); return; }
+  if (action === 'clear-lived-need') { state.livedNeed = ''; render(); return; }
+  if (action === 'toggle-illustrations') { state.illustrationsEnabled = !state.illustrationsEnabled; persistPreferences(); render(); return; }
+  if (action === 'practice-story' && state.view === 'movement' && state.practice.stage === 'continuity') {
+    const link = completionStory(state.practice.movement);
+    if (link) {
+      state.storyReturn = {view: state.view, lang: state.lang, practice: structuredClone(state.practice), scrollY: window.scrollY};
+      openComicIssue(link.webSeries, link.comicIssueID.number);
+    }
+    return;
+  }
   if (button.dataset.comicSeries && button.dataset.comicIssue) { openComicIssue(button.dataset.comicSeries, button.dataset.comicIssue); return; }
   if (button.dataset.comicLanguage) { state.lang = button.dataset.comicLanguage; persistPreferences(); render(); return; }
   if (button.dataset.libraryPath) { navigate("libraryPath", { path: button.dataset.libraryPath }); return; }
@@ -3445,7 +3638,13 @@ app.addEventListener("click", async event => {
     return;
   }
   if (button.dataset.breathDuration) { state.practice.breathDuration = Number(button.dataset.breathDuration); render(); return; }
-  if (button.dataset.capacityOption !== undefined) { state.practice.selectedOption = button.dataset.capacityOption; render(); return; }
+  if (button.dataset.capacityOption !== undefined) {
+    state.practice.selectedOption = button.dataset.capacityOption;
+    state.practice.storyExpanded = false;
+    render();
+    document.querySelector('[data-action="capacity-continue"]')?.focus({preventScroll: true});
+    return;
+  }
   if (button.dataset.noticeOutcome !== undefined) { state.practice.noticeOutcome = button.dataset.noticeOutcome; render(); return; }
   if (button.dataset.crossFocus) { state.practice.crossFocus = button.dataset.crossFocus; state.practice.crossQuestion = 0; state.practice.crossSaved = false; state.practice.crossCrossed = false; state.practice.crossRemaining = false; state.practice.stage = "choose"; render(); return; }
   if (button.dataset.breathPattern) { state.practice.breathPattern = button.dataset.breathPattern; state.practice.stage = "setup"; render(); return; }
@@ -3592,7 +3791,7 @@ app.addEventListener("click", async event => {
   if (action === "capacity-continue") {
     const flow = capacityFlows[state.practice.movement];
     state.practice.capacityAnswers[state.practice.capacityStep] = state.practice.selectedOption;
-    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; render(); }
+    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; state.practice.storyExpanded = true; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
     else requestMovementCompletion();
   }
   if (action === "listen-capacity-stage") playCapacityStageVoice(state.practice.movement, state.practice.capacityStep);
@@ -3641,8 +3840,8 @@ app.addEventListener("click", async event => {
     const id = currentCrossQuestionKey();
     const question = crossQuestions[currentCrossFocus().questionKey].en[state.practice.crossQuestion];
     const existing = marks.findIndex(item => item.id === id || (!item.id && item.question === question));
-    const next = existing >= 0 ? marks.filter((_, index) => index !== existing) : [{ id, focus: state.practice.crossFocus, questionKey: currentCrossFocus().questionKey, questionIndex: state.practice.crossQuestion, question, savedAt: new Date().toISOString(), returnCount: 0, lastReturn: null, lastCrossing: null }, ...marks].slice(0, 30);
-    localStorage.setItem(STORAGE.crossMarks, JSON.stringify(next));
+    const next = existing >= 0 ? marks.filter((_, index) => index !== existing) : [{ id, focus: state.practice.crossFocus, questionKey: currentCrossFocus().questionKey, questionIndex: state.practice.crossQuestion, question, savedAt: new Date().toISOString(), returnCount: 0, lastReturn: null, lastCrossing: null }, ...marks];
+    if (!(await saveCategories({crossMarks: next}))) return;
     state.practice.crossSaved = existing < 0;
     render();
   }
@@ -3662,7 +3861,7 @@ app.addEventListener("click", async event => {
     if (saved) {
       const marks = readJSON(STORAGE.crossMarks, []);
       const returnedAt = new Date().toISOString();
-      localStorage.setItem(STORAGE.crossMarks, JSON.stringify(marks.map((item, index) => index === 0 ? { ...item, returnCount: (item.returnCount || 0) + 1, lastReturn: returnedAt } : item)));
+      await saveCategories({crossMarks: marks.map((item, index) => index === 0 ? { ...item, returnCount: (item.returnCount || 0) + 1, lastReturn: returnedAt } : item)});
       state.practice.crossFocus = saved.focus;
       state.practice.crossQuestion = Number(saved.questionIndex) || 0;
       state.practice.crossSaved = true;
@@ -3681,7 +3880,7 @@ app.addEventListener("click", async event => {
       sound.thresholdCrossing().catch(() => {});
       if (state.practice.crossSaved) {
         const id = currentCrossQuestionKey();
-        localStorage.setItem(STORAGE.crossMarks, JSON.stringify(readJSON(STORAGE.crossMarks, []).map(item => item.id === id ? { ...item, lastCrossing: new Date().toISOString() } : item)));
+        await saveCategories({crossMarks: readJSON(STORAGE.crossMarks, []).map(item => item.id === id ? { ...item, lastCrossing: new Date().toISOString() } : item)});
       }
       render();
     }
@@ -3702,7 +3901,7 @@ app.addEventListener("click", async event => {
   if (action === "embody-complete") {
     sound.stop();
     state.practice.tonePlaying = false;
-    if (state.practice.tone) localStorage.setItem(STORAGE.lastHeldTone, state.practice.tone);
+    if (state.practice.tone) await saveCategories({lastHeldTone: state.practice.tone});
     state.practice.embodyStage = "after";
     render();
   }
@@ -3716,22 +3915,24 @@ app.addEventListener("click", async event => {
   if (action === "return-remembered-tone") startMovement("embody");
   if (action === "save-question") { state.practice.questionSaved = !state.practice.questionSaved; render(); }
   if (action === "toggle-tone") { state.practice.tonePlaying = !state.practice.tonePlaying; if (state.practice.tonePlaying) sound.tone(state.practice.frequency, state.practice.amplitude); else sound.stop(); render(); }
-  if (action === "save-field-practice") { const item = contentByID(catalogFor(state.lang).fields, button.dataset.field); addTrace({ type: "field", title: `${item.dimension}D · ${item.title}`, detail: item.returnPractice }); showToast(tr("saved")); }
-  if (action === "save-teaching") { const item = teachings.find(entry => entry.id === button.dataset.teaching); addTrace({ type: "teaching", title: item[state.lang].title, detail: item[state.lang].line }); showToast(tr("saved")); }
-  if (action === "save-entry") { const item = contentByID(catalogFor(state.lang).libraryEntries, button.dataset.entry); addTrace({ type: "teaching", title: item.title, detail: item.sovereignQuestion }); showToast(tr("saved")); }
+  if (action === "save-field-practice") { const item = contentByID(catalogFor(state.lang).fields, button.dataset.field); if (await addTrace({ type: "field", title: `${item.dimension}D · ${item.title}`, detail: item.returnPractice })) showToast(tr("saved")); }
+  if (action === "save-teaching") { const item = teachings.find(entry => entry.id === button.dataset.teaching); if (await addTrace({ type: "teaching", title: item[state.lang].title, detail: item[state.lang].line })) showToast(tr("saved")); }
+  if (action === "save-entry") { const item = contentByID(catalogFor(state.lang).libraryEntries, button.dataset.entry); if (await addTrace({ type: "teaching", title: item.title, detail: item.sovereignQuestion })) showToast(tr("saved")); }
   if (action === "toggle-full-teaching") { state.showFullTeaching = !state.showFullTeaching; render(); }
   if (action === "toggle-principle") {
     const id = button.dataset.principle;
-    state.ruleOfLife.principleIDs = state.ruleOfLife.principleIDs.includes(id) ? state.ruleOfLife.principleIDs.filter(item => item !== id) : [...state.ruleOfLife.principleIDs, id];
-    localStorage.setItem(STORAGE.ruleOfLife, JSON.stringify(state.ruleOfLife));
+    await saveCategories(current => ({ruleOfLife: {...current.ruleOfLife, principleIDs: current.ruleOfLife.principleIDs.includes(id) ? current.ruleOfLife.principleIDs.filter(item => item !== id) : [...current.ruleOfLife.principleIDs, id]}}));
     render();
   }
   if (action === "another-act") { const pool = currentActPool(); state.actIndex = (state.actIndex + 1 + Math.floor(Math.random() * Math.max(1, pool.length - 1))) % pool.length; render(); }
-  if (action === "carry-act") { const act = currentAct(); localStorage.setItem(STORAGE.carriedAct, String(state.actIndex)); addTrace({ type: "act", title: act.title, detail: act.invitation }); showToast(tr("saved")); }
+  if (action === "carry-act") { const act = currentAct(); if (await addTrace({ type: "act", title: act.title, detail: act.invitation }, {carriedAct: state.actIndex})) showToast(tr("saved")); }
   if (action === "attune-act") { state.practice = newPractice(); state.practice.index = 0; navigate("practice"); }
-  if (action === "keep-threshold") { const doorwayItem = doorways.find(item => item.id === state.practice.doorway); addTrace({ type: "threshold", title: doorwayItem[state.lang][0], detail: doorwayItem[state.lang][2] }); showToast(tr("saved")); }
+  if (action === "keep-threshold") { const doorwayItem = doorways.find(item => item.id === state.practice.doorway); if (await addTrace({ type: "threshold", title: doorwayItem[state.lang][0], detail: doorwayItem[state.lang][2] })) showToast(tr("saved")); }
   if (action === "leave-threshold") goHome();
-  if (action === "export") exportData();
+  if (action === "export") navigate('backup');
+  if (action === 'download-backup') await exportData();
+  if (action === 'confirm-restore') await confirmRestore();
+  if (action === 'cancel-restore') { state.pendingBackup = null; render(); }
   if (action === "import") document.querySelector("[data-import-file]")?.click();
   if (action === "erase") { state.resetError = ""; state.resetConfirmationOpen = true; render(); focusCurrentView(); }
   if (action === "cancel-erase") { state.resetError = ""; state.resetConfirmationOpen = false; render(); focusCurrentView(); }
@@ -3743,26 +3944,37 @@ app.addEventListener("click", async event => {
     if (state.engineStep < engineItem.steps.length - 1) state.engineStep += 1;
     else {
       state.engineComplete = true;
-      addTrace({ type: "practice", title: engineItem.title, detail: phrase("Completed as a private practice.", "Completada como práctica privada.") });
-      delete state.engineDrafts[engineItem.id];
-      localStorage.setItem(STORAGE.engineDrafts, JSON.stringify(state.engineDrafts));
+      // Completion is not consent to keep a response or history record.
     }
     render();
   }
   if (action === "restart-engine") { state.engineStep = 0; state.engineComplete = false; state.engineResponses = {}; render(); }
+  if (action === 'save-engine-draft') {
+    const id = state.selectedEngine; const responses = {...state.engineResponses};
+    if (await saveCategories(current => ({engineDrafts: {...current.engineDrafts, [id]: responses}}))) showToast(tr('saved'));
+  }
+  if (action === 'keep-engine' && state.engineComplete) {
+    const engine = contentByID(catalogFor(state.lang).practiceEngines, state.selectedEngine);
+    const responses = {...state.engineResponses};
+    const detail = engine.steps.filter(step => responses[step.id]?.trim()).map(step => `${step.prompt}\n${responses[step.id]}`).join('\n\n');
+    if (await addTrace({type: 'practice', title: engine.title, detail, data: {engineID: engine.id, responses}}, current => {
+      const drafts = {...current.engineDrafts}; delete drafts[engine.id];
+      return {engineDrafts: drafts};
+    })) {
+      showToast(tr('saved')); navigate('practiceEngines', {remember: false});
+    }
+  }
   if (action === "finish-engine") { state.libraryMode = "practices"; navigate("practiceEngines", { remember: false }); }
   if (action === "new-mission") { navigate("mission", { mission: "" }); }
   if (action === "save-mission") {
     const existingIndex = state.missions.findIndex(item => item.id === state.selectedMission);
     const value = { id: state.selectedMission || crypto.randomUUID?.() || String(Date.now()), ...state.missionDraft, updatedAt: new Date().toISOString() };
-    state.missions = existingIndex >= 0 ? state.missions.map((item, index) => index === existingIndex ? value : item) : [value, ...state.missions];
-    localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
+    if (!(await saveCategories(current => ({missions: current.missions.some(item => item.id === value.id) ? current.missions.map(item => item.id === value.id ? value : item) : [value, ...current.missions]})))) return;
     showToast(tr("saved"));
     navigate("missions", { remember: false });
   }
   if (action === "delete-mission") {
-    state.missions = state.missions.filter(item => item.id !== state.selectedMission);
-    localStorage.setItem(STORAGE.missions, JSON.stringify(state.missions));
+    if (!(await saveCategories(current => ({missions: current.missions.filter(item => item.id !== state.selectedMission)})))) return;
     navigate("missions", { remember: false });
   }
 });
@@ -3779,8 +3991,7 @@ app.addEventListener("input", event => {
   }
   if (target.dataset.engineResponse) {
     state.engineResponses[target.dataset.engineResponse] = target.value;
-    state.engineDrafts[state.selectedEngine] = { ...state.engineResponses };
-    localStorage.setItem(STORAGE.engineDrafts, JSON.stringify(state.engineDrafts));
+    // Typed responses remain temporary until the explicit Save draft action.
   }
   if (target.dataset.missionInput) {
     state.missionDraft[target.dataset.missionInput] = target.value;
@@ -3853,7 +4064,14 @@ app.addEventListener("toggle", event => {
   if (details?.open) loadComicTranscript(details);
 }, true);
 
-app.addEventListener("change", event => {
+app.addEventListener("change", async event => {
+  if (event.target.matches('[data-backup-drafts]')) state.backupIncludeDrafts = event.target.checked;
+  if (event.target.dataset.backupCategory) {
+    const category = event.target.dataset.backupCategory;
+    state.backupCategories = event.target.checked ? [...new Set([...state.backupCategories, category])] : state.backupCategories.filter(key => key !== category);
+    const confirm = app.querySelector('[data-action="confirm-restore"]');
+    if (confirm) confirm.disabled = !state.backupCategories.length;
+  }
   if (event.target.matches("[data-import-file]") && event.target.files[0]) importData(event.target.files[0]);
   if (event.target.matches("[data-notice-duration]")) { state.practice.noticeDuration = Number(event.target.value); }
   if (event.target.matches("[data-comic-zoom]")) setComicZoom(Number(event.target.value));
@@ -3874,8 +4092,8 @@ app.addEventListener("change", event => {
   if (actFilter) { state.actIndex = 0; render(); }
   if (event.target.dataset.commitment) {
     const id = event.target.dataset.commitment;
-    state.ruleOfLife.commitmentIDs = event.target.checked ? [...new Set([...state.ruleOfLife.commitmentIDs, id])] : state.ruleOfLife.commitmentIDs.filter(item => item !== id);
-    localStorage.setItem(STORAGE.ruleOfLife, JSON.stringify(state.ruleOfLife));
+    const checked = event.target.checked;
+    if (!(await saveCategories(current => ({ruleOfLife: {...current.ruleOfLife, commitmentIDs: checked ? [...new Set([...current.ruleOfLife.commitmentIDs, id])] : current.ruleOfLife.commitmentIDs.filter(item => item !== id)}})))) event.target.checked = !checked;
   }
   if (event.target.matches("[data-mission-principle]")) state.missionDraft.principleID = event.target.value;
 });
@@ -3966,6 +4184,18 @@ window.addEventListener("beforeunload", () => { cancelAnimationFrame(fieldFrame)
 
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 
+// Known public entry points never start a practice or audio.
+const publicEntry = new URLSearchParams(window.location.search).get("open");
+if (["home", "comics", "the-lock"].includes(publicEntry)) {
+  state.view = publicEntry === "the-lock" ? "comicReader" : publicEntry;
+  state.stack = publicEntry === "home" ? [] : publicEntry === "comics" ? ["home"] : ["home", "comics"];
+  if (publicEntry === "the-lock") {
+    state.selectedComicSeries = "specials";
+    state.selectedComicIssue = 1;
+  }
+  state.ceremonySettled = true;
+  state.ceremonyEntryReady = true;
+}
 persistPreferences();
 resizeField();
 window.history.replaceState({ app: HISTORY_MARKER, view: state.view }, "", window.location.href);

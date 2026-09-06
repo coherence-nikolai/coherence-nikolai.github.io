@@ -1,5 +1,8 @@
-const CACHE = "tone-sovereign-v33";
+const CACHE = "tone-sovereign-v35";
 const COMIC_CACHE = "tone-sovereign-comics-v2";
+const MEDIA_CACHE = "tone-sovereign-media-v1";
+// v1 is also used by a sibling app. Only retire editions positively identified here.
+const RETIRED_APP_CACHES = ["tone-sovereign-v32", "tone-sovereign-v33", "tone-sovereign-v34"];
 const THE_LOCK_EDITION = "ink-v4";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
@@ -57,6 +60,12 @@ const CORE = [
   "./catalog.js",
   "./guided-sits.json",
   "./app.js",
+  "./offline-downloads.js",
+  "./offline-packs.json",
+  "./narrative-ui.js",
+  "./narrative-metadata.js",
+  "./tone-state.mjs",
+  "./comic-editions.json",
   "./breath-instrument.html",
   "./manifest.webmanifest",
   "./manifest-es.webmanifest",
@@ -64,9 +73,6 @@ const CORE = [
   "./tone-sovereign-logo.png",
   `./assets/comics/en/specials/the-lock/transcript.json?edition=${THE_LOCK_EDITION}`,
   `./assets/comics/es/specials/the-lock/transcript.json?edition=${THE_LOCK_EDITION}`,
-  "./assets/sound/ts_first_light_arrival_full.wav",
-  "./assets/sound/ts_first_light_living_ambience.wav",
-  ...["en", "es"].flatMap(language => [...VOICE_CUES, ...GUIDED_SIT_VOICE_CUES].map(cue => `./assets/voice/${language}/${cue}.mp3`))
 ];
 
 self.addEventListener("install", event => {
@@ -77,7 +83,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     Promise.all([
-      caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("tone-sovereign-") && ![CACHE, COMIC_CACHE].includes(key)).map(key => caches.delete(key)))),
+      caches.keys().then(keys => Promise.all(keys.filter(key => RETIRED_APP_CACHES.includes(key)).map(key => caches.delete(key)))),
       // Replace only the old LOCK edition; keep other downloaded comics available offline.
       caches.open(COMIC_CACHE).then(cache => cache.keys().then(requests => Promise.all(requests.filter(request => {
         const url = new URL(request.url);
@@ -95,6 +101,16 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
+  if (url.origin === self.location.origin && /\/assets\/(voice|sound)\//.test(url.pathname)) {
+    event.respondWith(caches.open(MEDIA_CACHE).then(async cache => {
+      const cached = await cache.match(event.request);
+      if (cached) return cached;
+      const response = await fetch(event.request);
+      if (response.ok) { try { await cache.put(event.request, response.clone()); } catch {} }
+      return response;
+    }));
+    return;
+  }
   if (url.origin === self.location.origin && url.pathname.includes("/assets/comics/")) {
     event.respondWith(
       caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || caches.match(event.request).then(coreCached => coreCached || fetch(event.request).then(async response => {
