@@ -34,7 +34,7 @@ assert.match(app, /state\.practice\.interrupted = true/);
 assert.match(css, /\.ceremony\.is-playing\.entry-ready \.landing-actions/);
 assert.match(css, /\.practice-duration/);
 assert.match(css, /\.reset-confirmation/);
-assert.match(sw, /tone-sovereign-v32/);
+assert.match(sw, /tone-sovereign-v33/);
 
 const forbiddenAutomaticCalls = [
   /render\(\);\s*playCapacityStageVoice\(/,

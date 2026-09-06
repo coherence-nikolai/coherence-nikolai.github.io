@@ -1,5 +1,6 @@
-const CACHE = "tone-sovereign-v32";
+const CACHE = "tone-sovereign-v33";
 const COMIC_CACHE = "tone-sovereign-comics-v2";
+const THE_LOCK_EDITION = "ink-v4";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
   "ts_attunement_capacity_v1",
@@ -61,8 +62,8 @@ const CORE = [
   "./manifest-es.webmanifest",
   "./sword-mark.png",
   "./tone-sovereign-logo.png",
-  "./assets/comics/en/specials/the-lock/transcript.json",
-  "./assets/comics/es/specials/the-lock/transcript.json",
+  `./assets/comics/en/specials/the-lock/transcript.json?edition=${THE_LOCK_EDITION}`,
+  `./assets/comics/es/specials/the-lock/transcript.json?edition=${THE_LOCK_EDITION}`,
   "./assets/sound/ts_first_light_arrival_full.wav",
   "./assets/sound/ts_first_light_living_ambience.wav",
   ...["en", "es"].flatMap(language => [...VOICE_CUES, ...GUIDED_SIT_VOICE_CUES].map(cue => `./assets/voice/${language}/${cue}.mp3`))
@@ -75,7 +76,17 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(key => ![CACHE, COMIC_CACHE].includes(key)).map(key => caches.delete(key))))
+    Promise.all([
+      caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("tone-sovereign-") && ![CACHE, COMIC_CACHE].includes(key)).map(key => caches.delete(key)))),
+      // Replace only the old LOCK edition; keep other downloaded comics available offline.
+      caches.open(COMIC_CACHE).then(cache => cache.keys().then(requests => Promise.all(requests.filter(request => {
+        const url = new URL(request.url);
+        return url.origin === self.location.origin
+          && url.pathname.includes("/assets/comics/")
+          && url.pathname.includes("/specials/the-lock/")
+          && url.searchParams.get("edition") !== THE_LOCK_EDITION;
+      }).map(request => cache.delete(request)))))
+    ])
   );
   self.clients.claim();
 });
@@ -86,8 +97,11 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   if (url.origin === self.location.origin && url.pathname.includes("/assets/comics/")) {
     event.respondWith(
-      caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || caches.match(event.request).then(coreCached => coreCached || fetch(event.request).then(response => {
-          if (response.ok) cache.put(event.request, response.clone());
+      caches.open(COMIC_CACHE).then(cache => cache.match(event.request).then(cached => cached || caches.match(event.request).then(coreCached => coreCached || fetch(event.request).then(async response => {
+          if (response.ok) {
+            // Keep this event alive until storage finishes; quota errors must not hide an online page.
+            try { await cache.put(event.request, response.clone()); } catch {}
+          }
           return response;
         }))))
     );
@@ -96,10 +110,10 @@ self.addEventListener("fetch", event => {
 
   event.respondWith(
     fetch(event.request)
-      .then(response => {
+      .then(async response => {
         if (response.ok && new URL(event.request.url).origin === self.location.origin) {
           const copy = response.clone();
-          caches.open(CACHE).then(cache => cache.put(event.request, copy));
+          try { await (await caches.open(CACHE)).put(event.request, copy); } catch {}
         }
         return response;
       })

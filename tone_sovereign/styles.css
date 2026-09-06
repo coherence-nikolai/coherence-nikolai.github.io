@@ -1452,9 +1452,13 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .comic-reader-heading .eyebrow { margin: 0 0 5px; }
 .comic-reader-heading h1 { margin: 0; font-family: var(--serif); font-size: clamp(1.65rem, 4.4vw, 2.4rem); font-weight: 400; }
 .comic-language-note { margin: 0 auto 18px; padding: 11px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--gold-light); font-size: .86rem; text-align: center; }
-.comic-page-stage { width: min(100%, 860px); min-height: 240px; margin: 0 auto; display: grid; place-items: start center; outline: none; touch-action: pan-y; }
+.comic-page-stage { width: min(100%, 860px); min-height: 240px; margin: 0 auto; display: block; outline: none; touch-action: pan-y pinch-zoom; scroll-margin-top: 18px; }
+.comic-page-stage.is-enlarged { height: 75vh; height: 75svh; overflow: auto; touch-action: pan-x pan-y pinch-zoom; overscroll-behavior-x: contain; }
+.comic-zoom-control { width: min(100%, 860px); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: var(--ivory-soft); font-size: .85rem; }
+.comic-zoom-control select { min-height: 44px; padding: 8px 12px; color: var(--ivory); background: var(--black, #0b0c09); border: 1px solid var(--gold-dim, #756335); border-radius: 4px; font: inherit; }
+.comic-zoom-help { width: min(100%, 860px); margin: 8px auto 16px; color: var(--ivory-soft); font-size: .78rem; line-height: 1.5; }
 .comic-page-stage:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 5px; }
-.comic-page-image { display: block; width: 100%; height: auto; max-height: none; box-shadow: 0 18px 56px rgba(0, 0, 0, .5); -webkit-user-drag: none; user-select: none; }
+.comic-page-image { display: block; width: calc(100% * var(--comic-zoom, 1)); max-width: none; height: auto; max-height: none; box-shadow: 0 18px 56px rgba(0, 0, 0, .5); -webkit-user-drag: none; user-select: none; }
 .comic-page-placeholder { width: min(100%, 760px); min-height: min(72svh, 920px); aspect-ratio: 2 / 3; padding: clamp(28px, 8vw, 72px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; border: 1px solid rgba(247, 223, 155, .24); background: radial-gradient(circle at 50% 36%, rgba(216, 180, 90, .11), transparent 40%), repeating-linear-gradient(118deg, rgba(247, 223, 155, .022) 0 1px, transparent 1px 8px), #080806; box-shadow: 0 18px 56px rgba(0, 0, 0, .5); text-align: center; }
 .comic-page-placeholder .eyebrow { margin: 0; }
 .comic-page-placeholder strong { font-family: var(--serif); font-size: clamp(2rem, 8vw, 4.5rem); font-weight: 400; letter-spacing: .08em; overflow-wrap: anywhere; }

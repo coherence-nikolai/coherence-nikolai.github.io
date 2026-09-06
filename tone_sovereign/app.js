@@ -175,11 +175,12 @@ const guidedLibraryPaths = {
   ]
 };
 
+const THE_LOCK_EDITION = "ink-v4";
 const theLockAssetSet = language => Object.freeze({
-  cover: `${ROOT}assets/comics/${language}/specials/the-lock/cover.webp`,
+  cover: `${ROOT}assets/comics/${language}/specials/the-lock/cover.webp?edition=${THE_LOCK_EDITION}`,
   pages: Object.freeze(Array.from(
     { length: 30 },
-    (_, index) => `${ROOT}assets/comics/${language}/specials/the-lock/page-${String(index + 1).padStart(2, "0")}.webp`
+    (_, index) => `${ROOT}assets/comics/${language}/specials/the-lock/page-${String(index + 1).padStart(2, "0")}.webp?edition=${THE_LOCK_EDITION}`
   ))
 });
 
@@ -254,8 +255,8 @@ const comicSeries = [
           es: theLockAssetSet("es")
         },
         transcriptPaths: {
-          en: `${ROOT}assets/comics/en/specials/the-lock/transcript.json`,
-          es: `${ROOT}assets/comics/es/specials/the-lock/transcript.json`
+          en: `${ROOT}assets/comics/en/specials/the-lock/transcript.json?edition=${THE_LOCK_EDITION}`,
+          es: `${ROOT}assets/comics/es/specials/the-lock/transcript.json?edition=${THE_LOCK_EDITION}`
         }
       }
     ]
@@ -717,6 +718,7 @@ const state = {
   selectedComicSeries: "mainline",
   selectedComicIssue: 1,
   comicPage: 1,
+  comicZoom: 1,
   teachingDepth: 1,
   showFullTeaching: false,
   showAllPractices: false,
@@ -3034,7 +3036,9 @@ function renderComicReader() {
     <main class="comic-reader-page">
       <header class="comic-reader-heading"><div><p class="eyebrow">${escapeHTML(comicIssueLabel(series, issue))}</p><h1>${escapeHTML(issue[state.lang])}</h1></div>${renderComicLanguageControl()}</header>
       <p id="comic-language-note" class="comic-language-note" ${spanishFallback ? "" : "hidden"}>${phrase("Spanish edition in preparation. Showing the English artwork.", "La edición en español está en preparación. Se muestra la versión gráfica en inglés.")}</p>
-      <figure class="comic-page-stage" data-comic-swipe tabindex="0" aria-label="${phrase("Comic page. Swipe or use the arrow keys to turn pages.", "Página del cómic. Desliza o usa las flechas para cambiar de página.")}">
+      <label class="comic-zoom-control"><span>${phrase("Reading size", "Tamaño de lectura")}</span><select data-comic-zoom aria-describedby="comic-zoom-help">${[1, 1.5, 2, 3].map(zoom => `<option value="${zoom}" ${state.comicZoom === zoom ? "selected" : ""}>${zoom === 1 ? phrase("Fit page", "Ajustar página") : `${zoom * 100}%`}</option>`).join("")}</select></label>
+      <p id="comic-zoom-help" class="comic-zoom-help">${phrase("Enlarge to read the lettering. Scroll within the enlarged page; use Previous and Next to turn pages.", "Amplía para leer el texto. Desplázate dentro de la página ampliada; usa Anterior y Siguiente para pasar de página.")}</p>
+      <figure class="comic-page-stage ${state.comicZoom > 1 ? "is-enlarged" : ""}" style="--comic-zoom: ${state.comicZoom}" data-comic-swipe tabindex="0" aria-label="${phrase("Comic artwork. Enlarge using Reading size above.", "Ilustración del cómic. Amplía con Tamaño de lectura arriba.")}">
         ${comicPage}
       </figure>
       <nav class="comic-reader-controls" aria-label="${phrase("Comic page navigation", "Navegación de páginas del cómic")}">
@@ -3106,7 +3110,26 @@ function openComicIssue(seriesID, issueNumber) {
   state.selectedComicSeries = series.id;
   state.selectedComicIssue = issue.number;
   state.comicPage = 1;
+  state.comicZoom = 1;
   navigate("comicReader");
+}
+
+function setComicZoom(value) {
+  if (state.view !== "comicReader" || ![1, 1.5, 2, 3].includes(value)) return;
+  state.comicZoom = value;
+  comicSwipeStart = null;
+  const stage = document.querySelector("[data-comic-swipe]");
+  if (!stage) return;
+  stage.style.setProperty("--comic-zoom", value);
+  stage.classList.toggle("is-enlarged", value > 1);
+  stage.scrollTo(0, 0);
+  announce(value === 1 ? phrase("Page fitted to screen.", "Página ajustada a la pantalla.") : phrase(`Reading size ${value * 100} percent.`, `Tamaño de lectura: ${value * 100} por ciento.`));
+}
+
+function focusComicPageStart() {
+  const stage = document.querySelector("[data-comic-swipe]");
+  stage?.focus({ preventScroll: true });
+  stage?.scrollIntoView({ block: "start", behavior: "instant" });
 }
 
 function turnComicPage(offset) {
@@ -3116,7 +3139,7 @@ function turnComicPage(offset) {
   if (next === state.comicPage) return;
   state.comicPage = next;
   render();
-  document.querySelector("[data-comic-swipe]")?.focus({ preventScroll: true });
+  focusComicPageStart();
 }
 
 function renderLibraryPath() {
@@ -3798,7 +3821,7 @@ app.addEventListener("pointerdown", event => {
 
 app.addEventListener("pointerdown", event => {
   const stage = event.target.closest("[data-comic-swipe]");
-  if (!stage || state.view !== "comicReader") return;
+  if (!stage || state.view !== "comicReader" || state.comicZoom > 1) return;
   comicSwipeStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
   stage.setPointerCapture?.(event.pointerId);
 });
@@ -3833,10 +3856,11 @@ app.addEventListener("toggle", event => {
 app.addEventListener("change", event => {
   if (event.target.matches("[data-import-file]") && event.target.files[0]) importData(event.target.files[0]);
   if (event.target.matches("[data-notice-duration]")) { state.practice.noticeDuration = Number(event.target.value); }
+  if (event.target.matches("[data-comic-zoom]")) setComicZoom(Number(event.target.value));
   if (event.target.matches("[data-comic-page-picker]")) {
     state.comicPage = Number(event.target.value);
     render();
-    document.querySelector("[data-comic-swipe]")?.focus({ preventScroll: true });
+    focusComicPageStart();
   }
   const libraryFilter = event.target.dataset.libraryFilter;
   if (libraryFilter === "field") state.libraryField = event.target.value;
@@ -3857,7 +3881,7 @@ app.addEventListener("change", event => {
 });
 
 document.addEventListener("keydown", event => {
-  if (state.view === "comicReader" && !event.target.matches("input, textarea, select") && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+  if (state.view === "comicReader" && state.comicZoom === 1 && !event.target.matches("input, textarea, select") && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
     event.preventDefault();
     turnComicPage(event.key === "ArrowLeft" ? -1 : 1);
   }
