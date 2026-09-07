@@ -1,0 +1,15 @@
+/* Homepage-only narrative surface. Shared app identities and instruments stay unchanged. */
+.cn-sovereign-identity{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:0 0 1.8rem;min-width:0}
+.cn-sovereign-identity>img{width:64px;height:86px;object-fit:contain;flex-shrink:0}
+.coherence-page .cn-sovereign-identity p{flex:1 1 0;margin:0;min-width:min-content;max-width:100%;overflow-wrap:normal}
+.cn-sovereign-identity span{display:block;color:var(--cn-gold);font-size:.75rem;line-height:1.5;letter-spacing:.06em;margin-bottom:.35rem}
+.cn-sovereign-identity strong{display:block;font:400 clamp(2rem,3vw,2.8rem)/1 var(--cn-serif);letter-spacing:-.025em}
+.cn-arrival-actions{gap:.4rem 1rem;margin-top:1.5rem}
+.cn-arrival .cn-tone-definition{font-size:1rem;line-height:1.65;max-width:39ch}
+.cn-arrival-art img{aspect-ratio:3/2;object-fit:contain}
+@media(max-width:900px){
+  .cn-sovereign-identity{margin-bottom:1.25rem}
+  .cn-sovereign-identity>img{width:56px;height:74px}
+  .cn-sovereign-identity span{font-size:.75rem}
+  .cn-arrival-actions{margin-top:1.25rem}
+}
