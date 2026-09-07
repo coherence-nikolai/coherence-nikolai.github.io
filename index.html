@@ -13,7 +13,8 @@
   <meta property="og:url" content="https://coherence-nikolai.app/">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r2">
-  <link rel="stylesheet" href="/assets/home-tone.css?v=20260907-1">
+  <link rel="stylesheet" href="/assets/home-tone.css?v=20260908-sunrise">
+  <script type="module" src="/assets/home-sunlight.mjs?v=20260908-sunrise"></script>
   <link rel="preload" href="/assets/fonts/newsreader-regular.ttf" as="font" type="font/ttf" crossorigin>
   <script defer src="/assets/coherence.js?v=20260907-r2"></script>
 </head>
@@ -21,7 +22,7 @@
   <a class="cn-skip" href="#main">Skip to content</a>
   <header class="cn-header">
     <a class="cn-wordmark" href="/" aria-label="Coherence Nikolai website home"><span>coherence</span><span>nikolai</span></a>
-    <nav class="cn-nav" aria-label="Website navigation"><a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="#welcome">About</a><a href="/support/">Support</a></nav>
+    <nav class="cn-nav" aria-label="Website navigation"><a href="/tone_sovereign/">Tone Sovereign</a><a href="#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="#welcome">About</a><a href="/support/">Support</a></nav>
   </header>
   <main id="main">
     <section class="cn-wrap cn-arrival" aria-labelledby="arrival-title">
@@ -34,13 +35,16 @@
         <p class="cn-arrival-invitation">A world defined by love begins in how we meet one another.</p>
         <p class="cn-muted cn-tone-definition">Your tone is the quality you bring to a moment—in how you meet yourself, listen to others, and choose to respond.</p>
         <div class="cn-actions cn-arrival-actions">
-          <a class="cn-button" href="/tone_sovereign/?open=home">Enter Tone Sovereign <span aria-hidden="true">→</span></a>
+          <a class="cn-button" href="/tone_sovereign/">Enter Tone Sovereign <span aria-hidden="true">→</span></a>
           <a class="cn-link" href="/tone_comics/">Explore the comics <span aria-hidden="true">→</span></a>
         </div>
       </div>
       <figure class="cn-arrival-art">
-        <img src="/assets/room-at-table-v1/conversation-1536.webp" srcset="/assets/room-at-table-v1/conversation-768.webp 768w, /assets/room-at-table-v1/conversation-1152.webp 1152w, /assets/room-at-table-v1/conversation-1536.webp 1536w" sizes="(max-width:900px) calc(100vw - 40px), (min-width:1440px) 860px, 62vw" width="1536" height="1024" fetchpriority="high" decoding="async" alt="In a sunlit courtyard, a woman in a terracotta jacket speaks at a shared table. An older woman, a man in an ivory shirt and the navy-and-gold Sovereign listen. He is one of the gathering.">
-        <figcaption>Room at the table. The Sovereign listens.</figcaption>
+        <div class="cn-sunrise" data-sunrise>
+          <img src="/assets/sovereign-sunrise-v1/sunrise-1672.webp" srcset="/assets/sovereign-sunrise-v1/sunrise-768.webp 768w, /assets/sovereign-sunrise-v1/sunrise-1152.webp 1152w, /assets/sovereign-sunrise-v1/sunrise-1672.webp 1672w" sizes="(max-width:900px) calc(100vw - 40px), (min-width:1440px) 860px, 62vw" width="1672" height="941" fetchpriority="high" decoding="async" alt="The Sovereign stands on a stone terrace, his sword sheathed at his hip, looking toward sunrise over a golden river city.">
+          <span class="cn-sunlight" aria-hidden="true"></span>
+        </div>
+        <figcaption><span>A Golden Age on the horizon. A choice in this moment.</span><button class="cn-sunlight-toggle" type="button" data-sunlight-toggle hidden>Pause sunlight</button></figcaption>
       </figure>
     </section>
 
@@ -102,7 +106,7 @@
   </main>
   <footer class="cn-footer">
     <div class="cn-footer-heading"><a class="cn-wordmark" href="/"><span>coherence</span><span>nikolai</span></a><p>Apps and creative work by Nikolai.<br>Choose what is useful. Leave when you have enough.</p></div>
-    <nav class="cn-nav" aria-label="Footer navigation"><a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="#welcome">About</a><a href="/support/">Support</a></nav>
+    <nav class="cn-nav" aria-label="Footer navigation"><a href="/tone_sovereign/">Tone Sovereign</a><a href="#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="#welcome">About</a><a href="/support/">Support</a></nav>
     <nav class="cn-nav cn-footer-utility" aria-label="App groups and support"><a href="#tone-apps">Tone &amp; reflection</a><a href="#sota-family">Meditation &amp; inquiry</a><a href="#study-support">Study &amp; getting started</a><a href="#experiments">Exploration &amp; play</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/restore-purchases/">Purchase help</a></nav>
   </footer>
 </body>

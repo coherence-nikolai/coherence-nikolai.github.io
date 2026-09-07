@@ -37,7 +37,11 @@ assert.match(app, /state\.practice\.interrupted = true/);
 assert.match(css, /\.ceremony\.is-playing\.entry-ready \.landing-actions/);
 assert.match(css, /\.practice-duration/);
 assert.match(css, /\.reset-confirmation/);
-assert.match(sw, /const CACHE = "tone-sovereign-v37"/);
+assert.match(sw, /const CACHE = "tone-sovereign-v39"/);
+assert.match(sw, /\.\/app\.js\?v=20260908-entrance/);
+assert.match(sw, /\.\/styles\.css\?v=20260908-entrance/);
+assert.match(app, /data-action="skip-to-practice"/);
+assert.match(app, /state\.view === "home" && state\.stack\.length === 0/);
 
 const forbiddenAutomaticCalls = [
   /render\(\);\s*playCapacityStageVoice\(/,

@@ -187,6 +187,7 @@ img { display: block; max-width: 100%; }
 }
 
 .icon-button {
+  text-decoration: none;
   width: 44px;
   height: 44px;
   padding: 0;
@@ -346,12 +347,21 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   min-height: 100svh;
   padding: calc(var(--safe-top) + 18px) 24px calc(var(--safe-bottom) + 22px);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto minmax(300px, 1fr) auto auto;
   justify-items: center;
   align-items: center;
 }
 
+.landing-navigation { width: 100%; min-width: 0; }
+.landing-tools > * { min-width: 0; max-width: 100%; white-space: normal; }
+.landing-replay-button span { min-width: 0; overflow-wrap: anywhere; }
+.landing-quick-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem; margin-bottom: .5rem; }
+.landing-quick-actions a,
+.landing-quick-actions button { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; padding: .5rem 0; border: 0; background: none; color: var(--gold-light); font: inherit; font-size: .9375rem; cursor: pointer; text-decoration: underline; text-underline-offset: .25em; }
+.landing-quick-actions :focus-visible { outline: 3px solid var(--gold-light); outline-offset: 4px; }
 .landing-tools {
+  flex-wrap: wrap;
   width: 100%;
   display: flex;
   justify-content: flex-end;
@@ -387,6 +397,9 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 }
 
 .landing-title {
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
   align-self: end;
   text-align: center;
   opacity: 0;
@@ -396,6 +409,10 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .landing-title span { display: block; font-family: var(--serif); font-weight: 400; line-height: 0.88; }
 .landing-title .tone-word { font-size: clamp(4rem, 17vw, 7rem); color: var(--ivory); }
 .landing-title .sovereign-word { margin-top: 10px; font-size: clamp(2rem, 8.8vw, 3.7rem); color: var(--ivory); }
+/* The wordmark scales to its own column; enlarged controls may wrap beneath it. */
+.landing-title .tone-word { font-size: min(7rem, 26cqi); }
+.landing-title .sovereign-word { font-size: min(3.7rem, 12cqi); }
+.landing-copy { min-width: 0; max-width: 100%; }
 
 .ceremony.is-settled .landing-title,
 .ceremony.is-settled .landing-copy,
@@ -1650,7 +1667,7 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
   .comic-transcript-content { grid-template-columns: 1fr; gap: 20px; }
   .comic-reader-help { display: none; }
   .landing-inner { padding-inline: 18px; }
-  .landing-title .tone-word { font-size: clamp(3.6rem, 18vw, 5rem); }
+  .landing-title .tone-word { font-size: min(5rem, 26cqi); }
   .mark-stage { --mark-w: min(64vw, 280px); }
   .landing-copy strong { font-size: clamp(2rem, 10vw, 3rem); }
   .topbar { grid-template-columns: 44px minmax(0,1fr) auto; }
@@ -1695,8 +1712,8 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 
 @media (max-height: 760px) and (max-width: 620px) {
   .landing-inner { grid-template-rows: auto auto minmax(180px,1fr) auto auto; padding-top: calc(var(--safe-top) + 8px); padding-bottom: calc(var(--safe-bottom) + 8px); }
-  .landing-title .tone-word { font-size: 3.3rem; }
-  .landing-title .sovereign-word { font-size: 1.75rem; }
+  .landing-title .tone-word { font-size: min(3.3rem, 26cqi); }
+  .landing-title .sovereign-word { font-size: min(1.75rem, 12cqi); }
   .mark-stage { --mark-w: min(43vw, 205px); }
   .landing-copy p { font-size: .96rem; }
   .landing-copy strong { font-size: 1.9rem; }
@@ -1710,8 +1727,8 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
     padding-top: calc(var(--safe-top) + 10px);
     padding-bottom: calc(var(--safe-bottom) + 10px);
   }
-  .landing-title .tone-word { font-size: 4.75rem; }
-  .landing-title .sovereign-word { font-size: 2.5rem; }
+  .landing-title .tone-word { font-size: min(4.75rem, 26cqi); }
+  .landing-title .sovereign-word { font-size: min(2.5rem, 12cqi); }
   .mark-stage { --mark-w: min(34vh, 260px); margin-top: 2px; }
   .landing-copy p { font-size: 1rem; }
   .landing-copy strong { font-size: 2.45rem; }
@@ -1720,6 +1737,7 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ceremony *, .ceremony *::before, .ceremony *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
   .travelling-star, .ring-trace, .ring-leading-star-orbit, .blade-current, .sun-rays, .gold-wash, .tip-ray, .tip-spark { display: none !important; }
@@ -1745,6 +1763,9 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .user-reduced-motion .sword-mark,
 .user-reduced-motion .tip-star { opacity: 1 !important; transform: none !important; }
 .user-reduced-motion .sword-construction-mark { display: none !important; }
+.user-reduced-motion .ceremony *,
+.user-reduced-motion .ceremony *::before,
+.user-reduced-motion .ceremony *::after { animation: none !important; transition: none !important; }
 /* Optional offline packs remain plain controls, not a progress dashboard. */
 .offline-pack { border-top: 1px solid var(--line, #55482d); padding-block: 24px; }
 .offline-pack h2 { font-size: 1.3rem; }

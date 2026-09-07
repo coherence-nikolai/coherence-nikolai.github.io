@@ -1,8 +1,8 @@
-const CACHE = "tone-sovereign-v38";
+const CACHE = "tone-sovereign-v39";
 const COMIC_CACHE = "tone-sovereign-comics-v2";
 const MEDIA_CACHE = "tone-sovereign-media-v1";
 // v1 is also used by a sibling app. Only retire editions positively identified here.
-const RETIRED_APP_CACHES = ["tone-sovereign-v32", "tone-sovereign-v33", "tone-sovereign-v34", "tone-sovereign-v35", "tone-sovereign-v36", "tone-sovereign-v37"];
+const RETIRED_APP_CACHES = ["tone-sovereign-v32", "tone-sovereign-v33", "tone-sovereign-v34", "tone-sovereign-v35", "tone-sovereign-v36", "tone-sovereign-v37", "tone-sovereign-v38"];
 const THE_LOCK_EDITION = "ink-v4";
 const VOICE_CUES = [
   "ts_about_introduction_v1",
@@ -58,9 +58,11 @@ const CORE = [
   "./",
   "./index.html",
   "./styles.css",
+  "./styles.css?v=20260908-entrance",
   "./catalog.js",
   "./guided-sits.json",
   "./app.js",
+  "./app.js?v=20260908-entrance",
   "./offline-downloads.js",
   "./offline-packs.json",
   "./narrative-ui.js",

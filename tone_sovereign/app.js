@@ -856,6 +856,7 @@ const canvas = document.querySelector("#ambient-field");
 const ctx = canvas.getContext("2d", { alpha: true });
 let ceremonyTimer = 0;
 let ceremonyEntryTimer = 0;
+let ceremonyGeneration = 0;
 let practiceTimer = 0;
 let practiceNavigationGeneration = 0;
 let guidedSitTimer = 0;
@@ -877,6 +878,7 @@ class SoundEngine {
     this.voiceSource = null;
     this.voiceToken = 0;
     this.firstLightSources = [];
+    this.firstLightGeneration = 0;
     this.breathDrone = null;
     this.breathDroneGain = null;
     this.guidedSitAmbient = null;
@@ -918,6 +920,7 @@ class SoundEngine {
   }
 
   stopFirstLight() {
+    this.firstLightGeneration += 1;
     this.firstLightSources.forEach(({ source }) => {
       try { source.stop(); } catch {}
     });
@@ -1023,10 +1026,13 @@ class SoundEngine {
     oscillator.addEventListener("ended", () => this.nodes.delete(oscillator));
   }
 
-  async ceremony(includeVoice = false) {
+  async ceremony(includeVoice = false, stillCurrent = () => true) {
     this.stop();
+    const generation = this.firstLightGeneration;
+    const active = () => generation === this.firstLightGeneration && stillCurrent();
     if (!state.sound && !(state.voice && includeVoice)) return;
     const context = await this.prepareFirstLight();
+    if (!active()) return;
     const start = context.currentTime + 0.06;
 
     if (state.sound) {
@@ -1034,6 +1040,7 @@ class SoundEngine {
         this.loadBuffer(`${ROOT}assets/sound/ts_first_light_arrival_full.wav`, context),
         this.loadBuffer(`${ROOT}assets/sound/ts_first_light_living_ambience.wav`, context)
       ]);
+      if (!active() || !state.sound) return;
       const arrivalNode = this.scheduleBuffer(arrival, start, 0.52, { firstLight: true });
       arrivalNode.gain.gain.setValueAtTime(0.52, start + FIRST_LIGHT.voiceDelay - 0.30);
       arrivalNode.gain.gain.linearRampToValueAtTime(0.125, start + FIRST_LIGHT.voiceDelay);
@@ -1052,6 +1059,7 @@ class SoundEngine {
 
     if (state.voice && includeVoice) {
       const buffer = await this.loadBuffer(this.voiceURL("ts_first_light_tagline_v1"), context);
+      if (!active() || !state.voice) return;
       const { source } = this.scheduleBuffer(buffer, start + FIRST_LIGHT.voiceDelay, 0.86);
       this.voiceSource = source;
       source.addEventListener("ended", () => {
@@ -1314,6 +1322,10 @@ function announce(message) { liveRegion.textContent = ""; requestAnimationFrame(
 
 function focusCurrentView() {
   requestAnimationFrame(() => {
+    if (state.view === "landing") {
+      app.querySelector('[data-action="skip-to-practice"]')?.focus({preventScroll:true});
+      return;
+    }
     const heading = app.querySelector("main h1, main [role='heading']");
     if (!heading) return;
     heading.setAttribute("tabindex", "-1");
@@ -1331,6 +1343,7 @@ function showToast(message) {
 }
 
 function navigate(view, options = {}) {
+  if (state.view === "landing" && view !== "landing") finishCeremony();
   cancelOfflineDownloads();
   pausePracticeForNavigation();
   stopPracticeTimers();
@@ -1376,6 +1389,7 @@ function navigate(view, options = {}) {
 }
 
 function restorePreviousView() {
+  if (state.view === "landing") finishCeremony();
   cancelOfflineDownloads();
   stopPracticeTimers();
   if (state.view === "guidedSits") resetGuidedSitSession();
@@ -1407,6 +1421,7 @@ function goBack() {
 }
 
 function goHome() {
+  if (state.view === "landing") finishCeremony();
   cancelOfflineDownloads();
   state.storyReturn = null;
   stopPracticeTimers();
@@ -1515,8 +1530,9 @@ function render() {
 }
 
 function renderTopbar(title, subtitle = "") {
+  const rootHome = state.view === "home" && state.stack.length === 0;
   return `<header class="topbar">
-    <button class="icon-button" type="button" data-action="back" aria-label="${escapeHTML(tr("back"))}" title="${escapeHTML(tr("back"))}">←</button>
+    ${rootHome ? `<a class="icon-button" href="/" aria-label="${phrase("Website home", "Inicio del sitio")}" title="${phrase("Website home", "Inicio del sitio")}">←</a>` : `<button class="icon-button" type="button" data-action="back" aria-label="${escapeHTML(tr("back"))}" title="${escapeHTML(tr("back"))}">←</button>`}
     <div class="topbar-title"><strong>${escapeHTML(title)}</strong>${subtitle ? `<span>${escapeHTML(subtitle)}</span>` : ""}</div>
     <div class="topbar-actions">
       <button class="icon-button" type="button" data-action="home" aria-label="${phrase("Tone Sovereign home", "Inicio de Tone Sovereign")}" title="${phrase("Tone Sovereign home", "Inicio de Tone Sovereign")}">⌂</button>
@@ -1601,10 +1617,16 @@ function renderLanding() {
   return `<main class="landing ceremony ${state.ceremonySettled ? "is-settled" : "is-playing"} ${immediateEntry ? "entry-ready" : ""}" data-ceremony="${state.ceremonyKey}">
     <div class="gold-wash" aria-hidden="true"></div>
     <div class="landing-inner">
+      <div class="landing-navigation">
+      <div class="landing-quick-actions">
+        <a href="/">← ${phrase("Website home", "Inicio del sitio")}</a>
+        <button type="button" data-action="skip-to-practice">${phrase("Skip to practice", "Ir a la práctica")} →</button>
+      </div>
       <div class="landing-tools" ${state.ceremonySettled ? "" : "inert"}>
         <button class="landing-replay-button delayed-control" type="button" data-action="replay-ceremony" aria-label="${tr("replayWithSound")}" title="${tr("replayWithSound")}">${renderSoundIcon(true)}<span>${tr("replayWithSound")}</span></button>
         <button class="text-button delayed-control" type="button" data-action="listen-first-light">${phrase("Hear the invitation", "Escuchar la invitación")}</button>
         <button class="text-button delayed-control" type="button" data-action="toggle-language">${tr("language")}</button>
+      </div>
       </div>
       <section class="landing-title" aria-label="Tone Sovereign">
         <span class="tone-word">TONE</span>
@@ -1635,19 +1657,38 @@ function renderLanding() {
   </main>`;
 }
 
+// End only First Light's presentation. This does not start a practice or change preferences.
+function finishCeremony() {
+  ceremonyGeneration += 1;
+  window.clearTimeout(ceremonyTimer);
+  window.clearTimeout(ceremonyEntryTimer);
+  ceremonyTimer = 0;
+  ceremonyEntryTimer = 0;
+  state.ceremonySettled = true;
+  state.ceremonyEntryReady = true;
+  sound.stop();
+  const ceremony = document.querySelector(".ceremony");
+  ceremony?.classList.add("is-settled", "entry-ready");
+  ceremony?.classList.remove("is-playing");
+  ceremony?.querySelectorAll("[inert]").forEach(node => node.removeAttribute("inert"));
+}
+
 function settleCeremonyLater() {
   window.clearTimeout(ceremonyTimer);
   window.clearTimeout(ceremonyEntryTimer);
   const reduced = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches;
   const entryDelay = reduced ? 100 : FIRST_LIGHT.entryDelay * 1000;
   const duration = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : FIRST_LIGHT.duration * 1000;
+  const generation = ceremonyGeneration;
   ceremonyEntryTimer = window.setTimeout(() => {
+    if (state.view !== "landing" || generation !== ceremonyGeneration) return;
     state.ceremonyEntryReady = true;
     const actions = document.querySelector(".ceremony .landing-actions");
     document.querySelector(".ceremony")?.classList.add("entry-ready");
     actions?.removeAttribute("inert");
   }, entryDelay);
   ceremonyTimer = window.setTimeout(() => {
+    if (state.view !== "landing" || generation !== ceremonyGeneration) return;
     state.ceremonySettled = true;
     const ceremony = document.querySelector(".ceremony");
     ceremony?.classList.add("is-settled");
@@ -1657,21 +1698,25 @@ function settleCeremonyLater() {
 }
 
 async function replayCeremony(withAudio = true) {
-  sound.stop();
+  finishCeremony();
+  const generation = ceremonyGeneration;
+  const active = () => state.view === "landing" && generation === ceremonyGeneration && !document.hidden;
   const shouldPlayAudio = withAudio && (state.sound || state.voice);
   if (shouldPlayAudio) {
     try {
       await sound.prepareFirstLight();
     } catch {
-      showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
+      if (active()) showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
     }
   }
+  if (!active()) return;
   state.ceremonyKey += 1;
-  state.ceremonySettled = false;
-  state.ceremonyEntryReady = false;
+  state.ceremonySettled = state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  state.ceremonyEntryReady = state.ceremonySettled;
   render();
-  if (shouldPlayAudio) sound.ceremony(false).catch(() => {
-    showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
+  document.querySelector('[data-action="skip-to-practice"]')?.focus({preventScroll:true});
+  if (shouldPlayAudio) sound.ceremony(false, active).catch(() => {
+    if (active()) showToast(state.lang === "en" ? "Sound could not start. Tap replay once more." : "No se pudo iniciar el sonido. Toca repetir otra vez.");
   });
 }
 
@@ -3793,6 +3838,8 @@ app.addEventListener("click", async event => {
   if (!button) return;
   const { action, view, steady, pull, relation, doorway, tone, field, teaching, law, principle, entry, engine, mission } = button.dataset;
 
+  if (action === "skip-to-practice") { navigate("home"); return; }
+
   if (view === "threshold") { startMovement("cross"); return; }
   if (view) { navigate(view); return; }
   if (button.dataset.livedNeed) { state.livedNeed = button.dataset.livedNeed; render(); return; }
@@ -3976,7 +4023,7 @@ app.addEventListener("click", async event => {
     }
     render();
   }
-  if (action === "toggle-language") { sound.stop(); state.lang = state.lang === "en" ? "es" : "en"; persistPreferences(); render(); }
+  if (action === "toggle-language") { if (state.view === "landing") finishCeremony(); sound.stop(); state.lang = state.lang === "en" ? "es" : "en"; persistPreferences(); render(); }
   if (action === "toggle-voice") { state.voice = !state.voice; if (!state.voice) sound.stopVoice(); persistPreferences(); render(); }
   if (action === "toggle-motion") { state.reduceMotion = !state.reduceMotion; persistPreferences(); render(); }
   if (action === "toggle-words") { state.quietWords = !state.quietWords; persistPreferences(); render(); }
@@ -4366,6 +4413,7 @@ function drawAmbient(time = 0) {
 
 window.addEventListener("resize", resizeField);
 window.addEventListener("popstate", event => {
+  if (state.view === "landing") finishCeremony();
   if (event.state?.app !== HISTORY_MARKER) return;
   if(!Array.isArray(event.state.stack)){restorePreviousView();return;}
   pausePracticeForNavigation();
@@ -4384,6 +4432,7 @@ window.addEventListener("popstate", event => {
   render();focusCurrentView();window.scrollTo(0,returnStory?.scrollY||0);
 });
 document.addEventListener("visibilitychange", () => {
+  if (state.view === "landing" && document.hidden) finishCeremony();
   const noticing = state.view === "movement" && state.practice.movement === "notice" && state.practice.noticeStarted;
   const breathing = state.view === "movement" && state.practice.movement === "stabilise" && state.practice.breathStartedAt;
   const crossing = state.view === "movement" && state.practice.movement === "cross" && (state.practice.stage === "question" || state.practice.stage === "crossed");
@@ -4420,8 +4469,14 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 window.addEventListener("beforeunload", () => { cancelAnimationFrame(fieldFrame); stopPracticeTimers(); });
+window.addEventListener("pagehide", () => { if (state.view === "landing") finishCeremony(); });
 
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+if ("serviceWorker" in navigator) {
+  const registerWorker = () => navigator.serviceWorker.register("./sw.js").catch(() => {});
+  // Top-level content awaits can finish after window.load has already fired.
+  if (document.readyState === "complete") registerWorker();
+  else window.addEventListener("load", registerWorker, {once:true});
+}
 
 // Known public entry points never start a practice or audio.
 const publicEntry=readPublicRoute(location.search,comicManifest,catalogFor(new URLSearchParams(location.search).get('lang')||state.lang),state.lang);
@@ -4429,9 +4484,12 @@ if(publicEntry){
   applyPublicRoute(publicEntry);
   state.stack=publicEntry.view==='home'?[]:publicEntry.kind==='book'?['home','comics']:['home'];
 }
-// Public arrival is a still, immediate invitation. First Light remains an
-// explicit replay choice, including its separately chosen sound.
-state.ceremonySettled=true;state.ceremonyEntryReady=true;
+// The main entrance restores First Light silently. Explicit deep links still
+// open their destination directly, and reduced motion starts with the final mark.
+if (publicEntry || state.reduceMotion || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  state.ceremonySettled = true;
+  state.ceremonyEntryReady = true;
+}
 persistPreferences();
 resizeField();
 writeNavigationHistory(false);
