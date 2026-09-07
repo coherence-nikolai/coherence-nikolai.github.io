@@ -15,8 +15,10 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/tone/try/try.css">
+  <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r1">
+  <script defer src="/assets/coherence.js?v=20260907-r1"></script>
 </head>
-<body class="tone-try-page">
+<body class="coherence-public tone-try-page" data-coherence="public">
   <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
 
   <header class="site-header">
@@ -24,11 +26,7 @@
       <span>coherence</span>
       <span>nikolai</span>
     </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone/">Tone Recall</a>
-      <a href="/#apps">Apps</a>
-      <a href="/support/">Support</a>
-    </nav>
+    <nav class="nav" aria-label="Primary navigation"><a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="/#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="/#welcome">About</a><a href="/support/">Support</a></nav>
   </header>
 
   <main class="try-main" data-lang="en">
@@ -46,17 +44,11 @@
         </div>
       </div>
       <div class="try-hero-panel" aria-hidden="true">
-        <div class="mini-orb">
-          <span class="mini-orb-core"></span>
-          <span class="mini-orb-ring"></span>
-          <svg class="mini-wave" viewBox="0 0 420 160" role="presentation" focusable="false">
-            <path d="M8 91 C 70 91, 72 26, 134 32 C 194 38, 178 132, 248 132 C 318 132, 308 67, 412 67" />
-          </svg>
-        </div>
+        <img class="cn-brand-logo" src="/assets/tone-recall-icon.png" width="1024" height="1024" alt="" decoding="async">
       </div>
     </section>
 
-    <section class="web-map section" aria-label="Web version map">
+    <details class="cn-optional-guide"><summary data-cn-guide>About this web practice</summary><section class="web-map section" aria-label="Web version map">
       <div class="section-head centered">
         <p class="label" data-i18n="mapLabel">Map</p>
         <h2 data-i18n="mapTitle">The web version is a taste of the app.</h2>
@@ -70,7 +62,7 @@
         <article><span>03</span><h3 data-i18n="mapThreeTitle">Save</h3><p data-i18n="mapThreeCopy">Keep the tone in this browser, privately and locally.</p></article>
         <article><span>04</span><h3 data-i18n="mapFourTitle">Return</h3><p data-i18n="mapFourCopy">Replay a saved tone when you want to remember the state.</p></article>
       </div>
-    </section>
+    </section></details>
 
     <section class="instrument-shell section" id="instrument" aria-label="Tone Recall web instrument">
       <div class="language-strip">

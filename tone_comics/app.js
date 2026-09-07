@@ -14,6 +14,7 @@ const state = {
 };
 
 const MANIFEST_URL = "/tone_comics/manifest-20260810b.json";
+const scrollBehavior = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 
 function clear(node) {
   while (node.firstChild) {
@@ -71,7 +72,7 @@ function renderTabs() {
   const activeTab = tabsEl.querySelector('[aria-selected="true"]');
   if (activeTab) {
     requestAnimationFrame(() => {
-      activeTab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      activeTab.scrollIntoView({ behavior: scrollBehavior(), block: "nearest", inline: "center" });
     });
   }
 }
@@ -164,13 +165,13 @@ function openComic(comicId) {
   if (window.location.hash !== `#${comic.id}`) {
     history.replaceState(null, "", `#${comic.id}`);
   }
-  readerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  readerEl.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
 }
 
 function closeReader() {
   readerEl.hidden = true;
   history.replaceState(null, "", `#${state.collectionId}`);
-  document.getElementById("library").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("library").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
 }
 
 function openFromHash() {
@@ -184,7 +185,7 @@ function openFromHash() {
     readerEl.hidden = true;
     renderTabs();
     renderGrid();
-    document.getElementById("library").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("library").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     return;
   }
   const match = findComic(comicId);

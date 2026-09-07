@@ -14,30 +14,35 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/tone_comics/styles.css?v=20260810c">
+  <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r1">
+  <link rel="stylesheet" href="/tone_comics/library.css?v=20260907-r1">
+  <script defer src="/assets/coherence.js?v=20260907-r1"></script>
 </head>
-<body class="tone-comics-page">
-  <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
+<body class="coherence-page">
+  <a class="cn-skip" href="#current-library">Skip to comics</a>
 
-  <header class="site-header">
-    <a class="wordmark" href="/" aria-label="Coherence Nikolai home">
+  <header class="cn-header cn-frame">
+    <a class="cn-wordmark" href="/" aria-label="Coherence Nikolai — website home">
       <span>coherence</span>
       <span>nikolai</span>
     </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/">Home</a>
-      <a href="/#tone-apps">Tone</a>
-      <a href="/#sota-family">Sota</a>
+    <nav class="cn-nav" data-cn-nav aria-label="Website navigation">
+      <a href="/tone_sovereign/?open=home">Tone Sovereign</a>
+      <a href="/#apps">All apps</a>
+      <a href="/tone_comics/">Comics</a>
+      <a href="/#welcome">About</a>
       <a href="/support/">Support</a>
     </nav>
   </header>
 
-  <main>
+  <main id="current-library" class="cn-wrap"><h1>Tone Comics</h1><p>Loading the current editions…</p><noscript><p>The illustrated reader needs JavaScript. <a href="/support/">Get help opening a comic.</a></p></noscript></main>
+  <main id="archive-library" hidden>
     <section class="comics-hero" aria-labelledby="tone-comics-title">
-      <p class="label">Tone Comics</p>
-      <h1 id="tone-comics-title">Tone Comics.</h1>
+      <p class="label">Tone Comics · earlier editions</p>
+      <h1 id="tone-comics-title">The original archive.</h1>
       <p>Comics by Nikolai. This archive preserves earlier editions and their original page order.</p>
       <div class="comic-hero-actions">
-        <a class="button primary" href="/tone_sovereign/?open=comics">Read in Tone Sovereign · EN / ES</a>
+        <a class="button primary" href="/tone_comics/">Current editions · English / Español</a>
         <a class="button ghost" href="#library">Browse original archive</a>
         <a class="button ghost" href="#spanish-editions">Spanish editions</a>
         <a class="button ghost" href="/">Back to apps</a>
@@ -70,18 +75,18 @@
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Coherence Nikolai. Private apps and creative work by Nikolai.</p>
-    <nav aria-label="Footer navigation">
-      <a href="/">Home</a>
-      <a href="/tone_comics/">Tone Comics</a>
+  <footer class="cn-footer cn-frame">
+    <a class="cn-wordmark" href="/">Coherence Nikolai · website home</a>
+    <nav class="cn-nav" data-cn-nav aria-label="Website navigation">
+      <a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="/#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="/#welcome">About</a><a href="/support/">Support</a>
+    </nav>
+    <nav class="cn-nav" aria-label="Legal and support">
       <a href="/privacy/">Privacy</a>
       <a href="/terms/">Terms</a>
       <a href="/support/">Support</a>
     </nav>
   </footer>
 
-  <script src="/assets/site.js"></script>
-  <script src="/tone_comics/app.js?v=20260810c"></script>
+  <script type="module" src="/tone_comics/library.mjs?v=20260907-r1"></script>
 </body>
 </html>

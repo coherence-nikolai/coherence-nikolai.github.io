@@ -318,17 +318,20 @@ function renderProgress() {
   progressLine.textContent = count === 10 ? t("complete") : count >= 4 ? t("touched") : count >= 1 ? t("warming") : t("oneAct");
 
   interactiveMark.innerHTML = `<span class="interactive-orb"></span><span class="interactive-ring"></span>`;
-  const points = [
-    [11, 54], [14, 65], [26, 69], [40, 64], [54, 55],
-    [67, 45], [77, 36], [72, 28], [53, 28], [34, 34]
-  ];
-  points.forEach(([left, top], index) => {
+  const orbit = document.createElement("span");
+  orbit.className = "interactive-orbit";
+  orbit.appendChild(interactiveMark.querySelector(".interactive-ring"));
+  // The ring and every dot share one ellipse and one rotation. Resizing cannot
+  // move a dot off the ring, and completing an act changes brightness only.
+  for (let index = 0; index < 10; index += 1) {
+    const angle = Math.PI - index * Math.PI * 2 / 10;
     const dot = document.createElement("span");
     dot.className = `interactive-dot${index < count ? " is-lit" : ""}`;
-    dot.style.left = `${left}%`;
-    dot.style.top = `${top}%`;
-    interactiveMark.appendChild(dot);
-  });
+    dot.style.left = `${50 + 50 * Math.cos(angle)}%`;
+    dot.style.top = `${50 + 50 * Math.sin(angle)}%`;
+    orbit.appendChild(dot);
+  }
+  interactiveMark.appendChild(orbit);
   interactiveMark.setAttribute("aria-label", lang === "es" ? `${count} de 10 actos hechos` : `${count} of 10 acts done`);
 }
 

@@ -15,8 +15,10 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/tone-threshold/try/try.css">
+  <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r1">
+  <script defer src="/assets/coherence.js?v=20260907-r1"></script>
 </head>
-<body class="threshold-try-page">
+<body class="coherence-public threshold-try-page" data-coherence="public">
   <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
 
   <header class="site-header">
@@ -24,11 +26,7 @@
       <span>coherence</span>
       <span>nikolai</span>
     </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone-threshold/">Tone Threshold</a>
-      <a href="/#apps">Apps</a>
-      <a href="/support/">Support</a>
-    </nav>
+    <nav class="nav" aria-label="Primary navigation"><a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="/#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="/#welcome">About</a><a href="/support/">Support</a></nav>
   </header>
 
   <main class="threshold-try-main" data-lang="en">
@@ -52,19 +50,11 @@
       </div>
 
       <div class="threshold-hero-door" aria-hidden="true">
-        <div class="door-orb">
-          <span class="door-glow"></span>
-          <span class="door-ring"></span>
-          <span class="door-panel left"></span>
-          <span class="door-panel right"></span>
-          <span class="door-seam"></span>
-          <span class="door-ray horizontal"></span>
-          <span class="door-ray diagonal"></span>
-        </div>
+        <img class="cn-brand-logo" src="/assets/tone-threshold-icon.png" width="1024" height="1024" alt="" decoding="async">
       </div>
     </section>
 
-    <section class="threshold-map section" aria-label="Web version map">
+    <details class="cn-optional-guide"><summary data-cn-guide>About this web practice</summary><section class="threshold-map section" aria-label="Web version map">
       <div class="section-head centered">
         <p class="label" data-i18n="mapLabel">Map</p>
         <h2 data-i18n="mapTitle">The web version is a simple doorway.</h2>
@@ -78,7 +68,7 @@
         <article><span>03</span><h3 data-i18n="mapThreeTitle">Cross</h3><p data-i18n="mapThreeCopy">Move only when the answer starts falling silent.</p></article>
         <article><span>04</span><h3 data-i18n="mapFourTitle">Keep</h3><p data-i18n="mapFourCopy">Save a mark privately in this browser.</p></article>
       </div>
-    </section>
+    </section></details>
 
     <section class="threshold-instrument section" id="threshold-instrument" aria-label="Tone Threshold web instrument">
       <div class="language-strip">

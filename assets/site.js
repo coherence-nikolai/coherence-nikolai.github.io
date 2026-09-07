@@ -15,7 +15,7 @@ document.addEventListener("click", (event) => {
   window.location.href = href;
 });
 
-if (canvas) {
+if (canvas && document.body.dataset.coherence !== "public") {
   const context = canvas.getContext("2d");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let width = 0;

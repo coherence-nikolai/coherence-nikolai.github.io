@@ -17,12 +17,16 @@ const handlers = {};
 const media = new Map(); let installed = [];
 const cache = {addAll: async paths => {installed = paths;}, match: async request => media.get(request.url), put: async (request, value) => media.set(request.url, value)};
 let fetches = 0;
-const context = vm.createContext({URL, Response, self: {location: {origin: 'https://tone.test'}, addEventListener: (type, handler) => {handlers[type] = handler;}, skipWaiting() {}}, caches: {open: async name => {assert([MEDIA_CACHE, 'tone-sovereign-v36'].includes(name));return cache;}}, fetch: async () => {fetches++;return new Response('audio');}});
+const context = vm.createContext({URL, Response, self: {location: {origin: 'https://tone.test'}, addEventListener: (type, handler) => {handlers[type] = handler;}, skipWaiting() {}}, caches: {open: async name => {assert([MEDIA_CACHE, 'tone-sovereign-v37'].includes(name));return cache;}}, fetch: async () => {fetches++;return new Response('audio');}});
 vm.runInContext(await readFile(resolve(root, 'sw.js'), 'utf8'), context);
 let work; handlers.install({waitUntil: promise => {work = promise;}}); await work;
 assert(!installed.some(path => /\.(mp3|wav)$/.test(path)), 'No optional audio in core');
 let bytes = 0;
-for (const path of installed) bytes += (await stat(resolve(root, path === './' ? 'index.html' : path.split('?')[0]))).size;
+for (const path of installed) {
+  const asset=path==='./'?'index.html':path.split('?')[0];
+  const source=asset.startsWith('/')?resolve(root,'..',asset.slice(1)):resolve(root,asset);
+  bytes += (await stat(source)).size;
+}
 assert(bytes < 4 * 1048576, `Core exceeded 4 MiB: ${bytes}`);
 const request = {method: 'GET', url: 'https://tone.test/tone_sovereign/assets/voice/en/ts_notice_open_v1.mp3'};
 handlers.fetch({request, respondWith: promise => {work = promise;}}); await work;

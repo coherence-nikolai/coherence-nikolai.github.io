@@ -86,6 +86,8 @@
     .fade-in{animation:fadeUp .35s ease forwards}
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   </style>
+<link rel="stylesheet" href="/assets/tool-context.css?v=20260907-r1">
+<script defer src="/assets/tool-context.js?v=20260907-r1"></script>
 </head>
 <body>
 <canvas id="rippleCanvas"></canvas>
@@ -164,7 +166,7 @@
       <div class="api-text"><strong>What is it?</strong> An API key connects this app to an AI that reads your answers and writes a personalised profile just for you.</div>
       <div class="api-text"><strong>Does it cost money?</strong> A small amount, a few cents per use. You need an account at anthropic.com.</div>
       <div class="api-text"><strong>Do I need one?</strong> No. Pattern works fully without it. The AI adds a deeper personal reflection at the end.</div>
-      <div class="api-text"><strong>Is it private?</strong> Your key is stored only on your device. It is never shared anywhere else.</div>
+      <div class="api-text"><strong>What is sent?</strong> Using AI insights sends your questionnaire answers and API key directly to Anthropic. Your key is also stored in this browser. You can use the questionnaire without AI.</div>
       <input class="api-input" id="apiKeyInput" type="password" placeholder="Paste your API key here (optional)"/>
       <button class="api-save-btn" onclick="saveAPIKey()">Save key</button>
     </div>

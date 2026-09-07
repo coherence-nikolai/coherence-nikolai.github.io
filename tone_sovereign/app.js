@@ -1,6 +1,7 @@
 import {mountOfflineDownloads, cancelOfflineDownloads} from './offline-downloads.js';
 import {homeIllustration, stageIllustration, completionStory, livedExperience} from './narrative-ui.js';
 import {additionalComicSeries} from './comic-catalogue.mjs';
+import {CAPACITY_BOOKS, readPublicRoute, publicURL, libraryURL} from './public-routes.mjs';
 import {INTEGRATE_OPTIONS, INTEGRATE_GUIDANCE, newIntegrate, chooseIntegrate, integrateStepValid, integratePayload, integrateSummary} from './integrate-practice.mjs';
 import {STORAGE, JOURNAL_KEY, createBackup, parseBackup, planRestore, readPersistentState, recoverTransaction, transact, withStorageLock, weeklyPrompt, validateCategory} from './tone-state.mjs';
 const ROOT = "./";
@@ -741,6 +742,7 @@ const state = {
   libraryVisibleCount: 8,
   selectedComicSeries: "mainline",
   selectedComicIssue: 1,
+  selectedCapacity: "notice",
   comicPage: 1,
   comicZoom: 1,
   comicTranscriptOpen: false,
@@ -855,6 +857,7 @@ const ctx = canvas.getContext("2d", { alpha: true });
 let ceremonyTimer = 0;
 let ceremonyEntryTimer = 0;
 let practiceTimer = 0;
+let practiceNavigationGeneration = 0;
 let guidedSitTimer = 0;
 let toastTimer = 0;
 let fieldFrame = 0;
@@ -1057,9 +1060,10 @@ class SoundEngine {
     }
   }
 
-  async startBreathPattern(patternKey) {
+  async startBreathPattern(patternKey, stillCurrent = () => true) {
     if (!state.sound) return;
     await this.ready();
+    if(!state.sound||!stillCurrent())return;
     this.stopTones();
     const droneSettings = {
       anapana: { frequency: 110, gain: .045 },
@@ -1086,9 +1090,10 @@ class SoundEngine {
     oscillator.addEventListener("ended", () => this.nodes.delete(oscillator));
   }
 
-  async breathPhase(patternKey, phaseType) {
+  async breathPhase(patternKey, phaseType, stillCurrent = () => true) {
     if (!state.sound || phaseType === "observe") return;
     await this.ready();
+    if(!state.sound||!stillCurrent())return;
     const now = this.context.currentTime;
     if (patternKey === "coherent" && this.breathDrone) {
       const target = phaseType === "in" ? 140 : 100;
@@ -1327,6 +1332,7 @@ function showToast(message) {
 
 function navigate(view, options = {}) {
   cancelOfflineDownloads();
+  pausePracticeForNavigation();
   stopPracticeTimers();
   if (state.view === "guidedSits" && view !== "guidedSits") resetGuidedSitSession();
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -1360,11 +1366,10 @@ function navigate(view, options = {}) {
     if (view === "foundations") state.foundationMode = options.mode;
     if (view === "library") state.libraryMode = options.mode;
   }
+  if(options.publicRoute)applyPublicRoute(options.publicRoute);
   render();
   if (changedView) {
-    const historyState = { app: HISTORY_MARKER, view };
-    if (remembersView) window.history.pushState(historyState, "", window.location.href);
-    else window.history.replaceState(historyState, "", window.location.href);
+    writeNavigationHistory(remembersView);
   }
   if (changedView) focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -1393,11 +1398,12 @@ function restorePreviousView() {
 }
 
 function goBack() {
-  if (state.stack.length && window.history.state?.app === HISTORY_MARKER) {
+  if (state.stack.length && window.history.state?.app === HISTORY_MARKER && window.history.state.depth > 0) {
     window.history.back();
     return;
   }
   restorePreviousView();
+  writeNavigationHistory(false);
 }
 
 function goHome() {
@@ -1407,7 +1413,7 @@ function goHome() {
   if (state.view === "guidedSits") resetGuidedSitSession();
   state.stack = [];
   state.view = "home";
-  window.history.replaceState({ app: HISTORY_MARKER, view: "home" }, "", window.location.href);
+  writeNavigationHistory(false);
   render();
   focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -1472,6 +1478,8 @@ function render() {
     entry: renderLibraryEntry,
     comics: renderComics,
     comicReader: renderComicReader,
+    capacityOverview: renderCapacityOverview,
+    publicUnavailable: renderPublicUnavailable,
     practiceEngines: renderPracticeEngines,
     practiceEngine: renderPracticeEngine,
     ruleOfLife: renderRuleOfLife,
@@ -1489,7 +1497,7 @@ function render() {
   };
   const spectrum = currentSpectrum();
   const interfaceMode = currentInterfaceMode();
-  app.innerHTML = `<div class="app-shell spectrum-${spectrum.name} interface-${interfaceMode}" style="--section-color:${spectrum.color}">${(renderers[state.view] || renderHome)()}</div>`;
+  app.innerHTML = `<div class="app-shell spectrum-${spectrum.name} interface-${interfaceMode}" style="--section-color:${spectrum.color}">${renderWebsiteContext()}${(renderers[state.view] || renderHome)()}</div>`;
   if (storageProblem) showStorageFailure();
   if (state.view === "symbol") observeSymbolSections();
   if (state.view === "landing" && !state.ceremonySettled) settleCeremonyLater();
@@ -1497,7 +1505,13 @@ function render() {
   if (state.view === "guidedSits" && state.guidedSit.phase === "session" && !state.guidedSit.paused) startGuidedSitTimer();
   if (state.view === "threshold") sound.threshold().catch(() => {});
   if (state.view === "comics" || state.view === "comicReader") prepareComicImages();
+  if(state.view==='entry'){
+    const relation=CAPACITY_BOOKS.find(item=>item.teaching===state.selectedEntry);
+    if(relation)app.querySelector('.entry-actions')?.insertAdjacentHTML('beforebegin',renderBookConnection(relation.issue,true));
+  }
+  if(['capacityOverview','entry'].includes(state.view))app.querySelector('main')?.insertAdjacentHTML('afterbegin',`<div class="cn-reading-language">${renderComicLanguageControl(phrase('Reading language','Idioma de lectura'))}</div>`);
   if (state.view === "offline") mountOfflineDownloads(document.querySelector('#offline-downloads'), state.lang);
+  if (window.history.state?.view === state.view) writeNavigationHistory(false);
 }
 
 function renderTopbar(title, subtitle = "") {
@@ -1505,10 +1519,63 @@ function renderTopbar(title, subtitle = "") {
     <button class="icon-button" type="button" data-action="back" aria-label="${escapeHTML(tr("back"))}" title="${escapeHTML(tr("back"))}">←</button>
     <div class="topbar-title"><strong>${escapeHTML(title)}</strong>${subtitle ? `<span>${escapeHTML(subtitle)}</span>` : ""}</div>
     <div class="topbar-actions">
-      <button class="icon-button" type="button" data-action="home" aria-label="${escapeHTML(tr("home"))}" title="${escapeHTML(tr("home"))}">⌂</button>
+      <button class="icon-button" type="button" data-action="home" aria-label="${phrase("Tone Sovereign home", "Inicio de Tone Sovereign")}" title="${phrase("Tone Sovereign home", "Inicio de Tone Sovereign")}">⌂</button>
       <button class="icon-button" type="button" data-action="toggle-sound" aria-label="${state.sound ? tr("soundOn") : tr("soundOff")}" title="${state.sound ? tr("soundOn") : tr("soundOff")}">${renderSoundIcon(state.sound)}</button>
     </div>
   </header>`;
+}
+
+function renderWebsiteContext() {
+  const focused = ['movement','guided','guidedSits','practiceEngine','threshold'].includes(state.view);
+  return `<div class="cn-context cn-frame"><a href="/" class="cn-website-home">Coherence Nikolai <span>· ${phrase("website home", "inicio del sitio")}</span></a><nav class="cn-nav" aria-label="${phrase("Website navigation", "Navegación del sitio")}">${focused ? '' : `<a href="${publicURL({kind:'home',lang:state.lang})}">Tone Sovereign</a>`}<a href="/#apps">${phrase("All apps", "Todas las apps")}</a>${focused ? '' : `<a href="${libraryURL(null,state.lang)}">${phrase("Comics", "Cómics")}</a><a href="/#welcome">${phrase("About", "Acerca de")}</a><a href="/support/">${phrase("Support", "Ayuda")}</a>`}</nav></div>`;
+}
+
+function renderCapacityOverview() {
+  const catalog=catalogFor(state.lang);
+  const capacity=catalog.capacities.find(item=>item.id===state.selectedCapacity);
+  if(!capacity)return renderPublicUnavailable();
+  const relation=CAPACITY_BOOKS.find(item=>item.capacity===capacity.id);
+  const book=comicEditions.find(item=>item.series==='practice-compendium'&&item.issue===relation?.issue&&item.language===state.lang);
+  const teaching=catalog.libraryEntries.find(item=>item.id===relation?.teaching);
+  return `${renderTopbar(capacity.title,phrase('A capacity, not a compulsory step','Una capacidad, no un paso obligatorio'))}<main class="page wide cn-capacity-overview"><div class="cn-capacity-copy"><p class="eyebrow">${phrase('Explore the capacity','Explora la capacidad')}</p><h1 class="page-title">${escapeHTML(capacity.title)}</h1><p class="lede">${escapeHTML(capacity.function)}</p><blockquote>${escapeHTML(capacity.coreQuestion)}</blockquote><p class="gentle-note">${phrase('Read, practise, or leave it here. Opening this page starts no practice or audio.','Lee, practica o termina aquí. Abrir esta página no inicia ninguna práctica ni audio.')}</p><div class="practice-actions"><button class="primary-button" data-open-movement="${capacity.id}" type="button">${phrase('Begin this practice','Comenzar esta práctica')}</button><a class="secondary-button" href="${publicURL({kind:'library',lang:state.lang})}">${phrase('Practices & Teachings','Prácticas y enseñanzas')}</a></div>${teaching?`<aside class="cn-related"><p>${phrase('A related teaching','Una enseñanza relacionada')}</p><a href="${publicURL({kind:'teaching',id:teaching.id,lang:state.lang})}">${escapeHTML(teaching.title)} →</a></aside>`:''}</div>${book?`<figure class="cn-capacity-book"><a href="${publicURL({kind:'book',series:book.series,issue:book.issue,lang:state.lang})}"><img src="${escapeAttribute(book.thumbnail)}" width="320" height="480" alt="${escapeAttribute(book.title)}" decoding="async"></a><figcaption><a href="${publicURL({kind:'book',series:book.series,issue:book.issue,lang:state.lang})}">${phrase('Read the practice book','Leer el libro de práctica')} →</a></figcaption></figure>`:''}</main>`;
+}
+
+function renderPublicUnavailable() {
+  return `${renderTopbar(phrase('Link unavailable','Enlace no disponible'))}<main class="page"><h1 class="page-title">${phrase('That destination could not be opened.','No se pudo abrir ese destino.')}</h1><p class="lede">${phrase('The link may name an unknown book, page, teaching or language. Choose from the current library; no practice has been started.','El enlace puede indicar un libro, página, enseñanza o idioma desconocido. Elige en la biblioteca actual; no se ha iniciado ninguna práctica.')}</p><a class="primary-button" href="${libraryURL(null,state.lang)}">${phrase('Open the comic library','Abrir la biblioteca de cómics')}</a></main>`;
+}
+
+function currentPublicRoute() {
+  const lang=state.lang;
+  if(['home','comics','library'].includes(state.view))return {kind:state.view,lang};
+  if(state.view==='capacityOverview')return {kind:'capacity',id:state.selectedCapacity,lang};
+  if(state.view==='entry')return {kind:'teaching',id:state.selectedEntry,lang};
+  if(state.view==='comicReader'){
+    const {series,issue}=comicContext();
+    const descriptor=comicPageDescriptor(issue,state.comicPage);
+    return {kind:'book',series:series.id,issue:issue.number,lang,page:descriptor.key==='cover'?'cover':descriptor.storyPage};
+  }
+  return null;
+}
+
+function writeNavigationHistory(push=false) {
+  const route=currentPublicRoute();
+  const depth=(window.history.state?.app===HISTORY_MARKER?window.history.state.depth||0:0)+(push?1:0);
+  const record={app:HISTORY_MARKER,view:state.view,depth,stack:[...state.stack],route,lang:state.lang,
+    selection:{selectedField:state.selectedField,selectedTeaching:state.selectedTeaching,selectedLaw:state.selectedLaw,selectedPrinciple:state.selectedPrinciple,selectedEntry:state.selectedEntry,selectedEngine:state.selectedEngine,selectedPath:state.selectedPath,libraryMode:state.libraryMode,foundationMode:state.foundationMode,guidedKind:state.guidedKind,guidedPhase:state.guidedPhase}};
+  const url=route?publicURL(route):state.view==='publicUnavailable'?window.location.href:'/tone_sovereign/';
+  window.history[push?'pushState':'replaceState'](record,'',url);
+}
+
+function applyPublicRoute(route) {
+  if(!route)return;
+  state.view=route.view;state.lang=route.lang;
+  state.ceremonySettled=true;state.ceremonyEntryReady=true;
+  if(route.kind==='book'){
+    state.selectedComicSeries=route.series;state.selectedComicIssue=route.issue;
+    state.comicPage=route.position;state.comicZoom=1;
+  }
+  if(route.kind==='capacity')state.selectedCapacity=route.id;
+  if(route.kind==='teaching')state.selectedEntry=route.id;
 }
 
 function renderSoundIcon(enabled = true) {
@@ -2372,6 +2439,7 @@ function renderEmbodyMovement() {
 }
 
 function startMovement(id) {
+  const previousView=state.view;
   state.storyReturn = null;
   cancelOfflineDownloads();
   stopPracticeTimers();
@@ -2388,8 +2456,10 @@ function startMovement(id) {
   }[id] || "practice";
   if (id === "embody" && state.practice.tone) state.practice.embodyStage = "remembered";
   state.view = "movement";
-  if (state.stack.at(-1) !== "practice") state.stack.push("practice");
+  if(previousView==='capacityOverview') state.stack.push(previousView);
+  else if (state.stack.at(-1) !== "practice") state.stack.push("practice");
   render();
+  if(previousView!=='movement') writeNavigationHistory(true);
   focusCurrentView();
   window.scrollTo({ top: 0, behavior: "auto" });
 }
@@ -2454,6 +2524,7 @@ function returnToMovementField() {
   state.view = "practice";
   if (state.stack.at(-1) === "practice") state.stack.pop();
   render();
+  writeNavigationHistory(false);
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 
@@ -2696,11 +2767,21 @@ async function savePracticeTrace() {
 }
 
 function resumePracticeView() {
+  if(state.practice.interrupted)return;
   if (state.practice.noticeStarted) startNoticeTimer(false);
   if (state.practice.breathStartedAt) startBreathTimer(false);
 }
 
+function pausePracticeForNavigation() {
+  const p=state.practice;
+  if(state.view==='movement'&&!['continuity','complete','close'].includes(p.stage)&&(p.noticeStarted||p.breathStartedAt||(p.movement==='cross'&&['question','crossed'].includes(p.stage)))){
+    if(!p.interrupted)p.interruptedAt=Date.now();
+    p.interrupted=true;
+  }
+}
+
 function stopPracticeTimers() {
+  practiceNavigationGeneration += 1;
   window.clearInterval(practiceTimer);
   window.clearInterval(guidedSitTimer);
   window.clearTimeout(reclaimHoldTimer);
@@ -2757,11 +2838,14 @@ function startNoticeTimer(reset = true) {
 }
 
 async function beginNoticePractice() {
+  const practice=state.practice;
+  const generation=++practiceNavigationGeneration;
   try {
     if (state.practice.guidance === "guided" && state.voice) await sound.prepareVoiceCues(noticeVoiceCues);
   } catch {
     showToast(state.lang === "en" ? "Voice guidance could not start." : "No se pudo iniciar la guía de voz.");
   }
+  if(generation!==practiceNavigationGeneration||state.practice!==practice||state.view!=='movement'||practice.movement!=='notice'||practice.interrupted)return;
   state.practice.noticeStarted = true;
   state.practice.stage = "noting";
   state.practice.noticeStartedAt = Date.now();
@@ -2814,6 +2898,8 @@ function breathVoiceCues(pattern) {
 }
 
 async function beginBreathPractice() {
+  const practice=state.practice;
+  const generation=++practiceNavigationGeneration;
   const pattern = selectedBreathPattern();
   try {
     if (state.practice.guidance === "guided" && state.voice) await sound.prepareVoiceCues(breathVoiceCues(pattern));
@@ -2821,6 +2907,7 @@ async function beginBreathPractice() {
   } catch {
     showToast(state.lang === "en" ? "Breathing audio could not start." : "No se pudo iniciar el audio de respiración.");
   }
+  if(generation!==practiceNavigationGeneration||state.practice!==practice||state.view!=='movement'||practice.movement!=='stabilise'||practice.interrupted)return;
   state.practice.stage = "breath";
   state.practice.breathStartedAt = Date.now();
   breathLastPhaseKey = "";
@@ -2828,6 +2915,9 @@ async function beginBreathPractice() {
 }
 
 async function startBreathTimer(reset = true) {
+  const practice=state.practice;
+  const generation=practiceNavigationGeneration;
+  const stillCurrent=()=>generation===practiceNavigationGeneration&&state.practice===practice&&state.view==='movement'&&practice.movement==='stabilise'&&!practice.interrupted;
   if (reset) {
     state.practice.breathStartedAt = Date.now();
     breathLastPhaseKey = "";
@@ -2835,8 +2925,8 @@ async function startBreathTimer(reset = true) {
   const startedAt = state.practice.breathStartedAt;
   const patternKey = selectedBreathPatternKey();
   const pattern = selectedBreathPattern();
-  try { await sound.startBreathPattern(patternKey); } catch {}
-  if (!state.practice.breathStartedAt || state.practice.breathStartedAt !== startedAt) return;
+  try { await sound.startBreathPattern(patternKey,stillCurrent); } catch {}
+  if (!stillCurrent() || !state.practice.breathStartedAt || state.practice.breathStartedAt !== startedAt) return;
   window.clearInterval(practiceTimer);
   const update = () => {
     const elapsed = (Date.now() - state.practice.breathStartedAt) / 1000;
@@ -2856,7 +2946,7 @@ async function startBreathTimer(reset = true) {
     const frame = breathFrameAt(pattern, elapsed);
     if (frame.key !== breathLastPhaseKey) {
       breathLastPhaseKey = frame.key;
-      sound.breathPhase(patternKey, frame.phase.sound).catch(() => {});
+      sound.breathPhase(patternKey, frame.phase.sound,stillCurrent).catch(() => {});
       let voiceCue = frame.phase.voice;
       if (patternKey === "anapana" && frame.index === 0 && frame.cycleIndex > 0) voiceCue = "ts_stabilise_return_attention_v1";
       if (voiceCue && state.practice.guidance === "guided") sound.playVoice(voiceCue);
@@ -3131,8 +3221,8 @@ function comicIssueLabel(series, issue) {
   return `${phrase("Issue", "Número")} ${issue.number}`;
 }
 
-function renderComicLanguageControl() {
-  return `<div class="comic-language-control" role="group" aria-label="${phrase("Comic language", "Idioma del cómic")}">
+function renderComicLanguageControl(label=phrase("Comic language", "Idioma del cómic")) {
+  return `<div class="comic-language-control" role="group" aria-label="${escapeAttribute(label)}">
     <button type="button" data-comic-language="en" aria-pressed="${state.lang === "en"}">EN</button>
     <button type="button" data-comic-language="es" aria-pressed="${state.lang === "es"}">ES</button>
   </div>`;
@@ -3163,8 +3253,8 @@ function renderComics() {
       <header class="section-intro comics-intro"><div><p class="eyebrow">${phrase("Practices & Teachings", "Prácticas y enseñanzas")}</p><h1 class="page-title">${phrase("Stories for discernment.", "Historias para el discernimiento.")}</h1><p class="lede measure">${phrase("Read in any order. These stories offer images and questions; they do not diagnose you or decide what your experience means.", "Lee en cualquier orden. Estas historias ofrecen imágenes y preguntas; no te diagnostican ni deciden qué significa tu experiencia.")}</p></div>${renderComicLanguageControl()}</header>
       <nav class="comic-collection-links" aria-label="${phrase("Choose a collection", "Elige una colección")}">${publishedSeries.map(series => `<a href="#comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</a>`).join("")}</nav>
       ${publishedSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : series.kind === "specials" ? phrase("Optional fiction", "Ficción opcional") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
-      <p class="gentle-note">${phrase("Comic images load only as you open or approach them. Your reading position is not recorded.", "Las imágenes se cargan solo cuando las abres o te acercas a ellas. Tu posición de lectura no se registra.")}</p>
-      <p class="gentle-note"><a href="/tone_comics/">${phrase("Earlier editions and original archive", "Ediciones anteriores y archivo original")} →</a></p>
+      <p class="gentle-note">${phrase("Images load as you approach them. No reading progress is saved to your app archive. The book, language and page appear in shareable URLs and normal browser history.", "Las imágenes se cargan cuando te acercas a ellas. No se guarda progreso de lectura en el archivo de la app. El libro, idioma y página aparecen en enlaces compartibles y en el historial normal del navegador.")}</p>
+      <p class="gentle-note"><a href="${libraryURL(null,state.lang)}">${phrase("Complete public comic library", "Biblioteca pública completa de cómics")} →</a> · <a href="/tone_comics/?edition=archive">${phrase("Earlier editions and original archive", "Ediciones anteriores y archivo original")} →</a></p>
     </main>`;
 }
 
@@ -3189,6 +3279,7 @@ function renderComicReader() {
     : "";
   return `${renderTopbar(series[state.lang].title, `${comicIssueLabel(series, issue)} · ${issue[state.lang]}`)}
     <main class="comic-reader-page">
+      <a class="cn-reader-return" href="${libraryURL(series.id,state.lang)}">← ${phrase("Back to the comic library", "Volver a la biblioteca de cómics")}</a>
       <header class="comic-reader-heading"><div><p class="eyebrow">${escapeHTML(comicIssueLabel(series, issue))}</p><h1>${escapeHTML(issue[state.lang])}</h1></div>${renderComicLanguageControl()}</header>
       <p id="comic-language-note" class="comic-language-note" ${spanishFallback ? "" : "hidden"}>${phrase("Spanish edition in preparation. Showing the English artwork.", "La edición en español está en preparación. Se muestra la versión gráfica en inglés.")}</p>
       <label class="comic-zoom-control"><span>${phrase("Reading size", "Tamaño de lectura")}</span><select data-comic-zoom aria-describedby="comic-zoom-help">${[1, 1.5, 2, 3].map(zoom => `<option value="${zoom}" ${state.comicZoom === zoom ? "selected" : ""}>${zoom === 1 ? phrase("Fit page", "Ajustar página") : `${zoom * 100}%`}</option>`).join("")}</select></label>
@@ -3205,7 +3296,21 @@ function renderComicReader() {
       </nav>
       <p class="comic-reader-help">${phrase("Swipe left or right · Arrow keys turn pages", "Desliza a la izquierda o derecha · las flechas cambian de página")}</p>
       ${transcript}
+      ${series.id==='practice-compendium'?renderBookConnection(issue.number):''}
     </main>`;
+}
+
+function renderBookConnection(number,fromTeaching=false) {
+  const relation=CAPACITY_BOOKS.find(item=>item.issue===number);
+  if(!relation)return '';
+  const catalog=catalogFor(state.lang);
+  const capacity=catalog.capacities.find(item=>item.id===relation.capacity);
+  const teaching=catalog.libraryEntries.find(item=>item.id===relation.teaching);
+  if(!capacity||!teaching)return '';
+  const destination=fromTeaching
+    ? `<a href="${publicURL({kind:'book',series:'practice-compendium',issue:number,lang:state.lang})}">${phrase('Read the practice book','Leer el libro de práctica')} →</a>`
+    : `<a href="${publicURL({kind:'teaching',id:teaching.id,lang:state.lang})}">${escapeHTML(teaching.title)} →</a>`;
+  return `<aside class="cn-related"><p class="eyebrow">${phrase('If you want to explore further','Si quieres explorar más')}</p><p>${escapeHTML(capacity.function)}</p><a href="${publicURL({kind:'capacity',id:capacity.id,lang:state.lang})}">${escapeHTML(capacity.title)} →</a>${destination}</aside>`;
 }
 
 const comicTranscriptCache = new Map();
@@ -3668,7 +3773,22 @@ app.addEventListener('toggle', event => {
   if (event.target?.matches('.practice-story') && state.view === 'movement') state.practice.storyExpanded = event.target.open;
 }, true);
 
+function followPublicLink(event) {
+  if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return false;
+  const anchor=event.target.closest('a[href]');
+  if(!anchor||anchor.hasAttribute('download')||(anchor.target&&anchor.target!=='_self'))return false;
+  const url=new URL(anchor.href,window.location.href);
+  if(url.origin!==window.location.origin||url.pathname!=='/tone_sovereign/'||url.hash)return false;
+  const lang=url.searchParams.get('lang')||state.lang;
+  const route=readPublicRoute(url.search,comicManifest,catalogFor(lang),state.lang);
+  if(!route||route.view==='publicUnavailable')return false;
+  event.preventDefault();
+  navigate(route.view,{publicRoute:route});
+  return true;
+}
+
 app.addEventListener("click", async event => {
+  if(followPublicLink(event))return;
   const button = event.target.closest("button");
   if (!button) return;
   const { action, view, steady, pull, relation, doorway, tone, field, teaching, law, principle, entry, engine, mission } = button.dataset;
@@ -3837,7 +3957,7 @@ app.addEventListener("click", async event => {
     if (!state.voice) showToast(phrase("Voice is off. You can turn it on in Settings.", "La voz está desactivada. Puedes activarla en Ajustes."));
     else sound.playVoice("ts_first_light_tagline_v1");
   }
-  if (action === "replay-from-home" || action === "replay-from-settings") { state.stack = []; state.view = "landing"; replayCeremony(true); }
+  if (action === "replay-from-home" || action === "replay-from-settings") { state.stack = []; state.view = "landing"; writeNavigationHistory(false); replayCeremony(true); }
   if (action === "toggle-sound") {
     state.sound = !state.sound;
     persistPreferences();
@@ -4246,7 +4366,22 @@ function drawAmbient(time = 0) {
 
 window.addEventListener("resize", resizeField);
 window.addEventListener("popstate", event => {
-  if (event.state?.app === HISTORY_MARKER) restorePreviousView();
+  if (event.state?.app !== HISTORY_MARKER) return;
+  if(!Array.isArray(event.state.stack)){restorePreviousView();return;}
+  pausePracticeForNavigation();
+  cancelOfflineDownloads();stopPracticeTimers();
+  if(state.view==='guidedSits')resetGuidedSitSession();
+  const returnStory=state.storyReturn?.view===event.state.view?state.storyReturn:null;
+  state.stack=[...event.state.stack];state.view=event.state.view;
+  if(['en','es'].includes(event.state.lang))state.lang=event.state.lang;
+  for(const key of ['selectedField','selectedTeaching','selectedLaw','selectedPrinciple','selectedEntry','selectedEngine','selectedPath','libraryMode','foundationMode','guidedKind']){
+    if(typeof event.state.selection?.[key]==='string')state[key]=event.state.selection[key];
+  }
+  if(Number.isSafeInteger(event.state.selection?.guidedPhase)&&event.state.selection.guidedPhase>=0)state.guidedPhase=event.state.selection.guidedPhase;
+  const route=readPublicRoute(location.search,comicManifest,catalogFor(new URLSearchParams(location.search).get('lang')||state.lang),state.lang);
+  if(route)applyPublicRoute(route);
+  if(returnStory){state.practice=returnStory.practice;state.lang=returnStory.lang;state.storyReturn=null;}
+  render();focusCurrentView();window.scrollTo(0,returnStory?.scrollY||0);
 });
 document.addEventListener("visibilitychange", () => {
   const noticing = state.view === "movement" && state.practice.movement === "notice" && state.practice.noticeStarted;
@@ -4289,19 +4424,16 @@ window.addEventListener("beforeunload", () => { cancelAnimationFrame(fieldFrame)
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 
 // Known public entry points never start a practice or audio.
-const publicEntry = new URLSearchParams(window.location.search).get("open");
-if (["home", "comics", "the-lock"].includes(publicEntry)) {
-  state.view = publicEntry === "the-lock" ? "comicReader" : publicEntry;
-  state.stack = publicEntry === "home" ? [] : publicEntry === "comics" ? ["home"] : ["home", "comics"];
-  if (publicEntry === "the-lock") {
-    state.selectedComicSeries = "specials";
-    state.selectedComicIssue = 1;
-  }
-  state.ceremonySettled = true;
-  state.ceremonyEntryReady = true;
+const publicEntry=readPublicRoute(location.search,comicManifest,catalogFor(new URLSearchParams(location.search).get('lang')||state.lang),state.lang);
+if(publicEntry){
+  applyPublicRoute(publicEntry);
+  state.stack=publicEntry.view==='home'?[]:publicEntry.kind==='book'?['home','comics']:['home'];
 }
+// Public arrival is a still, immediate invitation. First Light remains an
+// explicit replay choice, including its separately chosen sound.
+state.ceremonySettled=true;state.ceremonyEntryReady=true;
 persistPreferences();
 resizeField();
-window.history.replaceState({ app: HISTORY_MARKER, view: state.view }, "", window.location.href);
+writeNavigationHistory(false);
 render();
 fieldFrame = requestAnimationFrame(drawAmbient);

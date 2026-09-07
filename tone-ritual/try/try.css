@@ -48,85 +48,12 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035), 0 2rem 6rem rgba(0, 0, 0, 0.35);
 }
 
-.ritual-mark {
-  --mark-size: 18rem;
-  position: relative;
-  width: var(--mark-size);
+.ritual-logo {
+  display: block;
+  width: min(calc(100% - 2rem), 22rem);
+  height: auto;
   aspect-ratio: 1;
-  filter: drop-shadow(0 0 2.4rem rgba(220, 188, 124, 0.16));
-}
-
-.mark-orb {
-  position: absolute;
-  inset: 14%;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 54% 48%, rgba(255, 253, 239, 0.72), rgba(193, 174, 137, 0.34) 22%, rgba(97, 73, 45, 0.58) 60%, rgba(21, 16, 13, 0.9) 100%);
-  border: 3px solid rgba(248, 238, 217, 0.76);
-  box-shadow:
-    inset 0 0 3.4rem rgba(255, 255, 255, 0.18),
-    inset 0 -1.8rem 3rem rgba(0, 0, 0, 0.32),
-    0 0 4rem rgba(209, 177, 119, 0.18);
-}
-
-.mark-ring,
-.interactive-ring {
-  position: absolute;
-  left: 5%;
-  top: 36%;
-  width: 90%;
-  height: 30%;
-  border: 0.36rem solid rgba(236, 218, 177, 0.48);
-  border-radius: 50%;
-  transform: rotate(-18deg);
-  box-shadow:
-    0 0 1rem rgba(230, 199, 132, 0.26),
-    inset 0 0 0.8rem rgba(255, 255, 255, 0.16);
-}
-
-.mark-dot {
-  position: absolute;
-  width: 0.78rem;
-  height: 0.78rem;
-  border-radius: 999px;
-  background: #fff5c8;
-  box-shadow: 0 0 0.65rem rgba(255, 224, 132, 0.86), 0 0 1.8rem rgba(255, 241, 198, 0.38);
-}
-
-.dot-one { left: 11%; top: 54%; }
-.dot-two { left: 14%; top: 65%; }
-.dot-three { left: 26%; top: 69%; }
-.dot-four { left: 40%; top: 64%; }
-.dot-five { left: 54%; top: 55%; }
-.dot-six { left: 67%; top: 45%; }
-.dot-seven { left: 77%; top: 36%; }
-.dot-eight { left: 72%; top: 28%; }
-.dot-nine { left: 53%; top: 28%; }
-.dot-ten { left: 34%; top: 34%; }
-
-.large-mark .mark-dot {
-  animation: ritual-lamp 4s ease-in-out infinite;
-}
-
-.large-mark .dot-two { animation-delay: 0.18s; }
-.large-mark .dot-three { animation-delay: 0.36s; }
-.large-mark .dot-four { animation-delay: 0.54s; }
-.large-mark .dot-five { animation-delay: 0.72s; }
-.large-mark .dot-six { animation-delay: 0.9s; }
-.large-mark .dot-seven { animation-delay: 1.08s; }
-.large-mark .dot-eight { animation-delay: 1.26s; }
-.large-mark .dot-nine { animation-delay: 1.44s; }
-.large-mark .dot-ten { animation-delay: 1.62s; }
-
-@keyframes ritual-lamp {
-  0%, 46%, 100% {
-    opacity: 0.5;
-    transform: scale(0.72);
-  }
-  16%, 28% {
-    opacity: 1;
-    transform: scale(1.16);
-  }
+  object-fit: contain;
 }
 
 .web-map-grid {
@@ -377,13 +304,22 @@
   filter: blur(0.55rem);
 }
 
-.interactive-ring {
-  left: 2.5%;
-  top: 34.5%;
+.interactive-orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 95%;
   height: 32%;
-  border-width: 0.5rem;
-  border-color: rgba(243, 225, 184, 0.64);
+  transform: translate(-50%, -50%) rotate(-35deg);
+  z-index: 4;
+}
+
+.interactive-ring {
+  position: absolute;
+  /* Put the stroke's centre on the same ellipse as the ten dot centres. */
+  inset: -0.25rem;
+  border: 0.5rem solid rgba(243, 225, 184, 0.64);
+  border-radius: 50%;
   box-shadow:
     0 0 0.3rem rgba(255, 249, 229, 0.62),
     0 0 1.35rem rgba(230, 199, 132, 0.3),
@@ -634,10 +570,6 @@
 
   .ritual-hero-panel {
     min-height: 18rem;
-  }
-
-  .ritual-mark {
-    --mark-size: 14rem;
   }
 
   .language-strip,

@@ -15,8 +15,10 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/site.css">
   <link rel="stylesheet" href="/tone-steady/try/try.css">
+  <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r1">
+  <script defer src="/assets/coherence.js?v=20260907-r1"></script>
 </head>
-<body class="steady-try-page">
+<body class="coherence-public steady-try-page" data-coherence="public">
   <canvas class="tone-field" id="tone-field" aria-hidden="true"></canvas>
 
   <header class="site-header">
@@ -24,11 +26,7 @@
       <span>coherence</span>
       <span>nikolai</span>
     </a>
-    <nav class="nav" aria-label="Primary navigation">
-      <a href="/tone-steady/">Tone Steady</a>
-      <a href="/#apps">Apps</a>
-      <a href="/support/">Support</a>
-    </nav>
+    <nav class="nav" aria-label="Primary navigation"><a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="/#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="/#welcome">About</a><a href="/support/">Support</a></nav>
   </header>
 
   <main class="steady-try-main" data-lang="en">
@@ -47,16 +45,11 @@
       </div>
 
       <div class="steady-hero-orb" aria-hidden="true">
-        <div class="compass-orb">
-          <span class="compass-core"></span>
-          <span class="compass-ring"></span>
-          <span class="compass-line"></span>
-          <span class="compass-tip"></span>
-        </div>
+        <img class="cn-brand-logo" src="/assets/tone-steady-icon.png" width="1024" height="1024" alt="" decoding="async">
       </div>
     </section>
 
-    <section class="steady-map section" aria-label="Web version map">
+    <details class="cn-optional-guide"><summary data-cn-guide>About this web practice</summary><section class="steady-map section" aria-label="Web version map">
       <div class="section-head centered">
         <p class="label" data-i18n="mapLabel">Map</p>
         <h2 data-i18n="mapTitle">The free core, in the browser.</h2>
@@ -70,7 +63,7 @@
         <article><span>03</span><h3 data-i18n="mapThreeTitle">Enough</h3><p data-i18n="mapThreeCopy">Stop as soon as enough has shifted.</p></article>
         <article><span>04</span><h3 data-i18n="mapFourTitle">Leave</h3><p data-i18n="mapFourCopy">Return without making the app the destination.</p></article>
       </div>
-    </section>
+    </section></details>
 
     <section class="steady-instrument section" id="steady-instrument" aria-label="Tone Steady web instrument">
       <div class="language-strip">

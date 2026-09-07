@@ -1,0 +1,19 @@
+/* A small website context, not a replacement for an instrument's own chrome. */
+.cn-tool-links{box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:.15rem 1.25rem;width:100%;padding:.65rem 0;margin:.5rem 0 1rem;border-bottom:1px solid #877340;font:inherit;font-size:.9375rem;line-height:1.4;position:relative;touch-action:auto;flex-shrink:0;grid-column:1/-1;clear:both}
+.cn-tool-links a{box-sizing:border-box;display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:underline;text-underline-offset:.28em;border:0;background:none;white-space:normal;letter-spacing:normal;line-height:1.4;font:inherit}
+.cn-tool-links a:first-child{font-family:"Iowan Old Style",Baskerville,Georgia,serif;font-size:1.05em;text-decoration:none}
+.cn-tool-links a:focus-visible{outline:3px solid currentColor;outline-offset:3px;border-radius:2px}
+.cn-tool-links a:hover{text-decoration-thickness:2px}
+.cn-connected-screen{overflow-y:auto!important;justify-content:safe center!important}
+.cn-connected-screen>*{flex-shrink:0}
+.cn-connected-screen>.cn-tool-links{justify-content:center;max-width:40rem;order:50;margin-top:1.5rem}
+.cn-connected-screen:not(.active)>.cn-tool-links{visibility:hidden}
+.cn-connected-landing{overflow-y:auto!important;justify-content:safe center!important}
+.cn-connected-landing>*{flex-shrink:0}
+.cn-connected-landing>.cn-tool-links{justify-content:center;max-width:42rem;margin-bottom:0}
+.cn-tool-dialog{max-height:85dvh;overflow-y:auto}
+.cn-tool-links.cn-tool-constrained{width:min(1040px,calc(100% - 2rem));margin-inline:auto}
+@media(max-width:640px){html[data-active-panel="mobile-result"] main.main>.cn-tool-links{display:none}}
+@media(max-width:780px){.cn-glyph-desktop{display:none}.cn-glyph-mobile{padding-inline:1rem}}
+@media(min-width:781px){.cn-glyph-mobile{display:none}}
+@media(prefers-reduced-motion:reduce){.cn-tool-links *{transition:none!important;animation:none!important}}

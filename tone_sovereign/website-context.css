@@ -1,0 +1,17 @@
+/* Shared website identity; the practice's existing state and visual instrument
+   remain owned by Tone Sovereign. No fixed overlay on art or controls. */
+.app-shell>.cn-context{max-width:none;padding-inline:max(1rem,calc((100% - 1320px)/2));box-sizing:border-box}
+.cn-website-home{flex-wrap:wrap;gap:.35rem;font-family:var(--cn-serif);text-decoration:none}
+.cn-website-home span{font-family:var(--cn-sans);font-size:.8rem;color:var(--cn-muted)}
+.cn-frame :is(a,button):focus-visible{outline:3px solid var(--cn-gold);outline-offset:3px}
+.cn-reader-return{display:inline-flex;align-items:center;min-height:44px;color:var(--cn-gold);text-underline-offset:.3em;margin-bottom:1rem}
+.cn-capacity-overview{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(240px,.7fr);gap:clamp(2rem,6vw,5rem);align-items:start}
+.cn-capacity-copy{min-width:0}
+.cn-capacity-book{margin:0;max-width:480px}
+.cn-capacity-book img{display:block;width:100%;height:auto;object-fit:contain}
+.cn-capacity-book figcaption{font-size:1rem;line-height:1.5;padding-top:1rem}
+.cn-capacity-copy .secondary-button,.cn-capacity-copy .primary-button{display:inline-flex;text-decoration:none;align-items:center;justify-content:center}
+.comic-reader-page .cn-related{max-width:70ch;margin-inline:auto}
+.cn-related a{line-height:1.6;text-underline-offset:.25em}
+.cn-reading-language{display:flex;justify-content:flex-end;margin-bottom:1.5rem;grid-column:1/-1}
+@media(max-width:700px){.cn-capacity-overview{grid-template-columns:1fr}.cn-capacity-book{width:min(100%,400px);justify-self:center}.app-shell>.cn-context{padding:.5rem 1rem}.cn-context .cn-nav{gap:.2rem .9rem}}
