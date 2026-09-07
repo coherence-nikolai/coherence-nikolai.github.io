@@ -1,4 +1,4 @@
-const CACHE_NAME = "sota-haiku-v24-website-context";
+const CACHE_NAME = "sota-haiku-v25-website-context";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -11,8 +11,8 @@ const APP_SHELL = [
   "./shared/brush-lines-only.png?v=23-about-lines",
   "./shared/haiku-gates.json",
   "./audio/Ambience/temple-gong.wav",
-  "/assets/tool-context.css?v=20260907-r1",
-  "/assets/tool-context.js?v=20260907-r1"
+  "/assets/tool-context.css?v=20260907-r2",
+  "/assets/tool-context.js?v=20260907-r2"
 ];
 
 self.addEventListener("install", (event) => {

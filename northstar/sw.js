@@ -1,10 +1,10 @@
-const CACHE_NAME = "northstar-shell-v57";
+const CACHE_NAME = "northstar-shell-v58";
 const ownMatch=request=>caches.open(CACHE_NAME).then(cache=>cache.match(request));
 const SHELL_ASSETS = [
   "./",
   "./index.html",
-  "/assets/tool-context.css?v=20260907-r1",
-  "/assets/tool-context.js?v=20260907-r1",
+  "/assets/tool-context.css?v=20260907-r2",
+  "/assets/tool-context.js?v=20260907-r2",
   "./styles.css?v=20260602a",
   "./manifest.webmanifest?v=20260602a",
   "./icon.svg?v=20260602a",

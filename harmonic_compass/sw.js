@@ -1,4 +1,4 @@
-const CACHE_NAME = "harmonic-compass-v24";
+const CACHE_NAME = "harmonic-compass-v25";
 const ownMatch=request=>caches.open(CACHE_NAME).then(cache=>cache.match(request));
 const APP_SHELL = [
   "/harmonic_compass/",
@@ -7,8 +7,8 @@ const APP_SHELL = [
   "/harmonic_compass/app.js?v=23",
   "/harmonic_compass/manifest.webmanifest",
   "/assets/favicon.svg",
-  "/assets/tool-context.css?v=20260907-r1",
-  "/assets/tool-context.js?v=20260907-r1"
+  "/assets/tool-context.css?v=20260907-r2",
+  "/assets/tool-context.js?v=20260907-r2"
 ];
 
 self.addEventListener("install", (event) => {

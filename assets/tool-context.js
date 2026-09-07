@@ -22,6 +22,7 @@
     '/innerorbit/':[{selector:'#aboutDialog h2',at:'after',dialog:true}],
     '/toneglyph/':[{selector:'.mode-rail',at:'after',variant:'cn-glyph-mobile'},{selector:'#control-drawer',variant:'cn-glyph-desktop'}],
     '/sota_haiku/':[{selector:'#app > main.stack'},{selector:'#app .line-menu-list',at:'start'}],
+    '/sota/':[{selector:'#screen-entry',screen:true},{selector:'#settings-panel .settings-inner',at:'start'},{selector:'#mode-sit-setup .setup-inner',at:'start'}],
     '/tone-mirror/':[{selector:'.landing-stack'},{selector:'.app-shell > header.topbar',at:'after',variant:'cn-tool-constrained'}],
     '/scaffold/':[{selector:'.app-header',at:'after',variant:'cn-tool-constrained'}],
     '/catastic/':[{selector:'#root',at:'before',variant:'cn-tool-constrained'}],

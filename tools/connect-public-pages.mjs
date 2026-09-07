@@ -5,7 +5,7 @@ const pages=['tone/index.html','tone/try/index.html','tone-steady/index.html','t
 const nav='<a href="/tone_sovereign/?open=home">Tone Sovereign</a><a href="/#apps">All apps</a><a href="/tone_comics/">Comics</a><a href="/#welcome">About</a><a href="/support/">Support</a>';
 for(const path of pages){
   let html=readFileSync(path,'utf8');
-  if(!html.includes('/assets/coherence.css')) html=html.replace('</head>','  <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r1">\n  <script defer src="/assets/coherence.js?v=20260907-r1"></script>\n</head>');
+  if(!html.includes('/assets/coherence.css')) html=html.replace('</head>','  <link rel="stylesheet" href="/assets/coherence.css?v=20260907-r2">\n  <script defer src="/assets/coherence.js?v=20260907-r2"></script>\n</head>');
   if(!html.includes('data-coherence="public"')) html=html.replace(/<body([^>]*)>/,'<body$1 data-coherence="public">');
   html=html.replace(/<body([^>]*)>/,(match,attrs)=>attrs.includes('coherence-public')?match:attrs.includes('class="')?`<body${attrs.replace('class="','class="coherence-public ')}>`:`<body class="coherence-public"${attrs}>`);
   html=html.replace(/(<header class="site-header[^\"]*">[\s\S]*?<nav class="nav"[^>]*>)[\s\S]*?(<\/nav>)/,`$1${nav}$2`);

@@ -1,7 +1,7 @@
-const CACHE_NAME = "catastic-v5";
+const CACHE_NAME = "catastic-v6";
 const ownMatch=request=>caches.open(CACHE_NAME).then(cache=>cache.match(request));
 const SCOPE = self.registration.scope;
-const CORE_ASSETS = [SCOPE, `${SCOPE}index.html`, `${SCOPE}manifest.webmanifest`, `${SCOPE}catastic-icon.svg`, '/catastic/assets/index-CLYIcHqx.js', '/catastic/assets/index-DjQk9Ktd.css', '/assets/tool-context.css?v=20260907-r1', '/assets/tool-context.js?v=20260907-r1'];
+const CORE_ASSETS = [SCOPE, `${SCOPE}index.html`, `${SCOPE}manifest.webmanifest`, `${SCOPE}catastic-icon.svg`, '/catastic/assets/index-CLYIcHqx.js', '/catastic/assets/index-DjQk9Ktd.css', '/assets/tool-context.css?v=20260907-r2', '/assets/tool-context.js?v=20260907-r2'];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)));

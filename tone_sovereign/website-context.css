@@ -3,6 +3,7 @@
 .app-shell>.cn-context{max-width:none;padding-inline:max(1rem,calc((100% - 1320px)/2));box-sizing:border-box}
 .cn-website-home{flex-wrap:wrap;gap:.35rem;font-family:var(--cn-serif);text-decoration:none}
 .cn-website-home span{font-family:var(--cn-sans);font-size:.8rem;color:var(--cn-muted)}
+.cn-website-home strong{font-weight:400;font-size:1.15rem}
 .cn-frame :is(a,button):focus-visible{outline:3px solid var(--cn-gold);outline-offset:3px}
 .cn-reader-return{display:inline-flex;align-items:center;min-height:44px;color:var(--cn-gold);text-underline-offset:.3em;margin-bottom:1rem}
 .cn-capacity-overview{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(240px,.7fr);gap:clamp(2rem,6vw,5rem);align-items:start}

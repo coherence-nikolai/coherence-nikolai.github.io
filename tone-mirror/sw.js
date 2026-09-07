@@ -1,4 +1,4 @@
-const CACHE_NAME = "tone-mirror-v3";
+const CACHE_NAME = "tone-mirror-v4";
 const ownMatch=request=>caches.open(CACHE_NAME).then(cache=>cache.match(request));
 const APP_SHELL = [
   "/tone-mirror/",
@@ -6,8 +6,8 @@ const APP_SHELL = [
   "/tone-mirror/icon.svg",
   "/tone-mirror/assets/index-26CQZSCk.js",
   "/tone-mirror/assets/index-C-B26Crp.css",
-  "/assets/tool-context.css?v=20260907-r1",
-  "/assets/tool-context.js?v=20260907-r1"
+  "/assets/tool-context.css?v=20260907-r2",
+  "/assets/tool-context.js?v=20260907-r2"
 ];
 
 self.addEventListener("install", (event) => {

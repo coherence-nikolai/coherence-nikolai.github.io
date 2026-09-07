@@ -16,7 +16,7 @@ export const appGroups = [
     {id:'tone-hidden-worlds', name:'Tone: Hidden Worlds', href:'/tone_hidden_worlds/', description:'The Tone edition of the empathy practice.', homepage:false}
   ]},
   {id:'sota-family', title:'Meditation & inquiry', description:'Sitting, poetry, direct observation and self-inquiry.', apps:[
-    {id:'sota', name:'Sota', href:'/sota/', action:'About / iPhone', description:'A structured meditation companion for iPhone.'},
+    {id:'sota', name:'Sota', href:'/sota/', description:'Sitting, noting and a companion for your practice. Optional AI features.'},
     {id:'haiku', name:'Sota Haiku', href:'/sota_haiku/', description:'One poem, an optional voice, and room to sit.'},
     {id:'unfabricate', name:'Unfabricate', href:'/unfabricate/', description:'A sutta-based companion for direct practice.'},
     {id:'i-sense', name:'I-Sense Observatory', href:'/i-sense_observatory/', description:'Observe the felt sense of being me.'}
@@ -44,5 +44,5 @@ export const appGroups = [
 
 export const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function directoryHTML(){
-  return appGroups.map(group=>`<section class="cn-directory-group" id="${group.id}" aria-labelledby="${group.id}-title"><h3 id="${group.id}-title">${escapeHTML(group.title)}</h3><p>${escapeHTML(group.description)}</p><ul class="cn-app-list">${group.apps.filter(app=>app.homepage!==false).map(app=>`<li><div><a href="${app.href}">${escapeHTML(app.name)} <span aria-hidden="true">↗</span></a><small>${escapeHTML(app.description)}</small></div>${app.about?`<a class="cn-app-about" href="${app.about}" aria-label="About ${escapeHTML(app.name)}">About</a>`:app.action?`<span class="cn-app-about">${escapeHTML(app.action)}</span>`:''}</li>`).join('')}</ul></section>`).join('\n');
+  return appGroups.map(group=>`<section class="cn-directory-group" id="${group.id}" aria-labelledby="${group.id}-title"><div class="cn-directory-heading"><h3 id="${group.id}-title">${escapeHTML(group.title)}</h3><p>${escapeHTML(group.description)}</p></div><ul class="cn-app-list">${group.apps.filter(app=>app.homepage!==false).map(app=>`<li><div><a href="${app.href}">${escapeHTML(app.name)}</a><small>${escapeHTML(app.description)}</small></div>${app.about?`<a class="cn-app-about" href="${app.about}" aria-label="About ${escapeHTML(app.name)}">About</a>`:app.action?`<span class="cn-app-about">${escapeHTML(app.action)}</span>`:''}</li>`).join('')}</ul></section>`).join('\n');
 }
