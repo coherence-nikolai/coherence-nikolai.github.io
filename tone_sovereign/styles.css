@@ -1785,3 +1785,8 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .storage-warning { padding: 18px; margin: 12px auto; max-width: 52rem; border: 1px solid #c89757; background: #1c160e; color: #f5ebd7; line-height: 1.55; }
 .backup-choice { display: flex; align-items: center; gap: 12px; padding-block: 12px; min-height: 44px; font-size: 1rem; }
 .backup-choice input { width: 20px; height: 20px; flex-shrink: 0; }
+.interactive-comic-entry{display:grid;grid-template-columns:minmax(160px,.62fr) minmax(0,1fr);gap:clamp(1.25rem,4vw,3rem);align-items:center;margin:2rem 0 4rem;border:1px solid var(--line);background:#0b0e0c;color:inherit;text-decoration:none;overflow:hidden}
+.interactive-comic-art{height:260px;overflow:hidden}.interactive-comic-art img{width:100%;height:100%;object-fit:cover;filter:saturate(.68) brightness(.67)}
+.interactive-comic-copy{display:grid;gap:.45rem;padding:1.5rem 1.5rem 1.5rem 0}.interactive-comic-copy small{color:var(--gold);letter-spacing:.12em;text-transform:uppercase}.interactive-comic-copy strong{font:800 clamp(2.8rem,7vw,5rem)/.85 "Arial Narrow",Impact,sans-serif;letter-spacing:-.05em}.interactive-comic-copy>span{color:var(--muted)}.interactive-comic-copy b{margin-top:.55rem;color:var(--gold)}
+.interactive-comic-entry:hover{border-color:var(--gold)}
+@media(max-width:620px){.interactive-comic-entry{grid-template-columns:1fr}.interactive-comic-art{height:220px}.interactive-comic-copy{padding:0 1.25rem 1.5rem}}

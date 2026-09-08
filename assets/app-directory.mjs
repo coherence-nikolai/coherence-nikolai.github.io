@@ -1,16 +1,16 @@
 // Public destination registry. An information page or historic alias is not another app.
 export const appGroups = [
   {id:'tone-apps', title:'Tone & reflection', description:'Attention, steadiness, reflection and participation.', apps:[
-    {id:'sovereign', name:'Tone Sovereign', href:'/tone_sovereign/?open=home', description:'Seven capacities, practices and teachings.', logo:'/tone_sovereign/sword-mark.png'},
+    {id:'sovereign', name:'Tone Sovereign', href:'/tone_sovereign/?open=home', about:'/tone_sovereign/?open=about&lang=en', description:'Seven capacities, practices and teachings.', logo:'/tone_sovereign/sword-mark.png'},
     {id:'recall', name:'Tone Recall', href:'/tone/try/#instrument', about:'/tone/', description:'Choose, shape and revisit a tone.', logo:'/assets/tone-recall-icon.png', aliases:['/tone-recall/','/tonerecall/']},
     {id:'tone-steady', name:'Tone Steady', href:'/tone-steady/try/#steady-instrument', about:'/tone-steady/', description:'A pause before responding.', logo:'/assets/tone-steady-icon.png'},
     {id:'ritual', name:'Tone Ritual', href:'/tone-ritual/try/#web-ritual', about:'/tone-ritual/', description:'Small acts that carry intention into life.', logo:'/assets/tone-ritual-icon.png'},
     {id:'tone-threshold', name:'Tone Threshold', href:'/tone-threshold/try/#threshold-instrument', about:'/tone-threshold/', description:'Reflective questions for a crossing.', logo:'/assets/tone-threshold-icon.png'},
     {id:'mirror', name:'Tone Mirror', href:'/tone-mirror/', about:'/tone-mirror-journal/', description:'Symbol, breath and a private reflection.', logo:'/tone-mirror/icon.svg'},
-    {id:'glyph', name:'Tone Glyph', href:'/toneglyph/', description:'Geometry, attention and personal symbolic form.', logo:'/toneglyph/icon.svg'},
-    {id:'paradox', name:'Tone Paradox', href:'/toneparadox/', description:'Hold a present state and its opposite.', logo:'/toneparadox/toneparadox-icon.svg'},
+    {id:'glyph', name:'Tone Glyph', href:'/toneglyph/', about:'/toneglyph/about/', description:'Geometry, attention and personal symbolic form.', logo:'/toneglyph/icon.svg'},
+    {id:'paradox', name:'Tone Paradox', href:'/toneparadox/', about:'/toneparadox/?open=about', description:'Hold a present state and its opposite.', logo:'/toneparadox/toneparadox-icon.svg'},
     {id:'compass', name:'Harmonic Compass', href:'/harmonic_compass/', description:'Daily gates, practice and reflection. Also known as Tone Compass.', aliases:['/tonecompass/'], homepage:false},
-    {id:'loom', name:'Tone Loom', href:'/tone_loom/', description:'Play tone wheels and weave patterns of sound and light.', logo:'/tone_loom/icon.svg'},
+    {id:'loom', name:'Tone Loom', href:'/tone_loom/', about:'/tone_loom/about/', description:'Play tone wheels and weave patterns of sound and light.', logo:'/tone_loom/icon.svg'},
     {id:'inner-orbit', name:'Inner Orbit', href:'/innerorbit/', description:'Another instrument for holding both sides of an experience.', homepage:false},
     {id:'hidden-worlds', name:'Hidden Worlds', href:'/hidden_worlds/app/', about:'/hidden_worlds/', description:'Consider what may lie behind visible behaviour.', homepage:false},
     {id:'tone-hidden-worlds', name:'Tone: Hidden Worlds', href:'/tone_hidden_worlds/', description:'The Tone edition of the empathy practice.', homepage:false}

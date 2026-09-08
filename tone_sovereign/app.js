@@ -188,7 +188,7 @@ const guidedLibraryPaths = {
   ]
 };
 
-const THE_LOCK_EDITION = "ink-v4";
+const THE_LOCK_EDITION = "ink-v4-bed-r1";
 const theLockAssetSet = language => Object.freeze({
   cover: `${ROOT}assets/comics/${language}/specials/the-lock/cover.webp?edition=${THE_LOCK_EDITION}`,
   pages: Object.freeze(Array.from(
@@ -3297,6 +3297,7 @@ function renderComics() {
     <main class="page wide comics-library-page">
       <header class="section-intro comics-intro"><div><p class="eyebrow">${phrase("Practices & Teachings", "Prácticas y enseñanzas")}</p><h1 class="page-title">${phrase("Stories for discernment.", "Historias para el discernimiento.")}</h1><p class="lede measure">${phrase("Read in any order. These stories offer images and questions; they do not diagnose you or decide what your experience means.", "Lee en cualquier orden. Estas historias ofrecen imágenes y preguntas; no te diagnostican ni deciden qué significa tu experiencia.")}</p></div>${renderComicLanguageControl()}</header>
       <nav class="comic-collection-links" aria-label="${phrase("Choose a collection", "Elige una colección")}">${publishedSeries.map(series => `<a href="#comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</a>`).join("")}</nav>
+      <a class="interactive-comic-entry" href="/tone_comics/one-gong/?lang=${state.lang}"><span class="interactive-comic-art"><img src="/tone_comics/one-gong/assets/station-field.jpg" alt="" loading="lazy" decoding="async"></span><span class="interactive-comic-copy"><small>${phrase("Interactive Tone Comic", "Cómic interactivo de Tone")}</small><strong>ONE GONG</strong><span>${phrase("One ordinary moment. One offered cue. Optional sound.", "Un momento cotidiano. Una señal ofrecida. Sonido opcional.")}</span><b>${phrase("Enter the story", "Entrar en la historia")} →</b></span></a>
       ${publishedSeries.map(series => `<section class="comic-shelf" aria-labelledby="comic-series-${series.id}"><header><p class="eyebrow">${series.id === "mainline" ? phrase("Mainline series", "Serie principal") : series.kind === "specials" ? phrase("Optional fiction", "Ficción opcional") : phrase("Separate series", "Serie independiente")}</p><h2 id="comic-series-${series.id}">${escapeHTML(series[state.lang].title)}</h2><p>${escapeHTML(series[state.lang].subtitle)}</p></header><div class="comic-issue-grid">${series.issues.map(issue => renderComicIssueCard(series, issue)).join("")}</div></section>`).join("")}
       <p class="gentle-note">${phrase("Images load as you approach them. No reading progress is saved to your app archive. The book, language and page appear in shareable URLs and normal browser history.", "Las imágenes se cargan cuando te acercas a ellas. No se guarda progreso de lectura en el archivo de la app. El libro, idioma y página aparecen en enlaces compartibles y en el historial normal del navegador.")}</p>
       <p class="gentle-note"><a href="${libraryURL(null,state.lang)}">${phrase("Complete public comic library", "Biblioteca pública completa de cómics")} →</a> · <a href="/tone_comics/?edition=archive">${phrase("Earlier editions and original archive", "Ediciones anteriores y archivo original")} →</a></p>
@@ -3319,7 +3320,7 @@ function renderComicReader() {
   const pagePicker = imageCount > 1
     ? `<label class="comic-page-picker"><span>${phrase("Go to", "Ir a")}</span><select data-comic-page-picker aria-label="${phrase("Go to comic page", "Ir a una página del cómic")}">${Array.from({ length: imageCount }, (_, index) => { const position = index + 1; const item = comicPageDescriptor(issue, position); return `<option value="${position}" ${position === page ? "selected" : ""}>${escapeHTML(item.label)}</option>`; }).join("")}</select></label>`
     : "";
-  const transcript = issue.transcriptPaths
+  const transcript = issue.transcriptPaths && !(series.id === "specials" && issue.number === 1)
     ? `<details class="comic-transcript" ${state.comicTranscriptOpen ? "open" : ""} data-comic-transcript data-transcript-key="${escapeAttribute(`${state.lang}:${series.id}:${issue.id || issue.number}:${descriptor.key}`)}"><summary>${phrase("Page transcript and image description", "Transcripción y descripción de la imagen")}</summary><div class="comic-transcript-content"><section><h2>${phrase("Image description", "Descripción de la imagen")}</h2><p data-comic-image-description>${phrase("Open this section to load the description.", "Abre esta sección para cargar la descripción.")}</p></section><section><h2>${phrase("Transcript", "Transcripción")}</h2><p data-comic-transcript-copy>${phrase("Open this section to load the transcript.", "Abre esta sección para cargar la transcripción.")}</p></section></div></details>`
     : "";
   return `${renderTopbar(series[state.lang].title, `${comicIssueLabel(series, issue)} · ${issue[state.lang]}`)}

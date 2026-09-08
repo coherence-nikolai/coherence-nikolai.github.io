@@ -11,6 +11,12 @@
 .cn-library-book .cn-book img{margin-bottom:.6rem}
 .cn-book-meta{font-size:.875rem;color:var(--cn-muted);margin:.7rem 0 .25rem}
 .cn-book-practice{font-size:.875rem;color:var(--cn-gold)!important}
+.cn-interactive-cover{position:relative;display:block;aspect-ratio:2/3;overflow:hidden;background:#0b0d0a;border:1px solid #4f452b}
+.cn-interactive-cover img{width:100%;height:100%;object-fit:cover!important;object-position:center;filter:saturate(.7) brightness(.62);margin:0!important}
+.cn-interactive-cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 20%,#060806e8 88%)}
+.cn-interactive-cover>span,.cn-interactive-cover>strong{position:absolute;z-index:1;left:8%;right:8%;color:#f1ead7;text-shadow:0 3px 12px #000}
+.cn-interactive-cover>span{top:7%;font:600 .75rem/1.2 var(--cn-sans);letter-spacing:.12em;text-transform:uppercase;color:#d4b86a}
+.cn-interactive-cover>strong{bottom:8%;font:800 clamp(2.6rem,4vw,4rem)/.82 "Arial Narrow",Impact,sans-serif!important;letter-spacing:-.05em}
 #archive-library .comics-hero{min-height:0;padding-block:3rem}
 #archive-library .comics-hero:before,#archive-library .comic-shell:before,#archive-library .reader:before{display:none}
 #archive-library .comics-hero h1{font-size:clamp(2.5rem,5vw,4rem)}

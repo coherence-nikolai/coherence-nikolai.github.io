@@ -9,6 +9,10 @@ const collections=[
   ['specials','Special stories','Historias especiales','THE LOCK and the longer stories.','EL BLOQUEO y las historias largas.'],
   ['insight','Insight','Insight','A separate illustrated exploration.','Una exploración ilustrada independiente.']
 ];
+function interactiveStoryCard(lang){
+  const es=lang==='es';
+  return `<article class="cn-library-book cn-interactive-book"><a class="cn-book" href="/tone_comics/one-gong/?lang=${lang}"><span class="cn-interactive-cover"><img src="/tone_comics/one-gong/assets/station-field.jpg" width="320" height="400" loading="lazy" decoding="async" alt=""><span>${es?'Cómic interactivo':'Interactive Tone Comic'}</span><strong>ONE GONG</strong></span></a><p class="cn-book-meta">${es?'Una experiencia breve · sonido opcional':'A short experience · optional sound'}</p><div class="cn-edition-links"><a href="/tone_comics/one-gong/?lang=${lang}">${es?'Leer en español':'Read in English'}</a><a href="/tone_comics/one-gong/?lang=${es?'en':'es'}" lang="${es?'en':'es'}">${es?'English':'Español'}</a></div></article>`;
+}
 let manifest;
 let archiveLoaded=false;
 function legacyRequested(){
@@ -45,7 +49,7 @@ async function renderLibrary(){
     if(legacyRequested()||document.documentElement.lang!==lang||new URLSearchParams(location.search).get('series')!==requested)return;
     shelves.innerHTML=collections.filter(([id])=>!active||id===active).map(([id,enTitle,esTitle,enCopy,esCopy])=>{
       const editions=manifest.editions.filter(item=>item.series===id&&item.language===lang&&item.issue>0).sort((a,b)=>a.issue-b.issue);
-      return `<section class="cn-section" aria-labelledby="collection-${id}"><div class="cn-section-intro"><div><h2 id="collection-${id}">${esc(es?esTitle:enTitle)}</h2><p>${esc(es?esCopy:enCopy)}</p></div></div><div class="cn-library-books">${editions.map(edition=>{
+      return `<section class="cn-section" aria-labelledby="collection-${id}"><div class="cn-section-intro"><div><h2 id="collection-${id}">${esc(es?esTitle:enTitle)}</h2><p>${esc(es?esCopy:enCopy)}</p></div></div><div class="cn-library-books">${id==='specials'?interactiveStoryCard(lang):''}${editions.map(edition=>{
         const other=manifest.editions.find(item=>item.series===id&&item.issue===edition.issue&&item.language!==(lang));
         const link=publicURL({kind:'book',series:id,issue:edition.issue,lang});
         const relation=id==='practice-compendium'?CAPACITY_BOOKS.find(item=>item.issue===edition.issue):null;

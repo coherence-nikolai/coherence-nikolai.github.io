@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>ONE GONG · An interactive Tone Comic</title>
+  <meta name="description" content="ONE GONG is a short interactive Tone Comic about one ordinary moment, one offered cue, and the room to notice what was already there.">
+  <meta name="theme-color" content="#080a09">
+  <link rel="canonical" href="https://coherence-nikolai.app/tone_comics/one-gong/">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/coherence.css?v=20260908-one-gong">
+  <link rel="stylesheet" href="./one-gong.css?v=20260908-one-gong">
+  <script>document.documentElement.classList.add('js')</script>
+  <script type="module" src="./one-gong.mjs?v=20260908-one-gong"></script>
+</head>
+<body class="coherence-page gong-page" data-lang="en" data-phase="before">
+  <a class="cn-skip" href="#story"><span data-copy="en">Skip to story</span><span data-copy="es">Ir a la historia</span></a>
+  <header class="gong-header">
+    <a class="gong-exit" href="/tone_comics/?series=specials" aria-label="Exit comic">← <span data-copy="en">Comics</span><span data-copy="es">Cómics</span></a>
+    <div class="gong-brand"><strong>TONE COMICS</strong><span>ONE GONG</span></div>
+    <nav class="gong-language" aria-label="Reading language"><a href="?lang=en" data-lang-link="en">EN</a><a href="?lang=es" data-lang-link="es" lang="es">ES</a></nav>
+  </header>
+
+  <main id="story" class="gong-story">
+    <p id="gong-status" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+    <section class="gong-cover" aria-labelledby="cover-title">
+      <div class="gong-cover-art" role="img" aria-label="Stephen waits on a rainy railway platform at dusk among other delayed passengers."></div>
+      <div class="gong-cover-title"><p>AN INTERACTIVE TONE COMIC</p><h1 id="cover-title">ONE<br>GONG</h1><p data-copy="en">The day does not have to disappear<br>for the field to widen.</p><p data-copy="es">El día no tiene que desaparecer<br>para que el campo se amplíe.</p><button class="gong-start" type="button" data-action="start"><span data-copy="en">Begin</span><span data-copy="es">Comenzar</span> <span aria-hidden="true">↓</span></button></div>
+    </section>
+
+    <div class="gong-progress" aria-hidden="true"><span></span></div>
+
+    <section class="comic-screen screen-one" id="screen-1" aria-label="Screen 1 of 9">
+      <figure class="comic-panel field-panel"><img src="./assets/station-field.jpg" alt="At dusk, Stephen waits on a rainy railway platform. The service display shows a delay. Other passengers stand nearby under fluorescent light." width="1120" height="1400"><figcaption class="caption caption-a"><span data-copy="en">It wasn't a crisis.</span><span data-copy="es">No era una crisis.</span></figcaption><figcaption class="caption caption-b"><span data-copy="en">Just one of those moments that became smaller and smaller from the inside.</span><span data-copy="es">Solo uno de esos momentos que se iban haciendo cada vez más pequeños por dentro.</span></figcaption></figure>
+    </section>
+
+    <section class="comic-screen screen-two" id="screen-2" aria-label="Screen 2 of 9">
+      <div class="triptych" aria-hidden="true"><div><img src="./assets/station-field.jpg" alt=""></div><div><img src="./assets/station-field.jpg" alt=""></div><div><img src="./assets/station-field.jpg" alt=""></div></div>
+      <p class="sr-only"><span data-copy="en">Stephen checks the delay and an unanswered message. His shoulders draw inward as the view moves closer.</span><span data-copy="es">Stephen mira el retraso y un mensaje sin respuesta. Sus hombros se encogen mientras el encuadre se acerca.</span></p>
+      <button class="thought thought-first" type="button" data-action="follow-thought" aria-describedby="thought-hint"><span data-copy="en">I should be better at this by now.</span><span data-copy="es">A estas alturas, esto ya se me debería dar mejor.</span></button><span id="thought-hint" class="sr-only"><span data-copy="en">Reveals where the thought leads.</span><span data-copy="es">Revela adónde lleva el pensamiento.</span></span>
+    </section>
+
+    <section class="comic-screen screen-three" id="screen-3" aria-label="Screen 3 of 9">
+      <figure class="comic-panel contraction-panel"><img src="./assets/station-field.jpg" alt="Three thought balloons crowd the closer view of Stephen. The platform and passengers remain faintly visible around them." width="1120" height="1400"></figure>
+      <div class="thought thought-one"><span data-copy="en">I should be better at this by now.</span><span data-copy="es">A estas alturas, esto ya se me debería dar mejor.</span></div>
+      <div class="thought thought-two"><span data-copy="en">Why do I always end up back here?</span><span data-copy="es">¿Por qué siempre termino otra vez aquí?</span></div>
+      <div class="thought thought-three"><span data-copy="en">What is wrong with me?</span><span data-copy="es">¿Qué me pasa?</span></div>
+    </section>
+
+    <section class="comic-screen screen-four" id="screen-4" aria-label="Screen 4 of 9">
+      <figure class="comic-panel threshold-panel"><img src="./assets/threshold.jpg" alt="Stephen stands tense on the same delayed platform. His phone remains in his hand. The choice to strike once or continue quietly appears below." width="1120" height="1400"></figure>
+      <div class="thought threshold-thought"><span data-copy="en">I need this to stop.</span><span data-copy="es">Necesito que esto pare.</span></div>
+      <div class="threshold-actions" aria-label="Continue the story"><button type="button" class="strike-button" data-action="strike" aria-describedby="strike-hint"><span class="gong-disc" aria-hidden="true"></span><span data-copy="en">Strike once</span><span data-copy="es">Tocar una vez</span></button><button type="button" class="quiet-button" data-action="quiet" aria-describedby="quiet-hint"><span data-copy="en">Continue quietly</span><span data-copy="es">Continuar en silencio</span></button></div><span id="strike-hint" class="sr-only"><span data-copy="en">Continues with one gong if sound is available.</span><span data-copy="es">Continúa con un gong si el sonido está disponible.</span></span><span id="quiet-hint" class="sr-only"><span data-copy="en">Continues without sound.</span><span data-copy="es">Continúa sin sonido.</span></span>
+    </section>
+
+    <div class="after-gong" data-after hidden>
+      <section class="comic-screen screen-five" id="screen-5" aria-label="Screen 5 of 9">
+        <figure class="comic-panel widening-panel"><img src="./assets/station-field.jpg" alt="A single muted-gold ring crosses the same platform while the wider scene comes back into view." width="1120" height="1400"><div class="resonance-ring" aria-hidden="true"></div><div class="gong-sfx" aria-label="Gong">GOOOOONG</div><figcaption class="caption caption-a"><span data-copy="en">Nothing vanished.</span><span data-copy="es">Nada desapareció.</span></figcaption><figcaption class="caption caption-b"><span data-copy="en">There was more room.</span><span data-copy="es">Había más espacio.</span></figcaption></figure>
+      </section>
+
+      <section class="comic-screen screen-six" id="screen-6" aria-label="Screen 6 of 9">
+        <figure class="comic-panel same-scene-panel"><img src="./assets/station-field.jpg" alt="The train is still delayed. Rain, passengers, reflections and Stephen's tense posture share the wider frame." width="1120" height="1400"><div class="caption caption-a"><span data-copy="en">The delay remained.<br>The tightness remained.<br>The thoughts remained.</span><span data-copy="es">El retraso seguía ahí.<br>La tensión seguía ahí.<br>Los pensamientos seguían ahí.</span></div><div class="caption caption-b"><span data-copy="en">But they no longer filled the whole field.</span><span data-copy="es">Pero ya no ocupaban todo el campo.</span></div></figure>
+      </section>
+
+      <section class="comic-screen screen-seven" id="screen-7" aria-label="Screen 7 of 9">
+        <figure class="comic-panel noticing-panel"><img src="./assets/noticing.jpg" alt="Nearby, a paper shopping bag splits. Oranges spill onto the wet platform, and one rolls to Stephen's shoe. He notices before anyone begins to help." width="1120" height="1400"><figcaption class="caption caption-a"><span data-copy="en">Then something entered the edge of his attention.</span><span data-copy="es">Entonces algo entró en el borde de su atención.</span></figcaption></figure>
+      </section>
+
+      <section class="comic-screen screen-eight" id="screen-8" aria-label="Screen 8 of 9">
+        <figure class="comic-panel act-panel"><img src="./assets/shared-act.jpg" alt="Stephen and another passenger crouch to gather the oranges while their owner holds the torn bag open." width="1120" height="1400"><div class="speech speech-stephen"><span data-copy="en">Here — I've got these.</span><span data-copy="es">Aquí... yo recojo estas.</span></div><div class="speech speech-owner"><span data-copy="en">Thank you.</span><span data-copy="es">Gracias.</span></div><div class="speech speech-helper"><span data-copy="en">This one rolled over here.</span><span data-copy="es">Esta rodó hasta aquí.</span></div></figure>
+      </section>
+
+      <section class="comic-screen screen-nine" id="screen-9" aria-label="Screen 9 of 9">
+        <figure class="comic-panel return-panel"><img src="./assets/station-field.jpg" alt="The same passengers wait on the same rainy platform. The service is still delayed." width="1120" height="1400"><figcaption class="final-caption"><span data-copy="en">ONE GONG.<br>THEN THE DAY CONTINUED.</span><span data-copy="es">UN GONG.<br>Y EL DÍA SIGUIÓ.</span></figcaption></figure>
+        <div class="gong-ending"><a class="gong-return" href="/tone_comics/?series=specials" aria-describedby="return-hint"><span data-copy="en">Return to the day</span><span data-copy="es">Volver al día</span> <span aria-hidden="true">→</span></a><span id="return-hint" class="sr-only"><span data-copy="en">Closes the comic and returns to the previous screen.</span><span data-copy="es">Cierra el cómic y vuelve a la pantalla anterior.</span></span><button type="button" data-action="replay"><span data-copy="en">Read again</span><span data-copy="es">Leer de nuevo</span></button></div>
+      </section>
+    </div>
+    <noscript><p class="gong-noscript">The complete story is shown below. Sound and animation are optional; no essential meaning depends on them.</p></noscript>
+  </main>
+  <footer class="gong-footer"><a href="/tone_comics/">Tone Comics</a><span>·</span><a href="/tone_sovereign/?open=home">Tone Sovereign</a><span>·</span><a href="/support/">Support</a></footer>
+</body>
+</html>

@@ -17,7 +17,7 @@ export function readPublicRoute(search,manifest,catalog,defaultLanguage='en'){
   const lang=query.get('lang')||(defaultLanguage==='es'?'es':'en');
   const invalid={kind:'unavailable',view:'publicUnavailable',lang:lang==='es'?'es':'en'};
   if(!['en','es'].includes(lang)) return invalid;
-  if(['home','comics','library'].includes(open)) return {kind:open,view:open,lang};
+  if(['home','comics','library','about'].includes(open)) return {kind:open,view:open,lang};
   if(open==='capacity'){
     const id=query.get('id');
     return catalog?.capacities?.some(item=>item.id===id)?{kind:open,view:'capacityOverview',id,lang}:invalid;
