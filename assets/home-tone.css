@@ -7,14 +7,28 @@
 .cn-arrival-actions{gap:.4rem 1rem;margin-top:1.5rem}
 .cn-arrival .cn-tone-definition{font-size:1rem;line-height:1.65;max-width:39ch}
 .cn-arrival-art img{display:block;aspect-ratio:1672/941;object-fit:contain}
-.cn-sunrise{position:relative;isolation:isolate;overflow:hidden}
-/* A separate light layer: the approved illustration is never transformed.
-   Its sun is at 83.37% / 33.15%; the fade stays clear of the figure on the left. */
-.cn-sunlight{position:absolute;inset:0;pointer-events:none;opacity:.48;mix-blend-mode:screen;background:radial-gradient(ellipse 23% 40% at 83.37% 33.15%,rgba(255,246,202,.75) 0%,rgba(255,212,116,.5) 16%,transparent 74%),repeating-conic-gradient(from 12deg at 83.37% 33.15%,transparent 0deg 12deg,rgba(255,226,153,.85) 16deg,transparent 21deg 32deg);-webkit-mask-image:radial-gradient(ellipse 47% 72% at 83.37% 33.15%,#000 0%,#000 15%,transparent 76%);mask-image:radial-gradient(ellipse 47% 72% at 83.37% 33.15%,#000 0%,#000 15%,transparent 76%);filter:blur(1px)}
-/* A single arrival shimmer, then steady sunlight. No endless motion or controls. */
-.cn-sunrise[data-motion="running"] .cn-sunlight{animation:cn-sunlight-arrival 4s ease-in-out 1}
-@keyframes cn-sunlight-arrival{0%,100%{opacity:.48}45%{opacity:.94}75%{opacity:.64}}
-@media(prefers-reduced-motion:reduce){.cn-sunrise .cn-sunlight{animation:none!important}}
+.cn-arrival{isolation:isolate}
+.cn-arrival-copy{position:relative;z-index:2}
+.cn-arrival-art{position:relative;z-index:1;--cn-ray-overhang:clamp(12px,2vw,28px)}
+.cn-arrival-art figcaption{position:relative;z-index:2}
+.cn-sunrise{position:relative;isolation:isolate}
+/* Only the light moves. Its fixed origin matches the sun in the unchanged art.
+   The feathered overhang reaches beyond the frame without reaching the copy. */
+.cn-sunlight{--cn-sun-x:calc(83.37% - var(--cn-ray-overhang)*.6674);--cn-sun-y:calc(33.15% + var(--cn-ray-overhang)*.337);position:absolute;inset:calc(-1*var(--cn-ray-overhang));overflow:hidden;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(ellipse 28% 48% at var(--cn-sun-x) var(--cn-sun-y),rgba(255,238,178,.42),transparent 72%);-webkit-mask-image:linear-gradient(transparent,#000 9%,#000 91%,transparent),linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(transparent,#000 9%,#000 91%,transparent),linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-composite:intersect}
+.cn-sunlight::before,.cn-sunlight::after{content:"";position:absolute;left:var(--cn-sun-x);top:var(--cn-sun-y);width:230%;aspect-ratio:1;transform-origin:center;transform:translate(-50%,-50%);opacity:0;filter:blur(1px);background:repeating-conic-gradient(from 7deg,transparent 0deg 10deg,rgba(255,246,197,.94) 14deg,rgba(255,214,127,.28) 19deg,transparent 24deg 43deg);-webkit-mask-image:radial-gradient(circle,#000 1%,rgba(0,0,0,.85) 12%,rgba(0,0,0,.7) 30%,transparent 53%);mask-image:radial-gradient(circle,#000 1%,rgba(0,0,0,.85) 12%,rgba(0,0,0,.7) 30%,transparent 53%)}
+.cn-sunlight::after{background:repeating-conic-gradient(from 24deg,transparent 0deg 24deg,rgba(255,230,147,.7) 28deg,transparent 33deg 67deg);filter:blur(2px)}
+.cn-sunrise[data-motion] .cn-sunlight::before{animation:cn-rays-welcome 8s ease-in-out infinite paused}
+.cn-sunrise[data-motion] .cn-sunlight::after{animation:cn-rays-reach 12s ease-in-out infinite paused}
+.cn-sunrise[data-motion="running"] .cn-sunlight::before,.cn-sunrise[data-motion="running"] .cn-sunlight::after{animation-play-state:running}
+@keyframes cn-rays-welcome{0%,100%{transform:translate(-50%,-50%) rotate(-10deg) scale(.86);opacity:.38}50%{transform:translate(-50%,-50%) rotate(12deg) scale(1.1);opacity:.88}}
+@keyframes cn-rays-reach{0%,100%{transform:translate(-50%,-50%) rotate(9deg) scale(1.06);opacity:.18}50%{transform:translate(-50%,-50%) rotate(-8deg) scale(.88);opacity:.58}}
+.coherence-page .cn-sunlight-surface{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--cn-ivory);cursor:pointer;touch-action:manipulation}
+.cn-sunlight-surface[hidden]{display:none}
+.cn-sunlight-surface:focus-visible{outline:3px solid var(--cn-gold);outline-offset:4px}
+.cn-motion-hint{position:absolute;bottom:12px;right:12px;display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(255,239,194,.5);border-radius:50%;background:rgba(8,10,7,.8);font:500 20px/1 var(--cn-sans);opacity:0;transition:opacity .15s}
+.cn-sunlight-surface:hover .cn-motion-hint,.cn-sunlight-surface:focus-visible .cn-motion-hint{opacity:1}
+@media(hover:none){.cn-motion-hint{opacity:1}}
+@media(prefers-reduced-motion:reduce){.cn-sunrise .cn-sunlight::before,.cn-sunrise .cn-sunlight::after{animation:none!important;opacity:0!important}.cn-sunlight-surface{display:none}.cn-motion-hint{transition:none}}
 @media(max-width:420px){.coherence-page .cn-header .cn-nav{column-gap:.6rem;row-gap:0}}
 @media(max-width:900px){
   .cn-sovereign-identity{margin-bottom:1.25rem}

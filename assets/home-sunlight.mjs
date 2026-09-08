@@ -1,45 +1,45 @@
-// Progressive enhancement: one short shimmer over an always-visible light layer.
-// No video, audio, storage, controls or external services.
+// Continuous light only: the illustration remains still. Tap the artwork to pause.
+// No video, audio, storage or external services.
 export function mountSunlight(root) {
   const image = root.querySelector('img');
-  const light = root.querySelector('.cn-sunlight');
+  const surface = root.querySelector('[data-sunlight-surface]');
+  if (!image || !surface) return () => {};
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
-  let ready = false, visible = false, started = false, settled = false, disposed = false;
-  let finishTimer;
-  function settle() {
-    settled = true;
-    clearTimeout(finishTimer);
-    delete root.dataset.motion;
-  }
+  let ready = false, visible = false, wanted = true, suspended = false, disposed = false;
   function update() {
     if (disposed) return;
-    if (preference.matches || document.hidden || (started && !visible)) {
-      settle();
-    } else if (ready && visible && !started && !settled) {
-      started = true;
-      root.dataset.motion = 'running';
-      finishTimer = setTimeout(settle, 4100);
-    }
+    const allowed = ready && !preference.matches;
+    if (!allowed) delete root.dataset.motion;
+    else root.dataset.motion = wanted && visible && !document.hidden && !suspended ? 'running' : 'paused';
+    surface.hidden = !allowed;
+    const label = wanted ? 'Pause sunlight animation' : 'Resume sunlight animation';
+    surface.setAttribute('aria-label', label);
+    surface.title = label;
+    surface.querySelector('.cn-motion-hint').textContent = wanted ? 'Ⅱ' : '▶';
   }
+  const toggle = () => { wanted = !wanted; update(); };
   const observer = new IntersectionObserver(entries => {
     visible = entries[0].isIntersecting;
     update();
   }, {threshold:0});
-  const onAnimationEnd = event => { if (event.animationName === 'cn-sunlight-arrival') settle(); };
-  const onPageHide = event => { settle(); if (!event.persisted) dispose(); };
+  const onPageHide = event => { suspended = true; update(); if (!event.persisted) dispose(); };
+  const onPageShow = () => { suspended = false; update(); };
   observer.observe(root);
-  light.addEventListener('animationend', onAnimationEnd);
+  surface.addEventListener('click', toggle);
   preference.addEventListener('change', update);
   document.addEventListener('visibilitychange', update);
   window.addEventListener('pagehide', onPageHide);
+  window.addEventListener('pageshow', onPageShow);
   function dispose() {
     disposed = true;
-    settle();
+    delete root.dataset.motion;
+    surface.hidden = true;
     observer.disconnect();
-    light.removeEventListener('animationend', onAnimationEnd);
+    surface.removeEventListener('click', toggle);
     preference.removeEventListener('change', update);
     document.removeEventListener('visibilitychange', update);
     window.removeEventListener('pagehide', onPageHide);
+    window.removeEventListener('pageshow', onPageShow);
   }
   image.decode().then(() => {
     if (!disposed) { ready = image.naturalWidth > 0; update(); }
