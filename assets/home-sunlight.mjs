@@ -1,44 +1,54 @@
-// Progressive enhancement only. No video, audio, storage or external services.
-export function sunlightState({ready, reduced, wanted, visible, foreground}) {
-  if (!ready || reduced) return 'off';
-  return wanted && visible && foreground ? 'running' : 'paused';
-}
-
-export function mountSunlight(root, button) {
+// Progressive enhancement: one short shimmer over an always-visible light layer.
+// No video, audio, storage, controls or external services.
+export function mountSunlight(root) {
   const image = root.querySelector('img');
+  const light = root.querySelector('.cn-sunlight');
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
-  let ready = false, wanted = true, visible = false, disposed = false;
-  function update() {
-    const mode = sunlightState({ready, reduced:preference.matches, wanted, visible, foreground:!document.hidden});
-    if (mode === 'off') delete root.dataset.motion;
-    else root.dataset.motion = mode;
-    button.hidden = !ready || preference.matches;
-    button.textContent = wanted ? 'Pause sunlight' : 'Play sunlight';
+  let ready = false, visible = false, started = false, settled = false, disposed = false;
+  let finishTimer;
+  function settle() {
+    settled = true;
+    clearTimeout(finishTimer);
+    delete root.dataset.motion;
   }
-  const toggle = () => { wanted = !wanted; update(); };
-  const observer = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; update(); }, {threshold:0});
+  function update() {
+    if (disposed) return;
+    if (preference.matches || document.hidden || (started && !visible)) {
+      settle();
+    } else if (ready && visible && !started && !settled) {
+      started = true;
+      root.dataset.motion = 'running';
+      finishTimer = setTimeout(settle, 4100);
+    }
+  }
+  const observer = new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting;
+    update();
+  }, {threshold:0});
+  const onAnimationEnd = event => { if (event.animationName === 'cn-sunlight-arrival') settle(); };
+  const onPageHide = event => { settle(); if (!event.persisted) dispose(); };
   observer.observe(root);
-  button.addEventListener('click', toggle);
+  light.addEventListener('animationend', onAnimationEnd);
   preference.addEventListener('change', update);
   document.addEventListener('visibilitychange', update);
-  window.addEventListener('pageshow', update);
-  const onPageHide = event => { if (!event.persisted) dispose(); };
   window.addEventListener('pagehide', onPageHide);
   function dispose() {
-    disposed = true; observer.disconnect(); delete root.dataset.motion;
-    button.hidden = true; button.removeEventListener('click', toggle);
+    disposed = true;
+    settle();
+    observer.disconnect();
+    light.removeEventListener('animationend', onAnimationEnd);
     preference.removeEventListener('change', update);
     document.removeEventListener('visibilitychange', update);
-    window.removeEventListener('pageshow', update);
     window.removeEventListener('pagehide', onPageHide);
   }
-  image.decode().then(() => { if (!disposed) { ready = image.naturalWidth > 0; update(); } }).catch(() => {});
+  image.decode().then(() => {
+    if (!disposed) { ready = image.naturalWidth > 0; update(); }
+  }).catch(() => {});
   update();
   return dispose;
 }
 
 if (typeof document !== 'undefined') {
   const root = document.querySelector('[data-sunrise]');
-  const button = document.querySelector('[data-sunlight-toggle]');
-  if (root && button && 'IntersectionObserver' in window) mountSunlight(root, button);
+  if (root && 'IntersectionObserver' in window) mountSunlight(root);
 }

@@ -10,16 +10,11 @@
 .cn-sunrise{position:relative;isolation:isolate;overflow:hidden}
 /* A separate light layer: the approved illustration is never transformed.
    Its sun is at 83.37% / 33.15%; the fade stays clear of the figure on the left. */
-.cn-sunlight{position:absolute;inset:0;pointer-events:none;opacity:0;mix-blend-mode:screen;background:repeating-conic-gradient(from 12deg at 83.37% 33.15%,transparent 0deg 14deg,rgba(255,222,141,.65) 16deg,transparent 19deg 32deg);-webkit-mask-image:radial-gradient(ellipse 47% 72% at 83.37% 33.15%,transparent 2%,#000 15%,transparent 76%);mask-image:radial-gradient(ellipse 47% 72% at 83.37% 33.15%,transparent 2%,#000 15%,transparent 76%);filter:blur(1px)}
-.cn-sunrise[data-motion] .cn-sunlight{animation:cn-sunlight-cycle 4s ease-in-out infinite paused}
-.cn-sunrise[data-motion="running"] .cn-sunlight{animation-play-state:running}
-.cn-arrival-art figcaption{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.25rem 1rem}
-.cn-arrival-art figcaption>span{flex:1 1 18rem}
-.coherence-page .cn-sunlight-toggle{flex:0 1 auto;min-height:44px;max-width:100%;padding:.5rem 0;border:0;background:transparent;color:var(--cn-ivory);font:400 .875rem/1.5 var(--cn-sans);text-decoration:underline;text-underline-offset:.25em;cursor:pointer}
-.cn-sunlight-toggle[hidden]{display:none}
-.cn-sunlight-toggle:focus-visible{outline:3px solid var(--cn-gold);outline-offset:4px}
-@keyframes cn-sunlight-cycle{0%,100%{opacity:.035}50%{opacity:.25}}
-@media(prefers-reduced-motion:reduce){.cn-sunrise .cn-sunlight{animation:none!important;opacity:0!important}.cn-sunlight-toggle{display:none}}
+.cn-sunlight{position:absolute;inset:0;pointer-events:none;opacity:.48;mix-blend-mode:screen;background:radial-gradient(ellipse 23% 40% at 83.37% 33.15%,rgba(255,246,202,.75) 0%,rgba(255,212,116,.5) 16%,transparent 74%),repeating-conic-gradient(from 12deg at 83.37% 33.15%,transparent 0deg 12deg,rgba(255,226,153,.85) 16deg,transparent 21deg 32deg);-webkit-mask-image:radial-gradient(ellipse 47% 72% at 83.37% 33.15%,#000 0%,#000 15%,transparent 76%);mask-image:radial-gradient(ellipse 47% 72% at 83.37% 33.15%,#000 0%,#000 15%,transparent 76%);filter:blur(1px)}
+/* A single arrival shimmer, then steady sunlight. No endless motion or controls. */
+.cn-sunrise[data-motion="running"] .cn-sunlight{animation:cn-sunlight-arrival 4s ease-in-out 1}
+@keyframes cn-sunlight-arrival{0%,100%{opacity:.48}45%{opacity:.94}75%{opacity:.64}}
+@media(prefers-reduced-motion:reduce){.cn-sunrise .cn-sunlight{animation:none!important}}
 @media(max-width:420px){.coherence-page .cn-header .cn-nav{column-gap:.6rem;row-gap:0}}
 @media(max-width:900px){
   .cn-sovereign-identity{margin-bottom:1.25rem}
