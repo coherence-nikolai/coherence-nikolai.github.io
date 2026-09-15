@@ -1772,12 +1772,49 @@ input[type="range"] { accent-color: var(--gold); width: 100%; }
 .offline-pack button { min-height: 44px; }
 .home-city-still { width: min(100%, 960px); margin: 0 auto 32px; }
 .home-city-still img { display: block; width: 100%; height: auto; max-height: none; object-fit: contain; }
-.practice-story { margin: 16px 0 24px; text-align: left; }
-.practice-story summary { cursor: pointer; min-height: 44px; display: list-item; padding-block: 10px; font-size: 1rem; color: #d8be82; }
+.practice-story { width: min(100%, 620px); min-width: 0; margin: 16px auto 24px; text-align: left; border-top: 1px solid var(--line); }
+.practice-story summary { cursor: pointer; min-height: 44px; display: list-item; padding: 14px 0; font-size: 1rem; color: #d8be82; list-style-position: inside; }
+.practice-story summary small { display: block; margin-top: 4px; color: var(--ivory-soft); font-size: .82rem; line-height: 1.4; }
 .practice-story summary:focus-visible { outline: 2px solid #d8be82; outline-offset: 4px; }
-.practice-story figure { width: min(100%, 560px); margin: 0 auto; }
+.practice-story figure { width: 100%; margin: 0 auto; }
 .practice-story img { display: block; width: 100%; height: auto; max-height: none; object-fit: contain; }
-.practice-story figcaption { font-size: 1rem; line-height: 1.55; padding-top: 14px; }
+.practice-story figcaption { font-size: 1rem; line-height: 1.65; padding: 18px 0 4px; color: var(--ivory-soft); text-wrap: pretty; }
+.practice-story figcaption strong { display: block; margin-bottom: 8px; font-family: var(--serif); font-size: 1.5rem; font-weight: 400; color: var(--ivory); line-height: 1.2; }
+.story-introduction { margin: 6px 0 24px; color: var(--ivory-soft); line-height: 1.65; }
+.notice-story-sequence { list-style: none; margin: 0; padding: 0; display: grid; gap: 32px; }
+.notice-story-sequence li { padding: 0; }
+.story-return-link, .story-practice-link { display: inline-flex; align-items: center; min-height: 44px; padding-block: 10px; color: var(--gold-light); text-underline-offset: .24em; font-size: .94rem; }
+.story-return-link { margin-top: 22px; }
+.story-practice-link { justify-self: center; }
+.illustrated-capacity-page .capacity-stage { width: 100%; align-content: start; }
+.illustrated-capacity-page .movement-heading { max-width: 44rem; }
+.practice-scene-layout { display: grid; width: min(620px, 100%); align-items: start; gap: 24px; text-align: left; }
+.practice-scene-layout .practice-story { margin: 0; }
+.practice-work { width: 100%; min-width: 0; display: grid; gap: 22px; align-content: start; scroll-margin-top: 115px; }
+.practice-work > .primary-button { justify-self: stretch; }
+.practice-work .choice-grid { width: 100%; }
+.practice-work .capacity-instrument { margin-bottom: 10px; }
+.practice-work .discern-lenses { grid-template-columns: minmax(0, 1fr) minmax(1rem, 3rem) minmax(0, 1fr); row-gap: 18px; }
+.practice-work .discern-lens { width: min(10rem, 100%); min-height: 10rem; aspect-ratio: auto; padding: .75rem; }
+.practice-work .discern-lenses .discern-lens { opacity: 1; }
+.practice-work .discern-lenses.step-0 .added,
+.practice-work .discern-lenses.step-1 .direct,
+.practice-work .discern-lenses.step-2 .discern-lens { border-color: color-mix(in srgb, var(--movement-color) 30%, transparent); background: none; box-shadow: none; }
+.practice-work .discern-lens span { font-size: .84rem; max-width: 100%; overflow-wrap: anywhere; }
+.practice-work .discern-lens small, .practice-work .discern-lenses > p small { font-size: .8rem; line-height: 1.4; }
+.practice-work .discern-lenses > p { line-height: 1.45; text-align: center; }
+.practice-work:focus-visible { outline: 2px solid var(--movement-color); outline-offset: 8px; }
+.focused-stage > .choice-grid { width: 100%; min-width: 0; }
+.movement-session-page .choice { overflow-wrap: anywhere; }
+#notice-begin { scroll-margin-top: 115px; }
+@media (min-width: 960px) {
+  .practice-scene-layout.with-story { width: 100%; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(32px, 5vw, 64px); }
+  .practice-scene-layout.with-story .practice-work { padding-top: 12px; }
+  .illustrated-capacity-page .story-practice-link { display: none; }
+}
+@media (max-width: 430px) {
+  .practice-work .capacity-choices { grid-template-columns: 1fr; }
+}
 .completion-story, .lived-offer { border-top: 1px solid #55482d; padding-block: 24px; margin-top: 28px; }
 .completion-story { max-width: 42rem; margin-inline: auto; }
 /* Narrative scenes use their full aspect ratio at every breakpoint. Their

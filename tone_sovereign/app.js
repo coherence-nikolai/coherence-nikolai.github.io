@@ -1,5 +1,5 @@
 import {mountOfflineDownloads, cancelOfflineDownloads} from './offline-downloads.js';
-import {homeIllustration, stageIllustration, completionStory, livedExperience} from './narrative-ui.js';
+import {homeIllustration, stageIllustration, noticeStory, reclaimIllustration, capacityArrivalIllustration, crossReturnIllustration, completionStory, livedExperience} from './narrative-ui.js?v=20260915-seven-stories';
 import {additionalComicSeries} from './comic-catalogue.mjs';
 import {CAPACITY_BOOKS, readPublicRoute, publicURL, libraryURL} from './public-routes.mjs';
 import {INTEGRATE_OPTIONS, INTEGRATE_GUIDANCE, newIntegrate, chooseIntegrate, integrateStepValid, integratePayload, integrateSummary} from './integrate-practice.mjs';
@@ -783,7 +783,7 @@ function newPractice() {
     capacityAnswers: [],
     integrate: newIntegrate(),
     completionDestination: "",
-    storyExpanded: true,
+    storyPanels: {},
     selectedOption: "",
     noticeStarted: false,
     noticeStartedAt: 0,
@@ -812,6 +812,7 @@ function newPractice() {
     questionSaved: false,
     crossFocus: "self",
     crossExpanded: false,
+    crossReturnAvailable: false,
     crossQuestion: 0,
     crossRecent: [],
     crossSaved: false,
@@ -2173,7 +2174,7 @@ function renderMovementSession() {
   if (movement.id === "stabilise" && p.stage === "breath" && p.breathStartedAt) return renderStabiliseSession();
   if (p.stage === "continuity") return renderContinuityChoice(movement);
   return `${movementTopbar(movement)}
-    <main class="page movement-session-page" style="--movement-color:${movement.color}">
+    <main class="page movement-session-page ${['discern', 'integrate'].includes(movement.id) ? 'wide illustrated-capacity-page' : ''}" style="--movement-color:${movement.color}">
       ${renderIndependentMovement(movement.id)}
     </main>`;
 }
@@ -2218,6 +2219,14 @@ function renderIndependentMovement(id) {
   return renderEmbodyMovement();
 }
 
+function storyPanelOpen(key, fallback = false) {
+  return state.practice.storyPanels?.[key] ?? fallback;
+}
+
+function storyPracticeLink(target) {
+  return state.illustrationsEnabled ? `<a class="story-practice-link" href="#${target}">${phrase('Go to the practice', 'Ir a la práctica')} ↓</a>` : '';
+}
+
 function renderNoticeMovement() {
   const p = state.practice;
   const lang = state.lang;
@@ -2225,9 +2234,10 @@ function renderNoticeMovement() {
     ${renderMovementHeading(lang === "en" ? "Notice one simple feeling in your body." : "Nota una sensación sencilla en tu cuerpo.", p.guidance === "guided" ? (lang === "en" ? "Four optional spoken cues, then notice freely." : "Cuatro indicaciones habladas opcionales y luego atención libre.") : (lang === "en" ? "A quiet practice with brief words on screen." : "Una práctica en silencio con palabras breves en pantalla."))}
     <div class="instrument-region notice-instrument still" aria-hidden="true"><span class="aperture-ring"></span><span class="aperture-line"></span><span class="aperture-point"></span></div>
     <div class="segmented practice-guidance" aria-label="${lang === "en" ? "Notice guidance" : "Guía para Observar"}"><button type="button" data-practice-guidance="quiet" aria-pressed="${p.guidance === "quiet"}">${lang === "en" ? "Quiet" : "Silencio"}</button><button type="button" data-practice-guidance="guided" aria-pressed="${p.guidance === "guided"}">${lang === "en" ? "Guided" : "Guiada"}</button></div>
-    <button class="primary-button" type="button" data-action="start-notice">${lang === "en" ? "Begin" : "Comenzar"}</button>
+    <button id="notice-begin" class="primary-button" type="button" data-action="start-notice">${lang === "en" ? "Begin" : "Comenzar"}</button>
     <div class="practice-settings-row"><button class="text-button" type="button" data-action="toggle-words">${state.quietWords ? (lang === "en" ? "Use quiet labels" : "Usar etiquetas suaves") : (lang === "en" ? "Without labels" : "Sin etiquetas")}</button>
     <label>${lang === "en" ? "Duration" : "Duración"}<select data-notice-duration><option value="30" ${p.noticeDuration === 30 ? "selected" : ""}>30s</option><option value="60" ${p.noticeDuration === 60 ? "selected" : ""}>60s</option><option value="90" ${p.noticeDuration === 90 ? "selected" : ""}>90s</option></select></label></div>
+    ${noticeStory(lang, state.illustrationsEnabled, storyPanelOpen('notice-example'))}
   </section>`;
   if (p.stage === "close") {
     const outcomes = lang === "en" ? ["Clearer", "Different", "No change", "Not sure"] : ["Más claro", "Diferente", "Sin cambios", "No estoy seguro"];
@@ -2263,6 +2273,7 @@ function renderStabiliseMovement() {
       <div class="stabilise-instrument" role="img" aria-label="${lang === "en" ? "A steady vertical line meeting a calm horizon" : "Una línea vertical estable que se encuentra con un horizonte tranquilo"}"><span></span><i></i></div>
       <div class="state-list">${visible.map(item => `<button class="state-choice" type="button" data-steady="${item.id}"><span class="state-mini-axis" aria-hidden="true"></span><span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></span><b>›</b></button>`).join("")}</div>
       ${p.steadyExpanded ? `<button class="text-button" type="button" data-action="less-steady">${lang === "en" ? "Back to three simple choices" : "Volver a tres opciones sencillas"}</button>` : `<button class="text-button" type="button" data-action="more-steady">${lang === "en" ? "Choose a more specific state" : "Elegir un estado más específico"} ↓</button>`}
+      ${capacityArrivalIllustration('stabilise', lang, state.illustrationsEnabled, storyPanelOpen('stabilise-arrival'))}
     </section>`;
   }
   const chosen = steadyStates.find(item => item.id === p.steadyState);
@@ -2319,10 +2330,14 @@ function renderCapacityMovement(id) {
     ${renderMovementHeading(item[0], item[1])}
     <button class="text-button voice-invitation" type="button" data-action="listen-capacity-stage">${lang === "en" ? "Hear this invitation" : "Escuchar esta invitación"}</button>
     ${heldTone ? `<p class="gentle-note">${lang === "en" ? `Also present: the ${heldTone.en} tone held in Embody. It is one strand, not the whole choice.` : `También está presente el tono ${heldTone.es} guardado en Encarnar. Es una hebra, no toda la elección.`}</p>` : ""}
-    ${stageIllustration(id, p.capacityStep, lang, state.illustrationsEnabled, Boolean(p.selectedOption), p.storyExpanded)}
+    ${storyPracticeLink('discern-practice')}
+    <div class="practice-scene-layout ${state.illustrationsEnabled ? 'with-story' : ''}">
+    ${stageIllustration(id, p.capacityStep, lang, state.illustrationsEnabled, Boolean(p.selectedOption), storyPanelOpen(`${id}-${p.capacityStep}`, true))}
+    <div id="discern-practice" class="practice-work" tabindex="-1">
     ${renderCapacityInstrument(id, p.capacityStep, lang, p.capacityAnswers, p.selectedOption)}
     <div class="choice-grid capacity-choices">${item[2].map(option => `<button class="choice ${p.selectedOption === option ? "selected" : ""}" type="button" aria-pressed="${p.selectedOption === option}" data-capacity-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>`).join("")}</div>
     <button class="primary-button" type="button" data-action="capacity-continue" ${p.selectedOption ? "" : "disabled"}>${p.capacityStep === flow.length - 1 ? (lang === "en" ? "Complete practice" : "Completar práctica") : tr("continue")}</button>
+    </div></div>
   </section>`;
 }
 
@@ -2341,10 +2356,14 @@ function renderIntegrateMovement() {
     ${renderMovementHeading(item[0], item[1])}
     <button class="text-button" type="button" data-action="return-movement-field">${phrase('Pass for now', 'Dejarlo por ahora')}</button>
     ${step === 1 ? `<div class="button-row"><button class="text-button voice-invitation" type="button" data-action="listen-integrate-guidance">${phrase('Hear this guidance', 'Escuchar esta orientación')}</button><button class="text-button" type="button" data-action="stop-integrate-guidance">${phrase('Stop voice', 'Detener la voz')}</button></div><details class="guided-sit-transcript"><summary>${phrase('Read the words', 'Leer las palabras')}</summary><p>${escapeHTML(INTEGRATE_GUIDANCE[lang])}</p></details>` : ''}
-    ${stageIllustration('integrate', step, lang, state.illustrationsEnabled, hasAnswer, p.storyExpanded)}
+    ${storyPracticeLink('integrate-practice')}
+    <div class="practice-scene-layout ${state.illustrationsEnabled ? 'with-story' : ''}">
+    ${stageIllustration('integrate', step, lang, state.illustrationsEnabled, hasAnswer, storyPanelOpen(`integrate-${step}`, true))}
+    <div id="integrate-practice" class="practice-work" tabindex="-1">
     ${step === 0 ? firstStep : `<div class="choice-grid capacity-choices">${step === 1 ? choices('authority', id => value.notSoleAuthority === id) : choices('response', id => value.response === id)}</div>`}
     ${step === 2 && payload ? `<div class="integrate-summary"><p class="eyebrow">${phrase('Your choices', 'Tus elecciones')}</p><p>${escapeHTML(integrateSummary(payload, lang))}</p></div>` : ''}
     <button class="primary-button" type="button" data-action="integrate-continue" ${hasAnswer ? '' : 'disabled'}>${step === 2 ? phrase('Complete practice', 'Completar práctica') : tr('continue')}</button>
+    </div></div>
   </section>`;
 }
 
@@ -2362,7 +2381,8 @@ function renderReclaimMovement() {
     <div class="instrument-region reclaim-instrument reclaim-opening" role="img" aria-label="${lang === "en" ? "Open spiral with your centre held clear" : "Espiral abierta con tu centro despejado"}" aria-description="${lang === "en" ? "No pull selected" : "No has seleccionado qué tira de ti"}"><svg class="reclaim-spiral" viewBox="0 0 120 120" aria-hidden="true"><path d="M63 58 C72 54 76 63 72 70 C66 82 45 78 40 64 C33 44 51 27 72 31 C97 36 105 65 91 85 C74 109 37 103 24 77"></path></svg><span class="reclaim-point"></span></div>
     <p class="reclaim-centre-copy">${lang === "en" ? "The pull can be present without occupying your centre." : "Eso que tira de ti puede estar presente sin ocupar tu centro."}</p>
     <div class="choice-grid">${pulls[lang].map((item, index) => `<button class="choice" type="button" data-pull="${index}">${item}</button>`).join("")}</div>
-    <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button></section>`;
+    <button class="text-button" type="button" data-action="reclaim-nothing-clear">${lang === "en" ? "Nothing clear" : "Nada claro"}</button>
+    ${reclaimIllustration(0, lang, state.illustrationsEnabled, storyPanelOpen('reclaim-0'))}</section>`;
   if (p.stage === "custom") return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Name it plainly." : "Nómbralo con sencillez.", lang === "en" ? "A few words are enough. You can leave it unclear." : "Bastan unas pocas palabras. Puedes dejarlo sin aclarar.")}
     <label class="field-label reclaim-custom-field"><span>${lang === "en" ? "What is pulling at your attention?" : "¿Qué está tirando de tu atención?"}</span><input class="field-input" data-input="customPull" value="${escapeAttribute(p.customPull)}" maxlength="80" autocomplete="off"></label>
     <button class="primary-button" type="button" data-action="reclaim-custom-continue" ${p.customPull.trim() ? "" : "disabled"}>${tr("continue")}</button>
@@ -2370,23 +2390,27 @@ function renderReclaimMovement() {
   if (p.stage === "confirm") return `<section class="practice-stage focused-stage">
     ${renderMovementHeading(lang === "en" ? "Is this close enough?" : "¿Esto se acerca lo suficiente?", lang === "en" ? "You can change it, leave it unclear, or continue. Naming does not make it the authority." : "Puedes cambiarlo, dejarlo sin aclarar o continuar. Nombrarlo no le da autoridad.")}
     <p class="reclaim-confirmed-pull">${escapeHTML(p.pendingPull)}</p>
+    ${reclaimIllustration(1, lang, state.illustrationsEnabled, storyPanelOpen('reclaim-1'))}
     <div class="practice-actions"><button class="primary-button" type="button" data-action="confirm-reclaim-pull">${lang === "en" ? "Continue with this" : "Continuar con esto"}</button><button class="text-button" type="button" data-action="change-reclaim-pull">${lang === "en" ? "Change it" : "Cambiarlo"}</button></div>
   </section>`;
   if (p.stage === "pause") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
     <button class="instrument-region reclaim-instrument ${p.reclaimHolding ? "hold-active" : ""} ${p.reclaimComplete ? "is-complete" : ""}" type="button" data-action="reclaim-hold" aria-label="${lang === "en" ? "Press and hold through one natural breath" : "Mantén pulsado durante una respiración natural"}"><svg class="reclaim-spiral" viewBox="0 0 120 120" aria-hidden="true"><path d="M63 58 C72 54 76 63 72 70 C66 82 45 78 40 64 C33 44 51 27 72 31 C97 36 105 65 91 85 C74 109 37 103 24 77"></path></svg><span class="reclaim-line"></span><span class="reclaim-point"></span></button>
     ${renderMovementHeading(p.reclaimComplete ? (lang === "en" ? "You can still choose." : "Todavía puedes elegir.") : (lang === "en" ? "Hold your centre for one breath." : "Mantén tu centro durante una respiración."), p.reclaimComplete ? unbindingSupport : (lang === "en" ? "Hold the spiral for one breath, or continue when ready." : "Mantén la espiral durante una respiración o continúa cuando estés listo."))}
-    <button class="primary-button" type="button" data-action="reclaim-to-relationship">${lang === "en" ? "Choose how to respond" : "Elegir cómo responder"}</button></section>`;
+    <button class="primary-button" type="button" data-action="reclaim-to-relationship">${lang === "en" ? "Choose how to respond" : "Elegir cómo responder"}</button>
+    ${p.reclaimComplete && !p.reclaimHolding ? reclaimIllustration(2, lang, state.illustrationsEnabled, storyPanelOpen('reclaim-2')) : ''}</section>`;
   if (p.stage === "relationship") return `<section class="practice-stage focused-stage"><p class="eyebrow">${escapeHTML(p.pull)}</p>
     <div class="instrument-region reclaim-instrument small" aria-hidden="true"><span class="reclaim-line"></span><span class="reclaim-point"></span></div>
     ${renderMovementHeading(lang === "en" ? "Choose how you will respond to it." : "Elige cómo responderás.", relationshipSupport)}
     <div class="choice-grid">${relations[lang].map(item => `<button class="choice ${p.relation === item ? "selected" : ""}" type="button" data-relation="${escapeAttribute(item)}">${item}</button>`).join("")}</div>
-    <button class="primary-button" type="button" data-action="reclaim-complete" ${p.relation ? "" : "disabled"}>${tr("continue")}</button></section>`;
+    <button class="primary-button" type="button" data-action="reclaim-complete" ${p.relation ? "" : "disabled"}>${tr("continue")}</button>
+    ${reclaimIllustration(p.relation ? 3 : 2, lang, state.illustrationsEnabled, storyPanelOpen('reclaim-relationship'), 'reclaim-relationship')}</section>`;
   const relationIndex = relations[lang].indexOf(p.relation);
   const principles = lang === "en" ? ["You can hear the pull without letting it steer. You choose what leads.", "You can set this down without resolving it. You choose what leads.", "You can question a demand before giving it authority. You choose what leads.", "You do not have to decide this now. You choose what leads."] : ["Puedes escuchar el impulso sin dejar que dirija. Tú eliges qué guía.", "Puedes dejar esto por ahora sin resolverlo. Tú eliges qué guía.", "Puedes cuestionar una exigencia antes de darle autoridad. Tú eliges qué guía.", "No tienes que decidir esto ahora. Tú eliges qué guía."];
   return `<section class="practice-stage focused-stage"><div class="instrument-region reclaim-instrument small" aria-hidden="true"><span class="reclaim-line"></span><span class="reclaim-point"></span></div>
     ${renderMovementHeading(p.relation, principles[Math.max(0, relationIndex)])}
     <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button>
-    <button class="text-button" type="button" data-action="continue-embody">${lang === "en" ? "Continue with Embody" : "Continuar con Encarnar"}</button></section>`;
+    <button class="text-button" type="button" data-action="continue-embody">${lang === "en" ? "Continue with Embody" : "Continuar con Encarnar"}</button>
+    ${reclaimIllustration(4, lang, state.illustrationsEnabled, storyPanelOpen('reclaim-4'))}</section>`;
 }
 
 function currentCrossFocus() { return crossFocuses.find(item => item.id === state.practice.crossFocus) || crossFocuses[0]; }
@@ -2432,15 +2456,19 @@ function renderCrossMovement() {
       <button type="button" data-action="cross-remain" aria-pressed="${p.crossRemaining}" aria-describedby="cross-remain-hint">${lang === "en" ? "Remain with the question" : "Permanecer con la pregunta"}${p.crossRemaining ? `<small>${lang === "en" ? "Chosen for now" : "Elegido por ahora"}</small>` : ""}</button>
       <button type="button" data-action="cross-return-focus" aria-describedby="cross-return-hint">${lang === "en" ? "Return to focus choices" : "Volver a las opciones de enfoque"}</button>
     </div>${p.crossRemaining ? `<p class="consent-copy remaining-copy">${lang === "en" ? "Remaining with the question. Cross or return only if you choose." : "Te quedas con la pregunta. Cruza o vuelve solo si así lo eliges."}</p>` : ""}`}
+    ${p.crossRemaining ? `<button class="text-button" type="button" data-action="cross-finish-remaining">${phrase('Finish here with the question', 'Terminar aquí con la pregunta')}</button>` : ''}
+    ${(p.stage === 'crossed' || p.crossRemaining) ? crossReturnIllustration(lang, state.illustrationsEnabled, storyPanelOpen('cross-return')) : ''}
   </section>`;
-  if (p.stage === "close") return `<section class="practice-stage focused-stage"><div class="doorway-instrument cross-door open" aria-hidden="true"><span>│</span></div><p class="eyebrow">${lang === "en" ? "RETURN" : "REGRESO"}</p>
+  if (p.stage === "close") return `<section class="practice-stage focused-stage"><div class="doorway-instrument cross-door ${p.crossCrossed ? 'open' : ''}" aria-hidden="true"><span>│</span></div><p class="eyebrow">${lang === "en" ? "RETURN" : "REGRESO"}</p>
     ${renderMovementHeading(lang === "en" ? "Take only what feels useful." : "Quédate solo con lo que sea útil.", lang === "en" ? "Keep the question, or leave it here." : "Guarda la pregunta o déjala aquí.")}
-    <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button></section>`;
+    <button class="primary-button" type="button" data-action="complete-movement">${lang === "en" ? "Return to practice menu" : "Volver al menú de prácticas"}</button>
+    ${crossReturnIllustration(lang, state.illustrationsEnabled, storyPanelOpen('cross-return'))}</section>`;
   return `<section class="practice-stage focused-stage">${renderMovementHeading(lang === "en" ? "Choose a focus" : "Elige un enfoque", lang === "en" ? "Choose what feels closest." : "Elige lo que se sienta más cercano.")}
     <div class="cross-focus-grid">${(p.crossExpanded ? crossFocuses : crossFocuses.slice(0, 6)).map(item => `<button class="cross-focus-choice ${item.id === focus.id ? "selected" : ""}" type="button" data-cross-focus="${item.id}" aria-pressed="${item.id === focus.id}"><span>${item.glyph}</span><strong>${item[lang][0]}</strong><small>${item[lang][1]}</small></button>`).join("")}</div>
     <button class="text-button" type="button" data-action="toggle-cross-more">${p.crossExpanded ? (lang === "en" ? "Show six core doors" : "Mostrar seis puertas principales") : (lang === "en" ? "More doors" : "Más puertas")}</button>
     ${readJSON(STORAGE.crossMarks, []).length ? `<button class="text-button" type="button" data-action="return-saved-cross">${lang === "en" ? "Return to saved question" : "Volver a una pregunta guardada"}</button>` : ""}
     <button class="primary-button" type="button" data-action="open-cross-question">${lang === "en" ? `Open the ${focus.en[0]} question` : `Abrir la pregunta de ${focus.es[0]}`}</button>
+    ${p.crossReturnAvailable ? crossReturnIllustration(lang, state.illustrationsEnabled, storyPanelOpen('cross-return')) : capacityArrivalIllustration('cross', lang, state.illustrationsEnabled, storyPanelOpen('cross-arrival'))}
   </section>`;
 }
 
@@ -2453,6 +2481,7 @@ function renderEmbodyMovement() {
     <div class="tone-field compact" style="color:${tone.color}" aria-hidden="true"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div>
     ${renderMovementHeading(lang === "en" ? `Return to ${tone.en}?` : `¿Volver a ${tone.es}?`, lang === "en" ? "This was your last held tone. It is offered as a memory, not a recommendation." : "Este fue tu último tono guardado. Se ofrece como recuerdo, no como recomendación.")}
     <div class="practice-actions"><button class="primary-button" type="button" data-action="use-remembered-tone">${lang === "en" ? "Use this tone" : "Usar este tono"}</button><button class="text-button" type="button" data-action="choose-fresh-tone">${lang === "en" ? "Choose fresh" : "Elegir de nuevo"}</button></div>
+    ${capacityArrivalIllustration('embody', lang, state.illustrationsEnabled, storyPanelOpen('embody-arrival'))}
   </section>`;
   if (p.embodyStage === "all") return `<section class="practice-stage">${renderMovementHeading(lang === "en" ? "Choose a tone" : "Elige un tono", lang === "en" ? "Choose the quality you want to practise." : "Elige la cualidad que quieres practicar.")}
     <div class="choice-grid">${tones.map(item => `<button class="choice" type="button" data-tone="${item.id}" data-select-tone="1">${item[lang]}</button>`).join("")}</div></section>`;
@@ -2480,7 +2509,8 @@ function renderEmbodyMovement() {
       : (lang === "en" ? "Begin without a prescribed tone." : "Empieza sin un tono preestablecido.");
   return `<section class="practice-stage focused-stage embody-stage"><div class="tone-field compact ${tone ? "" : "neutral"}" style="color:${toneColor}"><div class="tone-orb"></div><svg class="tone-wave" viewBox="0 300 1024 440" preserveAspectRatio="none" aria-hidden="true"><path class="tone-wave-main" d="M92 558 C154 558 210 414 306 386 C397 360 445 504 520 582 C593 658 662 674 742 596 C812 528 858 506 932 514"></path></svg></div><p class="eyebrow embody-selection-context">${selectionContext}</p><h1 class="practice-title" style="color:${toneColor}">${toneName}</h1>
     <div class="tone-carousel"><button class="icon-button" type="button" data-action="previous-tone" aria-label="${lang === "en" ? "Previous tone" : "Tono anterior"}">‹</button><button class="primary-button" type="button" data-action="enter-tone" ${tone ? "" : "disabled"}>${lang === "en" ? "Enter this tone" : "Entrar en este tono"}</button><button class="icon-button" type="button" data-action="next-tone" aria-label="${lang === "en" ? "Next tone" : "Tono siguiente"}">›</button></div>
-    <button class="text-button" type="button" data-action="show-all-tones">${lang === "en" ? "All tones" : "Todos los tonos"}</button></section>`;
+    <button class="text-button" type="button" data-action="show-all-tones">${lang === "en" ? "All tones" : "Todos los tonos"}</button>
+    ${capacityArrivalIllustration('embody', lang, state.illustrationsEnabled, storyPanelOpen('embody-arrival'))}</section>`;
 }
 
 function startMovement(id) {
@@ -2587,7 +2617,6 @@ function movementBack() {
   else if ((id === "discern" || id === "integrate") && p.capacityStep > 0) {
     p.capacityStep -= 1;
     p.selectedOption = p.capacityAnswers[p.capacityStep] || "";
-    p.storyExpanded = !p.selectedOption;
   } else if (id === "reclaim" && p.stage === "complete") p.stage = "relationship";
   else if (id === "reclaim" && p.stage === "relationship") p.stage = "pause";
   else if (id === "reclaim" && p.stage === "pause") p.stage = p.customPull ? "custom" : "authority";
@@ -3813,10 +3842,16 @@ function readAbout() {
 app.addEventListener('error', event => {
   if (event.target?.tagName !== 'IMG') return;
   const optionalStory = event.target.closest('.practice-story, .home-city-still');
-  if (optionalStory) optionalStory.hidden = true;
+  if (optionalStory) {
+    optionalStory.hidden = true;
+    optionalStory.closest('.practice-scene-layout')?.classList.remove('with-story');
+  }
 }, true);
 app.addEventListener('toggle', event => {
-  if (event.target?.matches('.practice-story') && state.view === 'movement') state.practice.storyExpanded = event.target.open;
+  if (event.target?.isConnected && event.target.matches('.practice-story[data-story-key]') && state.view === 'movement') {
+    state.practice.storyPanels ||= {};
+    state.practice.storyPanels[event.target.dataset.storyKey] = event.target.open;
+  }
 }, true);
 
 function followPublicLink(event) {
@@ -3834,6 +3869,14 @@ function followPublicLink(event) {
 }
 
 app.addEventListener("click", async event => {
+  const storyAnchor = event.target.closest('.story-practice-link, .story-return-link');
+  if (storyAnchor) {
+    event.preventDefault();
+    const target = document.querySelector(storyAnchor.getAttribute('href'));
+    target?.scrollIntoView({block: 'start', behavior: 'instant'});
+    target?.focus({preventScroll: true});
+    return;
+  }
   if(followPublicLink(event))return;
   const button = event.target.closest("button");
   if (!button) return;
@@ -3889,14 +3932,12 @@ app.addEventListener("click", async event => {
     const result = chooseIntegrate(state.practice.integrate, button.dataset.integrateGroup, button.dataset.integrateOption);
     if (result.limitReached) { announce(phrase('Choose up to two signals. Deselect one to choose another.', 'Elige hasta dos señales. Desmarca una para elegir otra.')); return; }
     state.practice.integrate = result.value;
-    state.practice.storyExpanded = false;
     render();
     document.getElementById(`integrate-${button.dataset.integrateOption}`)?.focus({preventScroll: true});
     return;
   }
   if (button.dataset.capacityOption !== undefined) {
     state.practice.selectedOption = button.dataset.capacityOption;
-    state.practice.storyExpanded = false;
     render();
     document.querySelector('[data-action="capacity-continue"]')?.focus({preventScroll: true});
     return;
@@ -4050,14 +4091,14 @@ app.addEventListener("click", async event => {
     const p = state.practice;
     if (!integrateStepValid(p.integrate, p.capacityStep)) return;
     sound.stopVoice();
-    if (p.capacityStep < 2) { p.capacityStep += 1; p.storyExpanded = true; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
+    if (p.capacityStep < 2) { p.capacityStep += 1; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
     else if (integratePayload(p.integrate)) requestMovementCompletion();
     return;
   }
   if (action === "capacity-continue") {
     const flow = capacityFlows[state.practice.movement];
     state.practice.capacityAnswers[state.practice.capacityStep] = state.practice.selectedOption;
-    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; state.practice.storyExpanded = true; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
+    if (state.practice.capacityStep < flow.length - 1) { state.practice.capacityStep += 1; state.practice.selectedOption = state.practice.capacityAnswers[state.practice.capacityStep] || ""; render(); focusCurrentView(); window.scrollTo({top: 0, behavior: 'instant'}); }
     else requestMovementCompletion();
   }
   if (action === 'listen-integrate-guidance' && state.practice.movement === 'integrate' && state.practice.capacityStep === 1) {
@@ -4097,6 +4138,7 @@ app.addEventListener("click", async event => {
     state.practice.crossSaved = crossQuestionIsSaved();
     state.practice.crossCrossed = false;
     state.practice.crossRemaining = false;
+    state.practice.crossReturnAvailable = false;
     state.practice.stage = "question";
     sound.threshold().catch(() => {});
     render();
@@ -4124,8 +4166,16 @@ app.addEventListener("click", async event => {
   if (action === "cross-return-focus") {
     state.practice.crossCrossed = false;
     state.practice.crossRemaining = false;
+    state.practice.crossReturnAvailable = true;
     state.practice.stage = "choose";
     render();
+  }
+  if (action === 'cross-finish-remaining' && state.practice.crossRemaining) {
+    stopPracticeTimers();
+    state.practice.stage = 'close';
+    render();
+    focusCurrentView();
+    window.scrollTo({top: 0, behavior: 'instant'});
   }
   if (action === "return-saved-cross") {
     const saved = readJSON(STORAGE.crossMarks, [])[0];
