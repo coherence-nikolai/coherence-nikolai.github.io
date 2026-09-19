@@ -27,5 +27,8 @@ assert.equal(calls.find(x=>x[0]==='intoView')[1].block,'start');
 assert(app.includes('state.comicZoom === 1 && !event.target.matches'));
 assert(app.includes('state.view !== "comicReader" || state.comicZoom > 1'));
 assert(css.includes('width: calc(100% * var(--comic-zoom, 1))'));
+// A working zoom state alone is insufficient: the shared image reset formerly
+// clamped the actual artwork to 100%. Keep the reader override more specific.
+assert(css.includes('.comic-page-stage .comic-page-image {'), 'Reader zoom must outrank the shared .coherence-page img reset.');
 assert(css.includes('overflow: auto; touch-action: pan-x pan-y pinch-zoom'));
 console.log('Comic zoom logic passes: valid ranges, reset, screen guard, swipe/keyboard guards and scrollable art dimensions. Browser visual checks remain separate.');
